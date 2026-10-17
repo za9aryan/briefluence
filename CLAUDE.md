@@ -13,6 +13,11 @@
 9. UI text goes through next-intl in **all three languages (en, ru, hy)**. Never hard-code UI strings.
 10. Small commits with clear messages; keep `README.md` current.
 
+## Data safety
+
+- Never wipe or reseed the developer's database (`pnpm db:seed` / `db:reset-demo`) without asking first; take `pnpm db:backup` before risky operations.
+- E2E tests run on `briefluence_e2e` via their own servers; API tests on `briefluence_test`. Do not point tests at `briefluence`.
+
 ## Frontend rules
 
 - Build screens only from the design system in `packages/ui` (Block, Stack, Grid, Container, Heading, Text, Icon, Button, Card, Badge, Field…). Add new primitives there, not ad hoc in pages.

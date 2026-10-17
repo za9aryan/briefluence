@@ -23,7 +23,7 @@ docker compose up -d            # postgres + redis + mailpit
 pnpm db:local                   # or: embedded PostgreSQL 16 without Docker (keeps running)
 
 pnpm db:migrate                 # apply migrations
-pnpm db:seed                    # demo data (wipes the dev database)
+pnpm db:seed                    # demo data — only on an empty/demo database (see below)
 pnpm dev                        # web on :3000, API on :4000
 ```
 
@@ -42,6 +42,17 @@ pnpm dev                        # web on :3000, API on :4000
 | Admin | admin@briefluence.local | Admin12345 (from `.env`) |
 | Brand | brand1…brand5@briefluence.local | Password123 |
 | Blogger | influencer1…influencer30@briefluence.local | Password123 (1–24 verified, 25–27 in review, 28–30 draft) |
+
+## Your data is safe
+
+- `pnpm db:seed` **refuses** to run when the database has real accounts (anything not `…@briefluence.local`).
+  To deliberately start over with demo data: `pnpm db:reset-demo` — it saves a backup first.
+- `pnpm db:backup [file]` saves the whole database to `backups/…json` (no pg_dump needed; works locally,
+  in Docker and on Render). `pnpm db:restore <file> --yes` puts it back (replaces current data; run
+  `pnpm db:migrate` first if the schema changed).
+- Migrations never drop your data without copying it first.
+- Browser E2E tests use their own servers (:4100 / :3100) and database `briefluence_e2e`; API tests use
+  `briefluence_test`. Neither touches your dev database.
 
 ## Admin access
 

@@ -16,7 +16,10 @@
     "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "tsx prisma/seed.ts",
     "prisma:reset": "prisma migrate reset --force",
-    "admin:create": "tsx prisma/create-admin.ts"
+    "admin:create": "tsx prisma/create-admin.ts",
+    "prisma:backup": "tsx prisma/backup.ts",
+    "prisma:restore": "tsx prisma/restore.ts",
+    "prisma:reset-demo": "tsx prisma/backup.ts && SEED_RESET=1 tsx prisma/seed.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

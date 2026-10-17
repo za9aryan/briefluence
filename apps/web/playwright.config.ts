@@ -1,9 +1,33 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * End-to-end tests against a running stack (API on :4000 with SOCIAL_MOCK=true and
- * PAYMENT_PROVIDER=mock, web on :3000). Locally the dev servers are reused; in CI they are started.
+ * End-to-end tests run against their OWN servers and database, never your dev data:
+ *   API on :4100 and web on :3100, database `briefluence_e2e` (created/migrated automatically).
+ * Your dev servers (:4000 / :3000) and the `briefluence` database are not touched.
  */
+const E2E_DB = process.env.E2E_DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/briefluence_e2e';
+const API_PORT = 4100;
+const WEB_PORT = 3100;
+const WEB = `http://localhost:${WEB_PORT}`;
+
+const apiEnv = {
+  NODE_ENV: 'development',
+  DATABASE_URL: E2E_DB,
+  API_PORT: String(API_PORT),
+  API_URL: `http://localhost:${API_PORT}`,
+  WEB_URL: WEB,
+  CORS_ORIGINS: WEB,
+  PROCESS_ROLE: 'all',
+  REDIS_URL: '',
+  SOCIAL_MOCK: 'true',
+  PAYMENT_PROVIDER: 'mock',
+  EMAIL_TRANSPORT: 'log',
+  STORAGE_DRIVER: 'local',
+  RATES_SOURCE: 'static',
+  ADMIN_EMAIL: 'admin@briefluence.local',
+  ADMIN_PASSWORD: 'Admin12345',
+};
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
@@ -13,7 +37,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
-    baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:3000',
+    baseURL: WEB,
     locale: 'en-GB',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
@@ -21,18 +45,21 @@ export default defineConfig({
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: [
     {
-      command: 'pnpm --filter @briefluence/api start',
-      url: 'http://localhost:4000/api/v1/health',
-      reuseExistingServer: true,
-      cwd: '../..',
-      timeout: 120_000,
+      // Migrate the E2E database, ensure the admin exists, start the built API.
+      command: 'npx prisma migrate deploy && npx tsx prisma/create-admin.ts && node dist/main.js',
+      cwd: '../api',
+      url: `http://localhost:${API_PORT}/api/v1/health`,
+      env: apiEnv,
+      reuseExistingServer: !process.env.CI,
+      timeout: 180_000,
     },
     {
-      command: 'pnpm --filter @briefluence/web start',
-      url: 'http://localhost:3000',
-      reuseExistingServer: true,
-      cwd: '../..',
-      timeout: 120_000,
+      // Production build in its own folder so it never clashes with `next dev`.
+      command: `pnpm exec next build && pnpm exec next start --port ${WEB_PORT}`,
+      url: WEB,
+      env: { NEXT_DIST_DIR: '.next-e2e', API_INTERNAL_URL: `http://localhost:${API_PORT}`, NEXT_TELEMETRY_DISABLED: '1' },
+      reuseExistingServer: !process.env.CI,
+      timeout: 300_000,
     },
   ],
 });

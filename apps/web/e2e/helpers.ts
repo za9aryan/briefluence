@@ -33,10 +33,6 @@ export async function emailLink(to: string, path: 'verify-email' | 'reset-passwo
   return found!;
 }
 
-export async function setEnglish(page: Page) {
-  await page.context().addCookies([{ name: 'NEXT_LOCALE', value: 'en', url: page.url().startsWith('http') ? page.url() : 'http://localhost:3000' }]);
-}
-
 export async function signupViaUi(page: Page, role: 'BRAND' | 'INFLUENCER', email: string) {
   await page.goto(`/signup?role=${role}`);
   await page.getByLabel('Email').fill(email);

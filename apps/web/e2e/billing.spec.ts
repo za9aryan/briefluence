@@ -3,10 +3,10 @@ import { adminRequest, signupViaUi, uid } from './helpers';
 
 test.use({ storageState: { cookies: [{ name: 'NEXT_LOCALE', value: 'en', domain: 'localhost', path: '/', expires: -1, httpOnly: false, secure: false, sameSite: 'Lax' }], origins: [] } });
 
-test('trial → pay → renew with the saved card', async ({ page, playwright }) => {
+test('trial → pay → renew with the saved card', async ({ page, playwright, baseURL }) => {
   const id = uid();
   const email = `trial-${id}@e2e.test`;
-  const adminCtx = await playwright.request.newContext({ baseURL: 'http://localhost:3000' });
+  const adminCtx = await playwright.request.newContext({ baseURL });
   const admin = await adminRequest(adminCtx);
 
   try {

@@ -8,6 +8,8 @@ const apiOrigin =
   (process.env.API_INTERNAL_HOSTPORT ? `http://${process.env.API_INTERNAL_HOSTPORT}` : 'http://localhost:4000');
 
 const nextConfig: NextConfig = {
+  // Separate build folder for the isolated E2E server (see playwright.config.ts).
+  distDir: process.env.NEXT_DIST_DIR ?? '.next',
   transpilePackages: ['@briefluence/ui', '@briefluence/shared'],
   poweredByHeader: false,
   // Dev only: let the dev server answer through HTTPS tunnels used for real OAuth testing

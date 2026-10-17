@@ -17,7 +17,10 @@
     "db:seed": "pnpm --filter @briefluence/api prisma:seed",
     "e2e": "pnpm --filter @briefluence/web e2e",
     "prepare": "husky || true",
-    "admin:create": "pnpm --filter @briefluence/api admin:create"
+    "admin:create": "pnpm --filter @briefluence/api admin:create",
+    "db:backup": "pnpm --filter @briefluence/api prisma:backup",
+    "db:restore": "pnpm --filter @briefluence/api prisma:restore",
+    "db:reset-demo": "pnpm --filter @briefluence/api prisma:reset-demo"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",

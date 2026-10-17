@@ -7,7 +7,7 @@ import { resolve } from 'node:path';
 
 const port = Number(process.env.LOCAL_DB_PORT ?? 5432);
 const databaseDir = resolve(process.cwd(), '.local-db/data');
-const databases = (process.env.LOCAL_DB_NAMES ?? 'briefluence,briefluence_test').split(',');
+const databases = (process.env.LOCAL_DB_NAMES ?? 'briefluence,briefluence_test,briefluence_e2e').split(',');
 
 const pg = new EmbeddedPostgres({
   databaseDir,

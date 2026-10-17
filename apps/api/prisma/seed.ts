@@ -66,7 +66,28 @@ async function wipe() {
   ]);
 }
 
+/**
+ * Refuses to wipe a database that holds real accounts (anything that is not a demo, test or the
+ * seeded admin user) unless SEED_RESET=1 is set — use `pnpm db:reset-demo`, which backs up first.
+ */
+async function guardRealData() {
+  if (process.env.SEED_RESET === '1') return;
+  const real = await prisma.user.count({
+    where: {
+      NOT: [{ email: { endsWith: '@briefluence.local' } }, { email: { endsWith: '@e2e.test' } }, { email: env.ADMIN_EMAIL.toLowerCase() }],
+    },
+  });
+  if (real > 0) {
+    console.error(
+      `Refusing to seed: the database has ${real} real account(s) and seeding wipes everything.\n` +
+        `To start over anyway: pnpm db:reset-demo   (makes a backup first)`,
+    );
+    process.exit(1);
+  }
+}
+
 async function main() {
+  await guardRealData();
   await wipe();
   const now = new Date();
   const hash = await argon2.hash(PASSWORD, { type: argon2.argon2id });
