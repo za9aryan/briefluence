@@ -1,5 +1,5 @@
 'use client';
-import { PAYMENT_TYPES, PLATFORMS } from '@briefluence/shared';
+import { COLLABORATION_TYPES, PAYMENT_TYPES, PLATFORMS } from '@briefluence/shared';
 import { BarList, ChartCard, ColumnChart, DonutChart, Grid, Skeleton, Stack, Stat, Tabs, Text, type ChartRow } from '@briefluence/ui';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
@@ -20,6 +20,7 @@ interface InsightsDto {
   niches: { key: string; count: number }[];
   cities: { key: string; count: number }[];
   paymentTypes: { key: string; count: number }[];
+  collaborationTypes: { key: string; count: number }[];
   budgetBuckets: { min: number; max: number | null; count: number }[];
   perDay: { date: string; count: number }[];
 }
@@ -110,6 +111,14 @@ export default function BrandInsightsPage() {
               );
             })()}
             {(() => {
+              const rows = byKey(d.collaborationTypes, COLLABORATION_TYPES, (k) => te(`collaboration.${k}`));
+              return (
+                <ChartCard title={t('collaboration.title')} subtitle={t('collaboration.subtitle')} valueLabel={t('searches')} labels={labels} format={n} rows={rows}>
+                  <DonutChart rows={rows} order={[...COLLABORATION_TYPES]} centerLabel={t('searches')} format={n} />
+                </ChartCard>
+              );
+            })()}
+            {(() => {
               const rows = d.niches.map((x) => ({ key: x.key, label: o.niche(x.key), value: x.count }));
               return (
                 <ChartCard title={t('niches.title')} subtitle={t('niches.subtitle')} valueLabel={t('searches')} labels={labels} format={n} rows={rows}>
@@ -144,7 +153,7 @@ export default function BrandInsightsPage() {
             {(() => {
               const rows = d.cities.map((x) => ({ key: x.key, label: x.key, value: x.count }));
               return (
-                <ChartCard title={t('cities.title')} subtitle={t('cities.subtitle')} valueLabel={t('searches')} labels={labels} format={n} rows={rows} className="lg:col-span-2">
+                <ChartCard title={t('cities.title')} subtitle={t('cities.subtitle')} valueLabel={t('searches')} labels={labels} format={n} rows={rows}>
                   <BarList rows={rows} format={n} />
                 </ChartCard>
               );

@@ -1,7 +1,6 @@
 'use client';
 import {
   Alert,
-  Avatar,
   Badge,
   Button,
   Card,
@@ -25,7 +24,8 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
-import { ApplicationStatusBadge } from '@/components/domain/badges';
+import { BrandAvatar, ConfidentialNote, isHiddenBrand, useBrandName } from '@/components/domain/BrandIdentity';
+import { ApplicationStatusBadge, CollaborationBadge } from '@/components/domain/badges';
 import { Compensation } from '@/components/domain/Compensation';
 import { ApplyModal } from '@/components/influencer/ApplyModal';
 import { BriefsChecklist } from '@/components/influencer/StartTrial';
@@ -42,6 +42,7 @@ export default function DealDetailPage() {
   const tc = useTranslations('common');
   const te = useTranslations('enums');
   const f = useFormat();
+  const brandName = useBrandName();
   const o = useOptions();
   const toast = useToast();
   const errorMessage = useErrorMessage();
@@ -93,7 +94,18 @@ export default function DealDetailPage() {
 
   return (
     <Stack gap={6}>
-      <PageHeader back={{ href: '/influencer/deals', label: t('backToFeed') }} title={d.title} />
+      <PageHeader
+        back={{ href: '/influencer/deals', label: t('backToFeed') }}
+        title={d.title}
+        description={
+          <span className="mt-1 inline-flex flex-wrap items-center gap-2">
+            <CollaborationBadge type={d.collaborationType} />
+            <span className="inline-flex items-center gap-1 text-small text-ink-muted">
+              <Icon name="eye" size="xs" /> {t('views', { count: d.viewCount })}
+            </span>
+          </span>
+        }
+      />
       <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
         <Stack gap={6} className="min-w-0">
           {d.imageUrl && <img src={d.imageUrl} alt="" className="aspect-[16/9] w-full rounded-card object-cover" />}
@@ -161,9 +173,9 @@ export default function DealDetailPage() {
 
           <Card>
             <Inline gap={2}>
-              <Avatar square name={d.brand.companyName} src={d.brand.logoUrl} />
+              <BrandAvatar brand={d.brand} />
               <Stack gap={0}>
-                <Text weight="bold">{d.brand.companyName}</Text>
+                <Text weight="bold">{brandName(d.brand)}</Text>
                 {d.brand.city && (
                   <Text size="small" tone="muted">
                     {d.brand.city}
@@ -171,6 +183,7 @@ export default function DealDetailPage() {
                 )}
               </Stack>
             </Inline>
+            {isHiddenBrand(d.brand) && <ConfidentialNote className="mt-4" />}
             {d.brand.description && (
               <Text size="small" tone="muted" className="mt-4" clamp={3}>
                 {d.brand.description}

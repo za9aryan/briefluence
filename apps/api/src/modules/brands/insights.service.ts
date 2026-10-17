@@ -28,14 +28,14 @@ export class InsightsService {
     const since = new Date(now.getTime() - days * 86_400_000);
     const where = { createdAt: { gte: since } };
 
-    const unnest = (column: 'platforms' | 'niches' | 'cities' | 'paymentTypes') =>
+    const unnest = (column: 'platforms' | 'niches' | 'cities' | 'paymentTypes' | 'collaborationTypes') =>
       this.prisma.$queryRaw<Row[]>`
         SELECT x::text AS key, count(*) AS count
         FROM "FeedSearch", unnest(${Prisma.raw(`"${column}"`)}) AS x
         WHERE "createdAt" >= ${since}
         GROUP BY 1 ORDER BY 2 DESC`;
 
-    const [total, bloggers, filtered, platforms, niches, cities, payments, perDay, budgets, verified] = await Promise.all([
+    const [total, bloggers, filtered, platforms, niches, cities, payments, perDay, budgets, verified, collaboration] = await Promise.all([
       this.prisma.feedSearch.count({ where }),
       this.prisma.feedSearch.findMany({ where, distinct: ['influencerId'], select: { influencerId: true } }),
       this.prisma.feedSearch.count({
@@ -46,6 +46,7 @@ export class InsightsService {
             { niches: { isEmpty: false } },
             { cities: { isEmpty: false } },
             { paymentTypes: { isEmpty: false } },
+            { collaborationTypes: { isEmpty: false } },
             { budgetMin: { not: null } },
           ],
         },
@@ -63,6 +64,7 @@ export class InsightsService {
         FROM "FeedSearch" WHERE "createdAt" >= ${since} AND "budgetMin" IS NOT NULL
         GROUP BY 1`,
       this.prisma.influencerProfile.count({ where: { status: 'APPROVED', user: { blockedAt: null } } }),
+      unnest('collaborationTypes'),
     ]);
 
     const list = (rows: Row[]) => rows.map((r) => ({ key: r.key, count: Number(r.count) }));
@@ -92,6 +94,7 @@ export class InsightsService {
       niches: list(niches),
       cities: list(cities).slice(0, 8),
       paymentTypes: list(payments),
+      collaborationTypes: list(collaboration),
       budgetBuckets,
       perDay: series,
     };

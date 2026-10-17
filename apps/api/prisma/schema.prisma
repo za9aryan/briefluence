@@ -46,6 +46,11 @@ enum PaymentType {
   MIXED
 }
 
+enum CollaborationType {
+  ONE_TIME
+  LONG_TERM
+}
+
 enum ContactMethod {
   TELEGRAM
   MESSENGER
@@ -211,42 +216,46 @@ model BrandProfile {
 }
 
 model Deal {
-  id                  String          @id @default(cuid())
+  id                  String            @id @default(cuid())
   brandId             String
-  brand               BrandProfile    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brand               BrandProfile      @relation(fields: [brandId], references: [id], onDelete: Cascade)
   title               String
   description         String
   imageUrl            String?
   platforms           Platform[]
   contentFormats      ContentFormat[]
   niches              String[]
+  collaborationType   CollaborationType @default(ONE_TIME) // spec+
+  isConfidential      Boolean           @default(false) // spec+: brand hidden from bloggers until accepted
+  viewCount           Int               @default(0) // spec+: unique blogger views per day
   countries           String[]
   cities              String[]
   languages           String[]
   minFollowers        Int?
   maxFollowers        Int?
   minEngagementRate   Float?
-  influencerGender    GenderFilter    @default(ANY)
+  influencerGender    GenderFilter      @default(ANY)
   influencerAgeMin    Int?
   influencerAgeMax    Int?
-  audienceGender      GenderFilter    @default(ANY) // majority gender of followers
+  audienceGender      GenderFilter      @default(ANY) // majority gender of followers
   audienceAgeMin      Int?
   audienceAgeMax      Int?
   audienceCountry     String? // main follower country
   paymentType         PaymentType
   budgetMin           Int? // minor units
   budgetMax           Int? // minor units
-  currency            Currency        @default(AMD)
+  currency            Currency          @default(AMD)
   barterDescription   String?
   barterValue         Int? // minor units
-  slots               Int             @default(1) // influencers needed
+  slots               Int               @default(1) // influencers needed
   applicationDeadline DateTime
   publishBy           DateTime?
-  status              DealStatus      @default(DRAFT)
+  status              DealStatus        @default(DRAFT)
   publishedAt         DateTime? // spec+: "new deals matching you" digest
-  createdAt           DateTime        @default(now())
-  updatedAt           DateTime        @default(now()) @updatedAt // spec+
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @default(now()) @updatedAt // spec+
   applications        Application[]
+  views               DealView[]
 
   @@index([status, applicationDeadline])
   @@index([brandId])
@@ -330,14 +339,15 @@ model Notification {
 // spec+: anonymous log of the filters bloggers use in the deal feed, aggregated for brand insights.
 // Only aggregates are ever exposed; never which blogger searched for what.
 model FeedSearch {
-  id           String        @id @default(cuid())
-  influencerId String
-  platforms    Platform[]
-  niches       String[]
-  cities       String[]
-  paymentTypes PaymentType[]
-  budgetMin    Int? // minor units, AMD
-  createdAt    DateTime      @default(now())
+  id                 String              @id @default(cuid())
+  influencerId       String
+  platforms          Platform[]
+  niches             String[]
+  cities             String[]
+  paymentTypes       PaymentType[]
+  collaborationTypes CollaborationType[]
+  budgetMin          Int? // minor units, AMD
+  createdAt          DateTime            @default(now())
 
   @@index([createdAt])
   @@index([influencerId, createdAt])
@@ -349,4 +359,17 @@ model ExchangeRate {
   amdPerUnit Float
   source     String // "cba" | "open.er-api" | "fallback"
   fetchedAt  DateTime
+}
+
+// spec+: a blogger opened a brief (counted once per blogger per day, Yerevan time).
+model DealView {
+  id           String   @id @default(cuid())
+  dealId       String
+  deal         Deal     @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  influencerId String
+  day          String // YYYY-MM-DD in Asia/Yerevan
+  createdAt    DateTime @default(now())
+
+  @@unique([dealId, influencerId, day])
+  @@index([dealId, createdAt])
 }

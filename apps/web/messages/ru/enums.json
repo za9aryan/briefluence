@@ -126,5 +126,9 @@
     "WHATSAPP": "WhatsApp",
     "INSTAGRAM": "Instagram",
     "PHONE": "Телефон"
+  },
+  "collaboration": {
+    "ONE_TIME": "Разовое",
+    "LONG_TERM": "Долгосрочное"
   }
 }

@@ -1,6 +1,7 @@
 'use client';
 import {
   AUDIENCE_SIZE_PRESETS,
+  COLLABORATION_TYPES,
   CURRENCIES,
   CURRENCY_SYMBOL,
   INFLUENCER_AGE_RANGE,
@@ -24,6 +25,7 @@ import {
   Slider,
   Stack,
   Stepper,
+  Switch,
   Text,
   Textarea,
 } from '@briefluence/ui';
@@ -50,7 +52,7 @@ const resolver: Resolver<DealFormValues> = async (values) => {
 };
 
 const STEP_FIELDS: Path<DealFormValues>[][] = [
-  ['title', 'description', 'platforms', 'contentFormats', 'niches', 'imageUrl'],
+  ['title', 'description', 'platforms', 'contentFormats', 'niches', 'imageUrl', 'collaborationType', 'isConfidential'],
   ['countries', 'cities', 'minFollowers', 'maxFollowers', 'influencerAgeMax', 'audienceAgeMax', 'languages'],
   ['paymentType', 'budgetMin', 'budgetMax', 'barterDescription', 'barterValue', 'slots', 'applicationDeadline', 'publishBy'],
   [],
@@ -173,6 +175,31 @@ export function DealWizard({
                   <Field label={t('fields.niches')} aside={tc('optional')}>
                     {() => <ChipGroup multiple options={o.niches} value={(field.value ?? []) as string[]} onChange={field.onChange} />}
                   </Field>
+                )}
+              />
+              <Controller
+                control={form.control}
+                name="collaborationType"
+                render={({ field }) => (
+                  <Field label={t('fields.collaboration')} hint={t('fields.collaborationHint')}>
+                    {() => (
+                      <ChipGroup
+                        options={COLLABORATION_TYPES.map((c) => ({ value: c, label: te(`collaboration.${c}`), icon: c === 'LONG_TERM' ? ('repeat' as const) : ('clock' as const) }))}
+                        value={field.value ?? 'ONE_TIME'}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+              {/* Confidential brief: brand hidden from bloggers until it accepts them. */}
+              <Controller
+                control={form.control}
+                name="isConfidential"
+                render={({ field }) => (
+                  <div className="rounded-card border border-line p-4">
+                    <Switch checked={!!field.value} onChange={field.onChange} label={t('fields.confidential')} description={t('fields.confidentialHint')} />
+                  </div>
                 )}
               />
             </Stack>
@@ -416,6 +443,8 @@ export function DealWizard({
                   { label: t('fields.countries'), value: [v.countries.map(o.country).join(', '), (v.cities ?? []).join(', ')].filter(Boolean).join(' · ') },
                   { label: t('targeting.size'), value: range(v.minFollowers, v.maxFollowers, f.compact) },
                   { label: t('fields.bloggerAge'), value: range(v.influencerAgeMin, v.influencerAgeMax) },
+                  { label: t('fields.collaboration'), value: te(`collaboration.${v.collaborationType ?? 'ONE_TIME'}`) },
+                  { label: t('fields.confidentialShort'), value: v.isConfidential ? t('fields.confidentialOn') : t('fields.confidentialOff') },
                   { label: t('fields.paymentType'), value: te(`paymentType.${v.paymentType}`) },
                   ...(money ? [{ label: t('compensation.money'), value: range(v.budgetMin, v.budgetMax, (n) => f.money(n * 100, v.currency ?? 'AMD')) }] : []),
                   ...(barter ? [{ label: t('compensation.barter'), value: v.barterDescription || '—' }] : []),

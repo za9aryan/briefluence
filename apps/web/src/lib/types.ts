@@ -1,5 +1,6 @@
 import type {
   ApplicationStatus,
+  CollaborationType,
   ContactMethod,
   ContentFormat,
   Currency,
@@ -65,9 +66,10 @@ export interface BrandProfileDto {
   contactValue: string | null;
 }
 
+/** Brand as a blogger sees it; id / name are null on a confidential brief until acceptance. */
 export interface BrandCardDto {
-  id: string;
-  companyName: string;
+  id: string | null;
+  companyName: string | null;
   logoUrl: string | null;
   website?: string | null;
   instagramUrl?: string | null;
@@ -85,6 +87,9 @@ export interface DealDto {
   platforms: Platform[];
   contentFormats: ContentFormat[];
   niches: string[];
+  collaborationType: CollaborationType;
+  isConfidential: boolean;
+  viewCount: number;
   countries: string[];
   cities: string[];
   languages: string[];
@@ -150,7 +155,7 @@ export interface ApplicationDto {
 export interface MyApplicationDto extends ApplicationDto {
   deal: Pick<
     DealDto,
-    'id' | 'title' | 'status' | 'platforms' | 'paymentType' | 'budgetMin' | 'budgetMax' | 'currency' | 'barterDescription' | 'applicationDeadline' | 'publishBy'
+    'id' | 'title' | 'status' | 'platforms' | 'paymentType' | 'budgetMin' | 'budgetMax' | 'currency' | 'barterDescription' | 'applicationDeadline' | 'publishBy' | 'collaborationType' | 'isConfidential'
   > & { brand: BrandCardDto };
   brandContact: { name: string | null; position: string | null; method: ContactMethod | null; value: string | null } | null;
 }
@@ -173,7 +178,7 @@ export interface ApplicantDto {
 }
 
 export interface ApplicantsDto {
-  deal: { id: string; title: string; status: DealStatus; slots: number; filled: number; currency: Currency };
+  deal: { id: string; title: string; status: DealStatus; slots: number; filled: number; currency: Currency; viewCount: number; isConfidential: boolean };
   items: ApplicantDto[];
   total: number;
   page: number;

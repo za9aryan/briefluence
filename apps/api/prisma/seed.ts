@@ -51,6 +51,7 @@ function audience(platform: Platform) {
 
 async function wipe() {
   await prisma.$transaction([
+    prisma.dealView.deleteMany(),
     prisma.feedSearch.deleteMany(),
     prisma.notification.deleteMany(),
     prisma.payment.deleteMany(),
@@ -228,6 +229,9 @@ async function main() {
           platforms,
           contentFormats: pickSome<ContentFormat>(CONTENT_FORMATS, 1, 2),
           niches: pickSome(NICHES, 0, 2),
+          collaborationType: faker.helpers.weightedArrayElement([{ weight: 3, value: 'ONE_TIME' }, { weight: 2, value: 'LONG_TERM' }] as const),
+          // A few briefs keep the brand private (revealed only to accepted bloggers).
+          isConfidential: i % 6 === 2,
           countries: ['AM'],
           cities: i % 4 === 0 ? ['Yerevan'] : [],
           languages: pickSome(['hy', 'ru', 'en'], 0, 2),
@@ -314,6 +318,11 @@ async function main() {
         ]) as Platform[],
         niches: faker.datatype.boolean(0.7) ? pickSome(p.niches.length ? p.niches : NICHES, 1, 2) : [],
         cities: faker.datatype.boolean(0.4) ? [faker.helpers.weightedArrayElement([{ weight: 6, value: 'Yerevan' }, { weight: 1, value: 'Gyumri' }, { weight: 1, value: 'Vanadzor' }, { weight: 1, value: 'Dilijan' }])] : [],
+        collaborationTypes: faker.helpers.weightedArrayElement([
+          { weight: 3, value: ['LONG_TERM'] },
+          { weight: 2, value: ['ONE_TIME'] },
+          { weight: 5, value: [] },
+        ]) as ('ONE_TIME' | 'LONG_TERM')[],
         paymentTypes: faker.helpers.weightedArrayElement([
           { weight: 4, value: ['MONEY'] },
           { weight: 3, value: ['BARTER'] },
@@ -327,7 +336,22 @@ async function main() {
   }
   await prisma.feedSearch.createMany({ data: searches });
 
-  console.log(`Seeded: 1 admin, ${brands.length} brands, ${influencers.length} influencers, ${deals.length} deals, ${count} applications, ${searches.length} feed searches`);
+  // ─── Brief views (one per blogger per day) ──────────────
+  let viewTotal = 0;
+  for (const deal of deals.filter((d) => d.status !== 'DRAFT')) {
+    const rows = new Map<string, { dealId: string; influencerId: string; day: string }>();
+    const n = faker.number.int({ min: 5, max: 90 });
+    for (let k = 0; k < n; k++) {
+      const p = faker.helpers.arrayElement(searchers);
+      const day = addDays(now, -faker.number.int({ min: 0, max: 14 })).toISOString().slice(0, 10);
+      rows.set(`${p.id}|${day}`, { dealId: deal.id, influencerId: p.id, day });
+    }
+    await prisma.dealView.createMany({ data: [...rows.values()] });
+    await prisma.deal.update({ where: { id: deal.id }, data: { viewCount: rows.size } });
+    viewTotal += rows.size;
+  }
+
+  console.log(`Seeded: 1 admin, ${brands.length} brands, ${influencers.length} influencers, ${deals.length} deals, ${count} applications, ${searches.length} feed searches, ${viewTotal} brief views`);
   console.log(`Logins: ${env.ADMIN_EMAIL} / ${env.ADMIN_PASSWORD}; brand1@briefluence.local / ${PASSWORD}; influencer1@briefluence.local / ${PASSWORD}`);
 }
 

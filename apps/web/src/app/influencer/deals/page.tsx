@@ -1,5 +1,5 @@
 'use client';
-import type { FeedQuery, PaymentType, Platform } from '@briefluence/shared';
+import type { CollaborationType, FeedQuery, PaymentType, Platform } from '@briefluence/shared';
 import { CURRENCY_SYMBOL, toMinor } from '@briefluence/shared';
 import {
   Button,
@@ -36,10 +36,11 @@ type Filters = {
   niche: string[];
   city: string;
   paymentType: PaymentType[];
+  collaboration: CollaborationType[];
   budgetMin: string;
   sort: FeedQuery['sort'];
 };
-const EMPTY: Filters = { platform: [], niche: [], city: '', paymentType: [], budgetMin: '', sort: 'match' };
+const EMPTY: Filters = { platform: [], niche: [], city: '', paymentType: [], collaboration: [], budgetMin: '', sort: 'match' };
 type Saved = { name: string; query: Partial<Filters> };
 
 /** One horizontal row of filters above the results; wraps onto more lines on narrow screens. */
@@ -50,11 +51,12 @@ function FilterBar({ value, onChange }: { value: Filters; onChange: (f: Filters)
   const o = useOptions();
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) => onChange({ ...value, [k]: v });
   const pill = 'h-11 rounded-pill w-auto';
-  const active = value.platform.length + value.niche.length + value.paymentType.length + (value.city ? 1 : 0) + (value.budgetMin ? 1 : 0);
+  const active = value.platform.length + value.niche.length + value.paymentType.length + value.collaboration.length + (value.city ? 1 : 0) + (value.budgetMin ? 1 : 0);
   return (
     <div role="toolbar" aria-label={tc('filters')} className="flex flex-wrap items-center gap-2">
       <FilterDropdown label={t('filters.platform')} options={o.platforms} value={value.platform} onChange={(v) => set('platform', v)} clearLabel={tc('clear')} />
       <FilterDropdown label={t('filters.payment')} options={o.paymentTypes} value={value.paymentType} onChange={(v) => set('paymentType', v)} clearLabel={tc('clear')} />
+      <FilterDropdown label={t('filters.collaboration')} options={o.collaboration} value={value.collaboration} onChange={(v) => set('collaboration', v)} clearLabel={tc('clear')} />
       <FilterDropdown label={t('filters.niche')} options={o.niches} value={value.niche} onChange={(v) => set('niche', v)} clearLabel={tc('clear')} />
       <Select
         aria-label={t('filters.city')}
@@ -128,6 +130,7 @@ export default function DealFeedPage() {
     niche: filters.niche,
     city: filters.city ? [filters.city] : undefined,
     paymentType: filters.paymentType,
+    collaboration: filters.collaboration,
     // Entered in the viewer's currency (major units); the API converts it for each deal's currency.
     budgetMin: filters.budgetMin ? toMinor(Number(filters.budgetMin)) : undefined,
     budgetCurrency: filters.budgetMin ? currency : undefined,
@@ -145,7 +148,7 @@ export default function DealFeedPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['influencer', 'me'] }),
   });
 
-  const activeCount = filters.platform.length + filters.niche.length + filters.paymentType.length + (filters.city ? 1 : 0) + (filters.budgetMin ? 1 : 0);
+  const activeCount = filters.platform.length + filters.niche.length + filters.paymentType.length + filters.collaboration.length + (filters.city ? 1 : 0) + (filters.budgetMin ? 1 : 0);
 
   return (
     <Stack gap={6}>

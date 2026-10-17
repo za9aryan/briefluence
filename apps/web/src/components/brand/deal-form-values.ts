@@ -30,6 +30,8 @@ export function defaultDealValues(): DealFormValues {
     platforms: ['INSTAGRAM'],
     contentFormats: [],
     niches: [],
+    collaborationType: 'ONE_TIME',
+    isConfidential: false,
     countries: [DEFAULT_COUNTRY],
     cities: [],
     languages: [],

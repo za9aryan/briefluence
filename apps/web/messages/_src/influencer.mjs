@@ -149,6 +149,20 @@ export default {
       '{count, plural, =0 {пока нет откликов} one {# отклик} few {# отклика} many {# откликов} other {# отклика}}',
       '{count, plural, =0 {դեռ դիմորդներ չկան} one {# դիմորդ} other {# դիմորդ}}',
     ],
+    confidential: {
+      name: ['Confidential brand', 'Бренд скрыт', 'Գաղտնի բրենդ'],
+      note: [
+        "The brand keeps its name private for business reasons. You'll see who it is once they accept you.",
+        'Бренд пока не раскрывает название по бизнес-причинам. Ты узнаешь, кто это, когда тебя примут.',
+        'Բրենդն առայժմ չի բացահայտում անունը բիզնես նկատառումներով։ Կիմանաս, թե ով է, երբ քեզ ընդունեն։',
+      ],
+    },
+    views: [
+      '{count, plural, one {# view} other {# views}}',
+      '{count, plural, one {# просмотр} few {# просмотра} many {# просмотров} other {# просмотра}}',
+      '{count, plural, one {# դիտում} other {# դիտում}}',
+    ],
+    viewsHint: ['How many bloggers opened this brief', 'Сколько блогеров открыли бриф', 'Քանի բլոգեր է բացել այս բրիֆը'],
     feedTitle: ['Briefs for you', 'Брифы для тебя', 'Բրիֆներ քեզ համար'],
     feedLead: [
       'Only briefs you qualify for, best matches first.',
@@ -160,6 +174,7 @@ export default {
       payment: ['Payment', 'Оплата', 'Վճարում'],
       niche: ['Niche', 'Ниша', 'Նիշա'],
       city: ['City', 'Город', 'Քաղաք'],
+      collaboration: ['Collaboration', 'Сотрудничество', 'Համագործակցություն'],
       budgetMin: ['Minimum budget', 'Минимальный бюджет', 'Նվազագույն բյուջե'],
       budgetHint: ['In AMD, per blogger.', 'В драмах, на одного блогера.', 'Դրամով, մեկ բլոգերի համար։'],
     },

@@ -1,6 +1,7 @@
 'use client';
 import {
   CITIES,
+  COLLABORATION_TYPES,
   CONTENT_FORMATS,
   COUNTRIES,
   GENDERS,
@@ -28,6 +29,7 @@ export function useOptions() {
       countries.flatMap((c) => (CITIES[c as Country] ?? []).map((city) => ({ value: city, label: city }))),
     formats: CONTENT_FORMATS.map((f) => ({ value: f, label: t(`contentFormat.${f}`) })),
     paymentTypes: PAYMENT_TYPES.map((p) => ({ value: p, label: t(`paymentType.${p}`) })),
+    collaboration: COLLABORATION_TYPES.map((c) => ({ value: c, label: t(`collaboration.${c}`), icon: (c === 'LONG_TERM' ? 'repeat' : 'clock') as IconName })),
     genders: GENDERS.map((g) => ({ value: g, label: t(`gender.${g}`) })),
     country: (c: string) => (t.has(`country.${c}`) ? t(`country.${c}`) : c),
     niche: (n: string) => (t.has(`niche.${n}`) ? t(`niche.${n}`) : n),

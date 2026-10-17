@@ -21,6 +21,9 @@ import { EmailService } from '../notifications/email.service';
 import { DIGEST, renderDigestEmail } from '../notifications/emails/templates';
 
 const INTL = { en: 'en-GB', ru: 'ru-RU', hy: 'hy-AM' } as const;
+/** Brief line for digests: confidential briefs never show the brand name. */
+const digestLine = (d: { title: string; isConfidential: boolean; brand: { companyName: string } }) =>
+  d.isConfidential ? d.title : `${d.brand.companyName}: ${d.title}`;
 const localeOf = (v: string | null | undefined): NotificationLocale => (isNotificationLocale(v) ? v : 'en');
 import { NotificationsService } from '../notifications/notifications.service';
 import { SocialService } from '../social/social.service';
@@ -140,7 +143,7 @@ export class JobsService {
       if (!matching.length) continue;
       sent++;
       await this.notifications.notify(p.userId, 'NEW_MATCHING_DEALS', {
-        params: { count: matching.length, list: matching.slice(0, 3).map((d) => `${d.brand.companyName}: ${d.title}`).join('\n') },
+        params: { count: matching.length, list: matching.slice(0, 3).map(digestLine).join('\n') },
         link: '/influencer/deals',
       });
       if (p.user.digestEmails) {
@@ -150,7 +153,7 @@ export class JobsService {
           title: DIGEST.bloggerTitle[L](matching.length),
           intro: DIGEST.bloggerIntro[L],
           items: matching.slice(0, 10).map((d) => ({
-            title: `${d.brand.companyName}: ${d.title}`,
+            title: digestLine(d),
             subtitle: [
               d.platforms.map((x) => PLATFORM_LABELS[x]).join(', '),
               d.budgetMax != null ? `${DIGEST.upTo[L]} ${formatMoney(d.budgetMax, d.currency, INTL[L])}` : DIGEST.barter[L],

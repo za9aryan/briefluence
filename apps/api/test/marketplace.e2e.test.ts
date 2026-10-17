@@ -329,4 +329,51 @@ describe('marketplace core loop (e2e)', () => {
     expect(accepted.title).toBe('Твоя заявка одобрена');
     expect((await lastEmailTo(ctx, inf.email))?.subject).toBe('Твоя заявка одобрена');
   });
+
+  it('hides a confidential brand from bloggers until it accepts them', async () => {
+    const inf = await approvedInfluencer();
+    const brand = await brandWithDeal({ isConfidential: true });
+    const feed = await inf.agent.get(`${API}/deals/feed`).expect(200);
+    const card = feed.body.items.find((d: { id: string }) => d.id === brand.dealId);
+    expect(card.isConfidential).toBe(true);
+    expect(card.brand.companyName).toBeNull();
+    expect(card.brandId).toBeNull();
+    expect(JSON.stringify(feed.body)).not.toContain('Ararat Cosmetics');
+
+    const detail = await inf.agent.get(`${API}/deals/${brand.dealId}`).expect(200);
+    expect(detail.body.brand.companyName).toBeNull();
+    expect(JSON.stringify(detail.body)).not.toContain('Ararat');
+
+    await inf.agent.post(`${API}/deals/${brand.dealId}/applications`).send({ pitch: 'I would love this collab!' }).expect(201);
+    let mine = await inf.agent.get(`${API}/applications/mine`).expect(200);
+    expect(mine.body[0].deal.brand.companyName).toBeNull();
+
+    const list = await brand.agent.get(`${API}/deals/${brand.dealId}/applications`).expect(200);
+    await brand.agent.patch(`${API}/applications/${list.body.items[0].id}/status`).send({ status: 'ACCEPTED' }).expect(200);
+    mine = await inf.agent.get(`${API}/applications/mine`).expect(200);
+    expect(mine.body[0].deal.brand.companyName).toBe('Ararat Cosmetics');
+    expect(mine.body[0].brandContact).toMatchObject({ name: 'Karen' });
+    const after = await inf.agent.get(`${API}/deals/${brand.dealId}`).expect(200);
+    expect(after.body.brand.companyName).toBe('Ararat Cosmetics');
+  });
+
+  it('counts one view per blogger per day and filters by collaboration type', async () => {
+    const a = await approvedInfluencer();
+    const b = await approvedInfluencer();
+    const brand = await brandWithDeal({ collaborationType: 'LONG_TERM' });
+    await a.agent.get(`${API}/deals/${brand.dealId}`).expect(200);
+    await a.agent.get(`${API}/deals/${brand.dealId}`).expect(200); // same day: not counted again
+    await b.agent.get(`${API}/deals/${brand.dealId}`).expect(200);
+    await brand.agent.get(`${API}/deals/${brand.dealId}`).expect(200); // the brand itself: not counted
+    const own = await brand.agent.get(`${API}/deals/mine`).expect(200);
+    expect(own.body[0].viewCount).toBe(2);
+    ctx.clock.advance(86_400_000);
+    await a.agent.get(`${API}/deals/${brand.dealId}`).expect(200); // next day: counted
+    const feed = await a.agent.get(`${API}/deals/feed?collaboration=LONG_TERM`).expect(200);
+    expect(feed.body.items[0]).toMatchObject({ viewCount: 3, collaborationType: 'LONG_TERM' });
+    expect((await a.agent.get(`${API}/deals/feed?collaboration=ONE_TIME`)).body.total).toBe(0);
+    await new Promise((r) => setTimeout(r, 200));
+    const ins = await brand.agent.get(`${API}/brands/me/insights?days=7`).expect(200);
+    expect(ins.body.collaborationTypes).toEqual(expect.arrayContaining([{ key: 'LONG_TERM', count: 1 }, { key: 'ONE_TIME', count: 1 }]));
+  });
 });

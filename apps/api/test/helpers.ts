@@ -37,7 +37,7 @@ export async function createTestApp(): Promise<TestCtx> {
 }
 
 export async function resetDb(prisma: PrismaService) {
-  const tables = ['ExchangeRate', 'FeedSearch', 'Notification', 'Payment', 'Subscription', 'Application', 'Deal', 'SocialAccount', 'InfluencerProfile', 'BrandProfile', 'RefreshToken', 'User'];
+  const tables = ['DealView', 'ExchangeRate', 'FeedSearch', 'Notification', 'Payment', 'Subscription', 'Application', 'Deal', 'SocialAccount', 'InfluencerProfile', 'BrandProfile', 'RefreshToken', 'User'];
   await prisma.$executeRawUnsafe(`TRUNCATE ${tables.map((t) => `"${t}"`).join(', ')} RESTART IDENTITY CASCADE`);
 }
 

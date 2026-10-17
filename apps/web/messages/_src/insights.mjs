@@ -33,6 +33,10 @@ export default {
       title: ['Money or barter', 'Деньги или бартер', 'Գումար, թե բարտեր'],
       subtitle: ['What kind of compensation bloggers look for.', 'Какое вознаграждение ищут блогеры.', 'Ինչ վարձատրություն են փնտրում բլոգերները։'],
     },
+    collaboration: {
+      title: ['Short-term or long-term', 'Разовое или долгосрочное', 'Միանգամյա, թե երկարաժամկետ'],
+      subtitle: ['What kind of collaboration bloggers look for.', 'Какое сотрудничество ищут блогеры.', 'Ինչ համագործակցություն են փնտրում բլոգերները։'],
+    },
     niches: {
       title: ['Niches', 'Ниши', 'Նիշաներ'],
       subtitle: ['Topics bloggers filter for.', 'Темы, по которым фильтруют блогеры.', 'Թեմաներ, որոնցով ֆիլտրում են բլոգերները։'],

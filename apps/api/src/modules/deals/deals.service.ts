@@ -3,6 +3,7 @@ import {
   canDealTransition,
   convertMinor,
   CURRENCIES,
+  TIMEZONE,
   checkEligibility,
   FILLED_STATUSES,
   isDealEditable,
@@ -20,6 +21,7 @@ import { Clock } from '../../common/clock';
 import { PrismaService } from '../../common/prisma.service';
 import { BrandsService } from '../brands/brands.service';
 import { RatesService } from '../currency/rates.service';
+import { forBlogger } from './confidential';
 import { dealHardFilterWhere, toMatchDeal, toMatchInfluencer } from './match-input';
 
 const brandCard = { select: { id: true, companyName: true, logoUrl: true, website: true, instagramUrl: true } } as const;
@@ -138,6 +140,7 @@ export class DealsService {
     if (q.niche?.length) userFilters.push({ niches: { hasSome: q.niche } });
     if (q.city?.length) userFilters.push({ cities: { hasSome: q.city } });
     if (q.paymentType?.length) userFilters.push({ paymentType: { in: q.paymentType } });
+    if (q.collaboration?.length) userFilters.push({ collaborationType: { in: q.collaboration } });
     if (q.budgetMin != null) {
       // The filter is in the blogger's currency; compare against each deal in the deal's own currency.
       const { rates } = await this.rates.get();
@@ -167,9 +170,11 @@ export class DealsService {
     const scored = deals
       .filter((d) => checkEligibility(toMatchDeal(d), inf, now) === null)
       .map((d) => {
-        const { applications, _count, ...deal } = d;
+        const { applications, _count, brand: rawBrand, ...rawDeal } = d;
+        const { deal, brand } = forBlogger(rawDeal, rawBrand, applications[0]?.status);
         return {
           ...deal,
+          brand,
           matchScore: matchScore(toMatchDeal(d), inf)?.score ?? 0,
           applicantCount: _count.applications,
           myApplication: applications[0] ?? null,
@@ -199,6 +204,7 @@ export class DealsService {
       niches: q.niche ?? [],
       cities: q.city ?? [],
       paymentTypes: q.paymentType ?? [],
+      collaborationTypes: q.collaboration ?? [],
       budgetMin: null as number | null,
     };
     try {
@@ -215,6 +221,7 @@ export class DealsService {
         same(recent.niches, data.niches) &&
         same(recent.cities, data.cities) &&
         same(recent.paymentTypes, data.paymentTypes) &&
+        same(recent.collaborationTypes, data.collaborationTypes) &&
         recent.budgetMin === data.budgetMin
       ) {
         return;
@@ -223,6 +230,13 @@ export class DealsService {
     } catch {
       // Analytics only.
     }
+  }
+
+  /** Counts one view per blogger per day (Yerevan time); brands and admins are not counted. */
+  private async recordView(dealId: string, influencerId: string) {
+    const day = new Intl.DateTimeFormat('en-CA', { timeZone: TIMEZONE }).format(this.clock.now());
+    const { count } = await this.prisma.dealView.createMany({ data: [{ dealId, influencerId, day }], skipDuplicates: true });
+    if (count > 0) await this.prisma.deal.update({ where: { id: dealId }, data: { viewCount: { increment: 1 } } });
   }
 
   /** Deal detail for any role: owner and admin see everything; influencers see published, eligible deals. */
@@ -263,8 +277,11 @@ export class DealsService {
     const accounts = profile.socialAccounts
       .filter((a) => !a.tokenRevokedAt)
       .map((a) => ({ id: a.id, platform: a.platform, username: a.username, followers: a.followers, score: matchScore(toMatchDeal(deal), inf, a.id)?.score ?? null }));
+    if (deal.status !== 'DRAFT') await this.recordView(deal.id, profile.id);
+    const masked = forBlogger(base, base.brand, myApplication?.status);
     return {
-      ...base,
+      ...masked.deal,
+      brand: masked.brand,
       matchScore: matchScore(toMatchDeal(deal), inf)?.score ?? 0,
       eligibleAccounts: accounts.filter((a) => a.score != null),
       myApplication,

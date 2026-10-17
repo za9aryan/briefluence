@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { INFLUENCER_AGE_RANGE, LANGUAGES, NICHES } from '../constants';
-import { CONTENT_FORMATS, CURRENCIES, GENDER_FILTERS, PAYMENT_TYPES, PLATFORMS } from '../enums';
+import { COLLABORATION_TYPES, CONTENT_FORMATS, CURRENCIES, GENDER_FILTERS, PAYMENT_TYPES, PLATFORMS } from '../enums';
 import { countryCode, minorAmount, optionalText, optionalUrl, paginationSchema } from './common';
 
 const optionalInt = (min: number, max: number) =>
@@ -15,6 +15,10 @@ export const dealBaseSchema = z.object({
   platforms: z.array(z.enum(PLATFORMS)).min(1, 'pickOne'),
   contentFormats: z.array(z.enum(CONTENT_FORMATS)).min(1, 'pickOne'),
   niches: z.array(z.enum(NICHES)).default([]),
+  /** One-off promo or a long-term partnership. */
+  collaborationType: z.enum(COLLABORATION_TYPES).default('ONE_TIME'),
+  /** Hide the brand's name, logo and links from bloggers until it accepts them. */
+  isConfidential: z.boolean().default(false),
   // Targeting
   countries: z.array(countryCode).min(1, 'pickOne'),
   cities: z.array(z.string().trim().min(1).max(80)).default([]),
@@ -97,6 +101,7 @@ export const feedQuerySchema = paginationSchema.extend({
   niche: csv(z.enum(NICHES)),
   city: csv(z.string().max(80)),
   paymentType: csv(z.enum(PAYMENT_TYPES)),
+  collaboration: csv(z.enum(COLLABORATION_TYPES)),
   budgetMin: z.coerce.number().int().min(0).optional(),
   /** Currency the budget filter was entered in; the API converts it per deal currency. */
   budgetCurrency: z.enum(CURRENCIES).default('AMD'),

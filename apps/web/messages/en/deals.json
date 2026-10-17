@@ -3,6 +3,12 @@
   "wanted": "{count, plural, one {# blogger wanted} other {# bloggers wanted}}",
   "deadline": "Until {date}",
   "applicants": "{count, plural, =0 {no applicants yet} one {# applicant} other {# applicants}}",
+  "confidential": {
+    "name": "Confidential brand",
+    "note": "The brand keeps its name private for business reasons. You'll see who it is once they accept you."
+  },
+  "views": "{count, plural, one {# view} other {# views}}",
+  "viewsHint": "How many bloggers opened this brief",
   "feedTitle": "Briefs for you",
   "feedLead": "Only briefs you qualify for, best matches first.",
   "filters": {
@@ -10,6 +16,7 @@
     "payment": "Payment",
     "niche": "Niche",
     "city": "City",
+    "collaboration": "Collaboration",
     "budgetMin": "Minimum budget",
     "budgetHint": "In AMD, per blogger."
   },

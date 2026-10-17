@@ -1,12 +1,13 @@
 'use client';
 import { contactDisplay, contactHref, postUrlSchema, type ApplicationStatus } from '@briefluence/shared';
-import { Alert, Avatar, Button, Icon, Card, EmptyState, Field, Inline, Input, Skeleton, Stack, Tabs, Text, buttonStyles, useToast } from '@briefluence/ui';
+import { Alert, Button, Icon, Card, EmptyState, Field, Inline, Input, Skeleton, Stack, Tabs, Text, buttonStyles, useToast } from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
 import { CONTACT_ICON } from '@/components/brand/ContactMethodFields';
+import { BrandAvatar, useBrandName } from '@/components/domain/BrandIdentity';
 import { ApplicationStatusBadge } from '@/components/domain/badges';
 import { Compensation } from '@/components/domain/Compensation';
 import { api } from '@/lib/api';
@@ -58,6 +59,7 @@ export default function MyApplicationsPage() {
   const tr = useTranslations('enums.rejectionReason');
   const tm = useTranslations('enums.contactMethod');
   const f = useFormat();
+  const brandName = useBrandName();
   const toast = useToast();
   const errorMessage = useErrorMessage();
   const qc = useQueryClient();
@@ -107,13 +109,13 @@ export default function MyApplicationsPage() {
               <Stack gap={4}>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <Inline gap={2} align="start" className="min-w-0">
-                    <Avatar square name={a.deal.brand.companyName} src={a.deal.brand.logoUrl} />
+                    <BrandAvatar brand={a.deal.brand} />
                     <div className="min-w-0">
                       <Link href={`/influencer/deals/${a.deal.id}`} className="text-h2 font-bold text-ink hover:text-primary-text">
                         {a.deal.title}
                       </Link>
                       <Text size="small" tone="muted">
-                        {a.deal.brand.companyName} · {t('appliedOn', { date: f.date(a.createdAt) })} · {t('matchValue', { score: a.matchScore })}
+                        {brandName(a.deal.brand)} · {t('appliedOn', { date: f.date(a.createdAt) })} · {t('matchValue', { score: a.matchScore })}
                       </Text>
                     </div>
                   </Inline>

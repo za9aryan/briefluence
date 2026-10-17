@@ -90,7 +90,7 @@ export default function ApplicantsPage() {
               {t('slots', { filled: d.filled, slots: d.slots })}
             </Text>
             <Text size="small" tone="muted">
-              {t('total', { count: data.data!.total })}
+              {tf('viewsCount', { count: d.viewCount })} · {t('total', { count: data.data!.total })}
             </Text>
           </Inline>
           <Progress value={(d.filled / Math.max(1, d.slots)) * 100} label={t('slots', { filled: d.filled, slots: d.slots })} className="mt-2" />

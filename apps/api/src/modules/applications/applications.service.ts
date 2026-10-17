@@ -22,6 +22,7 @@ import { Clock } from '../../common/clock';
 import { PrismaService } from '../../common/prisma.service';
 import { publicAccount } from '../influencers/serializers';
 import { toMatchDeal, toMatchInfluencer } from '../deals/match-input';
+import { brandRevealed, HIDDEN_BRAND } from '../deals/confidential';
 import { DealsService } from '../deals/deals.service';
 import { NotificationsService } from '../notifications/notifications.service';
 
@@ -129,7 +130,10 @@ export class ApplicationsService {
           barterDescription: a.deal.barterDescription,
           applicationDeadline: a.deal.applicationDeadline,
           publishBy: a.deal.publishBy,
-          brand,
+          collaborationType: a.deal.collaborationType,
+          isConfidential: a.deal.isConfidential,
+          // Confidential briefs reveal the brand only after acceptance.
+          brand: a.deal.isConfidential && !brandRevealed(a.status) ? HIDDEN_BRAND : brand,
         },
         brandContact: contactsRevealed(a.status)
           ? { name: contactName, position: contactPosition, method: contactMethod, value: contactValue }
@@ -227,7 +231,16 @@ export class ApplicationsService {
     const filled = await this.prisma.application.count({ where: { dealId, status: { in: FILLED_STATUSES } } });
     const start = (q.page - 1) * q.pageSize;
     return {
-      deal: { id: deal.id, title: deal.title, status: deal.status, slots: deal.slots, filled, currency: deal.currency },
+      deal: {
+        id: deal.id,
+        title: deal.title,
+        status: deal.status,
+        slots: deal.slots,
+        filled,
+        currency: deal.currency,
+        viewCount: deal.viewCount,
+        isConfidential: deal.isConfidential,
+      },
       items: rows.slice(start, start + q.pageSize),
       total: rows.length,
       page: q.page,

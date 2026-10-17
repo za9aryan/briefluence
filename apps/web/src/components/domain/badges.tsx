@@ -1,5 +1,5 @@
 'use client';
-import type { ApplicationStatus, DealStatus, PaymentStatus, Platform, SubscriptionStatus, VerificationStatus } from '@briefluence/shared';
+import type { ApplicationStatus, CollaborationType, DealStatus, PaymentStatus, Platform, SubscriptionStatus, VerificationStatus } from '@briefluence/shared';
 import { Badge, type BadgeTone } from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
 import { PLATFORM_ICON } from '@/lib/hooks/options';
@@ -50,6 +50,15 @@ export function PlatformBadge({ platform }: { platform: Platform }) {
     </Badge>
   );
 }
+export function CollaborationBadge({ type }: { type: CollaborationType }) {
+  const t = useTranslations('enums.collaboration');
+  return (
+    <Badge tone={type === 'LONG_TERM' ? 'primary' : 'neutral'} icon={type === 'LONG_TERM' ? 'repeat' : 'clock'}>
+      {t(type)}
+    </Badge>
+  );
+}
+
 export function VerifiedBadge() {
   const t = useTranslations('common');
   return (

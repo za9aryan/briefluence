@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
-import { DealStatusBadge } from '@/components/domain/badges';
+import { CollaborationBadge, DealStatusBadge } from '@/components/domain/badges';
 import { Compensation } from '@/components/domain/Compensation';
 import { useDealActions } from '@/components/brand/useDealActions';
 import { api } from '@/lib/api';
@@ -73,6 +73,12 @@ export default function BrandDealsPage() {
                     <Text as="span" size="small" tone="muted">
                       {t('until', { date: f.date(d.applicationDeadline) })}
                     </Text>
+                    <CollaborationBadge type={d.collaborationType} />
+                    {d.isConfidential && (
+                      <Badge tone="ink" icon="lock">
+                        {t('confidentialBadge')}
+                      </Badge>
+                    )}
                   </Inline>
                   <Link href={`/brand/deals/${d.id}/applicants`} className="text-h2 font-bold text-ink hover:text-primary-text">
                     {d.title}
@@ -86,7 +92,7 @@ export default function BrandDealsPage() {
                       {d.newApplicantCount > 0 && <Badge tone="primary">{t('newCount', { count: d.newApplicantCount })}</Badge>}
                     </Inline>
                     <Text size="small" tone="muted">
-                      {t('filledOf', { filled: d.filled, slots: d.slots })}
+                      {t('filledOf', { filled: d.filled, slots: d.slots })} · {t('viewsCount', { count: d.viewCount })}
                     </Text>
                   </Stack>
                   <Inline gap={1}>

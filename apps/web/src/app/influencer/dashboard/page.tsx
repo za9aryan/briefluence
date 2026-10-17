@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { PageHeader } from '@/components/app/AppShell';
 import { ApplicationStatusBadge } from '@/components/domain/badges';
+import { useBrandName } from '@/components/domain/BrandIdentity';
 import { DealCard } from '@/components/domain/DealCard';
 import { BriefsChecklist } from '@/components/influencer/StartTrial';
 import { api } from '@/lib/api';
@@ -30,6 +31,7 @@ export default function InfluencerDashboardPage() {
   const tn = useTranslations('nav');
   const tb = useTranslations('enums.subscriptionStatus');
   const f = useFormat();
+  const brandName = useBrandName();
   const { data: me } = useMe();
   const stats = useQuery({ queryKey: ['influencer', 'dashboard'], queryFn: () => api.get<DashboardDto>('/influencers/me/dashboard') });
   const approved = stats.data?.verificationStatus === 'APPROVED' && !!me?.subscription;
@@ -108,7 +110,7 @@ export default function InfluencerDashboardPage() {
                     {a.deal.title}
                   </Text>
                   <Text size="small" tone="muted">
-                    {a.deal.brand.companyName} · {f.relative(a.updatedAt)}
+                    {brandName(a.deal.brand)} · {f.relative(a.updatedAt)}
                   </Text>
                 </div>
                 <ApplicationStatusBadge status={a.status} />

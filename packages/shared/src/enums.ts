@@ -72,3 +72,7 @@ export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 
 export const CONTACT_METHODS = values('TELEGRAM', 'MESSENGER', 'VIBER', 'WHATSAPP', 'INSTAGRAM', 'PHONE');
 export type ContactMethod = (typeof CONTACT_METHODS)[number];
+
+/** How long the brand wants to work with the blogger. */
+export const COLLABORATION_TYPES = values('ONE_TIME', 'LONG_TERM');
+export type CollaborationType = (typeof COLLABORATION_TYPES)[number];
