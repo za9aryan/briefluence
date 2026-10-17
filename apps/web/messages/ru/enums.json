@@ -1,0 +1,130 @@
+{
+  "role": {
+    "INFLUENCER": "Блогер",
+    "BRAND": "Бренд",
+    "ADMIN": "Администратор"
+  },
+  "platform": {
+    "INSTAGRAM": "Instagram",
+    "TIKTOK": "TikTok",
+    "YOUTUBE": "YouTube"
+  },
+  "niche": {
+    "food": "Еда",
+    "beauty": "Красота",
+    "fashion": "Мода",
+    "fitness": "Фитнес",
+    "travel": "Путешествия",
+    "tech": "Технологии",
+    "kids": "Дети",
+    "lifestyle": "Лайфстайл",
+    "auto": "Авто",
+    "education": "Образование"
+  },
+  "language": {
+    "hy": "Армянский",
+    "ru": "Русский",
+    "en": "Английский"
+  },
+  "country": {
+    "AM": "Армения",
+    "GE": "Грузия",
+    "RU": "Россия",
+    "US": "США",
+    "FR": "Франция",
+    "DE": "Германия",
+    "AE": "ОАЭ",
+    "UA": "Украина",
+    "KZ": "Казахстан",
+    "IR": "Иран"
+  },
+  "gender": {
+    "MALE": "Мужской",
+    "FEMALE": "Женский",
+    "OTHER": "Другой"
+  },
+  "genderFilter": {
+    "ANY": "Любой",
+    "MALE": "Мужской",
+    "FEMALE": "Женский"
+  },
+  "audienceGender": {
+    "ANY": "Любая",
+    "MALE": "Преимущественно мужчины",
+    "FEMALE": "Преимущественно женщины"
+  },
+  "paymentType": {
+    "BARTER": "Бартер",
+    "MONEY": "Оплата",
+    "MIXED": "Оплата + бартер"
+  },
+  "contentFormat": {
+    "POST": "Пост",
+    "REEL": "Reels",
+    "STORY": "Сторис",
+    "SHORT_VIDEO": "Короткое видео",
+    "LONG_VIDEO": "Длинное видео",
+    "LIVE": "Эфир"
+  },
+  "dealStatus": {
+    "DRAFT": "Черновик",
+    "ACTIVE": "Активно",
+    "PAUSED": "На паузе",
+    "CLOSED": "Закрыто",
+    "EXPIRED": "Истекло"
+  },
+  "applicationStatus": {
+    "APPLIED": "Отправлен",
+    "VIEWED": "Просмотрен",
+    "SHORTLISTED": "В шорт-листе",
+    "ACCEPTED": "Принят",
+    "REJECTED": "Отклонён",
+    "WITHDRAWN": "Отозван",
+    "COMPLETED": "Выполнен"
+  },
+  "verificationStatus": {
+    "DRAFT": "Не отправлен",
+    "PENDING_REVIEW": "На проверке",
+    "APPROVED": "Проверен",
+    "REJECTED": "Нужны исправления"
+  },
+  "subscriptionStatus": {
+    "TRIALING": "Пробный период",
+    "ACTIVE": "Активна",
+    "PAST_DUE": "Проблема с оплатой",
+    "CANCELED": "Отменена",
+    "EXPIRED": "Истекла"
+  },
+  "paymentStatus": {
+    "PENDING": "В обработке",
+    "SUCCEEDED": "Оплачено",
+    "FAILED": "Ошибка",
+    "REFUNDED": "Возврат"
+  },
+  "rejectionReason": {
+    "BUDGET": "Бюджет",
+    "AUDIENCE": "Аудитория",
+    "NICHE": "Ниша",
+    "OTHER": "Другое"
+  },
+  "audienceSize": {
+    "nano": "Нано · 1k–10k",
+    "micro": "Микро · 10k–50k",
+    "mid": "Средний · 50k–500k",
+    "macro": "Макро · 500k+",
+    "custom": "Свой диапазон"
+  },
+  "currency": {
+    "AMD": "Армянский драм",
+    "USD": "Доллар США",
+    "RUB": "Российский рубль"
+  },
+  "contactMethod": {
+    "TELEGRAM": "Telegram",
+    "MESSENGER": "Messenger",
+    "VIBER": "Viber",
+    "WHATSAPP": "WhatsApp",
+    "INSTAGRAM": "Instagram",
+    "PHONE": "Телефон"
+  }
+}

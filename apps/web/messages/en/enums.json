@@ -1,0 +1,130 @@
+{
+  "role": {
+    "INFLUENCER": "Blogger",
+    "BRAND": "Brand",
+    "ADMIN": "Admin"
+  },
+  "platform": {
+    "INSTAGRAM": "Instagram",
+    "TIKTOK": "TikTok",
+    "YOUTUBE": "YouTube"
+  },
+  "niche": {
+    "food": "Food",
+    "beauty": "Beauty",
+    "fashion": "Fashion",
+    "fitness": "Fitness",
+    "travel": "Travel",
+    "tech": "Tech",
+    "kids": "Kids",
+    "lifestyle": "Lifestyle",
+    "auto": "Auto",
+    "education": "Education"
+  },
+  "language": {
+    "hy": "Armenian",
+    "ru": "Russian",
+    "en": "English"
+  },
+  "country": {
+    "AM": "Armenia",
+    "GE": "Georgia",
+    "RU": "Russia",
+    "US": "United States",
+    "FR": "France",
+    "DE": "Germany",
+    "AE": "UAE",
+    "UA": "Ukraine",
+    "KZ": "Kazakhstan",
+    "IR": "Iran"
+  },
+  "gender": {
+    "MALE": "Male",
+    "FEMALE": "Female",
+    "OTHER": "Other"
+  },
+  "genderFilter": {
+    "ANY": "Any",
+    "MALE": "Male",
+    "FEMALE": "Female"
+  },
+  "audienceGender": {
+    "ANY": "Any",
+    "MALE": "Mostly male",
+    "FEMALE": "Mostly female"
+  },
+  "paymentType": {
+    "BARTER": "Barter",
+    "MONEY": "Money",
+    "MIXED": "Money + barter"
+  },
+  "contentFormat": {
+    "POST": "Post",
+    "REEL": "Reel",
+    "STORY": "Story",
+    "SHORT_VIDEO": "Short video",
+    "LONG_VIDEO": "Long video",
+    "LIVE": "Live"
+  },
+  "dealStatus": {
+    "DRAFT": "Draft",
+    "ACTIVE": "Active",
+    "PAUSED": "Paused",
+    "CLOSED": "Closed",
+    "EXPIRED": "Expired"
+  },
+  "applicationStatus": {
+    "APPLIED": "Applied",
+    "VIEWED": "Viewed",
+    "SHORTLISTED": "Shortlisted",
+    "ACCEPTED": "Accepted",
+    "REJECTED": "Rejected",
+    "WITHDRAWN": "Withdrawn",
+    "COMPLETED": "Completed"
+  },
+  "verificationStatus": {
+    "DRAFT": "Not submitted",
+    "PENDING_REVIEW": "In review",
+    "APPROVED": "Verified",
+    "REJECTED": "Needs changes"
+  },
+  "subscriptionStatus": {
+    "TRIALING": "Free trial",
+    "ACTIVE": "Active",
+    "PAST_DUE": "Payment issue",
+    "CANCELED": "Canceled",
+    "EXPIRED": "Expired"
+  },
+  "paymentStatus": {
+    "PENDING": "Pending",
+    "SUCCEEDED": "Paid",
+    "FAILED": "Failed",
+    "REFUNDED": "Refunded"
+  },
+  "rejectionReason": {
+    "BUDGET": "Budget",
+    "AUDIENCE": "Audience",
+    "NICHE": "Niche",
+    "OTHER": "Other"
+  },
+  "audienceSize": {
+    "nano": "Nano · 1k–10k",
+    "micro": "Micro · 10k–50k",
+    "mid": "Mid · 50k–500k",
+    "macro": "Macro · 500k+",
+    "custom": "Custom"
+  },
+  "currency": {
+    "AMD": "Armenian dram",
+    "USD": "US dollar",
+    "RUB": "Russian ruble"
+  },
+  "contactMethod": {
+    "TELEGRAM": "Telegram",
+    "MESSENGER": "Messenger",
+    "VIBER": "Viber",
+    "WHATSAPP": "WhatsApp",
+    "INSTAGRAM": "Instagram",
+    "PHONE": "Phone"
+  }
+}

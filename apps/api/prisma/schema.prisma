@@ -1,0 +1,351 @@
+// Data model from the build spec. Additions beyond the spec are marked "spec+" with the reason.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  INFLUENCER
+  BRAND
+  ADMIN
+}
+
+enum Platform {
+  INSTAGRAM
+  TIKTOK
+  YOUTUBE
+}
+
+enum VerificationStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum GenderFilter {
+  ANY
+  MALE
+  FEMALE
+}
+
+enum PaymentType {
+  BARTER
+  MONEY
+  MIXED
+}
+
+enum ContactMethod {
+  TELEGRAM
+  MESSENGER
+  VIBER
+  WHATSAPP
+  INSTAGRAM
+  PHONE
+}
+
+enum Currency {
+  AMD
+  USD
+  RUB
+}
+
+enum ContentFormat {
+  POST
+  REEL
+  STORY
+  SHORT_VIDEO
+  LONG_VIDEO
+  LIVE
+}
+
+enum DealStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  CLOSED
+  EXPIRED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  VIEWED
+  SHORTLISTED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+  COMPLETED
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+model User {
+  id              String             @id @default(cuid())
+  email           String             @unique
+  passwordHash    String
+  role            Role
+  emailVerifiedAt DateTime?
+  createdAt       DateTime           @default(now())
+  blockedAt       DateTime? // spec+: admin moderation of users/brands
+  digestEmails    Boolean            @default(true) // spec+: notification settings page
+  currency        Currency           @default(AMD) // spec+: currency amounts are shown in
+  influencer      InfluencerProfile?
+  brand           BrandProfile?
+  subscription    Subscription?
+  notifications   Notification[]
+  refreshTokens   RefreshToken[]
+}
+
+// spec+: refresh token rotation with reuse detection needs server-side state.
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique // sha256 of the opaque token
+  familyId  String // all rotations of one login share a family; reuse revokes the family
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([familyId])
+}
+
+model InfluencerProfile {
+  id              String             @id @default(cuid())
+  userId          String             @unique
+  user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  displayName     String
+  avatarUrl       String?
+  bio             String?
+  country         String // ISO 3166-1 alpha-2, e.g. "AM"
+  city            String?
+  gender          Gender?
+  birthYear       Int?
+  languages       String[] // ISO 639-1
+  niches          String[] // from a fixed category list
+  contactEmail    String?
+  contactPhone    String?
+  telegram        String?
+  status          VerificationStatus @default(DRAFT)
+  rejectionReason String?
+  approvedAt      DateTime?
+  submittedAt     DateTime? // spec+: review queue ordering
+  profileViews    Int                @default(0) // spec+: dashboard stat
+  savedFilters    Json? // spec+: saved feed filters
+  createdAt       DateTime           @default(now())
+  socialAccounts  SocialAccount[]
+  applications    Application[]
+
+  @@index([status])
+}
+
+model SocialAccount {
+  id                String            @id @default(cuid())
+  influencerId      String
+  influencer        InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  platform          Platform
+  externalId        String
+  username          String
+  profileUrl        String
+  avatarUrl         String? // spec+
+  mediaCount        Int? // spec+
+  followers         Int
+  avgViews          Int?
+  engagementRate    Float? // percent
+  audienceGender    Json? // { male: 38.2, female: 61.8 }
+  audienceAge       Json? // { "18-24": 30.1, "25-34": 41.0, ... }
+  audienceCountries Json? // { "AM": 72.4, "RU": 9.1, ... }
+  accessTokenEnc    String // AES-256-GCM encrypted
+  refreshTokenEnc   String?
+  tokenExpiresAt    DateTime?
+  tokenRevokedAt    DateTime? // spec+: flagged when a sync finds the token revoked
+  lastSyncedAt      DateTime?
+  createdAt         DateTime          @default(now())
+
+  @@unique([platform, externalId])
+  @@index([influencerId])
+}
+
+model BrandProfile {
+  id              String         @id @default(cuid())
+  userId          String         @unique
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName     String
+  logoUrl         String?
+  website         String?
+  instagramUrl    String?
+  description     String?
+  country         String
+  city            String?
+  contactName     String?
+  contactPosition String? // spec+
+  contactMethod   ContactMethod? // spec+: replaces contactPhone / contactEmail
+  contactValue    String? // normalized: +digits for phones, username without @
+  createdAt       DateTime       @default(now())
+  deals           Deal[]
+}
+
+model Deal {
+  id                  String          @id @default(cuid())
+  brandId             String
+  brand               BrandProfile    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  title               String
+  description         String
+  imageUrl            String?
+  platforms           Platform[]
+  contentFormats      ContentFormat[]
+  niches              String[]
+  countries           String[]
+  cities              String[]
+  languages           String[]
+  minFollowers        Int?
+  maxFollowers        Int?
+  minEngagementRate   Float?
+  influencerGender    GenderFilter    @default(ANY)
+  influencerAgeMin    Int?
+  influencerAgeMax    Int?
+  audienceGender      GenderFilter    @default(ANY) // majority gender of followers
+  audienceAgeMin      Int?
+  audienceAgeMax      Int?
+  audienceCountry     String? // main follower country
+  paymentType         PaymentType
+  budgetMin           Int? // minor units
+  budgetMax           Int? // minor units
+  currency            Currency        @default(AMD)
+  barterDescription   String?
+  barterValue         Int? // minor units
+  slots               Int             @default(1) // influencers needed
+  applicationDeadline DateTime
+  publishBy           DateTime?
+  status              DealStatus      @default(DRAFT)
+  publishedAt         DateTime? // spec+: "new deals matching you" digest
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @default(now()) @updatedAt // spec+
+  applications        Application[]
+
+  @@index([status, applicationDeadline])
+  @@index([brandId])
+}
+
+model Application {
+  id              String            @id @default(cuid())
+  dealId          String
+  deal            Deal              @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  influencerId    String
+  influencer      InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  socialAccountId String
+  pitch           String
+  proposedPrice   Int? // minor units, in the deal's currency
+  matchScore      Int // 0-100, frozen at apply time
+  status          ApplicationStatus @default(APPLIED)
+  rejectionReason String?
+  postUrl         String? // proof of publication
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@unique([dealId, influencerId])
+  @@index([influencerId])
+  @@index([dealId, status])
+}
+
+model Subscription {
+  id                  String             @id @default(cuid())
+  userId              String             @unique
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status              SubscriptionStatus
+  trialEndsAt         DateTime
+  currentPeriodEnd    DateTime?
+  cancelAtPeriodEnd   Boolean            @default(false)
+  bindingId           String? // Ameriabank card binding (CardHolderID) for recurring charges
+  cardMask            String?
+  failedAttempts      Int                @default(0) // spec+: renewal retries on days 1, 3, 5
+  pastDueSince        DateTime? // spec+
+  trialReminderSentAt DateTime? // spec+: send the 3-day reminder once
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @default(now()) @updatedAt
+  payments            Payment[]
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  subscriptionId    String
+  subscription      Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  orderNumber       Int           @unique @default(autoincrement()) // spec+: Ameria OrderID must be an integer
+  kind              String        @default("checkout") // spec+: "checkout" | "renewal"
+  amount            Int // minor units
+  currency          Currency
+  provider          String // "ameriabank" | "mock"
+  providerOrderId   String        @unique
+  providerPaymentId String?
+  status            PaymentStatus @default(PENDING)
+  failureReason     String? // spec+
+  raw               Json?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @default(now()) @updatedAt
+
+  @@index([subscriptionId])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String
+  title     String
+  body      String
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+}
+
+// spec+: anonymous log of the filters bloggers use in the deal feed, aggregated for brand insights.
+// Only aggregates are ever exposed; never which blogger searched for what.
+model FeedSearch {
+  id           String        @id @default(cuid())
+  influencerId String
+  platforms    Platform[]
+  niches       String[]
+  cities       String[]
+  paymentTypes PaymentType[]
+  budgetMin    Int? // minor units, AMD
+  createdAt    DateTime      @default(now())
+
+  @@index([createdAt])
+  @@index([influencerId, createdAt])
+}
+
+// spec+: latest exchange rate per currency, as AMD per 1 unit (Central Bank of Armenia format).
+model ExchangeRate {
+  currency   Currency @id
+  amdPerUnit Float
+  source     String // "cba" | "open.er-api" | "fallback"
+  fetchedAt  DateTime
+}

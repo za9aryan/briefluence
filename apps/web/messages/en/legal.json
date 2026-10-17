@@ -1,0 +1,80 @@
+{
+  "updated": "Last updated: 16 October 2026 · Draft",
+  "contact": "Questions? Write to support@briefluence.am.",
+  "terms": {
+    "title": "Terms of service",
+    "intro": "These terms govern your use of briefluence, a marketplace that connects brands that publish promo briefs with bloggers who apply to them. By creating an account you agree to them.",
+    "sections": {
+      "a": {
+        "title": "1. The service",
+        "body": "We provide the platform; collaborations are agreed directly between the brand and the blogger. We are not a party to those agreements and do not guarantee results, payment or publication."
+      },
+      "b": {
+        "title": "2. Your account",
+        "body": "You must be at least 16, give accurate information and keep your password safe. One person or company per account. We may suspend accounts that break these terms."
+      },
+      "c": {
+        "title": "3. Brands",
+        "body": "Posting briefs is free during the launch. Briefs must describe a real, lawful product or service and the actual compensation. Contacts of a blogger may be used only for the accepted collaboration."
+      },
+      "d": {
+        "title": "4. Bloggers and subscription",
+        "body": "Applying requires a verified profile and an active free month or subscription. The first month is free; after that the subscription renews monthly at the price shown on the pricing page until you cancel."
+      },
+      "e": {
+        "title": "5. Payments and cancellation",
+        "body": "Payments are processed by Ameriabank. Your card is charged automatically each month. You can cancel any time in Billing; access continues until the end of the paid month. Payments already made are not refunded except where the law requires."
+      },
+      "f": {
+        "title": "6. Content and conduct",
+        "body": "Do not post illegal, misleading or offensive content, do not fake statistics and do not spam other users. Paid posts must be marked as advertising where the law or the platform requires it."
+      },
+      "g": {
+        "title": "7. Liability",
+        "body": "The service is provided as is. To the extent the law allows, our liability is limited to the amount you paid us in the last three months."
+      },
+      "h": {
+        "title": "8. Changes and law",
+        "body": "We will notify you of material changes by email. These terms are governed by the laws of the Republic of Armenia."
+      }
+    }
+  },
+  "privacy": {
+    "title": "Privacy policy",
+    "intro": "This policy explains what data briefluence collects, why, and what you can do about it.",
+    "sections": {
+      "a": {
+        "title": "1. What we collect",
+        "body": "Account data (email, password hash), profile data you enter (name, city, gender, birth year, niches, languages, contacts) and, for brands, company details."
+      },
+      "b": {
+        "title": "2. Connected social accounts",
+        "body": "When you connect Instagram, TikTok or YouTube through their official login, we receive your username, follower count, recent post statistics and, where available, aggregated audience demographics (age, gender, country). We never post on your behalf. Access tokens are stored encrypted (AES-256) and you can revoke access any time in the platform settings or by disconnecting the account here."
+      },
+      "c": {
+        "title": "3. How we use it",
+        "body": "To verify bloggers, match them with briefs, show statistics to brands, send notifications and process subscriptions. We do not sell personal data."
+      },
+      "d": {
+        "title": "4. Who sees what",
+        "body": "Brands see a verified blogger’s public profile and statistics. Contact details are shared only between a brand and a blogger after the brand accepts the application."
+      },
+      "e": {
+        "title": "5. Payments",
+        "body": "Card payments are handled by Ameriabank. We never receive or store your full card number; we keep only a masked number and a payment token for renewals."
+      },
+      "f": {
+        "title": "6. Retention and deletion",
+        "body": "We keep data while your account exists. To delete your account and all related data, including data received from Instagram, TikTok and YouTube, email support@briefluence.am from your account email. We delete it within 30 days and confirm by email."
+      },
+      "g": {
+        "title": "7. Your rights",
+        "body": "You can access, correct and export your data, and object to its processing. Most of it you can edit yourself in Settings."
+      },
+      "h": {
+        "title": "8. Cookies",
+        "body": "We use only necessary cookies: your session and your language choice. No advertising trackers."
+      }
+    }
+  }
+}

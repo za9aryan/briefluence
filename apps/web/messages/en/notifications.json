@@ -1,0 +1,8 @@
+{
+  "bell": "Notifications",
+  "bellUnread": "{count, plural, one {# unread notification} other {# unread notifications}}",
+  "title": "Notifications",
+  "markAllRead": "Mark all as read",
+  "empty": "Nothing new yet.",
+  "seeAll": "See all"
+}

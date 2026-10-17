@@ -1,0 +1,83 @@
+/* Briefluence design tokens — plain CSS variables.
+   Palette v2 (2026-10-16): light surfaces, magenta primary (replaces coral/red-orange).
+   Light theme is the default. Dark theme: <html data-theme="dark">,
+   or automatic via prefers-color-scheme unless data-theme="light" is set. */
+
+:root {
+  /* Color */
+  --bf-surface: #FFFFFF;        /* page / screen background (white) */
+  --bf-surface-raised: #FFFFFF; /* cards, modals, menus (separated by --bf-line borders) */
+  --bf-line: #EEE6EF;           /* dividers, input borders */
+  --bf-ink: #241B2B;            /* primary text (deep plum) */
+  --bf-ink-muted: #6B6175;      /* secondary text, metadata */
+  --bf-primary: #C8187F;        /* brand magenta: logo, primary button, active, text >= 24px */
+  --bf-primary-text: #A3136A;   /* small accent text, links (AA on white) */
+  --bf-primary-soft: #FCE8F4;   /* tinted backgrounds, badges */
+  --bf-on-primary: #FFFFFF;     /* text/icons on primary fill */
+  --bf-sun: #FFF0A8;            /* barter & rewards only (light yellow); text on it = ink */
+  --bf-success: #1E7A4F;        /* approved / confirmed */
+  --bf-link: var(--bf-primary-text);
+
+  /* Chart categorical slots (fixed order; validated with the dataviz palette checker:
+     CVD ΔE ≥ 9.6 all-pairs on white). Slot 3 is < 3:1 → charts always ship labels + table view. */
+  --bf-chart-1: #C8187F;
+  --bf-chart-2: #2A78D6;
+  --bf-chart-3: #1BAF7A;
+
+  /* Type */
+  --bf-font-display: "Syne", "Manrope", system-ui, sans-serif;
+  --bf-font-sans: "Manrope", "Noto Sans Armenian", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Spacing */
+  --bf-space-1: 4px;
+  --bf-space-2: 8px;
+  --bf-space-4: 16px;
+  --bf-space-6: 24px;
+  --bf-space-8: 32px;
+
+  /* Radius */
+  --bf-radius-sm: 8px;
+  --bf-radius-md: 16px;
+  --bf-radius-lg: 24px;
+  --bf-radius-pill: 999px;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bf-surface: #16111A;
+    --bf-surface-raised: #211A26;
+    --bf-line: #382D3F;
+    --bf-ink: #F8F0F7;
+    --bf-ink-muted: #C2B5C7;
+    --bf-primary: #FF5CB8;
+    --bf-primary-text: #FF8BCB;
+    --bf-primary-soft: #46173A;
+    --bf-on-primary: #2A0A1F;
+    --bf-sun: #FFE27A;
+    --bf-success: #5FD39A;
+    --bf-chart-1: #FF5CB8;
+    --bf-chart-2: #3987E5;
+    --bf-chart-3: #199E70;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bf-surface: #16111A;
+  --bf-surface-raised: #211A26;
+  --bf-line: #382D3F;
+  --bf-ink: #F8F0F7;
+  --bf-ink-muted: #C2B5C7;
+  --bf-primary: #FF5CB8;
+  --bf-primary-text: #FF8BCB;
+  --bf-primary-soft: #46173A;
+  --bf-on-primary: #2A0A1F;
+  --bf-sun: #FFE27A;
+  --bf-success: #5FD39A;
+  --bf-chart-1: #FF5CB8;
+  --bf-chart-2: #3987E5;
+  --bf-chart-3: #199E70;
+  color-scheme: dark;
+}

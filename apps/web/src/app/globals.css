@@ -1,0 +1,10 @@
+@import 'tailwindcss';
+@import '@briefluence/ui/styles.css';
+
+@source '../../../../packages/ui/src';
+
+/* Brand fonts are self-hosted by next/font (see app/layout.tsx); point the brand tokens at them. */
+:root {
+  --bf-font-display: var(--font-syne), var(--font-manrope), system-ui, sans-serif;
+  --bf-font-sans: var(--font-manrope), var(--font-armenian), system-ui, -apple-system, 'Segoe UI', sans-serif;
+}

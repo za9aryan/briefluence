@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "isolatedModules": false,
+    "noUncheckedIndexedAccess": true,
+    "strictPropertyInitialization": false,
+    "types": ["node", "multer"]
+  },
+  "include": ["src", "test", "prisma"]
+}

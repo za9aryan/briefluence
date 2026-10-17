@@ -1,0 +1,115 @@
+import { Body, Controller, ForbiddenException, Get, HttpCode, Inject, Param, Post, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import {
+  DEAL_STATUSES,
+  ROLES,
+  VERIFICATION_STATUSES,
+  verificationDecisionSchema,
+  type DealStatus,
+  type Role,
+  type VerificationDecisionInput,
+  type VerificationStatus,
+} from '@briefluence/shared';
+import { Clock } from '../../common/clock';
+import { Roles } from '../../common/decorators';
+import { ApiZodBody, ZodBody } from '../../common/zod';
+import { ENV } from '../../config/config.module';
+import type { Env } from '../../config/env';
+import { JobsService, type JobName } from '../jobs/jobs.service';
+import { AdminService } from './admin.service';
+
+const pick = <T extends string>(list: readonly T[], v?: string) => (list.includes(v as T) ? (v as T) : undefined);
+
+@ApiTags('admin')
+@Roles('ADMIN')
+@Controller('admin')
+export class AdminController {
+  constructor(
+    private readonly admin: AdminService,
+    private readonly jobs: JobsService,
+    private readonly clock: Clock,
+    @Inject(ENV) private readonly env: Env,
+  ) {}
+
+  @Get('stats')
+  stats() {
+    return this.admin.stats();
+  }
+
+  @Get('verifications')
+  verifications(@Query('status') status?: string) {
+    return this.admin.verifications(pick<VerificationStatus>(VERIFICATION_STATUSES, status) ?? 'PENDING_REVIEW');
+  }
+
+  @Post('verifications/:id/approve')
+  @HttpCode(204)
+  approve(@Param('id') id: string) {
+    return this.admin.approve(id);
+  }
+
+  @Post('verifications/:id/reject')
+  @HttpCode(204)
+  @ApiZodBody(verificationDecisionSchema)
+  reject(@Param('id') id: string, @ZodBody(verificationDecisionSchema) body: VerificationDecisionInput) {
+    return this.admin.reject(id, body.reason);
+  }
+
+  @Get('deals')
+  deals(@Query('status') status?: string, @Query('q') q?: string) {
+    return this.admin.deals(pick<DealStatus>(DEAL_STATUSES, status), q?.slice(0, 100));
+  }
+
+  @Post('deals/:id/close')
+  @HttpCode(200)
+  closeDeal(@Param('id') id: string) {
+    return this.admin.closeDeal(id);
+  }
+
+  @Get('users')
+  users(@Query('role') role?: string, @Query('q') q?: string) {
+    return this.admin.users(pick<Role>(ROLES, role), q?.slice(0, 100));
+  }
+
+  @Post('users/:id/block')
+  @HttpCode(204)
+  block(@Param('id') id: string) {
+    return this.admin.setBlocked(id, true);
+  }
+
+  @Post('users/:id/unblock')
+  @HttpCode(204)
+  unblock(@Param('id') id: string) {
+    return this.admin.setBlocked(id, false);
+  }
+
+  @Get('payments')
+  payments() {
+    return this.admin.payments();
+  }
+
+  /** Runs a scheduled job immediately (support / debugging). */
+  @Post('jobs/:name/run')
+  @HttpCode(200)
+  runJob(@Param('name') name: string) {
+    return this.jobs.run(name as JobName);
+  }
+
+  /** Dev/test only: shifts the server clock to exercise trials and renewals. */
+  @Post('dev/advance-time')
+  @HttpCode(200)
+  advance(@Body() body: { days?: number }) {
+    if (this.env.NODE_ENV === 'production') throw new ForbiddenException();
+    const days = Math.max(0, Math.min(400, Number(body?.days ?? 0)));
+    this.clock.advance(days * 86_400_000);
+    return { now: this.clock.now() };
+  }
+
+  /** Dev/test only: undoes advance-time. */
+  @Post('dev/reset-time')
+  @HttpCode(200)
+  resetTime() {
+    if (this.env.NODE_ENV === 'production') throw new ForbiddenException();
+    this.clock.reset();
+    return { now: this.clock.now() };
+  }
+}

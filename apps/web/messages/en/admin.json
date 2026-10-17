@@ -1,0 +1,53 @@
+{
+  "verifications": {
+    "title": "Verification queue",
+    "lead": "Check the profile and open every account before approving.",
+    "empty": "Nothing to review",
+    "emailNotVerified": "email not confirmed",
+    "submitted": "Submitted {date}",
+    "previousReason": "Previous reason: {reason}",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approved": "Approved. The blogger got an email.",
+    "rejected": "Rejected. The blogger got an email.",
+    "rejectTitle": "Reject verification",
+    "reason": "Reason",
+    "reasonHint": "The blogger sees this. Say what to fix."
+  },
+  "deals": {
+    "title": "Briefs",
+    "search": "Title or brand",
+    "status": "Status",
+    "empty": "No briefs found",
+    "deal": "Brief",
+    "brand": "Brand",
+    "compensation": "Pays",
+    "applicants": "Applicants",
+    "deadline": "Deadline",
+    "close": "Close",
+    "closed": "Brief closed"
+  },
+  "users": {
+    "title": "Users",
+    "search": "Email",
+    "role": "Role",
+    "empty": "No users found",
+    "user": "User",
+    "state": "State",
+    "joined": "Joined",
+    "block": "Block",
+    "unblock": "Unblock",
+    "blocked": "User blocked and signed out",
+    "unblocked": "User unblocked",
+    "isBlocked": "Blocked",
+    "emailPending": "Email not confirmed"
+  },
+  "payments": {
+    "title": "Payments",
+    "collected": "Collected, {currency}",
+    "count": "Payments",
+    "empty": "No payments yet",
+    "user": "User",
+    "subscription": "Subscription"
+  }
+}

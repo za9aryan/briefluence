@@ -1,0 +1,45 @@
+{
+  "hello": "Hi, {name}",
+  "influencerLead": "Here is what is happening with your collabs.",
+  "brandLead": "Your briefs and the bloggers who replied.",
+  "match": "Match",
+  "verify": {
+    "DRAFT": {
+      "title": "Get verified to see briefs",
+      "body": "Connect at least one account and send your profile for review.",
+      "cta": "Connect accounts"
+    },
+    "PENDING_REVIEW": {
+      "title": "We are reviewing your profile",
+      "body": "Usually within a day. Your feed opens as soon as you are approved.",
+      "cta": "View status"
+    },
+    "REJECTED": {
+      "title": "Your profile needs changes",
+      "body": "See what to fix and send it again.",
+      "cta": "See details"
+    }
+  },
+  "stats": {
+    "applications": "Applications",
+    "accepted": "Accepted",
+    "profileViews": "Profile views",
+    "plan": "Plan",
+    "daysLeft": "{count, plural, one {# day free} other {# days free}}"
+  },
+  "topMatches": "Best matches for you",
+  "noMatchesTitle": "No matching briefs right now",
+  "noMatchesBody": "We will send you new ones every day.",
+  "recentApplications": "Recent applications",
+  "noApplications": "You have not applied yet.",
+  "brand": {
+    "active": "Active briefs",
+    "awaiting": "Waiting for your answer",
+    "new7d": "New this week",
+    "drafts": "Drafts",
+    "recent": "Latest applicants",
+    "noApplicants": "No applicants yet.",
+    "firstTitle": "Post your first brief",
+    "firstBody": "Describe the task, choose who you want, and see how many verified bloggers match."
+  }
+}

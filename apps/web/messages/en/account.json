@@ -1,0 +1,14 @@
+{
+  "title": "Settings",
+  "influencerLead": "Your profile, notifications and password.",
+  "brandLead": "Your brand profile and password.",
+  "profile": "Profile",
+  "notifications": "Email notifications",
+  "digest": "Daily digest",
+  "digestHint": "New matching briefs or applicants, once a day. Payment and approval emails always arrive.",
+  "password": "Password",
+  "passwordHint": "Changing it signs you out on other devices.",
+  "currentPassword": "Current password",
+  "changePassword": "Change password",
+  "passwordChanged": "Password changed"
+}

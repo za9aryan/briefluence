@@ -1,0 +1,54 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: briefluence
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/briefluence
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/briefluence_test
+      JWT_ACCESS_SECRET: ci-access-secret-ci-access-secret-ci-0000
+      JWT_EMAIL_SECRET: ci-email-secret-ci-email-secret-ci-00000
+      TOKEN_ENCRYPTION_KEY: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+      SOCIAL_MOCK: 'true'
+      PAYMENT_PROVIDER: mock
+      EMAIL_TRANSPORT: log
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: PGPASSWORD=postgres psql -h localhost -U postgres -c 'CREATE DATABASE briefluence_test'
+      - run: pnpm --filter @briefluence/api prisma:generate
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - name: Build
+        run: pnpm build
+      - name: Migrate and seed
+        run: pnpm --filter @briefluence/api prisma:deploy && pnpm db:seed
+      - name: Install Playwright
+        run: pnpm --filter @briefluence/web exec playwright install --with-deps chromium
+      - name: E2E
+        run: pnpm e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report

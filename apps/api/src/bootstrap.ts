@@ -1,0 +1,23 @@
+import type { INestApplication } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
+import express from 'express';
+import { join } from 'node:path';
+import type { Env } from './config/env';
+
+/** Shared HTTP setup for main.ts and e2e tests. */
+export function configureApp(app: INestApplication, env: Env) {
+  app.setGlobalPrefix('api/v1');
+  app.use(cookieParser());
+  app.enableCors({ origin: env.CORS_ORIGINS.split(',').map((o) => o.trim()), credentials: true });
+  // Local file storage driver serves uploads from the API.
+  app.use('/api/v1/files', express.static(join(process.cwd(), 'uploads'), { maxAge: '7d', fallthrough: false }));
+
+  const config = new DocumentBuilder()
+    .setTitle('Briefluence API')
+    .setDescription('Influencer marketplace REST API. Auth uses httpOnly cookies set by /auth/login.')
+    .setVersion('1.0')
+    .addCookieAuth('bf_at')
+    .build();
+  SwaggerModule.setup('api/docs', app, () => SwaggerModule.createDocument(app, config));
+}

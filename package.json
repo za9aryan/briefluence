@@ -1,0 +1,37 @@
+{
+  "name": "briefluence",
+  "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write .",
+    "db:local": "node scripts/local-db.mjs",
+    "db:migrate": "pnpm --filter @briefluence/api prisma:migrate",
+    "db:seed": "pnpm --filter @briefluence/api prisma:seed",
+    "e2e": "pnpm --filter @briefluence/web e2e",
+    "prepare": "husky || true",
+    "admin:create": "pnpm --filter @briefluence/api admin:create"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "embedded-postgres": "16.14.0-beta.17",
+    "eslint": "^9.39.0",
+    "globals": "^16.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.0.0",
+    "prettier": "^3.6.0",
+    "turbo": "^2.5.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs,json,md,css}": "prettier --write"
+  }
+}

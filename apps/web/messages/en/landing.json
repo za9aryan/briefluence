@@ -1,0 +1,115 @@
+{
+  "hero": {
+    "badge": "Now in Armenia",
+    "title": "Brands post briefs. Bloggers reply.",
+    "lead": "Brands publish promo briefs for free. Active bloggers with 5k–100k followers see the ones that fit them and apply — for money or barter.",
+    "ctaBrand": "Post a brief for free",
+    "ctaInfluencer": "I'm a blogger",
+    "points": {
+      "free": "Free for brands",
+      "verified": "Stats from official APIs",
+      "local": "Made for Armenia"
+    }
+  },
+  "preview": {
+    "barter": "Barter",
+    "meta": "Yerevan · 2 days ago",
+    "title": "Dinner for two for a Reels",
+    "subtitle": "A cafe in the center is looking for 3 bloggers, 5k+ followers",
+    "city": "Yerevan",
+    "match": "Match",
+    "apply": "Apply",
+    "accepted": "Your application is approved — the brand expects the post by Friday"
+  },
+  "how": {
+    "eyebrow": "How it works",
+    "title": "From brief to post in four steps",
+    "lead": "No agencies, no screenshots of follower counts.",
+    "steps": {
+      "post": { "title": "A brand posts a brief", "body": "Country, city, audience size, age, gender, money or barter — as precise as the brand needs." },
+      "match": { "title": "You see what fits you", "body": "Your feed shows only briefs you qualify for, each with a 0–100 match score. Apply with a short pitch." },
+      "accept": { "title": "The brand says yes", "body": "Once you're accepted, you both see each other's contacts. Not before." },
+      "publish": { "title": "You post, they confirm", "body": "Publish the content, drop the link, and the brand marks the collab as done." }
+    }
+  },
+  "audiences": {
+    "brands": {
+      "badge": "For brands",
+      "title": "Find bloggers whose audience is your customer",
+      "points": {
+        "a": "Post as many briefs as you like — free.",
+        "b": "See real followers, engagement and audience before you say yes.",
+        "c": "A live counter shows how many verified bloggers match your brief."
+      },
+      "more": "How it works for brands"
+    },
+    "influencers": {
+      "badge": "For bloggers",
+      "title": "Collabs that fit you, not spam in your DMs",
+      "points": {
+        "a": "A feed of briefs you actually qualify for, best matches first.",
+        "b": "Money, barter or both — you choose. Models who work for barter are welcome.",
+        "c": "First month free, then 9.99 per month."
+      },
+      "more": "How it works for bloggers"
+    }
+  },
+  "trust": {
+    "eyebrow": "Trust",
+    "title": "Every number here is real",
+    "oauth": { "title": "Official APIs only", "body": "Bloggers connect Instagram, TikTok and YouTube through the official login. Followers and engagement come straight from the platform." },
+    "review": { "title": "Checked by people", "body": "We review every blogger profile before it can apply. Brands see a Verified badge and links to the real accounts." },
+    "match": { "title": "A fair match score", "body": "The score weighs niche, engagement, audience gender, age, country and language — and shows you why." }
+  },
+  "cta": {
+    "title": "Your next collab starts with a brief",
+    "lead": "Create a free brand account and post your first brief in five minutes.",
+    "pricing": "See pricing"
+  },
+  "brands": {
+    "title": "Influencer marketing without guesswork",
+    "lead": "Post a brief, see how many verified bloggers match it, and choose by real numbers.",
+    "features": {
+      "targeting": { "title": "Precise targeting", "body": "Country, city, platform, followers, engagement, blogger and audience gender and age, content language." },
+      "reach": { "title": "Reach before you post", "body": "The brief form shows a live count of verified bloggers who match your filters." },
+      "applicants": { "title": "Compare applicants", "body": "Sort by match or followers, see the audience split and open every connected profile." },
+      "contacts": { "title": "Talk directly", "body": "Accept a blogger and you both get each other's contacts. No middlemen, no commission." }
+    },
+    "cta": "Create a brand account"
+  },
+  "influencers": {
+    "title": "Collabs that fit your audience",
+    "lead": "Connect your accounts once, get verified, and apply to briefs that match your niche and followers.",
+    "features": {
+      "feed": { "title": "A feed made for you", "body": "Only briefs you qualify for, sorted by a match score that explains the fit." },
+      "verified": { "title": "Verified badge", "body": "Your stats come from official APIs, so brands trust them — and you." },
+      "track": { "title": "Track every application", "body": "Applied, viewed, shortlisted, accepted — you always know where you stand." },
+      "fair": { "title": "Honest price", "body": "First month free. Then 9.99 per month, cancel any time." }
+    },
+    "cta": "Start your free month"
+  },
+  "pricing": {
+    "title": "Simple pricing",
+    "lead": "Brands post for free. Bloggers pay a small monthly fee to apply.",
+    "brand": {
+      "name": "Brand",
+      "price": "Free",
+      "period": "while we launch",
+      "features": { "a": "Unlimited briefs", "b": "Live reach counter", "c": "Applicant comparison", "d": "Direct contacts after you accept" },
+      "cta": "Post a brief"
+    },
+    "influencer": {
+      "name": "Blogger",
+      "price": "{price}",
+      "period": "per month · first month free",
+      "features": { "a": "Personal feed with match scores", "b": "Unlimited applications", "c": "Verified badge", "d": "Cancel any time" },
+      "cta": "Start free month"
+    },
+    "faq": {
+      "title": "Questions",
+      "card": { "q": "Do I need a card for the free month?", "a": "No. You add a card only when you decide to subscribe." },
+      "cancel": { "q": "Can I cancel?", "a": "Yes, any time. You keep access until the end of the paid month." },
+      "cards": { "q": "Which cards work?", "a": "Visa, Mastercard and ArCa. Payments are processed by Ameriabank." }
+    }
+  }
+}

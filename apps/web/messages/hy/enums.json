@@ -1,0 +1,130 @@
+{
+  "role": {
+    "INFLUENCER": "Բլոգեր",
+    "BRAND": "Բրենդ",
+    "ADMIN": "Ադմինիստրատոր"
+  },
+  "platform": {
+    "INSTAGRAM": "Instagram",
+    "TIKTOK": "TikTok",
+    "YOUTUBE": "YouTube"
+  },
+  "niche": {
+    "food": "Սնունդ",
+    "beauty": "Գեղեցկություն",
+    "fashion": "Նորաձևություն",
+    "fitness": "Ֆիթնես",
+    "travel": "Ճանապարհորդություն",
+    "tech": "Տեխնոլոգիաներ",
+    "kids": "Երեխաներ",
+    "lifestyle": "Լայֆսթայլ",
+    "auto": "Ավտո",
+    "education": "Կրթություն"
+  },
+  "language": {
+    "hy": "Հայերեն",
+    "ru": "Ռուսերեն",
+    "en": "Անգլերեն"
+  },
+  "country": {
+    "AM": "Հայաստան",
+    "GE": "Վրաստան",
+    "RU": "Ռուսաստան",
+    "US": "ԱՄՆ",
+    "FR": "Ֆրանսիա",
+    "DE": "Գերմանիա",
+    "AE": "ԱՄԷ",
+    "UA": "Ուկրաինա",
+    "KZ": "Ղազախստան",
+    "IR": "Իրան"
+  },
+  "gender": {
+    "MALE": "Արական",
+    "FEMALE": "Իգական",
+    "OTHER": "Այլ"
+  },
+  "genderFilter": {
+    "ANY": "Ցանկացած",
+    "MALE": "Արական",
+    "FEMALE": "Իգական"
+  },
+  "audienceGender": {
+    "ANY": "Ցանկացած",
+    "MALE": "Հիմնականում տղամարդիկ",
+    "FEMALE": "Հիմնականում կանայք"
+  },
+  "paymentType": {
+    "BARTER": "Բարտեր",
+    "MONEY": "Գումար",
+    "MIXED": "Գումար + բարտեր"
+  },
+  "contentFormat": {
+    "POST": "Փոստ",
+    "REEL": "Reels",
+    "STORY": "Սթորի",
+    "SHORT_VIDEO": "Կարճ տեսանյութ",
+    "LONG_VIDEO": "Երկար տեսանյութ",
+    "LIVE": "Ուղիղ եթեր"
+  },
+  "dealStatus": {
+    "DRAFT": "Սևագիր",
+    "ACTIVE": "Ակտիվ",
+    "PAUSED": "Դադարեցված",
+    "CLOSED": "Փակված",
+    "EXPIRED": "Ժամկետանց"
+  },
+  "applicationStatus": {
+    "APPLIED": "Ուղարկված",
+    "VIEWED": "Դիտված",
+    "SHORTLISTED": "Ընտրվածների մեջ",
+    "ACCEPTED": "Ընդունված",
+    "REJECTED": "Մերժված",
+    "WITHDRAWN": "Հետ կանչված",
+    "COMPLETED": "Կատարված"
+  },
+  "verificationStatus": {
+    "DRAFT": "Ուղարկված չէ",
+    "PENDING_REVIEW": "Ստուգման մեջ",
+    "APPROVED": "Ստուգված",
+    "REJECTED": "Պետք են ուղղումներ"
+  },
+  "subscriptionStatus": {
+    "TRIALING": "Անվճար ամիս",
+    "ACTIVE": "Ակտիվ",
+    "PAST_DUE": "Վճարման խնդիր",
+    "CANCELED": "Չեղարկված",
+    "EXPIRED": "Ժամկետանց"
+  },
+  "paymentStatus": {
+    "PENDING": "Մշակվում է",
+    "SUCCEEDED": "Վճարված",
+    "FAILED": "Չհաջողվեց",
+    "REFUNDED": "Վերադարձված"
+  },
+  "rejectionReason": {
+    "BUDGET": "Բյուջե",
+    "AUDIENCE": "Լսարան",
+    "NICHE": "Նիշա",
+    "OTHER": "Այլ"
+  },
+  "audienceSize": {
+    "nano": "Նանո · 1k–10k",
+    "micro": "Միկրո · 10k–50k",
+    "mid": "Միջին · 50k–500k",
+    "macro": "Մակրո · 500k+",
+    "custom": "Իմ միջակայքը"
+  },
+  "currency": {
+    "AMD": "Հայկական դրամ",
+    "USD": "ԱՄՆ դոլար",
+    "RUB": "Ռուսական ռուբլի"
+  },
+  "contactMethod": {
+    "TELEGRAM": "Telegram",
+    "MESSENGER": "Messenger",
+    "VIBER": "Viber",
+    "WHATSAPP": "WhatsApp",
+    "INSTAGRAM": "Instagram",
+    "PHONE": "Հեռախոս"
+  }
+}

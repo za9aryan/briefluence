@@ -1,0 +1,50 @@
+/*
+ * Briefluence design system stylesheet. Import after `@import "tailwindcss";`.
+ * Colors, type and radii come from the brand book (brand/tokens.css + brand/tailwind-v4.css).
+ * Breakpoints are Tailwind's defaults: sm 640, md 768, lg 1024, xl 1280, 2xl 1536.
+ */
+@import './brand/tokens.css';
+@import './brand/tailwind-v4.css';
+
+@source "./";
+
+@theme {
+  --shadow-card: 0 1px 2px color-mix(in oklab, var(--bf-ink) 6%, transparent);
+  --shadow-pop: 0 12px 32px -12px color-mix(in oklab, var(--bf-ink) 35%, transparent);
+}
+
+/* Safelist: classes produced by responsive props in primitives (see lib/responsive.ts). */
+@source inline("{,sm:,md:,lg:,xl:,2xl:}gap-{0,1,2,4,6,8,12,16}");
+@source inline("{,sm:,md:,lg:,xl:,2xl:}{p,px,py,pt,pb}-{0,1,2,4,6,8,12,16}");
+@source inline("{,sm:,md:,lg:,xl:,2xl:}grid-cols-{1,2,3,4,5,6,7,8,9,10,11,12}");
+@source inline("{,sm:,md:,lg:,xl:,2xl:}col-span-{1,2,3,4,5,6,7,8,9,10,11,12,full}");
+@source inline("{,sm:,md:,lg:,xl:,2xl:}flex-{row,col,row-reverse,col-reverse}");
+@source inline("{,sm:,md:,lg:,xl:,2xl:}items-{start,center,end,stretch,baseline}");
+@source inline("{,sm:,md:,lg:,xl:,2xl:}justify-{start,center,end,between,around,evenly}");
+@source inline("{,sm:,md:,lg:,xl:,2xl:}{hidden,block,flex,grid,inline,inline-flex,contents}");
+@source inline("{,sm:,md:,lg:,xl:,2xl:}text-{display,h1,h2,body,small,label,xs,sm,base,lg,xl,2xl}");
+@source inline("{,sm:,md:,lg:,xl:,2xl:}text-{left,center,right}");
+@source inline("{,sm:,md:,lg:,xl:,2xl:}w-{auto,full}");
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-surface font-sans text-body text-ink antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--bf-primary);
+    outline-offset: 2px;
+  }
+  a {
+    color: inherit;
+  }
+  /* Syne has no Cyrillic / Armenian glyphs: display headings fall back to Manrope extrabold. */
+  :lang(ru) .font-display,
+  :lang(hy) .font-display {
+    font-family: var(--bf-font-sans);
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+}

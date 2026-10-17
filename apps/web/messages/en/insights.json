@@ -1,0 +1,44 @@
+{
+  "title": "What bloggers are looking for",
+  "lead": "Filters verified bloggers use in their brief feed. Shape your next brief around them.",
+  "period": "Period",
+  "lastDays": "Last {count} days",
+  "searches": "Searches",
+  "category": "Category",
+  "showTable": "Table",
+  "showChart": "Chart",
+  "empty": "No searches in this period yet.",
+  "kpi": {
+    "searches": "Feed searches",
+    "bloggers": "Bloggers searching",
+    "ofVerified": "of {count} verified",
+    "filtered": "Used filters",
+    "topNiche": "Top niche"
+  },
+  "perDay": {
+    "title": "Searches per day",
+    "subtitle": "How active bloggers are in the feed."
+  },
+  "platforms": {
+    "title": "Platforms",
+    "subtitle": "Which platform bloggers filter for."
+  },
+  "payment": {
+    "title": "Money or barter",
+    "subtitle": "What kind of compensation bloggers look for."
+  },
+  "niches": {
+    "title": "Niches",
+    "subtitle": "Topics bloggers filter for."
+  },
+  "budget": {
+    "title": "Minimum budget asked",
+    "subtitle": "Lowest budget bloggers set in the filter, AMD.",
+    "note": "Only searches with a budget filter are counted."
+  },
+  "cities": {
+    "title": "Cities",
+    "subtitle": "Where bloggers want to collaborate."
+  },
+  "privacy": "Counts are anonymous totals across all verified bloggers; one search can count in several categories."
+}

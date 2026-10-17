@@ -1,0 +1,48 @@
+/* Tailwind CSS v4 mapping of the brand tokens (from the brand book).
+   Utilities: bg-surface, text-ink, bg-primary, text-on-primary, rounded-card, rounded-pill, font-display… */
+
+@theme inline {
+  --color-surface: var(--bf-surface);
+  --color-surface-raised: var(--bf-surface-raised);
+  --color-line: var(--bf-line);
+  --color-ink: var(--bf-ink);
+  --color-ink-muted: var(--bf-ink-muted);
+  --color-primary: var(--bf-primary);
+  --color-primary-text: var(--bf-primary-text);
+  --color-primary-soft: var(--bf-primary-soft);
+  --color-on-primary: var(--bf-on-primary);
+  --color-sun: var(--bf-sun);
+  --color-success: var(--bf-success);
+  --color-chart-1: var(--bf-chart-1);
+  --color-chart-2: var(--bf-chart-2);
+  --color-chart-3: var(--bf-chart-3);
+
+  --font-display: var(--bf-font-display);
+  --font-sans: var(--bf-font-sans);
+
+  --text-display: 48px;
+  --text-display--line-height: 52px;
+  --text-display--font-weight: 800;
+  --text-display--letter-spacing: -0.02em;
+  --text-h1: 32px;
+  --text-h1--line-height: 38px;
+  --text-h1--font-weight: 700;
+  --text-h1--letter-spacing: -0.01em;
+  --text-h2: 22px;
+  --text-h2--line-height: 28px;
+  --text-h2--font-weight: 700;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-small: 13px;
+  --text-small--line-height: 18px;
+  --text-small--font-weight: 500;
+  --text-label: 12px;
+  --text-label--line-height: 16px;
+  --text-label--font-weight: 700;
+  --text-label--letter-spacing: 0.08em;
+
+  --radius-sm: var(--bf-radius-sm);
+  --radius-card: var(--bf-radius-md);
+  --radius-lg: var(--bf-radius-lg);
+  --radius-pill: var(--bf-radius-pill);
+}

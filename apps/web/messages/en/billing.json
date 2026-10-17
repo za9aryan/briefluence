@@ -1,0 +1,83 @@
+{
+  "trial": {
+    "badge": "First month free",
+    "title": "Start your free month",
+    "terms": {
+      "a": "30 days of full access, counted from the moment you start.",
+      "b": "No card needed now. Nothing is charged automatically.",
+      "c": "After that, {price} per month — only if you decide to subscribe."
+    },
+    "cta": "Start my free month",
+    "note": "You can start it whenever you are ready.",
+    "started": "Your free month has started",
+    "checklist": {
+      "title": "Two steps to see briefs",
+      "lead": "Briefs open as soon as both are done.",
+      "trialTitle": "Start your free month",
+      "trialBody": "30 days free, no card needed.",
+      "trialDone": "Started.",
+      "trialCta": "Start free month",
+      "verifyTitle": "Get your account verified",
+      "verifyBody": {
+        "DRAFT": "Connect an account and send it for review.",
+        "PENDING_REVIEW": "We are reviewing it — usually within a day.",
+        "REJECTED": "Needs changes — see what to fix.",
+        "APPROVED": "Verified."
+      },
+      "verifyCta": "Open verification"
+    }
+  },
+  "subscribe": "Subscribe",
+  "trialBanner": "{count, plural, =0 {Your free month ends today.} one {# day left in your free month.} other {# days left in your free month.}}",
+  "expiredBanner": "Your plan has ended. You can browse briefs; subscribe to apply.",
+  "paidToast": "Payment received. Your plan is active.",
+  "pendingToast": "The bank is still processing the payment.",
+  "failedToast": "The payment did not go through.",
+  "title": "Billing",
+  "lead": "Your plan, card and payments.",
+  "noSubscription": "Finish your profile to start the free month.",
+  "plan": "Blogger plan",
+  "perMonth": "per month",
+  "trialInfo": "Free month: {count, plural, one {# day} other {# days}} left, until {date}. No card needed until then.",
+  "renewsOn": "Renews on {date}.",
+  "endsOn": "Ends on {date}. It will not renew.",
+  "pastDueTitle": "We could not charge your card",
+  "pastDueBody": "You still have access. We will try again on {date}, or you can pay now with another card.",
+  "pastDueNoRetry": "Pay now to keep access.",
+  "expiredInfo": "Your plan is not active. Browsing is free; subscribe to apply again.",
+  "subscribeNow": "Subscribe for {price}",
+  "subscribeAgain": "Subscribe again for {price}",
+  "cancel": "Cancel subscription",
+  "resume": "Keep my subscription",
+  "cardsNote": "Visa, Mastercard and ArCa. Payments are processed by Ameriabank; we never see your card number.",
+  "card": "Card",
+  "nextCharge": "Next charge on {date}",
+  "removeCard": "Remove card",
+  "noCard": "No saved card. You add one when you subscribe.",
+  "history": "Payment history",
+  "date": "Date",
+  "type": "Type",
+  "amount": "Amount",
+  "status": "Status",
+  "order": "Order",
+  "kind": {
+    "checkout": "Subscription",
+    "renewal": "Renewal"
+  },
+  "noPayments": "No payments yet.",
+  "cancelTitle": "Cancel your subscription?",
+  "cancelBody": "You keep access until {date}. After that you can still browse briefs.",
+  "removeCardTitle": "Remove your card?",
+  "removeCardBody": "Without a card your plan will not renew; it ends with the current month.",
+  "mock": {
+    "notice": "Test payment page. In production the Ameriabank page opens here. No real money is charged.",
+    "title": "Pay with a test card",
+    "amount": "Amount",
+    "pay": "Pay",
+    "cards": {
+      "success": "Always succeeds",
+      "renewal_decline": "Pays now, renewals decline",
+      "decline": "Declined"
+    }
+  }
+}
