@@ -1,7 +1,11 @@
 // Draft legal texts — have a lawyer review before launch. Every leaf is [en, ru, hy].
 export default {
   legal: {
-    updated: ['Last updated: 16 October 2026 · Draft', 'Обновлено: 16 октября 2026 · Черновик', 'Թարմացվել է՝ 2026 թ. հոկտեմբերի 16 · Սևագիր'],
+    updated: [
+      'Last updated: 16 October 2026 · Draft',
+      'Обновлено: 16 октября 2026 · Черновик',
+      'Թարմացվել է՝ 2026 թ. հոկտեմբերի 16 · Սևագիր',
+    ],
     contact: [
       'Questions? Write to support@briefluence.am.',
       'Вопросы? Пиши на support@briefluence.am.',
@@ -34,13 +38,17 @@ export default {
         c: {
           title: ['3. Brands', '3. Бренды', '3. Բրենդները'],
           body: [
-            'Posting briefs is free during the launch. Briefs must describe a real, lawful product or service and the actual compensation. Contacts of a blogger may be used only for the accepted collaboration.',
-            'На время запуска размещение брифов бесплатно. Бриф должен описывать реальный и законный продукт или услугу и реальное вознаграждение. Контакты блогера можно использовать только для принятого сотрудничества.',
-            'Մեկնարկի ընթացքում բրիֆների տեղադրումն անվճար է։ Բրիֆը պետք է նկարագրի իրական և օրինական ապրանք կամ ծառայություն և իրական վարձատրություն։ Բլոգերի կոնտակտները կարելի է օգտագործել միայն ընդունված համագործակցության համար։',
+            'Posting briefs is free. Briefs must describe a real, lawful product or service and the actual compensation. Contacts of a blogger may be used only for the accepted collaboration.',
+            'Размещение брифов бесплатно. Бриф должен описывать реальный и законный продукт или услугу и реальное вознаграждение. Контакты блогера можно использовать только для принятого сотрудничества.',
+            'Բրիֆների տեղադրումն անվճար է։ Բրիֆը պետք է նկարագրի իրական և օրինական ապրանք կամ ծառայություն և իրական վարձատրություն։ Բլոգերի կոնտակտները կարելի է օգտագործել միայն ընդունված համագործակցության համար։',
           ],
         },
         d: {
-          title: ['4. Bloggers and subscription', '4. Блогеры и подписка', '4. Բլոգերները և բաժանորդագրությունը'],
+          title: [
+            '4. Bloggers and subscription',
+            '4. Блогеры и подписка',
+            '4. Բլոգերները և բաժանորդագրությունը',
+          ],
           body: [
             'Applying requires a verified profile and an active free month or subscription. The first month is free; after that the subscription renews monthly at the price shown on the pricing page until you cancel.',
             'Для откликов нужен проверенный профиль и активный бесплатный месяц или подписка. Первый месяц бесплатный, затем подписка продлевается ежемесячно по цене со страницы «Цены», пока ты её не отменишь.',
@@ -56,7 +64,11 @@ export default {
           ],
         },
         f: {
-          title: ['6. Content and conduct', '6. Контент и поведение', '6. Բովանդակությունը և վարքագիծը'],
+          title: [
+            '6. Content and conduct',
+            '6. Контент и поведение',
+            '6. Բովանդակությունը և վարքագիծը',
+          ],
           body: [
             'Do not post illegal, misleading or offensive content, do not fake statistics and do not spam other users. Paid posts must be marked as advertising where the law or the platform requires it.',
             'Не публикуй незаконный, вводящий в заблуждение или оскорбительный контент, не подделывай статистику и не спамь другим пользователям. Платные публикации нужно помечать как рекламу, если этого требует закон или платформа.',
@@ -98,7 +110,11 @@ export default {
           ],
         },
         b: {
-          title: ['2. Connected social accounts', '2. Подключённые соцсети', '2. Միացված սոցիալական հաշիվները'],
+          title: [
+            '2. Connected social accounts',
+            '2. Подключённые соцсети',
+            '2. Միացված սոցիալական հաշիվները',
+          ],
           body: [
             'When you connect Instagram, TikTok or YouTube through their official login, we receive your username, follower count, recent post statistics and, where available, aggregated audience demographics (age, gender, country). We never post on your behalf. Access tokens are stored encrypted (AES-256) and you can revoke access any time in the platform settings or by disconnecting the account here.',
             'Когда ты подключаешь Instagram, TikTok или YouTube через официальный вход, мы получаем имя пользователя, число подписчиков, статистику последних публикаций и, если доступно, обобщённую демографию аудитории (возраст, пол, страна). Мы никогда не публикуем от твоего имени. Токены доступа хранятся в зашифрованном виде (AES-256), а отозвать доступ можно в любой момент в настройках платформы или отключив аккаунт здесь.',
