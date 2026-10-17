@@ -1,11 +1,12 @@
 'use client';
 import { REJECTION_REASONS, type Currency, type RejectionReason } from '@briefluence/shared';
-import { Alert, Avatar, Button, Card, ChipGroup, Inline, Modal, ScoreMeter, Stack, Text, buttonStyles } from '@briefluence/ui';
+import { Alert, Avatar, Badge, Button, Card, ChipGroup, Inline, Modal, ScoreMeter, Stack, Text, buttonStyles } from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useState } from 'react';
 import { AccountLine, AccountStats } from '@/components/domain/AccountStats';
 import { ApplicationStatusBadge, VerifiedBadge } from '@/components/domain/badges';
+import { ContactLink } from '@/components/domain/ContactLink';
 import { useFormat } from '@/lib/hooks/format';
 import { useOptions } from '@/lib/hooks/options';
 import type { ApplicantDto } from '@/lib/types';
@@ -49,7 +50,11 @@ export function ApplicantCard({
               <Text size="small" tone="muted">
                 {[a.influencer.city, a.influencer.niches.map(o.niche).join(', ')].filter(Boolean).join(' · ')}
               </Text>
-              {a.account && <AccountLine account={a.account} />}
+              {a.accounts.length > 1 && (
+                <Text size="small" tone="muted">
+                  {t('accountsCount', { count: a.accounts.length })}
+                </Text>
+              )}
             </Stack>
           </Inline>
           <Inline gap={4} className="shrink-0">
@@ -66,26 +71,36 @@ export function ApplicantCard({
           </Text>
         </div>
 
-        {a.account && (
-          <div>
-            <button type="button" className="min-h-11 text-small font-bold text-primary-text hover:underline" onClick={() => setExpanded((x) => !x)} aria-expanded={expanded}>
+        {/* All connected accounts, so the brand can plan further collaboration beyond this brief. */}
+        {a.accounts.length > 0 && (
+          <Stack gap={2}>
+            {a.accounts.map((acc) => (
+              <Inline key={acc.id} gap={2} wrap>
+                <AccountLine account={acc} />
+                {acc.id === a.matchedAccountId && a.accounts.length > 1 && <Badge tone="primary">{t('bestMatch')}</Badge>}
+              </Inline>
+            ))}
+            <button type="button" className="min-h-11 self-start text-small font-bold text-primary-text hover:underline" onClick={() => setExpanded((x) => !x)} aria-expanded={expanded}>
               {expanded ? t('hideStats') : t('showStats')}
             </button>
-            {expanded && <AccountStats account={a.account} />}
-          </div>
+            {expanded && (
+              <div className="grid gap-4 md:grid-cols-2">
+                {a.accounts.map((acc) => (
+                  <div key={acc.id} className="rounded-card border border-line p-4">
+                    <AccountLine account={acc} link={false} />
+                    <div className="mt-4">
+                      <AccountStats account={acc} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Stack>
         )}
 
         {a.contacts && (
           <Alert tone="success" title={t('contacts')}>
-            <Inline gap={4} wrap>
-              {a.contacts.phone && <a href={`tel:${a.contacts.phone}`} className="font-bold underline">{a.contacts.phone}</a>}
-              {a.contacts.email && <a href={`mailto:${a.contacts.email}`} className="font-bold underline">{a.contacts.email}</a>}
-              {a.contacts.telegram && (
-                <a href={`https://t.me/${a.contacts.telegram.replace(/^@/, '')}`} target="_blank" rel="noopener noreferrer" className="font-bold underline">
-                  {a.contacts.telegram}
-                </a>
-              )}
-            </Inline>
+            {a.contacts.method && a.contacts.value ? <ContactLink method={a.contacts.method} value={a.contacts.value} /> : t('noContact')}
           </Alert>
         )}
 

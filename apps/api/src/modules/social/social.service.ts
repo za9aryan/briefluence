@@ -181,8 +181,7 @@ export class SocialService implements OnModuleInit {
       if (!acc.tokenRevokedAt) {
         await this.prisma.socialAccount.update({ where: { id: acc.id }, data: { tokenRevokedAt: now } });
         await this.notifications.notify(acc.influencer.userId, 'SOCIAL_TOKEN_REVOKED', {
-          title: 'Reconnect your account',
-          body: `We lost access to your ${acc.platform.toLowerCase()} account @${acc.username}. Reconnect it so brands see up-to-date stats.`,
+          params: { platform: acc.platform, username: acc.username },
           link: '/influencer/verification',
         });
       }

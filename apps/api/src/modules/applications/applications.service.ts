@@ -25,13 +25,6 @@ import { toMatchDeal, toMatchInfluencer } from '../deals/match-input';
 import { DealsService } from '../deals/deals.service';
 import { NotificationsService } from '../notifications/notifications.service';
 
-const REJECTION_TEXT: Record<RejectionReason, string> = {
-  BUDGET: 'the budget did not fit',
-  AUDIENCE: 'the audience was not the right fit',
-  NICHE: 'the niche was not the right fit',
-  OTHER: 'the brand chose other creators',
-};
-
 @Injectable()
 export class ApplicationsService {
   constructor(
@@ -53,10 +46,15 @@ export class ApplicationsService {
     const inf = toMatchInfluencer(profile);
     const failure = checkEligibility(toMatchDeal(deal), inf, now);
     if (failure) throw new AppError('NOT_ELIGIBLE', 'You are not eligible for this deal', { reason: failure });
-    const account = profile.socialAccounts.find((a) => a.id === input.socialAccountId);
-    if (!account || account.tokenRevokedAt) throw new AppError('VALIDATION_FAILED', 'Choose one of your connected accounts');
-    const match = matchScore(toMatchDeal(deal), inf, account.id);
-    if (!match) throw new AppError('NOT_ELIGIBLE', 'This account does not fit the deal requirements', { reason: 'PLATFORM_OR_FOLLOWERS' });
+    // The blogger does not pick an account: the best-matching one is used for the score, and the
+    // brand sees all connected accounts. An explicit account id is still honoured if sent.
+    if (input.socialAccountId) {
+      const chosen = profile.socialAccounts.find((a) => a.id === input.socialAccountId);
+      if (!chosen || chosen.tokenRevokedAt) throw new AppError('VALIDATION_FAILED', 'Choose one of your connected accounts');
+    }
+    const match = matchScore(toMatchDeal(deal), inf, input.socialAccountId);
+    if (!match) throw new AppError('NOT_ELIGIBLE', 'No connected account fits the deal requirements', { reason: 'PLATFORM_OR_FOLLOWERS' });
+    const account = { id: match.accountId };
 
     const data = {
       socialAccountId: account.id,
@@ -85,8 +83,7 @@ export class ApplicationsService {
       }
     }
     await this.notifications.notify(deal.brand.userId, 'NEW_APPLICANT', {
-      title: 'New applicant',
-      body: `${profile.displayName} applied to "${deal.title}" (match ${match.score}%).`,
+      params: { name: profile.displayName, deal: deal.title, score: match.score },
       link: `/brand/deals/${deal.id}/applicants`,
     });
     return application;
@@ -161,8 +158,7 @@ export class ApplicationsService {
     if (!canSubmitPostUrl(app.status)) throw new AppError('INVALID_TRANSITION', 'Only accepted applications can get a post URL');
     const updated = await this.prisma.application.update({ where: { id }, data: { postUrl } });
     await this.notifications.notify(app.deal.brand.userId, 'POST_SUBMITTED', {
-      title: 'Content published',
-      body: `${app.influencer.displayName} published the content for "${app.deal.title}". Review it and mark the deal completed.`,
+      params: { name: app.influencer.displayName, deal: app.deal.title },
       link: `/brand/deals/${app.dealId}/applicants`,
     });
     return updated;
@@ -182,11 +178,7 @@ export class ApplicationsService {
       await this.prisma.application.updateMany({ where: { id: { in: fresh.map((f) => f.id) } }, data: { status: 'VIEWED' } });
       await Promise.all(
         fresh.map((f) =>
-          this.notifications.notify(f.influencer.userId, 'APPLICATION_VIEWED', {
-            title: 'Your application was viewed',
-            body: `The brand viewed your application to "${deal.title}".`,
-            link: '/influencer/applications',
-          }),
+          this.notifications.notify(f.influencer.userId, 'APPLICATION_VIEWED', { params: { deal: deal.title }, link: '/influencer/applications' }),
         ),
       );
     }
@@ -196,7 +188,6 @@ export class ApplicationsService {
       include: { influencer: { include: { socialAccounts: true } } },
     });
     const rows = apps.map((a) => {
-      const account = a.influencer.socialAccounts.find((s) => s.id === a.socialAccountId);
       const p = a.influencer;
       return {
         id: a.id,
@@ -217,15 +208,19 @@ export class ApplicationsService {
           niches: p.niches,
           verified: p.status === 'APPROVED',
         },
-        account: account ? publicAccount(account) : null,
-        contacts: contactsRevealed(a.status)
-          ? { email: p.contactEmail, phone: p.contactPhone, telegram: p.telegram }
-          : null,
+        /** The account the match score was computed for. */
+        matchedAccountId: a.socialAccountId,
+        /** All connected accounts (largest first) so the brand can evaluate further collaboration. */
+        accounts: p.socialAccounts
+          .filter((s) => !s.tokenRevokedAt)
+          .sort((x, y) => y.followers - x.followers)
+          .map(publicAccount),
+        contacts: contactsRevealed(a.status) ? { method: p.contactMethod, value: p.contactValue } : null,
       };
     });
     const sorters = {
       match: (a: (typeof rows)[number], b: (typeof rows)[number]) => b.matchScore - a.matchScore,
-      followers: (a: (typeof rows)[number], b: (typeof rows)[number]) => (b.account?.followers ?? 0) - (a.account?.followers ?? 0),
+      followers: (a: (typeof rows)[number], b: (typeof rows)[number]) => (b.accounts[0]?.followers ?? 0) - (a.accounts[0]?.followers ?? 0),
       newest: (a: (typeof rows)[number], b: (typeof rows)[number]) => b.createdAt.getTime() - a.createdAt.getTime(),
     };
     rows.sort(sorters[q.sort]);
@@ -279,8 +274,7 @@ export class ApplicationsService {
     await this.notifyStatus(app.influencer.userId, app.deal, to, input.rejectionReason);
     if (dealFilled) {
       await this.notifications.notify(userId, 'DEAL_FILLED', {
-        title: 'Deal filled',
-        body: `"${app.deal.title}" reached its ${app.deal.slots} slot(s) and was closed automatically.`,
+        params: { deal: app.deal.title, slots: app.deal.slots },
         link: `/brand/deals/${app.dealId}/applicants`,
       });
     }
@@ -288,29 +282,19 @@ export class ApplicationsService {
   }
 
   private async notifyStatus(influencerUserId: string, deal: Deal, status: string, reason?: RejectionReason) {
-    const messages: Partial<Record<string, { type: NotificationType; title: string; body: string }>> = {
-      SHORTLISTED: {
-        type: 'APPLICATION_SHORTLISTED',
-        title: 'You were shortlisted',
-        body: `You were shortlisted for "${deal.title}".`,
-      },
-      ACCEPTED: {
-        type: 'APPLICATION_ACCEPTED',
-        title: 'Application accepted',
-        body: `Your application to "${deal.title}" was accepted. The brand's contacts are now visible in your applications.`,
-      },
-      REJECTED: {
-        type: 'APPLICATION_REJECTED',
-        title: 'Application not selected',
-        body: `Your application to "${deal.title}" was not selected: ${REJECTION_TEXT[reason ?? 'OTHER']}.`,
-      },
-      COMPLETED: {
-        type: 'APPLICATION_COMPLETED',
-        title: 'Collaboration completed',
-        body: `The brand confirmed your work on "${deal.title}". Great job!`,
-      },
+    const types: Partial<Record<string, NotificationType>> = {
+      SHORTLISTED: 'APPLICATION_SHORTLISTED',
+      ACCEPTED: 'APPLICATION_ACCEPTED',
+      REJECTED: 'APPLICATION_REJECTED',
+      COMPLETED: 'APPLICATION_COMPLETED',
     };
-    const m = messages[status];
-    if (m) await this.notifications.notify(influencerUserId, m.type, { title: m.title, body: m.body, link: '/influencer/applications' });
+    const type = types[status];
+    if (type) {
+      await this.notifications.notify(influencerUserId, type, {
+        params: { deal: deal.title, reason: reason ?? null },
+        link: '/influencer/applications',
+      });
+    }
   }
+
 }

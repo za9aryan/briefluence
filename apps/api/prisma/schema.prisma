@@ -113,6 +113,7 @@ model User {
   blockedAt       DateTime? // spec+: admin moderation of users/brands
   digestEmails    Boolean            @default(true) // spec+: notification settings page
   currency        Currency           @default(AMD) // spec+: currency amounts are shown in
+  locale          String             @default("en") // spec+: language for emails / notifications (en | ru | hy)
   influencer      InfluencerProfile?
   brand           BrandProfile?
   subscription    Subscription?
@@ -148,9 +149,8 @@ model InfluencerProfile {
   birthYear       Int?
   languages       String[] // ISO 639-1
   niches          String[] // from a fixed category list
-  contactEmail    String?
-  contactPhone    String?
-  telegram        String?
+  contactMethod   ContactMethod? // spec+: replaces contactEmail / contactPhone / telegram
+  contactValue    String?
   status          VerificationStatus @default(DRAFT)
   rejectionReason String?
   approvedAt      DateTime?
@@ -318,6 +318,7 @@ model Notification {
   type      String
   title     String
   body      String
+  params    Json? // spec+: raw values to render the text in the reader's language
   link      String?
   readAt    DateTime?
   createdAt DateTime  @default(now())

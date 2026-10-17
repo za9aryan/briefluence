@@ -5,9 +5,15 @@ import type { ReactNode } from 'react';
 const colors = { brand: '#C8187F', onBrand: '#FFFFFF', text: '#241B2B', muted: '#6B6175', bg: '#FCFAFD', line: '#EEE6EF' };
 const font = "Manrope, 'Noto Sans Armenian', -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif";
 
-export function Layout({ preview, title, children }: { preview: string; title: string; children: ReactNode }) {
+const FOOTER = {
+  en: 'You receive this email because you have a briefluence account. Digest emails can be turned off in your account settings.',
+  ru: 'Ты получаешь это письмо, потому что у тебя есть аккаунт briefluence. Ежедневную подборку можно отключить в настройках.',
+  hy: 'Դու ստանում ես այս նամակը, քանի որ ունես briefluence հաշիվ։ Օրական ամփոփումը կարող ես անջատել կարգավորումներում։',
+} as const;
+
+export function Layout({ preview, title, locale = 'en', children }: { preview: string; title: string; locale?: keyof typeof FOOTER; children: ReactNode }) {
   return (
-    <Html lang="en">
+    <Html lang={locale}>
       <Head />
       <Preview>{preview}</Preview>
       <Body style={{ backgroundColor: colors.bg, fontFamily: font, margin: 0 }}>
@@ -19,8 +25,7 @@ export function Layout({ preview, title, children }: { preview: string; title: s
           {children}
           <Hr style={{ margin: '32px 0 16px', borderColor: colors.line }} />
           <Text style={{ color: colors.muted, fontSize: 12, margin: 0 }}>
-            You receive this email because you have a briefluence account. Digest emails can be turned off in your
-            account settings.
+            {FOOTER[locale]}
           </Text>
         </Container>
       </Body>

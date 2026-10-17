@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 import { LOCALE_COOKIE, LOCALE_NAMES, LOCALES, type Locale } from '@/i18n/config';
+import { api } from '@/lib/api';
 import { useDisplayCurrency, useSetCurrency } from '@/lib/hooks/currency';
 import { landingPath, useLogout, type Me } from '@/lib/hooks/session';
 
@@ -26,6 +27,8 @@ export function UserMenu({ me, showDashboard }: { me: Me; showDashboard?: boolea
 
   const chooseLocale = (l: Locale) => {
     document.cookie = `${LOCALE_COOKIE}=${l}; path=/; max-age=31536000; samesite=lax`;
+    // Emails and notifications follow the account language.
+    void api.patch('/auth/settings', { locale: l }).catch(() => undefined);
     start(() => router.refresh());
   };
   const item = 'flex min-h-11 w-full items-center gap-2 px-4 text-small text-ink hover:bg-surface';

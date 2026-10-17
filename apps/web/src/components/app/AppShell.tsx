@@ -105,7 +105,7 @@ function Banners({ me }: { me: Me }) {
             )
           }
         >
-          {t('verifyBanner')}
+          {me.role === 'BRAND' ? t('verifyBannerBrand') : t('verifyBannerBlogger')}
         </Alert>
       )}
       {me.role === 'INFLUENCER' && sub?.status === 'TRIALING' && sub.trialDaysLeft <= 7 && (

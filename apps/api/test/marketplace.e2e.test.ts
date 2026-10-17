@@ -82,7 +82,7 @@ describe('marketplace core loop (e2e)', () => {
     await admin.agent.post(`${API}/admin/verifications/${queue.body[0].id}/reject`).send({ reason: 'Account is private' }).expect(204);
     const rejected = await inf.agent.get(`${API}/notifications`).expect(200);
     expect(rejected.body.items[0]).toMatchObject({ type: 'VERIFICATION_REJECTED' });
-    expect((await lastEmailTo(ctx, inf.email))?.subject).toBe('Verification needs changes');
+    expect((await lastEmailTo(ctx, inf.email))?.subject).toBe('Your profile needs changes');
 
     await inf.agent.post(`${API}/influencers/me/submit`).expect(200);
     await admin.agent.post(`${API}/admin/verifications/${queue.body[0].id}/approve`).expect(204);
@@ -141,11 +141,13 @@ describe('marketplace core loop (e2e)', () => {
     await brand.agent.patch(`${API}/applications/${appId}/status`).send({ status: 'ACCEPTED' }).expect(200);
 
     const after = await brand.agent.get(`${API}/deals/${brand.dealId}/applications`).expect(200);
-    expect(after.body.items[0].contacts).toMatchObject({ email: 'anna@mail.am', telegram: '@anna' });
+    expect(after.body.items[0].contacts).toEqual({ method: 'TELEGRAM', value: 'anna' });
+    expect(after.body.items[0].accounts).toHaveLength(1);
+    expect(after.body.items[0].matchedAccountId).toBe(after.body.items[0].accounts[0].id);
     expect(after.body.deal).toMatchObject({ status: 'CLOSED', filled: 1 }); // slot reached → auto-closed
     const mine = await inf.agent.get(`${API}/applications/mine`).expect(200);
     expect(mine.body[0].brandContact).toEqual({ name: 'Karen', position: 'PR manager', method: 'TELEGRAM', value: 'ararat_pr' });
-    expect((await lastEmailTo(ctx, inf.email))?.subject).toBe('Application accepted');
+    expect((await lastEmailTo(ctx, inf.email))?.subject).toBe('Your application is approved');
 
     await inf.agent.post(`${API}/applications/${appId}/withdraw`).expect(409);
     const early = await brand.agent.patch(`${API}/applications/${appId}/status`).send({ status: 'COMPLETED' }).expect(409);
@@ -246,7 +248,7 @@ describe('marketplace core loop (e2e)', () => {
     ctx.email.outbox.length = 0;
     const res = await inf.admin.agent.post(`${API}/admin/jobs/digests/run`).expect(200);
     expect(res.body).toEqual({ influencers: 1, brands: 1 });
-    expect((await lastEmailTo(ctx, inf.email))?.subject).toBe('1 new deal for you');
+    expect((await lastEmailTo(ctx, inf.email))?.subject).toBe('1 new brief for you');
     expect((await lastEmailTo(ctx, brand.email))?.subject).toBe('1 new applicant yesterday');
   });
 
@@ -299,5 +301,32 @@ describe('marketplace core loop (e2e)', () => {
     await brand.agent.put(`${API}/brands/me`).send({ ...brandProfile, contactMethod: 'VIBER', contactValue: '' }).expect(400);
     const ok = await brand.agent.put(`${API}/brands/me`).send({ ...brandProfile, contactMethod: 'WHATSAPP', contactValue: '+374 (91) 12-34-56' }).expect(200);
     expect(ok.body).toMatchObject({ contactMethod: 'WHATSAPP', contactValue: '+37491123456' });
+  });
+
+  it('applies without choosing an account and shows the brand all connected accounts', async () => {
+    const inf = await approvedInfluencer();
+    await connectMock(ctx, inf.agent, 'tiktok');
+    const brand = await brandWithDeal({ platforms: ['INSTAGRAM', 'TIKTOK'] });
+    await inf.agent.post(`${API}/deals/${brand.dealId}/applications`).send({ pitch: 'Happy to do this collab!' }).expect(201);
+    const list = await brand.agent.get(`${API}/deals/${brand.dealId}/applications`).expect(200);
+    const row = list.body.items[0];
+    expect(row.accounts.map((a: { platform: string }) => a.platform).sort()).toEqual(['INSTAGRAM', 'TIKTOK']);
+    expect(row.accounts.some((a: { id: string }) => a.id === row.matchedAccountId)).toBe(true);
+    expect(JSON.stringify(row.accounts)).not.toContain('accessToken');
+  });
+
+  it('stores notification params and renders text and emails in the user language', async () => {
+    const inf = await approvedInfluencer();
+    await inf.agent.patch(`${API}/auth/settings`).send({ locale: 'ru' }).expect(204);
+    const brand = await brandWithDeal({ title: 'Ужин на двоих за Reels' });
+    await inf.agent.post(`${API}/deals/${brand.dealId}/applications`).send({ pitch: 'Хочу снять этот Reels!' }).expect(201);
+    const list = await brand.agent.get(`${API}/deals/${brand.dealId}/applications`).expect(200);
+    ctx.email.outbox.length = 0;
+    await brand.agent.patch(`${API}/applications/${list.body.items[0].id}/status`).send({ status: 'ACCEPTED' }).expect(200);
+    const notes = await inf.agent.get(`${API}/notifications`).expect(200);
+    const accepted = notes.body.items.find((n: { type: string }) => n.type === 'APPLICATION_ACCEPTED');
+    expect(accepted.params).toMatchObject({ deal: 'Ужин на двоих за Reels' });
+    expect(accepted.title).toBe('Твоя заявка одобрена');
+    expect((await lastEmailTo(ctx, inf.email))?.subject).toBe('Твоя заявка одобрена');
   });
 });

@@ -24,11 +24,11 @@ export class AdminService {
       include: { socialAccounts: true, user: { select: { email: true, emailVerifiedAt: true, createdAt: true } } },
       take: 200,
     });
-    return rows.map(({ socialAccounts, user, contactEmail, contactPhone, telegram, savedFilters: _s, ...p }) => ({
+    return rows.map(({ socialAccounts, user, contactMethod, contactValue, savedFilters: _s, ...p }) => ({
       ...p,
       email: user.email,
       emailVerified: !!user.emailVerifiedAt,
-      contacts: { email: contactEmail, phone: contactPhone, telegram },
+      contacts: { method: contactMethod, value: contactValue },
       socialAccounts: socialAccounts.map(publicAccount),
     }));
   }
@@ -41,11 +41,7 @@ export class AdminService {
       where: { id: p.id },
       data: { status: 'APPROVED', approvedAt: this.clock.now(), rejectionReason: null },
     });
-    await this.notifications.notify(p.userId, 'VERIFICATION_APPROVED', {
-      title: 'You are verified',
-      body: 'Your profile was approved. Your deal feed is unlocked: brands will now see your Verified badge.',
-      link: '/influencer/deals',
-    });
+    await this.notifications.notify(p.userId, 'VERIFICATION_APPROVED', { link: '/influencer/deals' });
   }
 
   async reject(profileId: string, reason: string) {
@@ -53,11 +49,7 @@ export class AdminService {
     if (!p) throw notFound('Influencer');
     if (p.status !== 'PENDING_REVIEW') throw new AppError('INVALID_TRANSITION', 'Profile is not waiting for review');
     await this.prisma.influencerProfile.update({ where: { id: p.id }, data: { status: 'REJECTED', rejectionReason: reason } });
-    await this.notifications.notify(p.userId, 'VERIFICATION_REJECTED', {
-      title: 'Verification needs changes',
-      body: `Your profile was not approved: ${reason}\nUpdate your profile or connected accounts and submit again.`,
-      link: '/influencer/verification',
-    });
+    await this.notifications.notify(p.userId, 'VERIFICATION_REJECTED', { params: { reason }, link: '/influencer/verification' });
   }
 
   async deals(status?: DealStatus, q?: string) {

@@ -1,17 +1,24 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import type { NotificationType, Paginated } from '@briefluence/shared';
-import type { Notification } from '@prisma/client';
+import {
+  isNotificationLocale,
+  renderNotification,
+  type NotificationLocale,
+  type NotificationParams,
+  type NotificationType,
+  type Paginated,
+} from '@briefluence/shared';
+import { Prisma, type Notification } from '@prisma/client';
 import { notFound } from '../../common/app-error';
 import { PrismaService } from '../../common/prisma.service';
 import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
-import { CTA_LABEL, EMAIL_POLICY } from './catalog';
+import { EMAIL_POLICY } from './catalog';
 import { EmailService } from './email.service';
 import { renderNotificationEmail } from './emails/templates';
 
 export interface NotifyPayload {
-  title: string;
-  body: string;
+  /** Raw values for the text (titles, amounts in minor units, ISO dates); rendered per language. */
+  params?: NotificationParams;
   /** Path inside the web app, e.g. /influencer/applications */
   link?: string;
 }
@@ -26,23 +33,34 @@ export class NotificationsService {
     @Inject(ENV) private readonly env: Env,
   ) {}
 
-  /** Writes the in-app notification and, for transactional events, enqueues the email. */
-  async notify(userId: string, type: NotificationType, payload: NotifyPayload): Promise<Notification> {
+  /**
+   * Writes the in-app notification (type + params, plus the text rendered in the user's language
+   * as a fallback) and, for transactional events, enqueues the email in that language.
+   */
+  async notify(userId: string, type: NotificationType, payload: NotifyPayload = {}): Promise<Notification> {
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { email: true, locale: true } });
+    const locale: NotificationLocale = isNotificationLocale(user?.locale) ? user.locale : 'en';
+    const params = payload.params ?? {};
+    const text = renderNotification(type, params, locale) ?? { title: type, body: '', cta: '' };
     const row = await this.prisma.notification.create({
-      data: { userId, type, title: payload.title, body: payload.body, link: payload.link ?? null },
+      data: {
+        userId,
+        type,
+        title: text.title,
+        body: text.body,
+        params: params as Prisma.InputJsonValue,
+        link: payload.link ?? null,
+      },
     });
-    if (EMAIL_POLICY[type] === 'instant') {
+    if (EMAIL_POLICY[type] === 'instant' && user) {
       try {
-        const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
-        if (user) {
-          const email = await renderNotificationEmail({
-            title: payload.title,
-            body: payload.body,
-            ctaUrl: payload.link ? `${this.env.WEB_URL}${payload.link}` : undefined,
-            ctaLabel: CTA_LABEL[type],
-          });
-          await this.email.send(user.email, email);
-        }
+        const email = await renderNotificationEmail(locale, {
+          title: text.title,
+          body: text.body,
+          ctaUrl: payload.link ? `${this.env.WEB_URL}${payload.link}` : undefined,
+          ctaLabel: text.cta,
+        });
+        await this.email.send(user.email, email);
       } catch (err) {
         // The in-app notification is already stored; an email failure must not fail the action.
         this.logger.error(`Failed to enqueue ${type} email: ${(err as Error).message}`);

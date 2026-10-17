@@ -15,7 +15,8 @@ test('sign-up → verify → apply → accept → post link', async ({ browser }
   await signupViaUi(blogger, 'INFLUENCER', bloggerEmail);
   await blogger.getByLabel('Name').fill('Ani E2E');
   await blogger.getByRole('checkbox', { name: 'Beauty' }).click();
-  await blogger.getByLabel('Phone').fill('+374 91 123456');
+  await blogger.getByLabel('Contact method').selectOption('WHATSAPP');
+  await blogger.getByLabel('Phone number').fill('+374 91 123456');
   await blogger.getByRole('button', { name: 'Save and continue' }).click();
   await blogger.waitForURL('**/influencer/verification');
   // The free month is opt-in: briefs stay locked until the blogger starts it.
@@ -75,7 +76,7 @@ test('sign-up → verify → apply → accept → post link', async ({ browser }
   await brand.reload();
   await expect(brand.getByText('Ani E2E')).toBeVisible();
   await brand.getByRole('button', { name: 'Accept', exact: true }).click();
-  await expect(brand.getByText('+374 91 123456')).toBeVisible();
+  await expect(brand.getByRole('link', { name: /WhatsApp: \+37491123456/ })).toHaveAttribute('href', 'https://wa.me/37491123456');
 
   // ── Blogger sees brand contacts and sends the post link ──
   await blogger.goto('/influencer/applications');

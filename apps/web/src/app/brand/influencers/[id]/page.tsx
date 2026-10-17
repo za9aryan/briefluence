@@ -3,7 +3,9 @@ import { Alert, Avatar, Card, CardHeader, ErrorState, Grid, Inline, Skeleton, St
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
+import type { ContactMethod } from '@briefluence/shared';
 import { AccountLine, AccountStats } from '@/components/domain/AccountStats';
+import { ContactLink } from '@/components/domain/ContactLink';
 import { VerifiedBadge } from '@/components/domain/badges';
 import { api } from '@/lib/api';
 import { useOptions } from '@/lib/hooks/options';
@@ -20,7 +22,7 @@ interface PublicInfluencer {
   niches: string[];
   verified: boolean;
   socialAccounts: SocialAccountDto[];
-  contacts: { email: string | null; phone: string | null; telegram: string | null } | null;
+  contacts: { method: ContactMethod | null; value: string | null } | null;
 }
 
 export default function InfluencerProfileForBrandPage() {
@@ -57,7 +59,7 @@ export default function InfluencerProfileForBrandPage() {
       </Card>
       {p.contacts ? (
         <Alert tone="success" title={t('contacts')}>
-          {[p.contacts.phone, p.contacts.email, p.contacts.telegram].filter(Boolean).join(' · ')}
+          <ContactLink method={p.contacts.method} value={p.contacts.value} />
         </Alert>
       ) : (
         <Alert tone="info">{t('contactsHidden')}</Alert>

@@ -11,6 +11,7 @@ import {
 } from '@briefluence/shared';
 import type { User } from '@prisma/client';
 import * as argon2 from 'argon2';
+import { isNotificationLocale, type NotificationLocale } from '@briefluence/shared';
 import { AppError } from '../../common/app-error';
 import type { AccessTokenPayload } from '../../common/auth-user';
 import { Clock } from '../../common/clock';
@@ -20,6 +21,8 @@ import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { EmailService } from '../notifications/email.service';
 import { renderResetPasswordEmail, renderVerifyEmail } from '../notifications/emails/templates';
+
+const localeOf = (v: string | null | undefined): NotificationLocale => (isNotificationLocale(v) ? v : 'en');
 
 export interface Session {
   accessToken: string;
@@ -51,17 +54,22 @@ export class AuthService {
     return argon2.hash(password, ARGON_OPTS);
   }
 
-  async signup(input: SignupInput): Promise<Session> {
+  async signup(input: SignupInput, locale?: string): Promise<Session> {
     const existing = await this.prisma.user.findUnique({ where: { email: input.email }, select: { id: true } });
     if (existing) throw new AppError('EMAIL_TAKEN', 'An account with this email already exists');
     const user = await this.prisma.user.create({
-      data: { email: input.email, passwordHash: await this.hashPassword(input.password), role: input.role },
+      data: {
+        email: input.email,
+        passwordHash: await this.hashPassword(input.password),
+        role: input.role,
+        locale: isNotificationLocale(locale) ? locale : 'en',
+      },
     });
     await this.sendVerification(user);
     return this.createSession(user);
   }
 
-  async login(input: LoginInput): Promise<Session> {
+  async login(input: LoginInput, locale?: string): Promise<Session> {
     const user = await this.prisma.user.findUnique({ where: { email: input.email } });
     if (!user) {
       // Spend comparable time so response timing does not reveal which emails exist.
@@ -72,6 +80,10 @@ export class AuthService {
     const ok = await argon2.verify(user.passwordHash, input.password).catch(() => false);
     if (!ok) throw new AppError('INVALID_CREDENTIALS', 'Wrong email or password');
     if (user.blockedAt) throw new AppError('ACCOUNT_BLOCKED', 'This account has been blocked');
+    // Remember the language the user is browsing in, for emails and notifications.
+    if (isNotificationLocale(locale) && locale !== user.locale) {
+      await this.prisma.user.update({ where: { id: user.id }, data: { locale } });
+    }
     return this.createSession(user);
   }
 
@@ -136,10 +148,10 @@ export class AuthService {
 
   // ─── Email verification ──────────────────────────────────
 
-  async sendVerification(user: Pick<User, 'id' | 'email' | 'emailVerifiedAt'>) {
+  async sendVerification(user: Pick<User, 'id' | 'email' | 'emailVerifiedAt' | 'locale'>) {
     if (user.emailVerifiedAt) return;
     const token = await this.signEmailToken({ sub: user.id, purpose: 'verify', email: user.email }, '48h');
-    const email = await renderVerifyEmail(`${this.env.WEB_URL}/verify-email?token=${encodeURIComponent(token)}`);
+    const email = await renderVerifyEmail(`${this.env.WEB_URL}/verify-email?token=${encodeURIComponent(token)}`, localeOf(user.locale));
     await this.email.send(user.email, email);
   }
 
@@ -167,7 +179,7 @@ export class AuthService {
       { sub: user.id, purpose: 'reset', pwv: this.passwordVersion(user.passwordHash) },
       '1h',
     );
-    const mail = await renderResetPasswordEmail(`${this.env.WEB_URL}/reset-password?token=${encodeURIComponent(token)}`);
+    const mail = await renderResetPasswordEmail(`${this.env.WEB_URL}/reset-password?token=${encodeURIComponent(token)}`, localeOf(user.locale));
     await this.email.send(user.email, mail);
   }
 
@@ -220,6 +232,7 @@ export class AuthService {
       emailVerified: !!user.emailVerifiedAt,
       digestEmails: user.digestEmails,
       currency: user.currency,
+      locale: user.locale,
       createdAt: user.createdAt,
       influencer: user.influencer,
       brand: user.brand,

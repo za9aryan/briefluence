@@ -36,7 +36,7 @@ describe('subscription & payments (e2e)', () => {
     const inf = await onboarded();
     ctx.clock.advance(27.5 * DAY);
     await inf.admin.agent.post(`${API}/admin/jobs/billing-daily/run`).expect(200);
-    expect((await lastEmailTo(ctx, inf.email))?.subject).toMatch(/Your free trial ends in 3 days/);
+    expect((await lastEmailTo(ctx, inf.email))?.subject).toMatch(/Your free month ends in 3 days/);
 
     ctx.clock.advance(3 * DAY);
     await inf.admin.agent.post(`${API}/admin/jobs/billing-daily/run`).expect(200);
@@ -92,7 +92,7 @@ describe('subscription & payments (e2e)', () => {
     expect((await runAt(3)).failedAttempts).toBe(3);
     const last = await runAt(5);
     expect(last.status).toBe('EXPIRED');
-    expect((await lastEmailTo(ctx, inf.email))?.subject).toBe('Subscription expired');
+    expect((await lastEmailTo(ctx, inf.email))?.subject).toBe('Your subscription has ended');
   });
 
   it('declined checkout keeps the trial; cancel and card removal work', async () => {

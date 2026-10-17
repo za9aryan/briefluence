@@ -1,5 +1,5 @@
 'use client';
-import type { VerificationStatus } from '@briefluence/shared';
+import type { ContactMethod, VerificationStatus } from '@briefluence/shared';
 import { Avatar, Button, Card, EmptyState, Field, Grid, Inline, Modal, Skeleton, Stack, Tabs, Text, Textarea, useToast } from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
@@ -13,7 +13,7 @@ import { useFormat } from '@/lib/hooks/format';
 import { useOptions } from '@/lib/hooks/options';
 import type { InfluencerProfileDto } from '@/lib/types';
 
-type Row = InfluencerProfileDto & { email: string; emailVerified: boolean; submittedAt: string | null; contacts: { email: string | null; phone: string | null; telegram: string | null } };
+type Row = InfluencerProfileDto & { email: string; emailVerified: boolean; submittedAt: string | null; contacts: { method: ContactMethod | null; value: string | null } };
 const TABS: VerificationStatus[] = ['PENDING_REVIEW', 'APPROVED', 'REJECTED', 'DRAFT'];
 
 export default function AdminVerificationsPage() {

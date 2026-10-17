@@ -31,12 +31,10 @@ export default {
     languagesHint: ['Languages you post in.', 'Языки, на которых ты публикуешь.', 'Լեզուներ, որոնցով հրապարակում ես։'],
     contactsTitle: ['Contacts for brands', 'Контакты для брендов', 'Կոնտակտներ բրենդների համար'],
     contactsHint: [
-      'Hidden until a brand accepts your application.',
-      'Скрыты, пока бренд не примет твою заявку.',
-      'Թաքնված են, մինչև բրենդը չընդունի քո հայտը։',
+      'How brands can reach you. Hidden until a brand accepts your application.',
+      'Как бренды смогут с тобой связаться. Скрыто, пока бренд не примет твою заявку.',
+      'Ինչպես բրենդները կկապվեն քեզ հետ։ Թաքնված է, մինչև բրենդը չընդունի քո հայտը։',
     ],
-    contactEmail: ['Email', 'Email', 'Էլ. փոստ'],
-    contactPhone: ['Phone', 'Телефон', 'Հեռախոս'],
     brandTitle: ['Set up your brand', 'Настрой профиль бренда', 'Կարգավորիր բրենդի պրոֆիլը'],
     brandLead: [
       'Bloggers see this before they apply, so add your Instagram and website.',
@@ -199,8 +197,6 @@ export default {
     apply: {
       title: ['Apply to this brief', 'Откликнуться на бриф', 'Դիմել այս բրիֆին'],
       send: ['Send application', 'Отправить заявку', 'Ուղարկել հայտը'],
-      account: ['Which account?', 'Какой аккаунт?', 'Ո՞ր հաշիվը'],
-      match: ['Match', 'Совпадение', 'Համընկնում'],
       pitch: ['Your pitch', 'Твой питч', 'Քո ուղերձը'],
       pitchHint: [
         'Why you and what you will post. Short and concrete works best.',
@@ -275,6 +271,9 @@ export default {
       showStats: ['Show audience', 'Показать аудиторию', 'Ցույց տալ լսարանը'],
       hideStats: ['Hide audience', 'Скрыть аудиторию', 'Թաքցնել լսարանը'],
       contacts: ['Contacts', 'Контакты', 'Կոնտակտներ'],
+      accountsCount: ['{count} connected accounts', 'Подключено аккаунтов: {count}', 'Միացված հաշիվներ՝ {count}'],
+      bestMatch: ['Best match', 'Лучшее совпадение', 'Լավագույն համընկնում'],
+      noContact: ['The blogger has not added a contact yet.', 'Блогер ещё не указал контакт.', 'Բլոգերը դեռ կոնտակտ չի ավելացրել։'],
       contactsHidden: [
         'Contacts appear after you accept this blogger on one of your briefs.',
         'Контакты появятся, когда ты примешь этого блогера в одном из брифов.',

@@ -43,7 +43,7 @@ export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 
 /** Account preferences; send only what changes. */
 export const notificationSettingsSchema = z
-  .object({ digestEmails: z.boolean(), currency: z.enum(CURRENCIES) })
+  .object({ digestEmails: z.boolean(), currency: z.enum(CURRENCIES), locale: z.enum(['en', 'ru', 'hy']) })
   .partial()
   .refine((v) => Object.keys(v).length > 0, { message: 'invalid' });
 export type NotificationSettingsInput = z.infer<typeof notificationSettingsSchema>;

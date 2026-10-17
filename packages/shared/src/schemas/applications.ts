@@ -4,7 +4,8 @@ import { APPLICATION_STATUSES, REJECTION_REASONS } from '../enums';
 import { idSchema, minorAmount, paginationSchema } from './common';
 
 export const applySchema = z.object({
-  socialAccountId: idSchema,
+  /** Optional: by default the best-matching connected account is used; brands see all accounts. */
+  socialAccountId: idSchema.optional(),
   pitch: z.string().trim().min(10).max(PITCH_MAX_LENGTH),
   proposedPrice: minorAmount.nullable().optional().transform((v) => v ?? null),
 });

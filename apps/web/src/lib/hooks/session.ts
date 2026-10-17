@@ -11,6 +11,7 @@ export interface Me {
   emailVerified: boolean;
   digestEmails: boolean;
   currency: Currency;
+  locale: string;
   createdAt: string;
   influencer: {
     id: string;

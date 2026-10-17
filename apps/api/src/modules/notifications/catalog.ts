@@ -27,15 +27,3 @@ export const EMAIL_POLICY: Record<NotificationType, 'instant' | 'digest' | 'none
   POST_SUBMITTED: 'none',
 };
 
-export const CTA_LABEL: Partial<Record<NotificationType, string>> = {
-  VERIFICATION_APPROVED: 'Browse deals',
-  VERIFICATION_REJECTED: 'Update your profile',
-  VERIFICATION_PENDING: 'Open review queue',
-  APPLICATION_ACCEPTED: 'See contacts',
-  APPLICATION_REJECTED: 'Find other deals',
-  TRIAL_ENDING: 'Subscribe',
-  PAYMENT_SUCCEEDED: 'View billing',
-  PAYMENT_FAILED: 'Update card',
-  SUBSCRIPTION_EXPIRED: 'Resubscribe',
-  SOCIAL_TOKEN_REVOKED: 'Reconnect account',
-};

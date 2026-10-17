@@ -117,6 +117,7 @@ async function main() {
     const user = await prisma.user.create({
       data: {
         email: `influencer${i}@briefluence.local`,
+        locale: (['en', 'ru', 'hy'] as const)[i % 3],
         passwordHash: hash,
         role: 'INFLUENCER',
         emailVerifiedAt: i === 30 ? null : now,
@@ -137,9 +138,8 @@ async function main() {
             birthYear: faker.number.int({ min: 1985, max: 2006 }),
             languages: pickSome(['hy', 'ru', 'en'], 1, 3),
             niches: pickSome(NICHES, 1, 3),
-            contactEmail: `${firstName.toLowerCase()}${i}@mail.am`,
-            contactPhone: `+374 ${faker.string.numeric(2)} ${faker.string.numeric(6)}`,
-            telegram: `@${firstName.toLowerCase()}_${i}`,
+            contactMethod: (['TELEGRAM', 'WHATSAPP', 'INSTAGRAM', 'PHONE', 'VIBER'] as const)[i % 5],
+            contactValue: [0, 2].includes(i % 5) ? `${firstName.toLowerCase()}_${i}` : `+3749${faker.string.numeric(7)}`,
             status,
             approvedAt: status === 'APPROVED' ? now : null,
             submittedAt: status !== 'DRAFT' ? addDays(now, -1) : null,

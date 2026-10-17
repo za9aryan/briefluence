@@ -76,9 +76,8 @@ export const influencerProfile = {
   birthYear: 1998,
   languages: ['hy', 'en'],
   niches: ['beauty', 'lifestyle'],
-  contactEmail: 'anna@mail.am',
-  contactPhone: '+374 91 000000',
-  telegram: '@anna',
+  contactMethod: 'TELEGRAM',
+  contactValue: '@anna',
 };
 
 export const brandProfile = {

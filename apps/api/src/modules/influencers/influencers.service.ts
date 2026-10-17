@@ -54,11 +54,7 @@ export class InfluencersService {
       where: { id: p.id },
       data: { status: 'PENDING_REVIEW', submittedAt: this.clock.now(), rejectionReason: null },
     });
-    await this.notifications.notifyAdmins('VERIFICATION_PENDING', {
-      title: 'New influencer waiting for review',
-      body: `${p.displayName} submitted their profile for verification.`,
-      link: '/admin/verifications',
-    });
+    await this.notifications.notifyAdmins('VERIFICATION_PENDING', { params: { name: p.displayName }, link: '/admin/verifications' });
     return this.getMine(userId);
   }
 
@@ -131,7 +127,7 @@ export class InfluencersService {
       approvedAt: p.approvedAt,
       socialAccounts: p.socialAccounts.map(publicAccount),
       contacts: showContacts
-        ? { email: p.contactEmail, phone: p.contactPhone, telegram: p.telegram }
+        ? { method: p.contactMethod, value: p.contactValue }
         : null,
     };
   }

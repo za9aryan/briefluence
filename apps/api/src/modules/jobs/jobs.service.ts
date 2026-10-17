@@ -1,6 +1,14 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { checkEligibility, formatMoney, PLATFORM_LABELS, shouldExpire, TIMEZONE } from '@briefluence/shared';
+import {
+  checkEligibility,
+  formatMoney,
+  isNotificationLocale,
+  PLATFORM_LABELS,
+  shouldExpire,
+  TIMEZONE,
+  type NotificationLocale,
+} from '@briefluence/shared';
 import { AppError } from '../../common/app-error';
 import { Clock } from '../../common/clock';
 import { PrismaService } from '../../common/prisma.service';
@@ -10,7 +18,10 @@ import { BillingService } from '../billing/billing.service';
 import { RatesService } from '../currency/rates.service';
 import { toMatchDeal, toMatchInfluencer } from '../deals/match-input';
 import { EmailService } from '../notifications/email.service';
-import { renderDigestEmail } from '../notifications/emails/templates';
+import { DIGEST, renderDigestEmail } from '../notifications/emails/templates';
+
+const INTL = { en: 'en-GB', ru: 'ru-RU', hy: 'hy-AM' } as const;
+const localeOf = (v: string | null | undefined): NotificationLocale => (isNotificationLocale(v) ? v : 'en');
 import { NotificationsService } from '../notifications/notifications.service';
 import { SocialService } from '../social/social.service';
 
@@ -103,11 +114,7 @@ export class JobsService {
         data: { status: 'EXPIRED' },
       });
       if (count) {
-        await this.notifications.notify(d.brand.userId, 'DEAL_EXPIRED', {
-          title: 'Deal expired',
-          body: `"${d.title}" passed its application deadline and no longer accepts applications.`,
-          link: `/brand/deals/${d.id}/applicants`,
-        });
+        await this.notifications.notify(d.brand.userId, 'DEAL_EXPIRED', { params: { deal: d.title }, link: `/brand/deals/${d.id}/applicants` });
       }
     }
     return { expired: due.length };
@@ -124,7 +131,7 @@ export class JobsService {
     if (!deals.length) return 0;
     const influencers = await this.prisma.influencerProfile.findMany({
       where: { status: 'APPROVED', user: { blockedAt: null } },
-      include: { socialAccounts: true, user: { select: { email: true, digestEmails: true } } },
+      include: { socialAccounts: true, user: { select: { email: true, digestEmails: true, locale: true } } },
     });
     let sent = 0;
     for (const p of influencers) {
@@ -133,25 +140,26 @@ export class JobsService {
       if (!matching.length) continue;
       sent++;
       await this.notifications.notify(p.userId, 'NEW_MATCHING_DEALS', {
-        title: `${matching.length} new deal${matching.length === 1 ? '' : 's'} match you`,
-        body: matching.slice(0, 3).map((d) => `${d.brand.companyName}: ${d.title}`).join('\n'),
+        params: { count: matching.length, list: matching.slice(0, 3).map((d) => `${d.brand.companyName}: ${d.title}`).join('\n') },
         link: '/influencer/deals',
       });
       if (p.user.digestEmails) {
+        const L = localeOf(p.user.locale);
         const email = await renderDigestEmail({
-          title: `${matching.length} new deal${matching.length === 1 ? '' : 's'} for you`,
-          intro: 'Brands posted new collaborations that fit your profile:',
+          locale: L,
+          title: DIGEST.bloggerTitle[L](matching.length),
+          intro: DIGEST.bloggerIntro[L],
           items: matching.slice(0, 10).map((d) => ({
             title: `${d.brand.companyName}: ${d.title}`,
             subtitle: [
               d.platforms.map((x) => PLATFORM_LABELS[x]).join(', '),
-              d.budgetMax != null ? `up to ${formatMoney(d.budgetMax, d.currency)}` : 'barter',
-              `apply by ${d.applicationDeadline.toLocaleDateString('en-GB', { timeZone: TIMEZONE })}`,
+              d.budgetMax != null ? `${DIGEST.upTo[L]} ${formatMoney(d.budgetMax, d.currency, INTL[L])}` : DIGEST.barter[L],
+              `${DIGEST.applyBy[L]} ${d.applicationDeadline.toLocaleDateString(INTL[L], { timeZone: TIMEZONE })}`,
             ].join(' · '),
             url: `${this.env.WEB_URL}/influencer/deals/${d.id}`,
           })),
           ctaUrl: `${this.env.WEB_URL}/influencer/deals`,
-          ctaLabel: 'Open deal feed',
+          ctaLabel: DIGEST.bloggerCta[L],
         });
         await this.email.send(p.user.email, email);
       }
@@ -166,7 +174,7 @@ export class JobsService {
       where: { createdAt: { gte: since }, status: { not: 'WITHDRAWN' } },
       include: {
         influencer: { select: { displayName: true } },
-        deal: { select: { id: true, title: true, brand: { select: { user: { select: { email: true, digestEmails: true, blockedAt: true } } } } } },
+        deal: { select: { id: true, title: true, brand: { select: { user: { select: { email: true, digestEmails: true, blockedAt: true, locale: true } } } } } },
       },
     });
     const byBrand = new Map<string, typeof apps>();
@@ -176,16 +184,18 @@ export class JobsService {
       byBrand.set(u.email, [...(byBrand.get(u.email) ?? []), a]);
     }
     for (const [to, list] of byBrand) {
+      const L = localeOf(list[0]!.deal.brand.user.locale);
       const email = await renderDigestEmail({
-        title: `${list.length} new applicant${list.length === 1 ? '' : 's'} yesterday`,
-        intro: 'Creators applied to your deals:',
+        locale: L,
+        title: DIGEST.brandTitle[L](list.length),
+        intro: DIGEST.brandIntro[L],
         items: list.slice(0, 15).map((a) => ({
           title: `${a.influencer.displayName} → ${a.deal.title}`,
-          subtitle: `Match ${a.matchScore}%`,
+          subtitle: `${DIGEST.match[L]} ${a.matchScore}%`,
           url: `${this.env.WEB_URL}/brand/deals/${a.deal.id}/applicants`,
         })),
         ctaUrl: `${this.env.WEB_URL}/brand/dashboard`,
-        ctaLabel: 'Review applicants',
+        ctaLabel: DIGEST.brandCta[L],
       });
       await this.email.send(to, email);
     }

@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { useNotificationText } from '@/lib/hooks/notification-text';
 import { useFormat } from '@/lib/hooks/format';
 import type { NotificationDto, Paginated } from '@/lib/types';
 
@@ -22,6 +23,7 @@ export function useUnreadCount() {
 export function NotificationBell() {
   const t = useTranslations('notifications');
   const f = useFormat();
+  const text = useNotificationText();
   const qc = useQueryClient();
   const router = useRouter();
   const unread = useUnreadCount();
@@ -89,8 +91,8 @@ export function NotificationBell() {
                   >
                     <span className={cn('mt-2 size-2 shrink-0 rounded-pill', n.readAt ? 'bg-transparent' : 'bg-primary')} />
                     <span className="min-w-0">
-                      <span className="block text-small font-bold text-ink">{n.title}</span>
-                      <span className="line-clamp-2 block text-small text-ink-muted">{n.body}</span>
+                      <span className="block text-small font-bold text-ink">{text(n).title}</span>
+                      <span className="line-clamp-2 block text-small text-ink-muted">{text(n).body}</span>
                       <span className="mt-1 block text-[11px] text-ink-muted">{f.relative(n.createdAt)}</span>
                     </span>
                   </button>

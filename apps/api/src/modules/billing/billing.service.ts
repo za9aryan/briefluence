@@ -10,9 +10,7 @@ import {
   hasAccess,
   isChargeDue,
   nextChargeAt,
-  RENEWAL_RETRY_DAYS,
   startTrial,
-  TIMEZONE,
   TRIAL_REMINDER_DAYS_BEFORE,
   trialDaysLeft,
   type SubscriptionState,
@@ -49,8 +47,6 @@ const fromState = (s: SubscriptionState) => ({
   failedAttempts: s.failedAttempts,
   pastDueSince: s.pastDueSince,
 });
-
-const fmtDate = (d: Date) => d.toLocaleDateString('en-GB', { timeZone: TIMEZONE, day: 'numeric', month: 'long', year: 'numeric' });
 
 @Injectable()
 export class BillingService implements OnModuleInit {
@@ -216,29 +212,23 @@ export class BillingService implements OnModuleInit {
 
     if (!result.applied) return result.payment.status === 'SUCCEEDED';
     const userId = result.payment.subscription.userId;
-    const amount = formatMoney(result.payment.amount, result.payment.currency);
+    const money = { amount: result.payment.amount, currency: result.payment.currency };
     if (outcome.status === 'SUCCEEDED') {
       await this.notifications.notify(userId, 'PAYMENT_SUCCEEDED', {
-        title: 'Payment received',
-        body: `We charged ${amount} for your Briefluence subscription. Your plan is active until ${fmtDate(result.next!.currentPeriodEnd!)}.`,
+        params: { ...money, until: result.next!.currentPeriodEnd!.toISOString() },
         link: '/influencer/billing',
       });
       return true;
     }
     if (result.payment.kind === 'renewal' && result.next?.status === 'EXPIRED') {
       await this.notifications.notify(userId, 'SUBSCRIPTION_EXPIRED', {
-        title: 'Subscription expired',
-        body: `We could not charge your card after ${RENEWAL_RETRY_DAYS.length} retries, so your subscription has expired. You can still browse deals; subscribe again to apply.`,
+        params: { reason: 'retries', amount: this.price.amount, currency: this.price.currency },
         link: '/influencer/billing',
       });
     } else {
       const retry = result.next ? nextChargeAt(result.next) : null;
       await this.notifications.notify(userId, 'PAYMENT_FAILED', {
-        title: 'Payment failed',
-        body:
-          result.payment.kind === 'renewal' && retry
-            ? `We could not charge ${amount} (${outcome.failureReason ?? 'declined'}). We will retry on ${fmtDate(retry)}. You can update your card on the billing page.`
-            : `Your payment of ${amount} did not go through (${outcome.failureReason ?? 'declined'}). Please try again.`,
+        params: { ...money, retry: result.payment.kind === 'renewal' && retry ? retry.toISOString() : null },
         link: '/influencer/billing',
       });
     }
@@ -314,8 +304,7 @@ export class BillingService implements OnModuleInit {
       await this.prisma.subscription.update({ where: { id: s.id }, data: { trialReminderSentAt: now } });
       const days = trialDaysLeft(toState(s), now);
       await this.notifications.notify(s.userId, 'TRIAL_ENDING', {
-        title: `Your free trial ends in ${days} day${days === 1 ? '' : 's'}`,
-        body: `Subscribe for ${this.priceLabel()}/month to keep applying to deals after ${fmtDate(s.trialEndsAt)}.`,
+        params: { days, amount: this.price.amount, currency: this.price.currency, date: s.trialEndsAt.toISOString() },
         link: '/influencer/billing',
       });
     }
@@ -331,8 +320,7 @@ export class BillingService implements OnModuleInit {
         if (next.status === 'EXPIRED') {
           expired++;
           await this.notifications.notify(s.userId, 'SUBSCRIPTION_EXPIRED', {
-            title: state.status === 'TRIALING' ? 'Your free trial has ended' : 'Your subscription has ended',
-            body: `You can still browse deals. Subscribe for ${this.priceLabel()}/month to apply again.`,
+            params: { reason: state.status === 'TRIALING' ? 'trial' : 'period', amount: this.price.amount, currency: this.price.currency },
             link: '/influencer/billing',
           });
         }

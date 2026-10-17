@@ -27,6 +27,8 @@ import { AuthService } from './auth.service';
 import { clearSessionCookies, setSessionCookies } from './cookies';
 
 const AUTH_LIMIT = { default: { limit: 10, ttl: 60_000 } };
+/** Language the visitor browses in (set by the website; requests reach the API through the same origin). */
+const uiLocale = (req: Request) => (req.cookies as Record<string, string> | undefined)?.NEXT_LOCALE;
 const refreshCookie = (req: Request) => (req.cookies as Record<string, string> | undefined)?.[COOKIE_REFRESH];
 
 @ApiTags('auth')
@@ -41,8 +43,8 @@ export class AuthController {
   @Throttle(AUTH_LIMIT)
   @Post('signup')
   @ApiZodBody(signupSchema)
-  async signup(@ZodBody(signupSchema) body: SignupInput, @Res({ passthrough: true }) res: Response) {
-    const session = await this.auth.signup(body);
+  async signup(@ZodBody(signupSchema) body: SignupInput, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const session = await this.auth.signup(body, uiLocale(req));
     setSessionCookies(res, this.env, session);
     return this.auth.me(session.user.id);
   }
@@ -52,8 +54,8 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   @ApiZodBody(loginSchema)
-  async login(@ZodBody(loginSchema) body: LoginInput, @Res({ passthrough: true }) res: Response) {
-    const session = await this.auth.login(body);
+  async login(@ZodBody(loginSchema) body: LoginInput, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const session = await this.auth.login(body, uiLocale(req));
     setSessionCookies(res, this.env, session);
     return this.auth.me(session.user.id);
   }

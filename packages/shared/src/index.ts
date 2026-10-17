@@ -2,6 +2,7 @@ export * from './enums';
 export * from './constants';
 export * from './money';
 export * from './contact';
+export * from './notifications';
 export * from './errors';
 export * from './schemas';
 export * from './domain/audience';

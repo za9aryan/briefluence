@@ -42,9 +42,8 @@ export interface InfluencerProfileDto {
   birthYear: number | null;
   languages: string[];
   niches: string[];
-  contactEmail: string | null;
-  contactPhone: string | null;
-  telegram: string | null;
+  contactMethod: ContactMethod | null;
+  contactValue: string | null;
   status: VerificationStatus;
   rejectionReason: string | null;
   savedFilters: { name: string; query: Record<string, unknown> }[] | null;
@@ -166,8 +165,11 @@ export interface ApplicantDto {
   postUrl: string | null;
   createdAt: string;
   influencer: { id: string; displayName: string; avatarUrl: string | null; city: string | null; country: string; niches: string[]; verified: boolean };
-  account: SocialAccountDto | null;
-  contacts: { email: string | null; phone: string | null; telegram: string | null } | null;
+  /** Account the match score was computed for. */
+  matchedAccountId: string;
+  /** All connected accounts, largest first. */
+  accounts: SocialAccountDto[];
+  contacts: { method: ContactMethod | null; value: string | null } | null;
 }
 
 export interface ApplicantsDto {
@@ -191,6 +193,7 @@ export interface NotificationDto {
   title: string;
   body: string;
   link: string | null;
+  params: Record<string, string | number | null> | null;
   readAt: string | null;
   createdAt: string;
 }

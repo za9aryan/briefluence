@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
 import { api } from '@/lib/api';
+import { useNotificationText } from '@/lib/hooks/notification-text';
 import { useFormat } from '@/lib/hooks/format';
 import type { NotificationDto, Paginated } from '@/lib/types';
 
@@ -13,6 +14,7 @@ export default function NotificationsPage() {
   const t = useTranslations('notifications');
   const tc = useTranslations('common');
   const f = useFormat();
+  const text = useNotificationText();
   const qc = useQueryClient();
   const router = useRouter();
   const [page, setPage] = useState(1);
@@ -54,8 +56,8 @@ export default function NotificationsPage() {
                 >
                   <span className={cn('mt-2 size-2 shrink-0 rounded-pill', n.readAt ? 'bg-line' : 'bg-primary')} />
                   <span className="min-w-0 flex-1">
-                    <span className="block font-bold text-ink">{n.title}</span>
-                    <span className="block whitespace-pre-line text-small text-ink-muted">{n.body}</span>
+                    <span className="block font-bold text-ink">{text(n).title}</span>
+                    <span className="block whitespace-pre-line text-small text-ink-muted">{text(n).body}</span>
                   </span>
                   <Text as="span" size="small" tone="muted" className="shrink-0">
                     {f.relative(n.createdAt)}

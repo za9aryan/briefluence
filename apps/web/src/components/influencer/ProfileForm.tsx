@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormError, SelectField, TextAreaField, TextField, useFieldError, useServerErrors } from '@/components/forms/form';
 import { ImageUpload } from '@/components/forms/ImageUpload';
+import { ContactMethodFields } from '@/components/brand/ContactMethodFields';
 import { api } from '@/lib/api';
 import { useOptions } from '@/lib/hooks/options';
 import type { InfluencerProfileDto } from '@/lib/types';
@@ -39,9 +40,8 @@ export function InfluencerProfileForm({
       birthYear: initial?.birthYear ?? null,
       languages: (initial?.languages ?? ['hy']) as InfluencerProfileInput['languages'],
       niches: (initial?.niches ?? []) as InfluencerProfileInput['niches'],
-      contactEmail: initial?.contactEmail ?? '',
-      contactPhone: initial?.contactPhone ?? '',
-      telegram: initial?.telegram ?? '',
+      contactMethod: initial?.contactMethod ?? null,
+      contactValue: initial?.contactValue ? (initial.contactValue.startsWith('+') ? initial.contactValue : `@${initial.contactValue}`) : '',
     },
   });
   const serverError = useServerErrors(form.setError);
@@ -135,11 +135,7 @@ export function InfluencerProfileForm({
               {t('contactsHint')}
             </Text>
           </Stack>
-          <FieldGrid cols={{ base: 1, md: 3 }} gap={4}>
-            <TextField name="contactEmail" type="email" icon="mail" label={t('contactEmail')} register={form.register} error={errors.contactEmail} />
-            <TextField name="contactPhone" type="tel" icon="phone" label={t('contactPhone')} placeholder="+374 …" register={form.register} error={errors.contactPhone} />
-            <TextField name="telegram" icon="telegram" label="Telegram" placeholder="@username" register={form.register} error={errors.telegram} />
-          </FieldGrid>
+          <ContactMethodFields form={form} withPerson={false} />
         </Stack>
 
         <div className="flex justify-end">

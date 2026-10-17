@@ -1,8 +1,8 @@
 'use client';
-import { CONTACT_KIND, CONTACT_METHODS, type BrandProfileInput, type ContactMethod } from '@briefluence/shared';
+import { CONTACT_KIND, CONTACT_METHODS, type ContactMethod } from '@briefluence/shared';
 import { Field, FieldGrid, Input, Select, type IconName } from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
-import type { UseFormReturn } from 'react-hook-form';
+import type { FieldError, UseFormReturn } from 'react-hook-form';
 import { TextField, useFieldError } from '@/components/forms/form';
 
 export const CONTACT_ICON: Record<ContactMethod, IconName> = {
@@ -14,20 +14,31 @@ export const CONTACT_ICON: Record<ContactMethod, IconName> = {
   PHONE: 'phone',
 };
 
-/** Contact person: name, optional position, and one contact method whose input adapts to the method. */
-export function ContactMethodFields({ form }: { form: UseFormReturn<BrandProfileInput> }) {
+/** Form values these fields bind to (brand and blogger profile forms both have them). */
+type ContactValues = { contactMethod?: ContactMethod | null; contactValue?: string | null; contactName?: string | null; contactPosition?: string | null };
+
+/**
+ * One contact method with an input that adapts to it (phone vs @username). Brands also get the
+ * contact person's name and position (`withPerson`).
+ */
+export function ContactMethodFields({ form: anyForm, withPerson = true }: { form: UseFormReturn<any>; withPerson?: boolean }) { // eslint-disable-line @typescript-eslint/no-explicit-any
+  const form = anyForm as UseFormReturn<ContactValues>;
   const t = useTranslations('onboarding');
   const tm = useTranslations('enums.contactMethod');
   const tc = useTranslations('common');
   const fe = useFieldError();
-  const { errors } = form.formState;
+  const errors = form.formState.errors as Partial<Record<keyof ContactValues, FieldError>>;
   const method = form.watch('contactMethod') as ContactMethod | null | undefined;
   const kind = method ? CONTACT_KIND[method] : null;
 
   return (
     <FieldGrid cols={{ base: 1, md: 2 }}>
-      <TextField name="contactName" icon="user" label={t('contactName')} register={form.register} error={errors.contactName} />
-      <TextField name="contactPosition" label={t('contactPosition')} aside={tc('optional')} placeholder={t('contactPositionPlaceholder')} register={form.register} error={errors.contactPosition} />
+      {withPerson && (
+        <>
+          <TextField name="contactName" icon="user" label={t('contactName')} register={form.register} error={errors.contactName} />
+          <TextField name="contactPosition" label={t('contactPosition')} aside={tc('optional')} placeholder={t('contactPositionPlaceholder')} register={form.register} error={errors.contactPosition} />
+        </>
+      )}
       <Field label={t('contactMethod')} error={fe(errors.contactMethod)}>
         {({ id, describedBy, invalid }) => (
           <Select
