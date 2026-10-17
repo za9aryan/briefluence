@@ -10,7 +10,5 @@
   "passwordHint": "После смены пароля другие устройства выйдут из аккаунта.",
   "currentPassword": "Текущий пароль",
   "changePassword": "Сменить пароль",
-  "passwordChanged": "Пароль изменён",
-  "setPassword": "Задать пароль",
-  "setPasswordHint": "Ты зарегистрировался через Google или Apple. Добавь пароль, чтобы входить и по email."
+  "passwordChanged": "Пароль изменён"
 }

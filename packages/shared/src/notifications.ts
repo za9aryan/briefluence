@@ -29,9 +29,21 @@ type L3 = Record<NotificationLocale, string>;
 
 const REASONS: Record<RejectionReason, L3> = {
   BUDGET: { en: 'the budget did not fit', ru: 'не подошёл бюджет', hy: 'բյուջեն չհամապատասխանեց' },
-  AUDIENCE: { en: 'the audience was not the right fit', ru: 'не подошла аудитория', hy: 'լսարանը չհամապատասխանեց' },
-  NICHE: { en: 'the niche was not the right fit', ru: 'не подошла ниша', hy: 'նիշան չհամապատասխանեց' },
-  OTHER: { en: 'the brand chose other bloggers', ru: 'бренд выбрал других блогеров', hy: 'բրենդն ընտրեց այլ բլոգերների' },
+  AUDIENCE: {
+    en: 'the audience was not the right fit',
+    ru: 'не подошла аудитория',
+    hy: 'լսարանը չհամապատասխանեց',
+  },
+  NICHE: {
+    en: 'the niche was not the right fit',
+    ru: 'не подошла ниша',
+    hy: 'նիշան չհամապատասխանեց',
+  },
+  OTHER: {
+    en: 'the brand chose other bloggers',
+    ru: 'бренд выбрал других блогеров',
+    hy: 'բրենդն ընտրեց այլ բլոգերների',
+  },
 };
 
 const PLATFORMS: Record<string, L3> = {
@@ -44,10 +56,17 @@ function helpers(locale: NotificationLocale) {
   const plural = new Intl.PluralRules(INTL[locale]);
   return {
     money: (minor: unknown, currency: unknown) =>
-      typeof minor === 'number' && typeof currency === 'string' ? formatMoney(minor, currency as Currency, INTL[locale]) : '',
+      typeof minor === 'number' && typeof currency === 'string'
+        ? formatMoney(minor, currency as Currency, INTL[locale])
+        : '',
     date: (iso: unknown) =>
       typeof iso === 'string'
-        ? new Intl.DateTimeFormat(INTL[locale], { day: 'numeric', month: 'long', year: 'numeric', timeZone: TIMEZONE }).format(new Date(iso))
+        ? new Intl.DateTimeFormat(INTL[locale], {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            timeZone: TIMEZONE,
+          }).format(new Date(iso))
         : '',
     /** Picks a form by CLDR plural category; `forms` keys: one, few, many, other. */
     plural: (n: number, forms: Partial<Record<Intl.LDMLPluralRule, string>> & { other: string }) =>
@@ -55,195 +74,346 @@ function helpers(locale: NotificationLocale) {
   };
 }
 
-type Renderer = (p: NotificationParams, h: ReturnType<typeof helpers>, locale: NotificationLocale) => Omit<RenderedNotification, 'cta'>;
+type Renderer = (
+  p: NotificationParams,
+  h: ReturnType<typeof helpers>,
+  locale: NotificationLocale,
+) => Omit<RenderedNotification, 'cta'>;
 
 const s = (v: unknown) => (v == null ? '' : String(v));
 
-const CATALOG: Record<NotificationType, { cta: L3; render: Record<NotificationLocale, Renderer> }> = {
-  VERIFICATION_PENDING: {
-    cta: { en: 'Open review queue', ru: 'Открыть очередь проверки', hy: 'Բացել ստուգման հերթը' },
-    render: {
-      en: (p) => ({ title: 'New blogger waiting for review', body: `${s(p.name)} sent their profile for verification.` }),
-      ru: (p) => ({ title: 'Новый блогер ждёт проверки', body: `${s(p.name)} отправил(а) профиль на проверку.` }),
-      hy: (p) => ({ title: 'Նոր բլոգերը սպասում է ստուգման', body: `${s(p.name)}-ը ուղարկել է պրոֆիլը ստուգման։` }),
+const CATALOG: Record<NotificationType, { cta: L3; render: Record<NotificationLocale, Renderer> }> =
+  {
+    VERIFICATION_PENDING: {
+      cta: { en: 'Open review queue', ru: 'Открыть очередь проверки', hy: 'Բացել ստուգման հերթը' },
+      render: {
+        en: (p) => ({
+          title: 'New blogger waiting for review',
+          body: `${s(p.name)} sent their profile for verification.`,
+        }),
+        ru: (p) => ({
+          title: 'Новый блогер ждёт проверки',
+          body: `${s(p.name)} отправил(а) профиль на проверку.`,
+        }),
+        hy: (p) => ({
+          title: 'Նոր բլոգերը սպասում է ստուգման',
+          body: `${s(p.name)}-ը ուղարկել է պրոֆիլը ստուգման։`,
+        }),
+      },
     },
-  },
-  VERIFICATION_APPROVED: {
-    cta: { en: 'Browse briefs', ru: 'Смотреть брифы', hy: 'Դիտել բրիֆները' },
-    render: {
-      en: () => ({ title: 'You are verified', body: 'Your profile is approved. Brands now see your Verified badge, and your brief feed is open.' }),
-      ru: () => ({ title: 'Ты проверен', body: 'Профиль одобрен. Бренды видят значок «Проверен», а лента брифов открыта.' }),
-      hy: () => ({ title: 'Դու ստուգված ես', body: 'Պրոֆիլը հաստատված է։ Բրենդները տեսնում են «Ստուգված» նշանը, իսկ բրիֆների լենտը բաց է։' }),
+    VERIFICATION_APPROVED: {
+      cta: { en: 'Browse briefs', ru: 'Смотреть брифы', hy: 'Դիտել բրիֆները' },
+      render: {
+        en: () => ({
+          title: 'You are verified',
+          body: 'Your profile is approved. Brands now see your Verified badge, and your brief feed is open.',
+        }),
+        ru: () => ({
+          title: 'Ты проверен',
+          body: 'Профиль одобрен. Бренды видят значок «Проверен», а лента брифов открыта.',
+        }),
+        hy: () => ({
+          title: 'Դու ստուգված ես',
+          body: 'Պրոֆիլը հաստատված է։ Բրենդները տեսնում են «Ստուգված» նշանը, իսկ բրիֆների լենտը բաց է։',
+        }),
+      },
     },
-  },
-  VERIFICATION_REJECTED: {
-    cta: { en: 'Update your profile', ru: 'Обновить профиль', hy: 'Թարմացնել պրոֆիլը' },
-    render: {
-      en: (p) => ({ title: 'Your profile needs changes', body: `Reason: ${s(p.reason)}\nFix it and send your profile again.` }),
-      ru: (p) => ({ title: 'Профиль нужно доработать', body: `Причина: ${s(p.reason)}\nИсправь и отправь профиль снова.` }),
-      hy: (p) => ({ title: 'Պրոֆիլը պետք է լրամշակել', body: `Պատճառը՝ ${s(p.reason)}\nՈւղղիր և կրկին ուղարկիր պրոֆիլը։` }),
+    VERIFICATION_REJECTED: {
+      cta: { en: 'Update your profile', ru: 'Обновить профиль', hy: 'Թարմացնել պրոֆիլը' },
+      render: {
+        en: (p) => ({
+          title: 'Your profile needs changes',
+          body: `Reason: ${s(p.reason)}\nFix it and send your profile again.`,
+        }),
+        ru: (p) => ({
+          title: 'Профиль нужно доработать',
+          body: `Причина: ${s(p.reason)}\nИсправь и отправь профиль снова.`,
+        }),
+        hy: (p) => ({
+          title: 'Պրոֆիլը պետք է լրամշակել',
+          body: `Պատճառը՝ ${s(p.reason)}\nՈւղղիր և կրկին ուղարկիր պրոֆիլը։`,
+        }),
+      },
     },
-  },
-  NEW_MATCHING_DEALS: {
-    cta: { en: 'Open brief feed', ru: 'Открыть ленту брифов', hy: 'Բացել բրիֆների լենտը' },
-    render: {
-      en: (p, h) => ({ title: h.plural(Number(p.count), { one: '# new brief matches you', other: '# new briefs match you' }), body: s(p.list) }),
-      ru: (p, h) => ({
-        title: h.plural(Number(p.count), { one: 'Тебе подходит # новый бриф', few: 'Тебе подходят # новых брифа', many: 'Тебе подходят # новых брифов', other: 'Тебе подходят # новых брифа' }),
-        body: s(p.list),
-      }),
-      hy: (p, h) => ({ title: h.plural(Number(p.count), { one: '# նոր բրիֆ համապատասխանում է քեզ', other: '# նոր բրիֆ համապատասխանում է քեզ' }), body: s(p.list) }),
+    NEW_MATCHING_DEALS: {
+      cta: { en: 'Open brief feed', ru: 'Открыть ленту брифов', hy: 'Բացել բրիֆների լենտը' },
+      render: {
+        en: (p, h) => ({
+          title: h.plural(Number(p.count), {
+            one: '# new brief matches you',
+            other: '# new briefs match you',
+          }),
+          body: s(p.list),
+        }),
+        ru: (p, h) => ({
+          title: h.plural(Number(p.count), {
+            one: 'Тебе подходит # новый бриф',
+            few: 'Тебе подходят # новых брифа',
+            many: 'Тебе подходят # новых брифов',
+            other: 'Тебе подходят # новых брифа',
+          }),
+          body: s(p.list),
+        }),
+        hy: (p, h) => ({
+          title: h.plural(Number(p.count), {
+            one: '# նոր բրիֆ համապատասխանում է քեզ',
+            other: '# նոր բրիֆ համապատասխանում է քեզ',
+          }),
+          body: s(p.list),
+        }),
+      },
     },
-  },
-  NEW_APPLICANT: {
-    cta: { en: 'Review applicants', ru: 'Смотреть отклики', hy: 'Դիտել դիմորդներին' },
-    render: {
-      en: (p) => ({ title: 'New applicant', body: `${s(p.name)} applied to "${s(p.deal)}" (match ${s(p.score)}%).` }),
-      ru: (p) => ({ title: 'Новый отклик', body: `${s(p.name)} откликнулся на «${s(p.deal)}» (совпадение ${s(p.score)}%).` }),
-      hy: (p) => ({ title: 'Նոր դիմորդ', body: `${s(p.name)}-ը դիմել է «${s(p.deal)}» բրիֆին (համընկնում ${s(p.score)}%)։` }),
+    NEW_APPLICANT: {
+      cta: { en: 'Review applicants', ru: 'Смотреть отклики', hy: 'Դիտել դիմորդներին' },
+      render: {
+        en: (p) => ({
+          title: 'New applicant',
+          body: `${s(p.name)} applied to "${s(p.deal)}" (match ${s(p.score)}%).`,
+        }),
+        ru: (p) => ({
+          title: 'Новый отклик',
+          body: `${s(p.name)} откликнулся на «${s(p.deal)}» (совпадение ${s(p.score)}%).`,
+        }),
+        hy: (p) => ({
+          title: 'Նոր դիմորդ',
+          body: `${s(p.name)}-ը դիմել է «${s(p.deal)}» բրիֆին (համընկնում ${s(p.score)}%)։`,
+        }),
+      },
     },
-  },
-  APPLICATION_VIEWED: {
-    cta: { en: 'My applications', ru: 'Мои заявки', hy: 'Իմ հայտերը' },
-    render: {
-      en: (p) => ({ title: 'Your application was viewed', body: `The brand viewed your application to "${s(p.deal)}".` }),
-      ru: (p) => ({ title: 'Твою заявку посмотрели', body: `Бренд посмотрел твою заявку на «${s(p.deal)}».` }),
-      hy: (p) => ({ title: 'Քո հայտը դիտվել է', body: `Բրենդը դիտել է քո հայտը «${s(p.deal)}» բրիֆին։` }),
+    APPLICATION_VIEWED: {
+      cta: { en: 'My applications', ru: 'Мои заявки', hy: 'Իմ հայտերը' },
+      render: {
+        en: (p) => ({
+          title: 'Your application was viewed',
+          body: `The brand viewed your application to "${s(p.deal)}".`,
+        }),
+        ru: (p) => ({
+          title: 'Твою заявку посмотрели',
+          body: `Бренд посмотрел твою заявку на «${s(p.deal)}».`,
+        }),
+        hy: (p) => ({
+          title: 'Քո հայտը դիտվել է',
+          body: `Բրենդը դիտել է քո հայտը «${s(p.deal)}» բրիֆին։`,
+        }),
+      },
     },
-  },
-  APPLICATION_SHORTLISTED: {
-    cta: { en: 'My applications', ru: 'Мои заявки', hy: 'Իմ հայտերը' },
-    render: {
-      en: (p) => ({ title: 'You were shortlisted', body: `You are on the shortlist for "${s(p.deal)}".` }),
-      ru: (p) => ({ title: 'Ты в шорт-листе', body: `Ты в шорт-листе брифа «${s(p.deal)}».` }),
-      hy: (p) => ({ title: 'Դու ընտրվածների մեջ ես', body: `Դու «${s(p.deal)}» բրիֆի ընտրվածների ցուցակում ես։` }),
+    APPLICATION_SHORTLISTED: {
+      cta: { en: 'My applications', ru: 'Мои заявки', hy: 'Իմ հայտերը' },
+      render: {
+        en: (p) => ({
+          title: 'You were shortlisted',
+          body: `You are on the shortlist for "${s(p.deal)}".`,
+        }),
+        ru: (p) => ({ title: 'Ты в шорт-листе', body: `Ты в шорт-листе брифа «${s(p.deal)}».` }),
+        hy: (p) => ({
+          title: 'Դու ընտրվածների մեջ ես',
+          body: `Դու «${s(p.deal)}» բրիֆի ընտրվածների ցուցակում ես։`,
+        }),
+      },
     },
-  },
-  APPLICATION_ACCEPTED: {
-    cta: { en: 'See contacts', ru: 'Смотреть контакты', hy: 'Տեսնել կոնտակտները' },
-    render: {
-      en: (p) => ({ title: 'Your application is approved', body: `The brand accepted you for "${s(p.deal)}". Their contacts are now in My applications.` }),
-      ru: (p) => ({ title: 'Твоя заявка одобрена', body: `Бренд принял тебя в «${s(p.deal)}». Его контакты теперь в разделе «Мои заявки».` }),
-      hy: (p) => ({ title: 'Քո հայտը հաստատված է', body: `Բրենդն ընդունել է քեզ «${s(p.deal)}» բրիֆում։ Նրա կոնտակտներն այժմ «Իմ հայտերը» բաժնում են։` }),
+    APPLICATION_ACCEPTED: {
+      cta: { en: 'See contacts', ru: 'Смотреть контакты', hy: 'Տեսնել կոնտակտները' },
+      render: {
+        en: (p) => ({
+          title: 'Your application is approved',
+          body: `The brand accepted you for "${s(p.deal)}". Their contacts are now in My applications.`,
+        }),
+        ru: (p) => ({
+          title: 'Твоя заявка одобрена',
+          body: `Бренд принял тебя в «${s(p.deal)}». Его контакты теперь в разделе «Мои заявки».`,
+        }),
+        hy: (p) => ({
+          title: 'Քո հայտը հաստատված է',
+          body: `Բրենդն ընդունել է քեզ «${s(p.deal)}» բրիֆում։ Նրա կոնտակտներն այժմ «Իմ հայտերը» բաժնում են։`,
+        }),
+      },
     },
-  },
-  APPLICATION_REJECTED: {
-    cta: { en: 'Find other briefs', ru: 'Найти другие брифы', hy: 'Գտնել այլ բրիֆներ' },
-    render: {
-      en: (p) => ({ title: 'Not this time', body: `Your application to "${s(p.deal)}" was not selected: ${REASONS[(p.reason as RejectionReason) ?? 'OTHER']?.en ?? REASONS.OTHER.en}.` }),
-      ru: (p) => ({ title: 'В этот раз нет', body: `Заявку на «${s(p.deal)}» не выбрали: ${REASONS[(p.reason as RejectionReason) ?? 'OTHER']?.ru ?? REASONS.OTHER.ru}.` }),
-      hy: (p) => ({ title: 'Այս անգամ՝ ոչ', body: `«${s(p.deal)}» բրիֆի հայտը չի ընտրվել․ ${REASONS[(p.reason as RejectionReason) ?? 'OTHER']?.hy ?? REASONS.OTHER.hy}։` }),
+    APPLICATION_REJECTED: {
+      cta: { en: 'Find other briefs', ru: 'Найти другие брифы', hy: 'Գտնել այլ բրիֆներ' },
+      render: {
+        en: (p) => ({
+          title: 'Not this time',
+          body: `Your application to "${s(p.deal)}" was not selected: ${REASONS[(p.reason as RejectionReason) ?? 'OTHER']?.en ?? REASONS.OTHER.en}.`,
+        }),
+        ru: (p) => ({
+          title: 'В этот раз нет',
+          body: `Заявку на «${s(p.deal)}» не выбрали: ${REASONS[(p.reason as RejectionReason) ?? 'OTHER']?.ru ?? REASONS.OTHER.ru}.`,
+        }),
+        hy: (p) => ({
+          title: 'Այս անգամ՝ ոչ',
+          body: `«${s(p.deal)}» բրիֆի հայտը չի ընտրվել․ ${REASONS[(p.reason as RejectionReason) ?? 'OTHER']?.hy ?? REASONS.OTHER.hy}։`,
+        }),
+      },
     },
-  },
-  APPLICATION_COMPLETED: {
-    cta: { en: 'My applications', ru: 'Мои заявки', hy: 'Իմ հայտերը' },
-    render: {
-      en: (p) => ({ title: 'Collab completed', body: `The brand confirmed your work on "${s(p.deal)}". Great job!` }),
-      ru: (p) => ({ title: 'Коллаб выполнен', body: `Бренд подтвердил твою работу по «${s(p.deal)}». Отличная работа!` }),
-      hy: (p) => ({ title: 'Համագործակցությունն ավարտված է', body: `Բրենդը հաստատել է քո աշխատանքը «${s(p.deal)}» բրիֆում։ Հիանալի է։` }),
+    APPLICATION_COMPLETED: {
+      cta: { en: 'My applications', ru: 'Мои заявки', hy: 'Իմ հայտերը' },
+      render: {
+        en: (p) => ({
+          title: 'Collab completed',
+          body: `The brand confirmed your work on "${s(p.deal)}". Great job!`,
+        }),
+        ru: (p) => ({
+          title: 'Коллаб выполнен',
+          body: `Бренд подтвердил твою работу по «${s(p.deal)}». Отличная работа!`,
+        }),
+        hy: (p) => ({
+          title: 'Համագործակցությունն ավարտված է',
+          body: `Բրենդը հաստատել է քո աշխատանքը «${s(p.deal)}» բրիֆում։ Հիանալի է։`,
+        }),
+      },
     },
-  },
-  POST_SUBMITTED: {
-    cta: { en: 'Review the post', ru: 'Посмотреть пост', hy: 'Դիտել հրապարակումը' },
-    render: {
-      en: (p) => ({ title: 'Content published', body: `${s(p.name)} published the content for "${s(p.deal)}". Check it and mark the collab done.` }),
-      ru: (p) => ({ title: 'Контент опубликован', body: `${s(p.name)} опубликовал(а) контент для «${s(p.deal)}». Проверь и отметь коллаб выполненным.` }),
-      hy: (p) => ({ title: 'Բովանդակությունը հրապարակված է', body: `${s(p.name)}-ը հրապարակել է «${s(p.deal)}» բրիֆի բովանդակությունը։ Ստուգիր և նշիր կատարված։` }),
+    POST_SUBMITTED: {
+      cta: { en: 'Review the post', ru: 'Посмотреть пост', hy: 'Դիտել հրապարակումը' },
+      render: {
+        en: (p) => ({
+          title: 'Content published',
+          body: `${s(p.name)} published the content for "${s(p.deal)}". Check it and mark the collab done.`,
+        }),
+        ru: (p) => ({
+          title: 'Контент опубликован',
+          body: `${s(p.name)} опубликовал(а) контент для «${s(p.deal)}». Проверь и отметь коллаб выполненным.`,
+        }),
+        hy: (p) => ({
+          title: 'Բովանդակությունը հրապարակված է',
+          body: `${s(p.name)}-ը հրապարակել է «${s(p.deal)}» բրիֆի բովանդակությունը։ Ստուգիր և նշիր կատարված։`,
+        }),
+      },
     },
-  },
-  DEAL_FILLED: {
-    cta: { en: 'Open brief', ru: 'Открыть бриф', hy: 'Բացել բրիֆը' },
-    render: {
-      en: (p, h) => ({ title: 'Brief filled', body: `"${s(p.deal)}" reached ${h.plural(Number(p.slots), { one: '# place', other: '# places' })} and was closed automatically.` }),
-      ru: (p, h) => ({ title: 'Бриф заполнен', body: `«${s(p.deal)}»: заняты все ${h.plural(Number(p.slots), { one: '# место', few: '# места', many: '# мест', other: '# места' })}, бриф закрыт автоматически.` }),
-      hy: (p) => ({ title: 'Բրիֆը լրացված է', body: `«${s(p.deal)}» բրիֆի բոլոր ${s(p.slots)} տեղերը զբաղված են, և այն ավտոմատ փակվել է։` }),
+    DEAL_FILLED: {
+      cta: { en: 'Open brief', ru: 'Открыть бриф', hy: 'Բացել բրիֆը' },
+      render: {
+        en: (p, h) => ({
+          title: 'Brief filled',
+          body: `"${s(p.deal)}" reached ${h.plural(Number(p.slots), { one: '# place', other: '# places' })} and was closed automatically.`,
+        }),
+        ru: (p, h) => ({
+          title: 'Бриф заполнен',
+          body: `«${s(p.deal)}»: заняты все ${h.plural(Number(p.slots), { one: '# место', few: '# места', many: '# мест', other: '# места' })}, бриф закрыт автоматически.`,
+        }),
+        hy: (p) => ({
+          title: 'Բրիֆը լրացված է',
+          body: `«${s(p.deal)}» բրիֆի բոլոր ${s(p.slots)} տեղերը զբաղված են, և այն ավտոմատ փակվել է։`,
+        }),
+      },
     },
-  },
-  DEAL_EXPIRED: {
-    cta: { en: 'Open brief', ru: 'Открыть бриф', hy: 'Բացել բրիֆը' },
-    render: {
-      en: (p) => ({ title: 'Brief expired', body: `"${s(p.deal)}" passed its application deadline and no longer takes applications.` }),
-      ru: (p) => ({ title: 'Бриф истёк', body: `У «${s(p.deal)}» прошёл дедлайн, заявки больше не принимаются.` }),
-      hy: (p) => ({ title: 'Բրիֆի ժամկետն անցել է', body: `«${s(p.deal)}» բրիֆի վերջնաժամկետն անցել է, հայտեր այլևս չեն ընդունվում։` }),
+    DEAL_EXPIRED: {
+      cta: { en: 'Open brief', ru: 'Открыть бриф', hy: 'Բացել բրիֆը' },
+      render: {
+        en: (p) => ({
+          title: 'Brief expired',
+          body: `"${s(p.deal)}" passed its application deadline and no longer takes applications.`,
+        }),
+        ru: (p) => ({
+          title: 'Бриф истёк',
+          body: `У «${s(p.deal)}» прошёл дедлайн, заявки больше не принимаются.`,
+        }),
+        hy: (p) => ({
+          title: 'Բրիֆի ժամկետն անցել է',
+          body: `«${s(p.deal)}» բրիֆի վերջնաժամկետն անցել է, հայտեր այլևս չեն ընդունվում։`,
+        }),
+      },
     },
-  },
-  TRIAL_ENDING: {
-    cta: { en: 'Subscribe', ru: 'Оформить подписку', hy: 'Բաժանորդագրվել' },
-    render: {
-      en: (p, h) => ({
-        title: `Your free month ends in ${h.plural(Number(p.days), { one: '# day', other: '# days' })}`,
-        body: `Subscribe for ${h.money(p.amount, p.currency)}/month to keep applying after ${h.date(p.date)}.`,
-      }),
-      ru: (p, h) => ({
-        title: `Бесплатный месяц закончится через ${h.plural(Number(p.days), { one: '# день', few: '# дня', many: '# дней', other: '# дня' })}`,
-        body: `Оформи подписку за ${h.money(p.amount, p.currency)} в месяц, чтобы откликаться и после ${h.date(p.date)}.`,
-      }),
-      hy: (p, h) => ({
-        title: `Անվճար ամիսն ավարտվում է ${s(p.days)} օրից`,
-        body: `Բաժանորդագրվիր ամսական ${h.money(p.amount, p.currency)}-ով, որ շարունակես դիմել ${h.date(p.date)}-ից հետո։`,
-      }),
+    TRIAL_ENDING: {
+      cta: { en: 'Subscribe', ru: 'Оформить подписку', hy: 'Բաժանորդագրվել' },
+      render: {
+        en: (p, h) => ({
+          title: `Your free period ends in ${h.plural(Number(p.days), { one: '# day', other: '# days' })}`,
+          body: `Subscribe for ${h.money(p.amount, p.currency)}/month to keep applying after ${h.date(p.date)}.`,
+        }),
+        ru: (p, h) => ({
+          title: `Бесплатный период закончится через ${h.plural(Number(p.days), { one: '# день', few: '# дня', many: '# дней', other: '# дня' })}`,
+          body: `Оформи подписку за ${h.money(p.amount, p.currency)} в месяц, чтобы откликаться и после ${h.date(p.date)}.`,
+        }),
+        hy: (p, h) => ({
+          title: `Անվճար ժամկետն ավարտվում է ${s(p.days)} օրից`,
+          body: `Բաժանորդագրվիր ամսական ${h.money(p.amount, p.currency)}-ով, որ շարունակես դիմել ${h.date(p.date)}-ից հետո։`,
+        }),
+      },
     },
-  },
-  PAYMENT_SUCCEEDED: {
-    cta: { en: 'View billing', ru: 'Открыть оплату', hy: 'Բացել վճարումը' },
-    render: {
-      en: (p, h) => ({ title: 'Payment received', body: `We charged ${h.money(p.amount, p.currency)}. Your plan is active until ${h.date(p.until)}.` }),
-      ru: (p, h) => ({ title: 'Оплата прошла', body: `Списано ${h.money(p.amount, p.currency)}. Подписка активна до ${h.date(p.until)}.` }),
-      hy: (p, h) => ({ title: 'Վճարումն ստացվել է', body: `Գանձվել է ${h.money(p.amount, p.currency)}։ Բաժանորդագրությունն ակտիվ է մինչև ${h.date(p.until)}։` }),
+    PAYMENT_SUCCEEDED: {
+      cta: { en: 'View billing', ru: 'Открыть оплату', hy: 'Բացել վճարումը' },
+      render: {
+        en: (p, h) => ({
+          title: 'Payment received',
+          body: `We charged ${h.money(p.amount, p.currency)}. Your plan is active until ${h.date(p.until)}.`,
+        }),
+        ru: (p, h) => ({
+          title: 'Оплата прошла',
+          body: `Списано ${h.money(p.amount, p.currency)}. Подписка активна до ${h.date(p.until)}.`,
+        }),
+        hy: (p, h) => ({
+          title: 'Վճարումն ստացվել է',
+          body: `Գանձվել է ${h.money(p.amount, p.currency)}։ Բաժանորդագրությունն ակտիվ է մինչև ${h.date(p.until)}։`,
+        }),
+      },
     },
-  },
-  PAYMENT_FAILED: {
-    cta: { en: 'Update card', ru: 'Обновить карту', hy: 'Թարմացնել քարտը' },
-    render: {
-      en: (p, h) => ({
-        title: 'Payment failed',
-        body: p.retry
-          ? `We could not charge ${h.money(p.amount, p.currency)}. We will try again on ${h.date(p.retry)}, or you can pay now with another card.`
-          : `Your payment of ${h.money(p.amount, p.currency)} did not go through. Please try again.`,
-      }),
-      ru: (p, h) => ({
-        title: 'Платёж не прошёл',
-        body: p.retry
-          ? `Не получилось списать ${h.money(p.amount, p.currency)}. Попробуем снова ${h.date(p.retry)}, или оплати сейчас другой картой.`
-          : `Платёж на ${h.money(p.amount, p.currency)} не прошёл. Попробуй ещё раз.`,
-      }),
-      hy: (p, h) => ({
-        title: 'Վճարումը չանցավ',
-        body: p.retry
-          ? `Չհաջողվեց գանձել ${h.money(p.amount, p.currency)}։ Կրկին կփորձենք ${h.date(p.retry)}, կամ վճարիր հիմա այլ քարտով։`
-          : `${h.money(p.amount, p.currency)} վճարումը չանցավ։ Փորձիր կրկին։`,
-      }),
+    PAYMENT_FAILED: {
+      cta: { en: 'Update card', ru: 'Обновить карту', hy: 'Թարմացնել քարտը' },
+      render: {
+        en: (p, h) => ({
+          title: 'Payment failed',
+          body: p.retry
+            ? `We could not charge ${h.money(p.amount, p.currency)}. We will try again on ${h.date(p.retry)}, or you can pay now with another card.`
+            : `Your payment of ${h.money(p.amount, p.currency)} did not go through. Please try again.`,
+        }),
+        ru: (p, h) => ({
+          title: 'Платёж не прошёл',
+          body: p.retry
+            ? `Не получилось списать ${h.money(p.amount, p.currency)}. Попробуем снова ${h.date(p.retry)}, или оплати сейчас другой картой.`
+            : `Платёж на ${h.money(p.amount, p.currency)} не прошёл. Попробуй ещё раз.`,
+        }),
+        hy: (p, h) => ({
+          title: 'Վճարումը չանցավ',
+          body: p.retry
+            ? `Չհաջողվեց գանձել ${h.money(p.amount, p.currency)}։ Կրկին կփորձենք ${h.date(p.retry)}, կամ վճարիր հիմա այլ քարտով։`
+            : `${h.money(p.amount, p.currency)} վճարումը չանցավ։ Փորձիր կրկին։`,
+        }),
+      },
     },
-  },
-  SUBSCRIPTION_EXPIRED: {
-    cta: { en: 'Resubscribe', ru: 'Подписаться снова', hy: 'Կրկին բաժանորդագրվել' },
-    render: {
-      en: (p, h) => ({
-        title: p.reason === 'trial' ? 'Your free month has ended' : 'Your subscription has ended',
-        body: `${p.reason === 'retries' ? 'We could not charge your card after several tries. ' : ''}You can still browse briefs. Subscribe for ${h.money(p.amount, p.currency)}/month to apply again.`,
-      }),
-      ru: (p, h) => ({
-        title: p.reason === 'trial' ? 'Бесплатный месяц закончился' : 'Подписка закончилась',
-        body: `${p.reason === 'retries' ? 'Не получилось списать оплату после нескольких попыток. ' : ''}Брифы можно смотреть и дальше. Оформи подписку за ${h.money(p.amount, p.currency)} в месяц, чтобы снова откликаться.`,
-      }),
-      hy: (p, h) => ({
-        title: p.reason === 'trial' ? 'Անվճար ամիսն ավարտվել է' : 'Բաժանորդագրությունն ավարտվել է',
-        body: `${p.reason === 'retries' ? 'Մի քանի փորձից հետո չհաջողվեց գանձել քարտից։ ' : ''}Բրիֆները կարող ես շարունակել դիտել։ Բաժանորդագրվիր ամսական ${h.money(p.amount, p.currency)}-ով՝ կրկին դիմելու համար։`,
-      }),
+    SUBSCRIPTION_EXPIRED: {
+      cta: { en: 'Resubscribe', ru: 'Подписаться снова', hy: 'Կրկին բաժանորդագրվել' },
+      render: {
+        en: (p, h) => ({
+          title:
+            p.reason === 'trial' ? 'Your 30 free days have ended' : 'Your subscription has ended',
+          body: `${p.reason === 'retries' ? 'We could not charge your card after several tries. ' : ''}You can still browse briefs. Subscribe for ${h.money(p.amount, p.currency)}/month to apply again.`,
+        }),
+        ru: (p, h) => ({
+          title: p.reason === 'trial' ? '30 бесплатных дней закончились' : 'Подписка закончилась',
+          body: `${p.reason === 'retries' ? 'Не получилось списать оплату после нескольких попыток. ' : ''}Брифы можно смотреть и дальше. Оформи подписку за ${h.money(p.amount, p.currency)} в месяц, чтобы снова откликаться.`,
+        }),
+        hy: (p, h) => ({
+          title:
+            p.reason === 'trial' ? '30 անվճար օրն ավարտվել է' : 'Բաժանորդագրությունն ավարտվել է',
+          body: `${p.reason === 'retries' ? 'Մի քանի փորձից հետո չհաջողվեց գանձել քարտից։ ' : ''}Բրիֆները կարող ես շարունակել դիտել։ Բաժանորդագրվիր ամսական ${h.money(p.amount, p.currency)}-ով՝ կրկին դիմելու համար։`,
+        }),
+      },
     },
-  },
-  SOCIAL_TOKEN_REVOKED: {
-    cta: { en: 'Reconnect account', ru: 'Переподключить аккаунт', hy: 'Վերամիացնել հաշիվը' },
-    render: {
-      en: (p) => ({ title: 'Reconnect your account', body: `We lost access to your ${PLATFORMS[s(p.platform)]?.en ?? s(p.platform)} account @${s(p.username)}. Reconnect it so brands see up-to-date stats.` }),
-      ru: (p) => ({ title: 'Переподключи аккаунт', body: `Мы потеряли доступ к аккаунту ${PLATFORMS[s(p.platform)]?.ru ?? s(p.platform)} @${s(p.username)}. Подключи его снова, чтобы бренды видели свежую статистику.` }),
-      hy: (p) => ({ title: 'Վերամիացրու հաշիվդ', body: `Մենք կորցրել ենք մուտքը ${PLATFORMS[s(p.platform)]?.hy ?? s(p.platform)} @${s(p.username)} հաշվին։ Կրկին միացրու այն, որ բրենդները տեսնեն թարմ վիճակագրությունը։` }),
+    SOCIAL_TOKEN_REVOKED: {
+      cta: { en: 'Reconnect account', ru: 'Переподключить аккаунт', hy: 'Վերամիացնել հաշիվը' },
+      render: {
+        en: (p) => ({
+          title: 'Reconnect your account',
+          body: `We lost access to your ${PLATFORMS[s(p.platform)]?.en ?? s(p.platform)} account @${s(p.username)}. Reconnect it so brands see up-to-date stats.`,
+        }),
+        ru: (p) => ({
+          title: 'Переподключи аккаунт',
+          body: `Мы потеряли доступ к аккаунту ${PLATFORMS[s(p.platform)]?.ru ?? s(p.platform)} @${s(p.username)}. Подключи его снова, чтобы бренды видели свежую статистику.`,
+        }),
+        hy: (p) => ({
+          title: 'Վերամիացրու հաշիվդ',
+          body: `Մենք կորցրել ենք մուտքը ${PLATFORMS[s(p.platform)]?.hy ?? s(p.platform)} @${s(p.username)} հաշվին։ Կրկին միացրու այն, որ բրենդները տեսնեն թարմ վիճակագրությունը։`,
+        }),
+      },
     },
-  },
-};
+  };
 
 /** Renders a notification in a language; unknown types return null (callers fall back to stored text). */
-export function renderNotification(type: string, params: NotificationParams | null | undefined, locale: NotificationLocale): RenderedNotification | null {
+export function renderNotification(
+  type: string,
+  params: NotificationParams | null | undefined,
+  locale: NotificationLocale,
+): RenderedNotification | null {
   const entry = CATALOG[type as NotificationType];
   if (!entry) return null;
   const loc = isNotificationLocale(locale) ? locale : 'en';

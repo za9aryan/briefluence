@@ -1,14 +1,47 @@
 import { expect, test } from '@playwright/test';
 import { PASSWORD, signupViaUi, uid, verifyEmailViaLink } from './helpers';
 
-test.use({ storageState: { cookies: [{ name: 'NEXT_LOCALE', value: 'en', domain: 'localhost', path: '/', expires: -1, httpOnly: false, secure: false, sameSite: 'Lax' }], origins: [] } });
+test.use({
+  storageState: {
+    cookies: [
+      {
+        name: 'NEXT_LOCALE',
+        value: 'en',
+        domain: 'localhost',
+        path: '/',
+        expires: -1,
+        httpOnly: false,
+        secure: false,
+        sameSite: 'Lax',
+      },
+    ],
+    origins: [],
+  },
+});
 
 test('sign-up → verify → apply → accept → post link', async ({ browser }) => {
   const id = uid();
   const bloggerEmail = `blogger-${id}@e2e.test`;
   const brandEmail = `brand-${id}@e2e.test`;
   const dealTitle = `E2E brief ${id}`;
-  const newCtx = () => browser.newContext({ storageState: { cookies: [{ name: 'NEXT_LOCALE', value: 'en', domain: 'localhost', path: '/', expires: -1, httpOnly: false, secure: false, sameSite: 'Lax' }], origins: [] } });
+  const newCtx = () =>
+    browser.newContext({
+      storageState: {
+        cookies: [
+          {
+            name: 'NEXT_LOCALE',
+            value: 'en',
+            domain: 'localhost',
+            path: '/',
+            expires: -1,
+            httpOnly: false,
+            secure: false,
+            sameSite: 'Lax',
+          },
+        ],
+        origins: [],
+      },
+    });
 
   // ── Blogger: sign up, onboard, connect Instagram, submit for review ──
   const blogger = await (await newCtx()).newPage();
@@ -22,8 +55,8 @@ test('sign-up → verify → apply → accept → post link', async ({ browser }
   // The free month is opt-in: briefs stay locked until the blogger starts it.
   await blogger.goto('/influencer/deals');
   await expect(blogger.getByText('Two steps to see briefs')).toBeVisible();
-  await blogger.getByRole('button', { name: 'Start free month' }).click();
-  await expect(blogger.getByText('Your free month has started')).toBeVisible();
+  await blogger.getByRole('button', { name: 'Start 30 free days' }).click();
+  await expect(blogger.getByText('Your 30 free days have started')).toBeVisible();
   await verifyEmailViaLink(blogger, bloggerEmail);
   await blogger.goto('/influencer/verification');
   await blogger.getByRole('link', { name: 'Connect Instagram' }).click();
@@ -38,7 +71,10 @@ test('sign-up → verify → apply → accept → post link', async ({ browser }
   await admin.getByLabel('Password', { exact: true }).fill('Admin12345');
   await admin.getByRole('button', { name: 'Log in' }).click();
   await admin.waitForURL('**/admin/verifications');
-  const card = admin.locator('div', { hasText: bloggerEmail }).filter({ has: admin.getByRole('button', { name: 'Approve' }) }).last();
+  const card = admin
+    .locator('div', { hasText: bloggerEmail })
+    .filter({ has: admin.getByRole('button', { name: 'Approve' }) })
+    .last();
   await card.getByRole('button', { name: 'Approve' }).click();
   await expect(admin.getByText('Approved. The blogger got an email.')).toBeVisible();
 
@@ -54,7 +90,9 @@ test('sign-up → verify → apply → accept → post link', async ({ browser }
   await brand.getByRole('button', { name: 'Save and post a brief' }).click();
   await brand.waitForURL('**/brand/deals/new');
   await brand.getByLabel('Title').fill(dealTitle);
-  await brand.getByLabel('Description').fill('Come for dinner and film a Reels about our new menu, please.');
+  await brand
+    .getByLabel('Description')
+    .fill('Come for dinner and film a Reels about our new menu, please.');
   await brand.getByRole('checkbox', { name: 'Reel' }).click();
   await brand.getByRole('button', { name: 'Next', exact: true }).click();
   await expect(brand.getByText('Matching now')).toBeVisible();
@@ -68,7 +106,9 @@ test('sign-up → verify → apply → accept → post link', async ({ browser }
   await blogger.goto('/influencer/deals');
   await blogger.getByRole('link', { name: dealTitle }).click();
   await blogger.getByRole('button', { name: 'Apply' }).first().click();
-  await blogger.getByLabel('Your pitch').fill('I post about food in Yerevan and would love to film this.');
+  await blogger
+    .getByLabel('Your pitch')
+    .fill('I post about food in Yerevan and would love to film this.');
   await blogger.getByRole('button', { name: 'Send application' }).click();
   await expect(blogger.getByText('Application sent.')).toBeVisible();
 
@@ -76,13 +116,19 @@ test('sign-up → verify → apply → accept → post link', async ({ browser }
   await brand.reload();
   await expect(brand.getByText('Ani E2E')).toBeVisible();
   await brand.getByRole('button', { name: 'Accept', exact: true }).click();
-  await expect(brand.getByRole('link', { name: /WhatsApp: \+37491123456/ })).toHaveAttribute('href', 'https://wa.me/37491123456');
+  await expect(brand.getByRole('link', { name: /WhatsApp: \+37491123456/ })).toHaveAttribute(
+    'href',
+    'https://wa.me/37491123456',
+  );
 
   // ── Blogger sees brand contacts and sends the post link ──
   await blogger.goto('/influencer/applications');
   await blogger.getByRole('tab', { name: /Accepted/ }).click();
   await expect(blogger.getByText('Brand contacts')).toBeVisible();
-  await expect(blogger.getByRole('link', { name: /Telegram: @e2e_cafe/ })).toHaveAttribute('href', 'https://t.me/e2e_cafe');
+  await expect(blogger.getByRole('link', { name: /Telegram: @e2e_cafe/ })).toHaveAttribute(
+    'href',
+    'https://t.me/e2e_cafe',
+  );
   await blogger.getByLabel('Link to your post').fill('https://www.instagram.com/p/e2e123/');
   await blogger.getByRole('button', { name: 'Send link' }).click();
   await expect(blogger.getByText('Link sent to the brand')).toBeVisible();

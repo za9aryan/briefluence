@@ -1,7 +1,23 @@
 import { expect, test } from '@playwright/test';
 import { adminRequest, signupViaUi, uid } from './helpers';
 
-test.use({ storageState: { cookies: [{ name: 'NEXT_LOCALE', value: 'en', domain: 'localhost', path: '/', expires: -1, httpOnly: false, secure: false, sameSite: 'Lax' }], origins: [] } });
+test.use({
+  storageState: {
+    cookies: [
+      {
+        name: 'NEXT_LOCALE',
+        value: 'en',
+        domain: 'localhost',
+        path: '/',
+        expires: -1,
+        httpOnly: false,
+        secure: false,
+        sameSite: 'Lax',
+      },
+    ],
+    origins: [],
+  },
+});
 
 test('trial → pay → renew with the saved card', async ({ page, playwright, baseURL }) => {
   const id = uid();
@@ -17,9 +33,9 @@ test('trial → pay → renew with the saved card', async ({ page, playwright, b
     await page.waitForURL('**/influencer/verification');
 
     await page.goto('/influencer/billing');
-    await page.getByRole('button', { name: 'Start my free month' }).click();
-    await expect(page.getByText('Your free month has started')).toBeVisible();
-    await expect(page.getByText(/Free month: 30 days left/)).toBeVisible();
+    await page.getByRole('button', { name: 'Start my 30 free days' }).click();
+    await expect(page.getByText('Your 30 free days have started')).toBeVisible();
+    await expect(page.getByText(/Free period: 30 days left/)).toBeVisible();
 
     // Trial runs out.
     await admin.advanceDays(31);

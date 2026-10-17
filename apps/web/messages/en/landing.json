@@ -61,7 +61,7 @@
       "points": {
         "a": "A feed of briefs you actually qualify for, best matches first.",
         "b": "Money, barter or both — you choose. Models who work for barter are welcome.",
-        "c": "First month free, then 9.99 per month."
+        "c": "First 30 days free, then 9.99 per month."
       },
       "more": "How it works for bloggers"
     }
@@ -128,10 +128,10 @@
       },
       "fair": {
         "title": "Honest price",
-        "body": "First month free. Then 9.99 per month, cancel any time."
+        "body": "First 30 days free. Then 9.99 per month, cancel any time."
       }
     },
-    "cta": "Start your free month"
+    "cta": "Start your 30 free days"
   },
   "pricing": {
     "title": "Simple pricing",
@@ -151,19 +151,19 @@
     "influencer": {
       "name": "Blogger",
       "price": "{price}",
-      "period": "per month · first month free",
+      "period": "per month · first 30 days free",
       "features": {
         "a": "Personal feed with match scores",
         "b": "Unlimited applications",
         "c": "Verified badge",
         "d": "Cancel any time"
       },
-      "cta": "Start free month"
+      "cta": "Start 30 free days"
     },
     "faq": {
       "title": "Questions",
       "card": {
-        "q": "Do I need a card for the free month?",
+        "q": "Do I need a card for the 30 free days?",
         "a": "No. You add a card only when you decide to subscribe."
       },
       "cancel": {

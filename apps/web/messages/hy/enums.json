@@ -89,7 +89,7 @@
     "REJECTED": "Պետք են ուղղումներ"
   },
   "subscriptionStatus": {
-    "TRIALING": "Անվճար ամիս",
+    "TRIALING": "Փորձնական ժամկետ",
     "ACTIVE": "Ակտիվ",
     "PAST_DUE": "Վճարման խնդիր",
     "CANCELED": "Չեղարկված",
