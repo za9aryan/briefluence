@@ -36,8 +36,8 @@ export interface HeadingProps extends HTMLAttributes<HTMLHeadingElement> {
 }
 
 /**
- * Levels 1–2 use the display face (Syne) for Latin text; Russian/Armenian automatically use
- * Manrope extrabold (see styles.css). Levels 3–4 are Manrope bold.
+ * All headings use the UI font (Manrope; Noto Sans Armenian for Armenian) so English, Russian and
+ * Armenian look the same: levels 1–2 extrabold, 3–4 bold. Syne is reserved for the logo wordmark.
  */
 export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Heading(
   { level = 2, size, tone = 'default', align, className, ...rest },
@@ -49,7 +49,7 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
       ref={ref}
       className={cn(
         'text-balance',
-        level <= 2 ? 'font-display font-extrabold' : 'font-bold',
+        level <= 2 ? 'font-extrabold' : 'font-bold',
         rx(size ?? HEADING_SIZE[level], sizeClass),
         TONE_TEXT[tone],
         rx(align, (v) => ALIGN[v]),

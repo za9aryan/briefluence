@@ -20,8 +20,8 @@ The full brand book (BRAND.md) lives with the design team; this folder holds the
 6. Small primary text uses `primary-text`, never `primary`.
 7. Works in light and dark theme without extra code (tokens switch automatically).
 8. Mobile-first: 16px side padding, layouts work at 360px width; touch targets ≥ 44px.
-9. Headings in Russian / Armenian use Manrope, not Syne (Syne has no Cyrillic/Armenian glyphs) —
-   handled globally in `styles.css` via `:lang()`.
+9. Headings use Manrope (Noto Sans Armenian for Armenian) in every language, so all three look the same.
+   Syne (`font-display`) is only for the logo wordmark — owner decision 2026-10-18.
 10. No separate error red: errors use `primary-text` + an icon + text. Approved → `success`.
 11. Spacing scale 4 / 8 / 16 / 24 / 32 px (Tailwind 1, 2, 4, 6, 8); 12 and 16 (48 / 64 px) only for section rhythm.
 12. Voice: warm, direct, informal "you" (ru «ты», hy «դու»), no hype, no emoji, no ALL CAPS except `label` badges.

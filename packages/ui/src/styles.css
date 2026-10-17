@@ -40,11 +40,4 @@
   a {
     color: inherit;
   }
-  /* Syne has no Cyrillic / Armenian glyphs: display headings fall back to Manrope extrabold. */
-  :lang(ru) .font-display,
-  :lang(hy) .font-display {
-    font-family: var(--bf-font-sans);
-    font-weight: 800;
-    letter-spacing: -0.01em;
-  }
 }

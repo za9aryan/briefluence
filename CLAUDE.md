@@ -21,7 +21,7 @@
 ## Frontend rules
 
 - Build screens only from the design system in `packages/ui` (Block, Stack, Grid, Container, Heading, Text, Icon, Button, Card, Badge, Field…). Add new primitives there, not ad hoc in pages.
-- Follow the brand book: `packages/ui/src/brand/README.md`. Colors only from tokens (`bg-surface`, `text-ink`, `bg-primary`, `text-primary-text`, `bg-sun` only for barter); pills for buttons/chips, `rounded-card` for cards; brand type scale (`text-display/h1/h2/body/small/label`); Russian/Armenian headings never use Syne (handled in CSS).
+- Follow the brand book: `packages/ui/src/brand/README.md`. Colors only from tokens (`bg-surface`, `text-ink`, `bg-primary`, `text-primary-text`, `bg-sun` only for barter); pills for buttons/chips, `rounded-card` for cards; brand type scale (`text-display/h1/h2/body/small/label`); all headings use Manrope (Syne only for the logo wordmark).
 - Responsive props use Tailwind breakpoints (`sm md lg xl 2xl`), e.g. `cols={{ base: 1, md: 2 }}`; layouts must work at 360px with 16px side padding and 44px touch targets.
 - Voice: warm, direct, informal ("ты" / "դու"), no hype, no emoji.
 - Translations for most namespaces are generated: edit `apps/web/messages/_src/*.mjs` ([en, ru, hy] tuples) and run `node scripts/write-messages.mjs messages/_src/<file>.mjs`. `pnpm --filter @briefluence/web test` checks all locales have the same keys and placeholders.
