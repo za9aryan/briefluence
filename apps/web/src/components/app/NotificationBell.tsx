@@ -57,8 +57,8 @@ export function NotificationBell() {
         >
           <Icon name="bell" size="md" />
           {count > 0 && (
-            <span className="absolute right-1.5 top-1.5 inline-flex min-w-5 items-center justify-center rounded-pill bg-primary px-1 text-[11px] font-bold text-on-primary">
-              {count > 99 ? '99+' : count}
+            <span className="pointer-events-none absolute bottom-1 left-[calc(50%+5px)] inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-pill bg-primary px-[5px] text-[10px] font-bold leading-none tabular-nums text-on-primary shadow-sm ring-2 ring-surface">
+              {count > 9 ? '9+' : count}
             </span>
           )}
         </button>
@@ -71,7 +71,11 @@ export function NotificationBell() {
               {t('title')}
             </Text>
             {count > 0 && (
-              <button type="button" onClick={() => markAll.mutate()} className="min-h-11 text-small font-bold text-primary-text hover:underline">
+              <button
+                type="button"
+                onClick={() => markAll.mutate()}
+                className="min-h-11 text-small font-bold text-primary-text hover:underline"
+              >
                 {t('markAllRead')}
               </button>
             )}
@@ -87,13 +91,25 @@ export function NotificationBell() {
                       close();
                       if (n.link) router.push(n.link);
                     }}
-                    className={cn('flex w-full gap-2 border-b border-line px-4 py-2 text-left hover:bg-surface', !n.readAt && 'bg-primary-soft/40')}
+                    className={cn(
+                      'flex w-full gap-2 border-b border-line px-4 py-2 text-left hover:bg-surface',
+                      !n.readAt && 'bg-primary-soft/40',
+                    )}
                   >
-                    <span className={cn('mt-2 size-2 shrink-0 rounded-pill', n.readAt ? 'bg-transparent' : 'bg-primary')} />
+                    <span
+                      className={cn(
+                        'mt-2 size-2 shrink-0 rounded-pill',
+                        n.readAt ? 'bg-transparent' : 'bg-primary',
+                      )}
+                    />
                     <span className="min-w-0">
                       <span className="block text-small font-bold text-ink">{text(n).title}</span>
-                      <span className="line-clamp-2 block text-small text-ink-muted">{text(n).body}</span>
-                      <span className="mt-1 block text-[11px] text-ink-muted">{f.relative(n.createdAt)}</span>
+                      <span className="line-clamp-2 block text-small text-ink-muted">
+                        {text(n).body}
+                      </span>
+                      <span className="mt-1 block text-[11px] text-ink-muted">
+                        {f.relative(n.createdAt)}
+                      </span>
                     </span>
                   </button>
                 </li>
@@ -102,7 +118,11 @@ export function NotificationBell() {
               <li className="px-4 py-8 text-center text-small text-ink-muted">{t('empty')}</li>
             )}
           </ul>
-          <Link href="/notifications" onClick={close} className="block px-4 py-3 text-center text-small font-bold text-primary-text hover:underline">
+          <Link
+            href="/notifications"
+            onClick={close}
+            className="block px-4 py-3 text-center text-small font-bold text-primary-text hover:underline"
+          >
             {t('seeAll')}
           </Link>
         </div>
