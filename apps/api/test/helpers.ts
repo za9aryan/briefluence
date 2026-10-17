@@ -37,19 +37,43 @@ export async function createTestApp(): Promise<TestCtx> {
 }
 
 export async function resetDb(prisma: PrismaService) {
-  const tables = ['DealView', 'ExchangeRate', 'FeedSearch', 'Notification', 'Payment', 'Subscription', 'Application', 'Deal', 'SocialAccount', 'InfluencerProfile', 'BrandProfile', 'RefreshToken', 'User'];
-  await prisma.$executeRawUnsafe(`TRUNCATE ${tables.map((t) => `"${t}"`).join(', ')} RESTART IDENTITY CASCADE`);
+  const tables = [
+    'AuthIdentity',
+    'DealView',
+    'ExchangeRate',
+    'FeedSearch',
+    'Notification',
+    'Payment',
+    'Subscription',
+    'Application',
+    'Deal',
+    'SocialAccount',
+    'InfluencerProfile',
+    'BrandProfile',
+    'RefreshToken',
+    'User',
+  ];
+  await prisma.$executeRawUnsafe(
+    `TRUNCATE ${tables.map((t) => `"${t}"`).join(', ')} RESTART IDENTITY CASCADE`,
+  );
 }
 
 export const API = '/api/v1';
 let counter = 0;
 
 /** Signs up a user, marks the email verified, and returns a cookie-keeping agent. */
-export async function signup(ctx: TestCtx, role: Exclude<Role, 'ADMIN'>, opts: { verified?: boolean } = {}) {
+export async function signup(
+  ctx: TestCtx,
+  role: Exclude<Role, 'ADMIN'>,
+  opts: { verified?: boolean } = {},
+) {
   const agent = ctx.agent();
   const email = `${role.toLowerCase()}${++counter}-${Date.now()}@test.am`;
-  const res = await agent.post(`${API}/auth/signup`).send({ email, password: 'secret123', role, acceptTerms: true });
-  if (res.status !== 201) throw new Error(`signup failed ${res.status} ${JSON.stringify(res.body)}`);
+  const res = await agent
+    .post(`${API}/auth/signup`)
+    .send({ email, password: 'secret123', role, acceptTerms: true });
+  if (res.status !== 201)
+    throw new Error(`signup failed ${res.status} ${JSON.stringify(res.body)}`);
   if (opts.verified !== false) {
     await ctx.prisma.user.update({ where: { email }, data: { emailVerifiedAt: new Date() } });
     await agent.post(`${API}/auth/login`).send({ email, password: 'secret123' }).expect(200);
@@ -61,7 +85,12 @@ export async function createAdmin(ctx: TestCtx) {
   const argon2 = await import('argon2');
   const email = `admin${++counter}@test.am`;
   await ctx.prisma.user.create({
-    data: { email, role: 'ADMIN', passwordHash: await argon2.hash('Admin12345'), emailVerifiedAt: new Date() },
+    data: {
+      email,
+      role: 'ADMIN',
+      passwordHash: await argon2.hash('Admin12345'),
+      emailVerifiedAt: new Date(),
+    },
   });
   const agent = ctx.agent();
   await agent.post(`${API}/auth/login`).send({ email, password: 'Admin12345' }).expect(200);
@@ -111,7 +140,11 @@ export const dealInput = (over: Record<string, unknown> = {}) => ({
 });
 
 /** Runs the mock OAuth round trip: connect → (fake consent) → callback. */
-export async function connectMock(ctx: TestCtx, agent: ReturnType<typeof request.agent>, platform = 'instagram') {
+export async function connectMock(
+  ctx: TestCtx,
+  agent: ReturnType<typeof request.agent>,
+  platform = 'instagram',
+) {
   const connect = await agent.get(`${API}/social/${platform}/connect`).expect(302);
   const url = new URL(connect.headers.location as string);
   const callback = await agent.get(`${API}/social/${platform}/callback${url.search}`).expect(302);

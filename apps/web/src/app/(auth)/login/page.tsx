@@ -1,6 +1,6 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, type LoginInput } from '@briefluence/shared';
+import { loginSchema, type ErrorCode, type LoginInput } from '@briefluence/shared';
 import { Button, Card, Heading, Stack, Text } from '@briefluence/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
@@ -10,7 +10,9 @@ import { Suspense, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormError, TextField, useServerErrors } from '@/components/forms/form';
 import { PasswordField } from '@/components/forms/PasswordInput';
-import { api } from '@/lib/api';
+import { SocialSignIn } from '@/components/auth/SocialSignIn';
+import { api, ApiError } from '@/lib/api';
+import { useErrorMessage } from '@/lib/hooks/errors';
 import { landingPath, ME_KEY, type Me } from '@/lib/hooks/session';
 
 function LoginForm() {
@@ -18,7 +20,11 @@ function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const qc = useQueryClient();
-  const [error, setError] = useState<string | null>(null);
+  const errorMessage = useErrorMessage();
+  const oauthError = params.get('error');
+  const [error, setError] = useState<string | null>(
+    oauthError ? errorMessage(new ApiError(400, oauthError as ErrorCode, '')) : null,
+  );
   const form = useForm<LoginInput>({ resolver: zodResolver(loginSchema) });
   const serverError = useServerErrors(form.setError);
 
@@ -28,7 +34,9 @@ function LoginForm() {
       const me = await api.post<Me>('/auth/login', values);
       qc.setQueryData(ME_KEY, me);
       const next = params.get('next');
-      router.replace(next && next.startsWith('/') && !next.startsWith('//') ? next : landingPath(me));
+      router.replace(
+        next && next.startsWith('/') && !next.startsWith('//') ? next : landingPath(me),
+      );
       router.refresh();
     } catch (e) {
       setError(serverError(e));
@@ -37,10 +45,20 @@ function LoginForm() {
 
   return (
     <Card p={{ base: 6, md: 8 }}>
+      <FormError message={error} />
+      <div className={error ? 'mt-4' : undefined}>
+        <SocialSignIn next={params.get('next')} />
+      </div>
       <form onSubmit={onSubmit} noValidate>
         <Stack gap={4}>
-          <FormError message={error} />
-          <TextField name="email" type="email" autoComplete="email" label={t('email')} register={form.register} error={form.formState.errors.email} />
+          <TextField
+            name="email"
+            type="email"
+            autoComplete="email"
+            label={t('email')}
+            register={form.register}
+            error={form.formState.errors.email}
+          />
           <PasswordField
             name="password"
             autoComplete="current-password"

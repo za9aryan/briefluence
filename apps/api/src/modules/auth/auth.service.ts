@@ -22,7 +22,8 @@ import type { Env } from '../../config/env';
 import { EmailService } from '../notifications/email.service';
 import { renderResetPasswordEmail, renderVerifyEmail } from '../notifications/emails/templates';
 
-const localeOf = (v: string | null | undefined): NotificationLocale => (isNotificationLocale(v) ? v : 'en');
+const localeOf = (v: string | null | undefined): NotificationLocale =>
+  isNotificationLocale(v) ? v : 'en';
 
 export interface Session {
   accessToken: string;
@@ -55,7 +56,10 @@ export class AuthService {
   }
 
   async signup(input: SignupInput, locale?: string): Promise<Session> {
-    const existing = await this.prisma.user.findUnique({ where: { email: input.email }, select: { id: true } });
+    const existing = await this.prisma.user.findUnique({
+      where: { email: input.email },
+      select: { id: true },
+    });
     if (existing) throw new AppError('EMAIL_TAKEN', 'An account with this email already exists');
     const user = await this.prisma.user.create({
       data: {
@@ -71,8 +75,9 @@ export class AuthService {
 
   async login(input: LoginInput, locale?: string): Promise<Session> {
     const user = await this.prisma.user.findUnique({ where: { email: input.email } });
-    if (!user) {
-      // Spend comparable time so response timing does not reveal which emails exist.
+    // Unknown email or a Google/Apple-only account (no password): same answer and similar timing,
+    // so the response does not reveal which emails exist.
+    if (!user?.passwordHash) {
       this.dummyHash ??= this.hashPassword('dummy-password-1');
       await argon2.verify(await this.dummyHash, input.password).catch(() => false);
       throw new AppError('INVALID_CREDENTIALS', 'Wrong email or password');
@@ -117,7 +122,9 @@ export class AuthService {
 
   async logout(rawToken: string | undefined) {
     if (!rawToken) return;
-    const row = await this.prisma.refreshToken.findUnique({ where: { tokenHash: CryptoService.sha256(rawToken) } });
+    const row = await this.prisma.refreshToken.findUnique({
+      where: { tokenHash: CryptoService.sha256(rawToken) },
+    });
     if (row) {
       await this.prisma.refreshToken.updateMany({
         where: { familyId: row.familyId, revokedAt: null },
@@ -127,14 +134,28 @@ export class AuthService {
   }
 
   async revokeAllSessions(userId: string) {
-    await this.prisma.refreshToken.updateMany({ where: { userId, revokedAt: null }, data: { revokedAt: this.clock.now() } });
+    await this.prisma.refreshToken.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: this.clock.now() },
+    });
   }
 
-  async createSession(user: Pick<User, 'id' | 'role' | 'emailVerifiedAt'>, familyId?: string): Promise<Session> {
-    const payload: AccessTokenPayload = { sub: user.id, role: user.role, ev: !!user.emailVerifiedAt };
-    const accessToken = await this.jwt.signAsync(payload, { expiresIn: this.env.ACCESS_TOKEN_TTL_SECONDS });
+  async createSession(
+    user: Pick<User, 'id' | 'role' | 'emailVerifiedAt'>,
+    familyId?: string,
+  ): Promise<Session> {
+    const payload: AccessTokenPayload = {
+      sub: user.id,
+      role: user.role,
+      ev: !!user.emailVerifiedAt,
+    };
+    const accessToken = await this.jwt.signAsync(payload, {
+      expiresIn: this.env.ACCESS_TOKEN_TTL_SECONDS,
+    });
     const refreshToken = CryptoService.randomToken();
-    const refreshExpiresAt = new Date(this.clock.now().getTime() + this.env.REFRESH_TOKEN_TTL_DAYS * 86_400_000);
+    const refreshExpiresAt = new Date(
+      this.clock.now().getTime() + this.env.REFRESH_TOKEN_TTL_DAYS * 86_400_000,
+    );
     await this.prisma.refreshToken.create({
       data: {
         userId: user.id,
@@ -150,8 +171,14 @@ export class AuthService {
 
   async sendVerification(user: Pick<User, 'id' | 'email' | 'emailVerifiedAt' | 'locale'>) {
     if (user.emailVerifiedAt) return;
-    const token = await this.signEmailToken({ sub: user.id, purpose: 'verify', email: user.email }, '48h');
-    const email = await renderVerifyEmail(`${this.env.WEB_URL}/verify-email?token=${encodeURIComponent(token)}`, localeOf(user.locale));
+    const token = await this.signEmailToken(
+      { sub: user.id, purpose: 'verify', email: user.email },
+      '48h',
+    );
+    const email = await renderVerifyEmail(
+      `${this.env.WEB_URL}/verify-email?token=${encodeURIComponent(token)}`,
+      localeOf(user.locale),
+    );
     await this.email.send(user.email, email);
   }
 
@@ -164,9 +191,13 @@ export class AuthService {
     const p = await this.readEmailToken(token, 'verify');
     const user = await this.prisma.user.findUnique({ where: { id: p.sub } });
     // Token is bound to the address it was sent to.
-    if (!user || user.email !== p.email) throw new AppError('INVALID_TOKEN', 'This link is invalid');
+    if (!user || user.email !== p.email)
+      throw new AppError('INVALID_TOKEN', 'This link is invalid');
     if (user.emailVerifiedAt) return user;
-    return this.prisma.user.update({ where: { id: user.id }, data: { emailVerifiedAt: this.clock.now() } });
+    return this.prisma.user.update({
+      where: { id: user.id },
+      data: { emailVerifiedAt: this.clock.now() },
+    });
   }
 
   // ─── Password reset ──────────────────────────────────────
@@ -179,7 +210,10 @@ export class AuthService {
       { sub: user.id, purpose: 'reset', pwv: this.passwordVersion(user.passwordHash) },
       '1h',
     );
-    const mail = await renderResetPasswordEmail(`${this.env.WEB_URL}/reset-password?token=${encodeURIComponent(token)}`, localeOf(user.locale));
+    const mail = await renderResetPasswordEmail(
+      `${this.env.WEB_URL}/reset-password?token=${encodeURIComponent(token)}`,
+      localeOf(user.locale),
+    );
     await this.email.send(user.email, mail);
   }
 
@@ -193,16 +227,25 @@ export class AuthService {
     await this.prisma.user.update({
       where: { id: user.id },
       // Opening the reset link proves control of the inbox.
-      data: { passwordHash: await this.hashPassword(input.password), emailVerifiedAt: user.emailVerifiedAt ?? this.clock.now() },
+      data: {
+        passwordHash: await this.hashPassword(input.password),
+        emailVerifiedAt: user.emailVerifiedAt ?? this.clock.now(),
+      },
     });
     await this.revokeAllSessions(user.id);
   }
 
   async changePassword(userId: string, input: ChangePasswordInput) {
     const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
-    const ok = await argon2.verify(user.passwordHash, input.currentPassword).catch(() => false);
-    if (!ok) throw new AppError('INVALID_CREDENTIALS', 'Current password is wrong');
-    await this.prisma.user.update({ where: { id: userId }, data: { passwordHash: await this.hashPassword(input.newPassword) } });
+    // Accounts created with Google / Apple have no password yet: they may set one directly.
+    if (user.passwordHash) {
+      const ok = await argon2.verify(user.passwordHash, input.currentPassword).catch(() => false);
+      if (!ok) throw new AppError('INVALID_CREDENTIALS', 'Current password is wrong');
+    }
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash: await this.hashPassword(input.newPassword) },
+    });
     await this.revokeAllSessions(userId);
     return this.createSession(user);
   }
@@ -217,7 +260,15 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       include: {
-        influencer: { select: { id: true, displayName: true, avatarUrl: true, status: true, rejectionReason: true } },
+        influencer: {
+          select: {
+            id: true,
+            displayName: true,
+            avatarUrl: true,
+            status: true,
+            rejectionReason: true,
+          },
+        },
         brand: { select: { id: true, companyName: true, logoUrl: true } },
         subscription: true,
       },
@@ -231,6 +282,7 @@ export class AuthService {
       role: user.role,
       emailVerified: !!user.emailVerifiedAt,
       digestEmails: user.digestEmails,
+      hasPassword: !!user.passwordHash,
       currency: user.currency,
       locale: user.locale,
       createdAt: user.createdAt,
@@ -251,8 +303,8 @@ export class AuthService {
 
   // ─── helpers ─────────────────────────────────────────────
 
-  private passwordVersion(hash: string) {
-    return CryptoService.sha256(hash).slice(0, 16);
+  private passwordVersion(hash: string | null) {
+    return CryptoService.sha256(hash ?? 'no-password').slice(0, 16);
   }
 
   private signEmailToken(payload: EmailTokenPayload, expiresIn: '1h' | '48h') {
@@ -261,7 +313,9 @@ export class AuthService {
 
   private async readEmailToken<P extends EmailTokenPayload['purpose']>(token: string, purpose: P) {
     try {
-      const p = await this.jwt.verifyAsync<EmailTokenPayload>(token, { secret: this.env.JWT_EMAIL_SECRET });
+      const p = await this.jwt.verifyAsync<EmailTokenPayload>(token, {
+        secret: this.env.JWT_EMAIL_SECRET,
+      });
       if (p.purpose !== purpose) throw new Error('wrong purpose');
       return p as Extract<EmailTokenPayload, { purpose: P }>;
     } catch {

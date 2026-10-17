@@ -36,14 +36,19 @@ export const resetPasswordSchema = z.object({
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 export const changePasswordSchema = z.object({
-  currentPassword: z.string().min(1).max(128),
+  /** Empty for Google/Apple-only accounts setting their first password; the API checks it otherwise. */
+  currentPassword: z.string().max(128).default(''),
   newPassword: passwordSchema,
 });
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
 
 /** Account preferences; send only what changes. */
 export const notificationSettingsSchema = z
-  .object({ digestEmails: z.boolean(), currency: z.enum(CURRENCIES), locale: z.enum(['en', 'ru', 'hy']) })
+  .object({
+    digestEmails: z.boolean(),
+    currency: z.enum(CURRENCIES),
+    locale: z.enum(['en', 'ru', 'hy']),
+  })
   .partial()
   .refine((v) => Object.keys(v).length > 0, { message: 'invalid' });
 export type NotificationSettingsInput = z.infer<typeof notificationSettingsSchema>;

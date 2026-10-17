@@ -111,7 +111,7 @@ enum PaymentStatus {
 model User {
   id              String             @id @default(cuid())
   email           String             @unique
-  passwordHash    String
+  passwordHash    String? // null for accounts created with Google / Apple sign-in
   role            Role
   emailVerifiedAt DateTime?
   createdAt       DateTime           @default(now())
@@ -124,6 +124,7 @@ model User {
   subscription    Subscription?
   notifications   Notification[]
   refreshTokens   RefreshToken[]
+  identities      AuthIdentity[]
 }
 
 // spec+: refresh token rotation with reuse detection needs server-side state.
@@ -372,4 +373,18 @@ model DealView {
 
   @@unique([dealId, influencerId, day])
   @@index([dealId, createdAt])
+}
+
+// spec+: "Sign in with Google / Apple" identities linked to a user.
+model AuthIdentity {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider  String // "google" | "apple"
+  subject   String // the provider's stable user id ("sub")
+  email     String?
+  createdAt DateTime @default(now())
+
+  @@unique([provider, subject])
+  @@index([userId])
 }

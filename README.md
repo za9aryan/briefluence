@@ -37,10 +37,10 @@ pnpm dev                        # web on :3000, API on :4000
 
 ### Seeded logins
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Admin | admin@briefluence.local | Admin12345 (from `.env`) |
-| Brand | brand1…brand5@briefluence.local | Password123 |
+| Role    | Email                                      | Password                                                  |
+| ------- | ------------------------------------------ | --------------------------------------------------------- |
+| Admin   | admin@briefluence.local                    | Admin12345 (from `.env`)                                  |
+| Brand   | brand1…brand5@briefluence.local            | Password123                                               |
 | Blogger | influencer1…influencer30@briefluence.local | Password123 (1–24 verified, 25–27 in review, 28–30 draft) |
 
 ## Your data is safe
@@ -53,6 +53,10 @@ pnpm dev                        # web on :3000, API on :4000
 - Migrations never drop your data without copying it first.
 - Browser E2E tests use their own servers (:4100 / :3100) and database `briefluence_e2e`; API tests use
   `briefluence_test`. Neither touches your dev database.
+
+## Sign in with Google / Apple
+
+The login and sign-up pages have "Continue with Google / Apple". Locally they are simulated (`OAUTH_LOGIN_MOCK=true`): you type any email on a test page. To make them real, see [docs/social-login-setup.md](docs/social-login-setup.md).
 
 ## Admin access
 

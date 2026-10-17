@@ -60,6 +60,16 @@ envVarGroups:
         value: "true"
       - key: PAYMENT_PROVIDER
         value: mock
+      - key: OAUTH_LOGIN_MOCK # simulated Google / Apple sign-in until their apps are set up
+        value: "true"
+      - key: APPLE_CLIENT_ID
+        sync: false
+      - key: APPLE_TEAM_ID
+        sync: false
+      - key: APPLE_KEY_ID
+        sync: false
+      - key: APPLE_PRIVATE_KEY
+        sync: false
       - key: INSTAGRAM_APP_ID
         sync: false
       - key: INSTAGRAM_APP_SECRET

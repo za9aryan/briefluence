@@ -10,5 +10,7 @@
   "passwordHint": "Changing it signs you out on other devices.",
   "currentPassword": "Current password",
   "changePassword": "Change password",
-  "passwordChanged": "Password changed"
+  "passwordChanged": "Password changed",
+  "setPassword": "Set a password",
+  "setPasswordHint": "You signed up with Google or Apple. Add a password to also sign in with your email."
 }

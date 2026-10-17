@@ -10,6 +10,7 @@ export interface Me {
   role: Role;
   emailVerified: boolean;
   digestEmails: boolean;
+  hasPassword: boolean;
   currency: Currency;
   locale: string;
   createdAt: string;

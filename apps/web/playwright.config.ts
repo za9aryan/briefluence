@@ -5,7 +5,8 @@ import { defineConfig, devices } from '@playwright/test';
  *   API on :4100 and web on :3100, database `briefluence_e2e` (created/migrated automatically).
  * Your dev servers (:4000 / :3000) and the `briefluence` database are not touched.
  */
-const E2E_DB = process.env.E2E_DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/briefluence_e2e';
+const E2E_DB =
+  process.env.E2E_DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5432/briefluence_e2e';
 const API_PORT = 4100;
 const WEB_PORT = 3100;
 const WEB = `http://localhost:${WEB_PORT}`;
@@ -20,6 +21,7 @@ const apiEnv = {
   PROCESS_ROLE: 'all',
   REDIS_URL: '',
   SOCIAL_MOCK: 'true',
+  OAUTH_LOGIN_MOCK: 'true',
   PAYMENT_PROVIDER: 'mock',
   EMAIL_TRANSPORT: 'log',
   STORAGE_DRIVER: 'local',
@@ -57,7 +59,11 @@ export default defineConfig({
       // Production build in its own folder so it never clashes with `next dev`.
       command: `pnpm exec next build && pnpm exec next start --port ${WEB_PORT}`,
       url: WEB,
-      env: { NEXT_DIST_DIR: '.next-e2e', API_INTERNAL_URL: `http://localhost:${API_PORT}`, NEXT_TELEMETRY_DISABLED: '1' },
+      env: {
+        NEXT_DIST_DIR: '.next-e2e',
+        API_INTERNAL_URL: `http://localhost:${API_PORT}`,
+        NEXT_TELEMETRY_DISABLED: '1',
+      },
       reuseExistingServer: !process.env.CI,
       timeout: 300_000,
     },

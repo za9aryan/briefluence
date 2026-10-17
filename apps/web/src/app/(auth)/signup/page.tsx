@@ -1,7 +1,17 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signupSchema, type SignupInput } from '@briefluence/shared';
-import { Button, Card, Checkbox, Heading, Icon, Stack, Text, cn, type IconName } from '@briefluence/ui';
+import {
+  Button,
+  Card,
+  Checkbox,
+  Heading,
+  Icon,
+  Stack,
+  Text,
+  cn,
+  type IconName,
+} from '@briefluence/ui';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -10,6 +20,7 @@ import { Suspense, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { FormError, TextField, useFieldError, useServerErrors } from '@/components/forms/form';
 import { PasswordField } from '@/components/forms/PasswordInput';
+import { SocialSignIn } from '@/components/auth/SocialSignIn';
 import { api } from '@/lib/api';
 import { landingPath, ME_KEY, type Me } from '@/lib/hooks/session';
 
@@ -28,7 +39,12 @@ function SignupForm() {
   const initialRole = params.get('role') === 'INFLUENCER' ? 'INFLUENCER' : 'BRAND';
   const form = useForm<SignupInput>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { role: initialRole, email: '', password: '', acceptTerms: false as unknown as true },
+    defaultValues: {
+      role: initialRole,
+      email: '',
+      password: '',
+      acceptTerms: false as unknown as true,
+    },
   });
   const serverError = useServerErrors(form.setError);
   const role = form.watch('role');
@@ -68,12 +84,18 @@ function SignupForm() {
                         onClick={() => field.onChange(r.value)}
                         className={cn(
                           'flex min-h-11 flex-col items-start gap-1 rounded-card border-2 p-4 text-left transition-colors',
-                          on ? 'border-primary bg-primary-soft' : 'border-line bg-surface-raised hover:border-primary/40',
+                          on
+                            ? 'border-primary bg-primary-soft'
+                            : 'border-line bg-surface-raised hover:border-primary/40',
                         )}
                       >
                         <Icon name={r.icon} size="md" tone={on ? 'accent' : 'muted'} />
-                        <span className="text-body font-bold text-ink">{t(`role.${r.value}.title`)}</span>
-                        <span className="text-small text-ink-muted">{t(`role.${r.value}.body`)}</span>
+                        <span className="text-body font-bold text-ink">
+                          {t(`role.${r.value}.title`)}
+                        </span>
+                        <span className="text-small text-ink-muted">
+                          {t(`role.${r.value}.body`)}
+                        </span>
                       </button>
                     );
                   })}
@@ -81,7 +103,23 @@ function SignupForm() {
               )}
             />
           </fieldset>
-          <TextField name="email" type="email" autoComplete="email" label={t('email')} register={form.register} error={form.formState.errors.email} />
+          {/* Social sign-up uses the chosen role; the terms checkbox below must be ticked first. */}
+          <SocialSignIn
+            role={role}
+            beforeStart={() => {
+              if (form.getValues('acceptTerms')) return true;
+              form.setError('acceptTerms', { type: 'custom', message: 'acceptTerms' });
+              return false;
+            }}
+          />
+          <TextField
+            name="email"
+            type="email"
+            autoComplete="email"
+            label={t('email')}
+            register={form.register}
+            error={form.formState.errors.email}
+          />
           <PasswordField
             name="password"
             autoComplete="new-password"
@@ -95,12 +133,20 @@ function SignupForm() {
               {...form.register('acceptTerms')}
               label={t.rich('acceptTerms', {
                 terms: (c) => (
-                  <Link href="/terms" target="_blank" className="font-bold text-primary-text hover:underline">
+                  <Link
+                    href="/terms"
+                    target="_blank"
+                    className="font-bold text-primary-text hover:underline"
+                  >
                     {c}
                   </Link>
                 ),
                 privacy: (c) => (
-                  <Link href="/privacy" target="_blank" className="font-bold text-primary-text hover:underline">
+                  <Link
+                    href="/privacy"
+                    target="_blank"
+                    className="font-bold text-primary-text hover:underline"
+                  >
                     {c}
                   </Link>
                 ),
