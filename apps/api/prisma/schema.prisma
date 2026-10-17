@@ -73,6 +73,13 @@ enum ContentFormat {
   SHORT_VIDEO
   LONG_VIDEO
   LIVE
+  TEXT_MENTION
+  INTEGRATION
+  PRODUCT_PLACEMENT
+  REVIEW
+  GIVEAWAY
+  EVENT
+  UGC
 }
 
 enum DealStatus {

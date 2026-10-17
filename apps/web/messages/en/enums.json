@@ -64,7 +64,14 @@
     "STORY": "Story",
     "SHORT_VIDEO": "Short video",
     "LONG_VIDEO": "Long video",
-    "LIVE": "Live"
+    "LIVE": "Live",
+    "TEXT_MENTION": "Text mention",
+    "INTEGRATION": "Integration (video, podcast)",
+    "PRODUCT_PLACEMENT": "Product in frame",
+    "REVIEW": "Review or unboxing",
+    "GIVEAWAY": "Giveaway",
+    "EVENT": "Event visit",
+    "UGC": "Content for the brand (UGC)"
   },
   "dealStatus": {
     "DRAFT": "Draft",

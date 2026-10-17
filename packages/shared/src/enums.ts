@@ -22,7 +22,21 @@ export type PaymentType = (typeof PAYMENT_TYPES)[number];
 export const CURRENCIES = values('AMD', 'USD', 'RUB');
 export type Currency = (typeof CURRENCIES)[number];
 
-export const CONTENT_FORMATS = values('POST', 'REEL', 'STORY', 'SHORT_VIDEO', 'LONG_VIDEO', 'LIVE');
+export const CONTENT_FORMATS = values(
+  'POST',
+  'REEL',
+  'STORY',
+  'SHORT_VIDEO',
+  'LONG_VIDEO',
+  'LIVE',
+  'TEXT_MENTION',
+  'INTEGRATION',
+  'PRODUCT_PLACEMENT',
+  'REVIEW',
+  'GIVEAWAY',
+  'EVENT',
+  'UGC',
+);
 export type ContentFormat = (typeof CONTENT_FORMATS)[number];
 
 export const DEAL_STATUSES = values('DRAFT', 'ACTIVE', 'PAUSED', 'CLOSED', 'EXPIRED');
@@ -39,7 +53,13 @@ export const APPLICATION_STATUSES = values(
 );
 export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
 
-export const SUBSCRIPTION_STATUSES = values('TRIALING', 'ACTIVE', 'PAST_DUE', 'CANCELED', 'EXPIRED');
+export const SUBSCRIPTION_STATUSES = values(
+  'TRIALING',
+  'ACTIVE',
+  'PAST_DUE',
+  'CANCELED',
+  'EXPIRED',
+);
 export type SubscriptionStatus = (typeof SUBSCRIPTION_STATUSES)[number];
 
 export const PAYMENT_STATUSES = values('PENDING', 'SUCCEEDED', 'FAILED', 'REFUNDED');
@@ -70,7 +90,14 @@ export const NOTIFICATION_TYPES = values(
 );
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 
-export const CONTACT_METHODS = values('TELEGRAM', 'MESSENGER', 'VIBER', 'WHATSAPP', 'INSTAGRAM', 'PHONE');
+export const CONTACT_METHODS = values(
+  'TELEGRAM',
+  'MESSENGER',
+  'VIBER',
+  'WHATSAPP',
+  'INSTAGRAM',
+  'PHONE',
+);
 export type ContactMethod = (typeof CONTACT_METHODS)[number];
 
 /** How long the brand wants to work with the blogger. */
