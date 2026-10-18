@@ -192,9 +192,9 @@ export default {
     manual: {
       button: ['Add manually', 'Добавить вручную', 'Ավելացնել ձեռքով'],
       hint: [
-        'Connecting does not work for you? Add the account by hand. We check it during review.',
-        'Подключение не работает? Добавь аккаунт вручную, мы проверим его при модерации.',
-        'Միացումը չի աշխատում՝ ավելացրու հաշիվը ձեռքով։ Մենք այն կստուգենք ստուգման ժամանակ։',
+        'Or you can add the account manually. We check it during review.',
+        'Или можешь добавить аккаунт вручную. Мы проверим его при модерации.',
+        'Կամ կարող ես ավելացնել հաշիվը ձեռքով։ Մենք այն կստուգենք ստուգման ժամանակ։',
       ],
       title: ['Add an account manually', 'Добавить аккаунт вручную', 'Ավելացնել հաշիվ ձեռքով'],
       editTitle: ['Edit account', 'Изменить аккаунт', 'Խմբագրել հաշիվը'],

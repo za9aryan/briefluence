@@ -21,7 +21,7 @@
   "sync": "Update",
   "manual": {
     "button": "Add manually",
-    "hint": "Connecting does not work for you? Add the account by hand. We check it during review.",
+    "hint": "Or you can add the account manually. We check it during review.",
     "title": "Add an account manually",
     "editTitle": "Edit account",
     "lead": "Only the username and followers are required. The more you fill in, the better we match you with briefs. Brands see that you added these numbers yourself.",
