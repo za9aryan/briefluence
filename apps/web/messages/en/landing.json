@@ -61,7 +61,7 @@
       "points": {
         "a": "A feed of briefs you actually qualify for, best matches first.",
         "b": "Money, barter or both — you choose. Models who work for barter are welcome.",
-        "c": "First 30 days free, then 9.99 per month."
+        "c": "Talk to brands directly once they accept you."
       },
       "more": "How it works for bloggers"
     }
@@ -84,8 +84,7 @@
   },
   "cta": {
     "title": "Your next collab starts with a brief",
-    "lead": "Create a free brand account and post your first brief in five minutes.",
-    "pricing": "See pricing"
+    "lead": "Create a free brand account and post your first brief in five minutes."
   },
   "brands": {
     "title": "Influencer marketing without guesswork",
@@ -126,54 +125,11 @@
         "title": "Track every application",
         "body": "Applied, viewed, shortlisted, accepted — you always know where you stand."
       },
-      "fair": {
-        "title": "Honest price",
-        "body": "First 30 days free. Then 9.99 per month, cancel any time."
+      "direct": {
+        "title": "Talk to brands directly",
+        "body": "Once a brand accepts you, you get its contacts and agree on the details yourselves."
       }
     },
-    "cta": "Start your 30 free days"
-  },
-  "pricing": {
-    "title": "Simple pricing",
-    "lead": "Brands post for free. Bloggers pay a small monthly fee to apply.",
-    "brand": {
-      "name": "Brand",
-      "price": "Free",
-      "period": "no card, no fees",
-      "features": {
-        "a": "Unlimited briefs",
-        "b": "Live reach counter",
-        "c": "Applicant comparison",
-        "d": "Direct contacts after you accept"
-      },
-      "cta": "Post a brief"
-    },
-    "influencer": {
-      "name": "Blogger",
-      "price": "{price}",
-      "period": "per month · first 30 days free",
-      "features": {
-        "a": "Personal feed with match scores",
-        "b": "Unlimited applications",
-        "c": "Verified badge",
-        "d": "Cancel any time"
-      },
-      "cta": "Start 30 free days"
-    },
-    "faq": {
-      "title": "Questions",
-      "card": {
-        "q": "Do I need a card for the 30 free days?",
-        "a": "No. You add a card only when you decide to subscribe."
-      },
-      "cancel": {
-        "q": "Can I cancel?",
-        "a": "Yes, any time. You keep access until the end of the paid month."
-      },
-      "cards": {
-        "q": "Which cards work?",
-        "a": "Visa, Mastercard and ArCa. Payments are processed by Ameriabank."
-      }
-    }
+    "cta": "Create a blogger account"
   }
 }

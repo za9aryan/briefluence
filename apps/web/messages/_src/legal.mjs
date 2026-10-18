@@ -50,9 +50,9 @@ export default {
             '4. Բլոգերները և բաժանորդագրությունը',
           ],
           body: [
-            'Applying requires a verified profile and active free days or a subscription. The first 30 days are free; after that the subscription renews monthly at the price shown on the pricing page until you cancel.',
-            'Для откликов нужен проверенный профиль и активный бесплатный период или подписка. Первые 30 дней бесплатны, затем подписка продлевается ежемесячно по цене со страницы «Цены», пока ты её не отменишь.',
-            'Դիմելու համար անհրաժեշտ է ստուգված պրոֆիլ և ակտիվ անվճար ժամկետ կամ բաժանորդագրություն։ Առաջին 30 օրն անվճար է, այնուհետև բաժանորդագրությունը երկարաձգվում է ամեն ամիս «Գներ» էջում նշված գնով, մինչև այն չեղարկես։',
+            'Applying requires a verified profile and an active plan. Plans and their prices are shown in your account before you choose one; a paid plan renews at the shown price until you cancel.',
+            'Для откликов нужен проверенный профиль и активный тариф. Тарифы и цены показываются в аккаунте до того, как ты выберешь тариф; платный тариф продлевается по указанной цене, пока ты его не отменишь.',
+            'Դիմելու համար անհրաժեշտ է ստուգված պրոֆիլ և ակտիվ փաթեթ։ Փաթեթներն ու գները ցուցադրվում են հաշվում՝ նախքան ընտրելը. վճարովի փաթեթը երկարաձգվում է նշված գնով, մինչև այն չեղարկես։',
           ],
         },
         e: {

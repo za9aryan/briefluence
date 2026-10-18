@@ -1,4 +1,17 @@
-import { Badge, Block, Card, Container, Grid, Heading, Icon, Inline, ScoreMeter, Stack, Text, buttonStyles } from '@briefluence/ui';
+import {
+  Badge,
+  Block,
+  Card,
+  Container,
+  Grid,
+  Heading,
+  Icon,
+  Inline,
+  ScoreMeter,
+  Stack,
+  Text,
+  buttonStyles,
+} from '@briefluence/ui';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { FeatureItem, Section } from '@/components/common/Section';
@@ -23,7 +36,10 @@ export default async function LandingPage() {
                 <Link href="/signup?role=BRAND" className={buttonStyles({ size: 'lg' })}>
                   {t('hero.ctaBrand')}
                 </Link>
-                <Link href="/signup?role=INFLUENCER" className={buttonStyles({ size: 'lg', variant: 'secondary' })}>
+                <Link
+                  href="/signup?role=INFLUENCER"
+                  className={buttonStyles({ size: 'lg', variant: 'secondary' })}
+                >
                   {t('hero.ctaInfluencer')}
                 </Link>
               </Stack>
@@ -63,7 +79,11 @@ export default async function LandingPage() {
                     {t('preview.city')}
                   </Badge>
                 </Inline>
-                <div className={buttonStyles({ block: true, className: 'pointer-events-none mt-6' })}>{t('preview.apply')}</div>
+                <div
+                  className={buttonStyles({ block: true, className: 'pointer-events-none mt-6' })}
+                >
+                  {t('preview.apply')}
+                </div>
               </Card>
               <Card p={4} className="ml-auto w-5/6">
                 <Inline gap={2}>
@@ -83,7 +103,9 @@ export default async function LandingPage() {
         <Grid cols={{ base: 1, sm: 2, lg: 4 }} gap={6}>
           {steps.map((s, i) => (
             <Stack key={s} gap={2}>
-              <span className="mb-2 inline-flex size-11 items-center justify-center rounded-pill bg-primary text-body font-extrabold text-on-primary">{i + 1}</span>
+              <span className="mb-2 inline-flex size-11 items-center justify-center rounded-pill bg-primary text-body font-extrabold text-on-primary">
+                {i + 1}
+              </span>
               <Heading level={3}>{t(`how.steps.${s}.title`)}</Heading>
               <Text tone="muted">{t(`how.steps.${s}.body`)}</Text>
             </Stack>
@@ -111,7 +133,10 @@ export default async function LandingPage() {
                     </Inline>
                   ))}
                 </Stack>
-                <Link href={who === 'brands' ? '/for-brands' : '/for-influencers'} className={buttonStyles({ variant: 'link', className: 'self-start' })}>
+                <Link
+                  href={who === 'brands' ? '/for-brands' : '/for-influencers'}
+                  className={buttonStyles({ variant: 'link', className: 'self-start' })}
+                >
                   {t(`audiences.${who}.more`)} <Icon name="arrow-right" />
                 </Link>
               </Stack>
@@ -146,12 +171,16 @@ export default async function LandingPage() {
               <Text tone="onPrimary" className="max-w-xl opacity-90">
                 {t('cta.lead')}
               </Text>
-              <Stack direction={{ base: 'col', sm: 'row' }} gap={2} className="mt-2 w-full sm:w-auto">
-                <Link href="/signup?role=BRAND" className={buttonStyles({ size: 'lg', className: 'bg-on-primary text-primary' })}>
+              <Stack
+                direction={{ base: 'col', sm: 'row' }}
+                gap={2}
+                className="mt-2 w-full sm:w-auto"
+              >
+                <Link
+                  href="/signup?role=BRAND"
+                  className={buttonStyles({ size: 'lg', className: 'bg-on-primary text-primary' })}
+                >
                   {t('hero.ctaBrand')}
-                </Link>
-                <Link href="/pricing" className={buttonStyles({ size: 'lg', variant: 'secondary', className: 'border-on-primary text-on-primary hover:bg-on-primary hover:text-primary' })}>
-                  {t('cta.pricing')}
                 </Link>
               </Stack>
             </Stack>

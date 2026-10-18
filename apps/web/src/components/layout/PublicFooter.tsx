@@ -7,9 +7,27 @@ export async function PublicFooter() {
   const t = await getTranslations('nav');
   const tc = await getTranslations('common');
   const cols = [
-    { title: t('product'), links: [['/for-brands', t('forBrands')], ['/for-influencers', t('forInfluencers')], ['/pricing', t('pricing')]] },
-    { title: t('account'), links: [['/login', t('login')], ['/signup', t('signup')]] },
-    { title: t('legal'), links: [['/terms', t('terms')], ['/privacy', t('privacy')]] },
+    {
+      title: t('product'),
+      links: [
+        ['/for-brands', t('forBrands')],
+        ['/for-influencers', t('forInfluencers')],
+      ],
+    },
+    {
+      title: t('account'),
+      links: [
+        ['/login', t('login')],
+        ['/signup', t('signup')],
+      ],
+    },
+    {
+      title: t('legal'),
+      links: [
+        ['/terms', t('terms')],
+        ['/privacy', t('privacy')],
+      ],
+    },
   ];
   return (
     <footer className="border-t border-line bg-surface-raised">
@@ -27,7 +45,11 @@ export async function PublicFooter() {
                 {c.title}
               </Text>
               {c.links.map(([href, label]) => (
-                <Link key={href} href={href!} className="py-1 text-small font-medium text-ink hover:text-primary-text">
+                <Link
+                  key={href}
+                  href={href!}
+                  className="py-1 text-small font-medium text-ink hover:text-primary-text"
+                >
                   {label}
                 </Link>
               ))}

@@ -17,7 +17,6 @@ export function PublicHeader() {
   const links = [
     { href: '/for-brands', label: t('forBrands') },
     { href: '/for-influencers', label: t('forInfluencers') },
-    { href: '/pricing', label: t('pricing') },
   ];
 
   return (
@@ -42,7 +41,10 @@ export function PublicHeader() {
           {/* Signed in: language & currency live in the user menu; signed out: plain language button. */}
           {me ? (
             <>
-              <Link href={landingPath(me)} className={buttonStyles({ size: 'sm', className: 'hidden sm:inline-flex' })}>
+              <Link
+                href={landingPath(me)}
+                className={buttonStyles({ size: 'sm', className: 'hidden sm:inline-flex' })}
+              >
                 {t('dashboard')}
               </Link>
               <UserMenu me={me} showDashboard />
@@ -50,7 +52,14 @@ export function PublicHeader() {
           ) : (
             <>
               <LanguageSwitcher compact />
-              <Link href="/login" className={buttonStyles({ variant: 'ghost', size: 'sm', className: 'hidden sm:inline-flex' })}>
+              <Link
+                href="/login"
+                className={buttonStyles({
+                  variant: 'ghost',
+                  size: 'sm',
+                  className: 'hidden sm:inline-flex',
+                })}
+              >
                 {t('login')}
               </Link>
               <Link href="/signup" className={buttonStyles({ size: 'sm' })}>
@@ -58,7 +67,14 @@ export function PublicHeader() {
               </Link>
             </>
           )}
-          <Button variant="ghost" size="icon" className="md:hidden" aria-label={t('menu')} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            aria-label={t('menu')}
+            aria-expanded={open}
+            onClick={() => setOpen((o) => !o)}
+          >
             <Icon name={open ? 'close' : 'menu'} size="md" />
           </Button>
         </div>
@@ -67,7 +83,12 @@ export function PublicHeader() {
         <nav className="border-t border-line bg-surface md:hidden" aria-label={t('main')}>
           <Container className="flex flex-col py-2">
             {[...links, ...(me ? [] : [{ href: '/login', label: t('login') }])].map((l) => (
-              <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className="rounded-sm px-2 py-3 text-body font-bold text-ink hover:bg-primary-soft/60">
+              <Link
+                key={l.href}
+                href={l.href}
+                onClick={() => setOpen(false)}
+                className="rounded-sm px-2 py-3 text-body font-bold text-ink hover:bg-primary-soft/60"
+              >
                 {l.label}
               </Link>
             ))}

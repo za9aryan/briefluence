@@ -15,7 +15,7 @@ export default function ForInfluencersPage() {
         ['feed', 'sparkles'],
         ['verified', 'verified'],
         ['track', 'send'],
-        ['fair', 'wallet'],
+        ['direct', 'message'],
       ]}
     />
   );
