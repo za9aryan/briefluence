@@ -42,11 +42,13 @@
   "lead": "Every brief you applied to, with its status.",
   "tabs": {
     "active": "In progress",
+    "shortlisted": "Shortlisted",
     "accepted": "Accepted",
     "closed": "Closed"
   },
   "empty": {
     "active": "No applications in progress",
+    "shortlisted": "No shortlisted applications yet. When a brand shortlists you, it shows up here.",
     "accepted": "No accepted applications yet",
     "closed": "Nothing here"
   },

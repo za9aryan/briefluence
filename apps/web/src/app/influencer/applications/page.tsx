@@ -1,5 +1,10 @@
 'use client';
-import { contactDisplay, contactHref, type ApplicationStatus } from '@briefluence/shared';
+import {
+  canWithdraw,
+  contactDisplay,
+  contactHref,
+  type ApplicationStatus,
+} from '@briefluence/shared';
 import {
   Alert,
   Button,
@@ -28,8 +33,10 @@ import { useErrorMessage } from '@/lib/hooks/errors';
 import { useFormat } from '@/lib/hooks/format';
 import type { MyApplicationDto } from '@/lib/types';
 
-const GROUPS: Record<'active' | 'accepted' | 'closed', ApplicationStatus[]> = {
-  active: ['APPLIED', 'VIEWED', 'SHORTLISTED'],
+/** Tabs in the order an application moves: in progress → shortlisted → accepted, or closed. */
+const GROUPS: Record<'active' | 'shortlisted' | 'accepted' | 'closed', ApplicationStatus[]> = {
+  active: ['APPLIED', 'VIEWED'],
+  shortlisted: ['SHORTLISTED'],
   accepted: ['ACCEPTED', 'COMPLETED'],
   closed: ['REJECTED', 'WITHDRAWN'],
 };
@@ -167,7 +174,7 @@ export default function MyApplicationsPage() {
                     {t('viewPost')}
                   </a>
                 )}
-                {GROUPS.active.includes(a.status) && (
+                {canWithdraw(a.status) && (
                   <div className="flex justify-end">
                     <Button
                       variant="ghost"

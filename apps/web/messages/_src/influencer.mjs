@@ -562,11 +562,17 @@ export default {
     ],
     tabs: {
       active: ['In progress', 'В работе', 'Ընթացքում'],
+      shortlisted: ['Shortlisted', 'В шорт-листе', 'Ընտրվածների մեջ'],
       accepted: ['Accepted', 'Приняты', 'Ընդունված'],
       closed: ['Closed', 'Закрыты', 'Փակված'],
     },
     empty: {
       active: ['No applications in progress', 'Нет заявок в работе', 'Ընթացիկ հայտեր չկան'],
+      shortlisted: [
+        'No shortlisted applications yet. When a brand shortlists you, it shows up here.',
+        'Пока никто не добавил тебя в шорт-лист. Когда бренд это сделает, заявка появится здесь.',
+        'Դեռ ոչ մի բրենդ քեզ չի ընտրել։ Երբ բրենդն ընտրի, հայտը կհայտնվի այստեղ։',
+      ],
       accepted: [
         'No accepted applications yet',
         'Пока нет принятых заявок',
