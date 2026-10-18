@@ -462,6 +462,46 @@ export default {
       category: ['Category', 'Категория', 'Կատեգորիա'],
       ofSent: ['{value} of sent', '{value} от отправленных', 'ուղարկվածների {value}-ը'],
     },
+    reuse: {
+      badge: [
+        'Possible re-registration',
+        'Возможна повторная регистрация',
+        'Հնարավոր կրկնակի գրանցում',
+      ],
+      warning: [
+        'This account was linked to another user before.',
+        'Этот аккаунт раньше был привязан к другому пользователю.',
+        'Այս հաշիվը նախկինում կապված է եղել այլ օգտատիրոջ։',
+      ],
+      view: ['View history', 'Смотреть историю', 'Դիտել պատմությունը'],
+      title: ['Account history', 'История аккаунта', 'Հաշվի պատմությունը'],
+      lead: [
+        'Every time this account was linked to a profile. The blogger keeps working until you decide.',
+        'Все случаи, когда этот аккаунт привязывали к профилю. Блогер продолжает работать, пока ты не решишь.',
+        'Բոլոր դեպքերը, երբ այս հաշիվը կապվել է պրոֆիլի։ Բլոգերը շարունակում է աշխատել, մինչև դու որոշես։',
+      ],
+      linked: ['linked {date} to', 'привязан {date} к', 'կապվել է {date}՝'],
+      removed: ['removed {date}', 'удалён {date}', 'հեռացվել է {date}'],
+      current: ['this user', 'этот пользователь', 'այս օգտատերը'],
+      deleted: ['user deleted', 'пользователь удалён', 'օգտատերը ջնջված է'],
+      blocked: ['blocked', 'заблокирован', 'արգելափակված'],
+      allow: ['Allow', 'Разрешить', 'Թույլատրել'],
+      allowed: ['Warning cleared', 'Предупреждение снято', 'Զգուշացումը հանված է'],
+      reject: ['Reject account', 'Отклонить аккаунт', 'Մերժել հաշիվը'],
+      rejectReason: [
+        'This account is already linked to another profile.',
+        'Этот аккаунт уже привязан к другому профилю.',
+        'Այս հաշիվն արդեն կապված է այլ պրոֆիլի։',
+      ],
+      rejected: ['Account rejected', 'Аккаунт отклонён', 'Հաշիվը մերժված է'],
+      block: ['Block user', 'Заблокировать пользователя', 'Արգելափակել օգտատիրոջը'],
+      blockedToast: [
+        'User blocked and signed out',
+        'Пользователь заблокирован и разлогинен',
+        'Օգտատերն արգելափակված է և դուրս է բերված',
+      ],
+      tab: ['Re-registration', 'Повторная регистрация', 'Կրկնակի գրանցում'],
+    },
     accounts: {
       title: ['Account review', 'Проверка аккаунтов', 'Հաշիվների ստուգում'],
       lead: [

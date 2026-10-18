@@ -19,6 +19,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
+import { ReuseWarning } from '@/components/admin/AccountReuse';
 import { AccountLine, AccountStats } from '@/components/domain/AccountStats';
 import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
@@ -26,10 +27,11 @@ import { useFormat } from '@/lib/hooks/format';
 import type { SocialAccountDto } from '@/lib/types';
 
 type Row = SocialAccountDto & {
+  reuseWarning: boolean;
   createdAt: string;
   influencer: { id: string; displayName: string; avatarUrl: string | null; email: string };
 };
-type Status = 'PENDING' | 'REJECTED' | 'APPROVED';
+type Status = 'PENDING' | 'REJECTED' | 'APPROVED' | 'REUSED';
 const TABS: { value: Status; key: 'tabPending' | 'tabRejected' | 'tabApproved' }[] = [
   { value: 'PENDING', key: 'tabPending' },
   { value: 'REJECTED', key: 'tabRejected' },
@@ -39,6 +41,7 @@ const TABS: { value: Status; key: 'tabPending' | 'tabRejected' | 'tabApproved' }
 /** Accounts added by already approved bloggers: each one is checked (public, content fine for brands). */
 export default function AdminAccountsPage() {
   const t = useTranslations('admin.accounts');
+  const tr = useTranslations('admin.reuse');
   const tc = useTranslations('common');
   const f = useFormat();
   const toast = useToast();
@@ -73,7 +76,10 @@ export default function AdminAccountsPage() {
         aria-label={t('title')}
         value={status}
         onChange={setStatus}
-        items={TABS.map((x) => ({ value: x.value, label: t(x.key) }))}
+        items={[
+          ...TABS.map((x) => ({ value: x.value, label: t(x.key) })),
+          { value: 'REUSED' as const, label: tr('tab') },
+        ]}
       />
       {list.isLoading ? (
         <Skeleton className="h-64 rounded-card" />
@@ -108,6 +114,7 @@ export default function AdminAccountsPage() {
                   </a>
                 </div>
                 <AccountLine account={a} />
+                {a.reuseWarning && <ReuseWarning accountId={a.id} />}
                 <AccountStats account={a} />
                 {a.reviewNote && (
                   <Text size="small" tone="muted">

@@ -31,6 +31,7 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import type { IconName } from '@briefluence/ui';
 import { PageHeader } from '@/components/app/AppShell';
+import { ReuseBadge } from '@/components/admin/AccountReuse';
 import { SubscriptionBadge, VerificationBadge } from '@/components/domain/badges';
 import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
@@ -46,6 +47,8 @@ interface UserRow {
   influencer: { id: string; displayName: string; status: VerificationStatus } | null;
   brand: { id: string; companyName: string } | null;
   subscription: { status: SubscriptionStatus } | null;
+  /** Accounts of this user with an open re-registration warning. */
+  reuseWarnings: string[];
 }
 
 type SupportAction = 'verify-email' | 'resend-verification' | 'send-password-reset' | 'sign-out';
@@ -168,6 +171,7 @@ export default function AdminUsersPage() {
                 <TD>
                   <Inline gap={1} wrap>
                     {u.blockedAt && <Badge tone="danger">{t('isBlocked')}</Badge>}
+                    <ReuseBadge accountIds={u.reuseWarnings} />
                     {!u.emailVerifiedAt && <Badge>{t('emailPending')}</Badge>}
                     {u.influencer && <VerificationBadge status={u.influencer.status} />}
                     {u.subscription && <SubscriptionBadge status={u.subscription.status} />}

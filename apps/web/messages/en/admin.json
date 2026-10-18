@@ -84,6 +84,26 @@
     "category": "Category",
     "ofSent": "{value} of sent"
   },
+  "reuse": {
+    "badge": "Possible re-registration",
+    "warning": "This account was linked to another user before.",
+    "view": "View history",
+    "title": "Account history",
+    "lead": "Every time this account was linked to a profile. The blogger keeps working until you decide.",
+    "linked": "linked {date} to",
+    "removed": "removed {date}",
+    "current": "this user",
+    "deleted": "user deleted",
+    "blocked": "blocked",
+    "allow": "Allow",
+    "allowed": "Warning cleared",
+    "reject": "Reject account",
+    "rejectReason": "This account is already linked to another profile.",
+    "rejected": "Account rejected",
+    "block": "Block user",
+    "blockedToast": "User blocked and signed out",
+    "tab": "Re-registration"
+  },
   "accounts": {
     "title": "Account review",
     "lead": "Accounts bloggers added after their profile was approved. Open each one: it must be public and its content fine for brands.",

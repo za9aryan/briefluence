@@ -147,6 +147,7 @@ model User {
   notifications   Notification[]
   refreshTokens   RefreshToken[]
   identities      AuthIdentity[]
+  accountLinks    SocialAccountLink[]
 }
 
 // spec+: refresh token rotation with reuse detection needs server-side state.
@@ -212,6 +213,8 @@ model SocialAccount {
   reviewStatus      AccountReviewStatus @default(PENDING) // spec+
   reviewNote        String? // admin's reason when rejected
   reviewedAt        DateTime?
+  reuseReviewedAt   DateTime? // admin looked at the re-registration warning and allowed it
+  links             SocialAccountLink[]
   accessTokenEnc    String? // AES-256-GCM encrypted; null for MANUAL accounts
   refreshTokenEnc   String?
   tokenExpiresAt    DateTime?
@@ -424,4 +427,25 @@ model AuthIdentity {
 
   @@unique([provider, subject])
   @@index([userId])
+}
+
+/// spec+: every time a social account is linked to a profile. Kept after the account or the user is
+/// deleted (ids become null; email/name stay as a snapshot) so admins can spot re-registrations.
+model SocialAccountLink {
+  id              String         @id @default(cuid())
+  platform        Platform
+  handle          String // lower-case username without @
+  externalId      String? // platform id for connected accounts
+  socialAccountId String?
+  socialAccount   SocialAccount? @relation(fields: [socialAccountId], references: [id], onDelete: SetNull)
+  userId          String?
+  user            User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email           String
+  displayName     String?
+  linkedAt        DateTime       @default(now())
+  unlinkedAt      DateTime?
+
+  @@index([platform, handle])
+  @@index([platform, externalId])
+  @@index([socialAccountId])
 }

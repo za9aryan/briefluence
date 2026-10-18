@@ -25,6 +25,7 @@ export const EMAIL_POLICY: Record<NotificationType, 'instant' | 'digest' | 'none
   SOCIAL_ACCOUNT_PENDING: 'instant',
   SOCIAL_ACCOUNT_APPROVED: 'instant',
   SOCIAL_ACCOUNT_REJECTED: 'instant',
+  SOCIAL_ACCOUNT_REUSED: 'instant',
   TRIAL_ENDING: 'instant',
   PAYMENT_SUCCEEDED: 'instant',
   PAYMENT_FAILED: 'instant',

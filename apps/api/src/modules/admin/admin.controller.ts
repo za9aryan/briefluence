@@ -88,8 +88,21 @@ export class AdminController {
   @Get('accounts')
   accounts(@Query('status') status?: string) {
     return this.admin.accounts(
-      pick<AccountReviewStatus>(ACCOUNT_REVIEW_STATUSES, status) ?? 'PENDING',
+      status === 'REUSED'
+        ? 'REUSED'
+        : (pick<AccountReviewStatus>(ACCOUNT_REVIEW_STATUSES, status) ?? 'PENDING'),
     );
+  }
+
+  @Get('accounts/:id/history')
+  accountHistory(@Param('id') id: string) {
+    return this.admin.accountHistory(id);
+  }
+
+  @Post('accounts/:id/allow-reuse')
+  @HttpCode(204)
+  allowReuse(@Param('id') id: string) {
+    return this.admin.allowReuse(id);
   }
 
   @Post('accounts/:id/approve')

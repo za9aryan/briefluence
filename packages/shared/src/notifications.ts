@@ -488,6 +488,23 @@ const CATALOG: Record<NotificationType, { cta: L3; render: Record<NotificationLo
         }),
       },
     },
+    SOCIAL_ACCOUNT_REUSED: {
+      cta: { en: 'Check the account', ru: 'Проверить аккаунт', hy: 'Ստուգել հաշիվը' },
+      render: {
+        en: (p) => ({
+          title: 'Possible re-registration',
+          body: `${PLATFORMS[s(p.platform)]?.en ?? s(p.platform)} @${s(p.username)} was linked to another user before. Now added by ${s(p.name)}.`,
+        }),
+        ru: (p) => ({
+          title: 'Возможна повторная регистрация',
+          body: `${PLATFORMS[s(p.platform)]?.ru ?? s(p.platform)} @${s(p.username)} раньше был привязан к другому пользователю. Сейчас его добавил(а) ${s(p.name)}.`,
+        }),
+        hy: (p) => ({
+          title: 'Հնարավոր կրկնակի գրանցում',
+          body: `${PLATFORMS[s(p.platform)]?.hy ?? s(p.platform)} @${s(p.username)}-ն նախկինում կապված է եղել այլ օգտատիրոջ։ Այժմ ավելացրել է ${s(p.name)}-ը։`,
+        }),
+      },
+    },
     SOCIAL_ACCOUNT_REJECTED: {
       cta: { en: 'Open verification', ru: 'Открыть верификацию', hy: 'Բացել ստուգումը' },
       render: {

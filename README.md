@@ -70,6 +70,13 @@ and their content fine for brands. Accounts present at the first profile review 
 accounts added later go to **Admin → Accounts**. Until approved, an account is not used for matching, applying
 or shown to brands. Changing a manual account's platform or username, or fixing a rejected one, sends it back.
 
+## Re-registration warning
+
+Every link of a social account to a profile is kept in `SocialAccountLink` (also after the account or user is
+deleted). If an account shows up on a different user than before, admins get a notification and a
+**Possible re-registration** warning (Accounts → Re-registration tab, Verifications, Users) with the full history;
+the blogger keeps working until the admin chooses **Allow**, **Reject account** or **Block user**.
+
 ## Admin access
 
 There is no public admin sign-up. The admin account comes from `ADMIN_EMAIL` / `ADMIN_PASSWORD` in `.env`:

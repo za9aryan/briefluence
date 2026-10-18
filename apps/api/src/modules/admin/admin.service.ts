@@ -13,6 +13,7 @@ import { PrismaService } from '../../common/prisma.service';
 import { AuthService } from '../auth/auth.service';
 import { publicAccount } from '../influencers/serializers';
 import { NotificationsService } from '../notifications/notifications.service';
+import { AccountLinksService } from '../social/account-links.service';
 
 export const USER_STATES = ['unverified', 'blocked'] as const;
 export type UserState = (typeof USER_STATES)[number];
@@ -24,6 +25,7 @@ export class AdminService {
     private readonly notifications: NotificationsService,
     private readonly auth: AuthService,
     private readonly clock: Clock,
+    private readonly links: AccountLinksService,
   ) {}
 
   async verifications(status: VerificationStatus = 'PENDING_REVIEW') {
@@ -36,13 +38,19 @@ export class AdminService {
       },
       take: 200,
     });
+    const flagged = await this.links.flaggedIds(
+      rows.flatMap((r) => r.socialAccounts.map((a) => a.id)),
+    );
     return rows.map(
       ({ socialAccounts, user, contactMethod, contactValue, savedFilters: _s, ...p }) => ({
         ...p,
         email: user.email,
         emailVerified: !!user.emailVerifiedAt,
         contacts: { method: contactMethod, value: contactValue },
-        socialAccounts: socialAccounts.map(publicAccount),
+        socialAccounts: socialAccounts.map((a) => ({
+          ...publicAccount(a),
+          reuseWarning: flagged.has(a.id),
+        })),
       }),
     );
   }
@@ -82,10 +90,17 @@ export class AdminService {
   }
 
   /** Accounts added or changed by already approved bloggers (first-time ones are reviewed with the profile). */
-  async accounts(status: AccountReviewStatus = 'PENDING') {
+  /**
+   * Account queues. REUSED lists every account linked to another user before (any review status)
+   * whose re-registration warning has not been cleared.
+   */
+  async accounts(status: AccountReviewStatus | 'REUSED' = 'PENDING') {
+    const reused = status === 'REUSED' ? await this.links.flaggedIds() : null;
     const rows = await this.prisma.socialAccount.findMany({
-      where: { reviewStatus: status, influencer: { status: 'APPROVED' } },
-      orderBy: status === 'PENDING' ? { createdAt: 'asc' } : { reviewedAt: 'desc' },
+      where: reused
+        ? { id: { in: [...reused] } }
+        : { reviewStatus: status as AccountReviewStatus, influencer: { status: 'APPROVED' } },
+      orderBy: status === 'PENDING' || reused ? { createdAt: 'asc' } : { reviewedAt: 'desc' },
       take: 200,
       include: {
         influencer: {
@@ -98,8 +113,10 @@ export class AdminService {
         },
       },
     });
+    const flagged = reused ?? (await this.links.flaggedIds(rows.map((r) => r.id)));
     return rows.map(({ influencer, ...a }) => ({
       ...publicAccount(a),
+      reuseWarning: flagged.has(a.id),
       createdAt: a.createdAt,
       influencer: {
         id: influencer.id,
@@ -108,6 +125,46 @@ export class AdminService {
         email: influencer.user.email,
       },
     }));
+  }
+
+  /** Every link of this account across users, for the re-registration modal. */
+  async accountHistory(id: string) {
+    const acc = await this.prisma.socialAccount.findUnique({
+      where: { id },
+      include: { influencer: { select: { userId: true, displayName: true } } },
+    });
+    if (!acc) throw notFound('Social account');
+    const links = await this.links.history(acc);
+    return {
+      account: {
+        ...publicAccount(acc),
+        userId: acc.influencer.userId,
+        displayName: acc.influencer.displayName,
+      },
+      links: links.map((l) => ({
+        id: l.id,
+        platform: l.platform,
+        handle: l.handle,
+        linkedAt: l.linkedAt,
+        unlinkedAt: l.unlinkedAt,
+        email: l.user?.email ?? l.email,
+        displayName: l.displayName,
+        userId: l.userId,
+        userDeleted: !l.userId,
+        blocked: !!l.user?.blockedAt,
+        current: l.userId === acc.influencer.userId,
+      })),
+    };
+  }
+
+  /** Admin looked at the history and lets the blogger keep the account. */
+  async allowReuse(id: string) {
+    const acc = await this.prisma.socialAccount.findUnique({ where: { id }, select: { id: true } });
+    if (!acc) throw notFound('Social account');
+    await this.prisma.socialAccount.update({
+      where: { id },
+      data: { reuseReviewedAt: this.clock.now() },
+    });
   }
 
   async approveAccount(id: string) {
@@ -123,7 +180,8 @@ export class AdminService {
   }
 
   async rejectAccount(id: string, reason: string) {
-    const acc = await this.pendingAccount(id);
+    // Pending ones from the queue, or an approved one found to be a re-registration.
+    const acc = await this.pendingAccount(id, ['PENDING', 'APPROVED']);
     await this.prisma.socialAccount.update({
       where: { id },
       data: { reviewStatus: 'REJECTED', reviewedAt: this.clock.now(), reviewNote: reason },
@@ -134,13 +192,13 @@ export class AdminService {
     });
   }
 
-  private async pendingAccount(id: string) {
+  private async pendingAccount(id: string, allowed: AccountReviewStatus[] = ['PENDING']) {
     const acc = await this.prisma.socialAccount.findUnique({
       where: { id },
       include: { influencer: { select: { userId: true } } },
     });
     if (!acc) throw notFound('Social account');
-    if (acc.reviewStatus !== 'PENDING')
+    if (!allowed.includes(acc.reviewStatus))
       throw new AppError('INVALID_TRANSITION', 'This account is not waiting for review');
     return acc;
   }
@@ -250,12 +308,32 @@ export class AdminService {
         emailVerifiedAt: true,
         blockedAt: true,
         createdAt: true,
-        influencer: { select: { id: true, displayName: true, status: true } },
+        influencer: {
+          select: {
+            id: true,
+            displayName: true,
+            status: true,
+            socialAccounts: { select: { id: true } },
+          },
+        },
         brand: { select: { id: true, companyName: true } },
         subscription: { select: { status: true } },
       },
     });
-    return users;
+    const flagged = await this.links.flaggedIds(
+      users.flatMap((u) => u.influencer?.socialAccounts.map((a) => a.id) ?? []),
+    );
+    return users.map(({ influencer, ...u }) => ({
+      ...u,
+      influencer: influencer && {
+        id: influencer.id,
+        displayName: influencer.displayName,
+        status: influencer.status,
+      },
+      /** Accounts of this user with an open re-registration warning. */
+      reuseWarnings:
+        influencer?.socialAccounts.filter((a) => flagged.has(a.id)).map((a) => a.id) ?? [],
+    }));
   }
 
   private async userOrThrow(id: string) {

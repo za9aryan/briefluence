@@ -17,6 +17,7 @@ import type { Env } from '../../config/env';
 import { QueueService } from '../../queue/queue.service';
 import { publicAccount } from '../influencers/serializers';
 import { NotificationsService } from '../notifications/notifications.service';
+import { AccountLinksService } from './account-links.service';
 import { InstagramProvider } from './providers/instagram.provider';
 import { MockSocialProvider } from './providers/mock.provider';
 import { TikTokProvider } from './providers/tiktok.provider';
@@ -47,6 +48,7 @@ export class SocialService implements OnModuleInit {
     private readonly jwt: JwtService,
     private readonly queue: QueueService,
     private readonly notifications: NotificationsService,
+    private readonly links: AccountLinksService,
     private readonly clock: Clock,
     @Inject(ENV) private readonly env: Env,
   ) {
@@ -145,6 +147,7 @@ export class SocialService implements OnModuleInit {
       : await this.prisma.socialAccount.create({
           data: { influencerId: profile.id, platform, ...data },
         });
+    if (!existing) await this.links.record(account);
     if (toReview) await this.askForReview(account);
     return publicAccount(account);
   }
@@ -197,6 +200,7 @@ export class SocialService implements OnModuleInit {
         ...this.manualData(input),
       },
     });
+    await this.links.record(account);
     await this.askForReview(account);
     return publicAccount(account);
   }
@@ -231,6 +235,11 @@ export class SocialService implements OnModuleInit {
         ...(review ? { reviewStatus: 'PENDING' as const, reviewNote: null } : {}),
       },
     });
+    if (
+      updated.platform !== acc.platform ||
+      updated.username.toLowerCase() !== acc.username.toLowerCase()
+    )
+      await this.links.record(updated);
     if (review) await this.askForReview(updated);
     return publicAccount(updated);
   }
@@ -311,6 +320,7 @@ export class SocialService implements OnModuleInit {
         'This account is used in active applications. Withdraw or finish them first.',
       );
     }
+    await this.links.unlink(acc.id);
     await this.prisma.socialAccount.delete({ where: { id: acc.id } });
     const remaining = await this.prisma.socialAccount.count({
       where: { influencerId: acc.influencerId },

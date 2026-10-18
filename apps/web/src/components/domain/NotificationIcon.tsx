@@ -27,6 +27,7 @@ const ICON: Record<NotificationType, { icon: IconName; tone: IconBubbleTone }> =
   SOCIAL_ACCOUNT_PENDING: { icon: 'shield', tone: 'neutral' },
   SOCIAL_ACCOUNT_APPROVED: { icon: 'check-circle', tone: 'success' },
   SOCIAL_ACCOUNT_REJECTED: { icon: 'x-circle', tone: 'primary' },
+  SOCIAL_ACCOUNT_REUSED: { icon: 'warning', tone: 'primary' },
 };
 
 export function NotificationIcon({ type, size }: { type: string; size?: 'sm' | 'md' }) {
