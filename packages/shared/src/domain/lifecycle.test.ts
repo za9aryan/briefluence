@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { canBrandTransition, canComplete, canWithdraw, contactsRevealed } from './applications';
-import { canDealTransition, exceedsSlots, isFilled, shouldExpire } from './deals';
+import {
+  canDealTransition,
+  dealReviewKey,
+  exceedsSlots,
+  isDealEditable,
+  isFilled,
+  publishTarget,
+  shouldExpire,
+} from './deals';
 
 describe('application lifecycle', () => {
   it('allows brand transitions along the lifecycle', () => {
@@ -35,7 +43,45 @@ describe('deal lifecycle', () => {
     expect(isFilled(2, 2)).toBe(true);
   });
   it('validates status transitions', () => {
-    expect(canDealTransition('DRAFT', 'ACTIVE')).toBe(true);
+    expect(canDealTransition('DRAFT', 'ACTIVE')).toBe(false);
+    expect(canDealTransition('DRAFT', 'IN_REVIEW')).toBe(true);
+    expect(canDealTransition('IN_REVIEW', 'ACTIVE')).toBe(true);
+    expect(canDealTransition('REJECTED', 'ACTIVE')).toBe(false);
+    expect(canDealTransition('REJECTED', 'IN_REVIEW')).toBe(true);
+    expect(canDealTransition('PAUSED', 'ACTIVE')).toBe(true);
     expect(canDealTransition('CLOSED', 'ACTIVE')).toBe(false);
+    expect(isDealEditable('REJECTED')).toBe(true);
+    expect(isDealEditable('ACTIVE')).toBe(false);
+  });
+
+  describe('review on publish', () => {
+    const deal = {
+      title: 'Dinner for two',
+      description: 'Film a reel at our place',
+      imageUrl: null,
+      contentFormats: ['REEL', 'STORY'],
+      paymentType: 'MONEY',
+      budgetMin: 1000,
+      budgetMax: 5000,
+      currency: 'AMD',
+      barterDescription: null,
+      barterValue: null,
+    };
+    const approvedKey = dealReviewKey(deal);
+    it('sends never-approved briefs to review', () => {
+      expect(publishTarget({ ...deal, approvedKey: null })).toBe('IN_REVIEW');
+    });
+    it('goes live again when key content is unchanged', () => {
+      expect(publishTarget({ ...deal, contentFormats: ['STORY', 'REEL'], approvedKey })).toBe(
+        'ACTIVE',
+      );
+    });
+    it('needs review after key changes', () => {
+      expect(publishTarget({ ...deal, title: 'Dinner for three', approvedKey })).toBe('IN_REVIEW');
+      expect(publishTarget({ ...deal, budgetMax: 9000, approvedKey })).toBe('IN_REVIEW');
+      expect(publishTarget({ ...deal, imageUrl: 'https://x/y.png', approvedKey })).toBe(
+        'IN_REVIEW',
+      );
+    });
   });
 });

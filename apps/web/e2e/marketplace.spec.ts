@@ -101,6 +101,16 @@ test('sign-up → verify → apply → accept → post link', async ({ browser }
   await brand.getByRole('button', { name: 'Next', exact: true }).click();
   await brand.getByRole('button', { name: 'Publish', exact: true }).click();
   await brand.waitForURL('**/applicants**');
+  await expect(brand.getByText(/In review\. We check every brief/)).toBeVisible();
+
+  // ── Admin approves the brief ──
+  await admin.goto('/admin/brief-review');
+  const briefCard = admin
+    .locator('div', { hasText: dealTitle })
+    .filter({ has: admin.getByRole('button', { name: 'Approve and publish' }) })
+    .last();
+  await briefCard.getByRole('button', { name: 'Approve and publish' }).click();
+  await expect(admin.getByText('Brief is live. The brand got a notification.')).toBeVisible();
 
   // ── Blogger applies from the feed ──
   await blogger.goto('/influencer/deals');

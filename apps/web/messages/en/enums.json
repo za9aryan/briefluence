@@ -75,6 +75,8 @@
   },
   "dealStatus": {
     "DRAFT": "Draft",
+    "IN_REVIEW": "In review",
+    "REJECTED": "Needs changes",
     "ACTIVE": "Active",
     "PAUSED": "Paused",
     "CLOSED": "Closed",

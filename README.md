@@ -67,7 +67,12 @@ pnpm admin:create     # creates the admin, or resets its password; touches no ot
 ```
 
 Then log in at `/login` with those credentials; admins land on **Verifications** (approve / reject bloggers),
-with **Briefs**, **Users** (block / unblock) and **Payments** in the sidebar. `pnpm db:seed` also creates the
+with **Brief review**, **Briefs**, **Users** (block, confirm email, send reset link, sign out everywhere) and
+**Payments** in the sidebar.
+
+Every brief is checked before bloggers see it: Publish puts it **In review**; the admin approves it (it goes live)
+or sends it back with a reason (**Needs changes**). Resuming a paused brief skips review unless its title,
+description, image, content formats or payment changed since the last approval. `pnpm db:seed` also creates the
 admin, but it wipes the database — dev only. In production use a strong `ADMIN_PASSWORD` (the command refuses
 the default one).
 

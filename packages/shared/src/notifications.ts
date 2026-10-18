@@ -296,6 +296,54 @@ const CATALOG: Record<NotificationType, { cta: L3; render: Record<NotificationLo
         }),
       },
     },
+    DEAL_REVIEW_PENDING: {
+      cta: { en: 'Open review queue', ru: 'Открыть очередь проверки', hy: 'Բացել ստուգման հերթը' },
+      render: {
+        en: (p) => ({
+          title: 'New brief waiting for review',
+          body: `${s(p.brand)}: "${s(p.deal)}"`,
+        }),
+        ru: (p) => ({ title: 'Новый бриф ждёт проверки', body: `${s(p.brand)}: «${s(p.deal)}»` }),
+        hy: (p) => ({
+          title: 'Նոր բրիֆը սպասում է ստուգման',
+          body: `${s(p.brand)}՝ «${s(p.deal)}»`,
+        }),
+      },
+    },
+    DEAL_APPROVED: {
+      cta: { en: 'Open brief', ru: 'Открыть бриф', hy: 'Բացել բրիֆը' },
+      render: {
+        en: (p) => ({
+          title: 'Your brief is live',
+          body: `"${s(p.deal)}" passed the check. Matching bloggers can see it and apply.`,
+        }),
+        ru: (p) => ({
+          title: 'Бриф опубликован',
+          body: `«${s(p.deal)}» прошёл проверку. Подходящие блогеры уже видят его и могут откликнуться.`,
+        }),
+        hy: (p) => ({
+          title: 'Բրիֆը հրապարակված է',
+          body: `«${s(p.deal)}»-ն անցավ ստուգումը։ Համապատասխան բլոգերներն արդեն տեսնում են այն և կարող են դիմել։`,
+        }),
+      },
+    },
+    DEAL_REJECTED: {
+      cta: { en: 'Edit brief', ru: 'Изменить бриф', hy: 'Խմբագրել բրիֆը' },
+      render: {
+        en: (p) => ({
+          title: 'Your brief needs changes',
+          body: `"${s(p.deal)}"\nReason: ${s(p.reason)}\nFix it and send it again.`,
+        }),
+        ru: (p) => ({
+          title: 'Бриф нужно доработать',
+          body: `«${s(p.deal)}»\nПричина: ${s(p.reason)}\nИсправь и отправь снова.`,
+        }),
+        hy: (p) => ({
+          title: 'Բրիֆը պետք է լրամշակել',
+          body: `«${s(p.deal)}»\nՊատճառը՝ ${s(p.reason)}\nՈւղղիր և կրկին ուղարկիր։`,
+        }),
+      },
+    },
     DEAL_EXPIRED: {
       cta: { en: 'Open brief', ru: 'Открыть бриф', hy: 'Բացել բրիֆը' },
       render: {

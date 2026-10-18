@@ -84,6 +84,8 @@ enum ContentFormat {
 
 enum DealStatus {
   DRAFT
+  IN_REVIEW
+  REJECTED
   ACTIVE
   PAUSED
   CLOSED
@@ -260,12 +262,19 @@ model Deal {
   publishBy           DateTime?
   status              DealStatus        @default(DRAFT)
   publishedAt         DateTime? // spec+: "new deals matching you" digest
+  /// Brief moderation: when it was sent for review, the admin's reason when sent back,
+  /// and a fingerprint of the content the admin approved (see dealReviewKey).
+  submittedAt         DateTime?
+  reviewedAt          DateTime?
+  reviewNote          String?
+  approvedKey         String?
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @default(now()) @updatedAt // spec+
   applications        Application[]
   views               DealView[]
 
   @@index([status, applicationDeadline])
+  @@index([status, submittedAt])
   @@index([brandId])
 }
 

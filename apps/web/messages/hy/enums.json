@@ -75,6 +75,8 @@
   },
   "dealStatus": {
     "DRAFT": "Սևագիր",
+    "IN_REVIEW": "Ստուգման մեջ",
+    "REJECTED": "Պետք են ուղղումներ",
     "ACTIVE": "Ակտիվ",
     "PAUSED": "Դադարեցված",
     "CLOSED": "Փակված",

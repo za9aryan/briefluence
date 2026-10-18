@@ -52,9 +52,35 @@ const resolver: Resolver<DealFormValues> = async (values) => {
 };
 
 const STEP_FIELDS: Path<DealFormValues>[][] = [
-  ['title', 'description', 'platforms', 'contentFormats', 'niches', 'imageUrl', 'collaborationType', 'isConfidential'],
-  ['countries', 'cities', 'minFollowers', 'maxFollowers', 'influencerAgeMax', 'audienceAgeMax', 'languages'],
-  ['paymentType', 'budgetMin', 'budgetMax', 'barterDescription', 'barterValue', 'slots', 'applicationDeadline', 'publishBy'],
+  [
+    'title',
+    'description',
+    'platforms',
+    'contentFormats',
+    'niches',
+    'imageUrl',
+    'collaborationType',
+    'isConfidential',
+  ],
+  [
+    'countries',
+    'cities',
+    'minFollowers',
+    'maxFollowers',
+    'influencerAgeMax',
+    'audienceAgeMax',
+    'languages',
+  ],
+  [
+    'paymentType',
+    'budgetMin',
+    'budgetMax',
+    'barterDescription',
+    'barterValue',
+    'slots',
+    'applicationDeadline',
+    'publishBy',
+  ],
   [],
 ];
 
@@ -95,24 +121,44 @@ export function DealWizard({
   const form = useForm<DealFormValues>({ resolver, defaultValues: initial, mode: 'onTouched' });
   const { errors } = form.formState;
   const v = form.watch();
-  const [preset, setPreset] = useState<AudienceSizePreset | 'custom' | null>(presetOf(initial.minFollowers, initial.maxFollowers));
+  const [preset, setPreset] = useState<AudienceSizePreset | 'custom' | null>(
+    presetOf(initial.minFollowers, initial.maxFollowers),
+  );
 
-  const steps = [t('steps.basics'), t('steps.targeting'), t('steps.compensation'), t('steps.review')];
+  const steps = [
+    t('steps.basics'),
+    t('steps.targeting'),
+    t('steps.compensation'),
+    t('steps.review'),
+  ];
   const next = async () => {
     if (await form.trigger(STEP_FIELDS[step])) {
       setStep((s) => Math.min(s + 1, 3));
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
-  const submit = (publish: boolean) => form.handleSubmit((values) => onSubmit(values, publish), () => setStep(0))();
+  const submit = (publish: boolean) =>
+    form.handleSubmit(
+      (values) => onSubmit(values, publish),
+      () => setStep(0),
+    )();
 
   const genderOptions = (kind: 'genderFilter' | 'audienceGender') =>
-    (['ANY', 'FEMALE', 'MALE'] as GenderFilter[]).map((g) => ({ value: g, label: te(`${kind}.${g}`) }));
+    (['ANY', 'FEMALE', 'MALE'] as GenderFilter[]).map((g) => ({
+      value: g,
+      label: te(`${kind}.${g}`),
+    }));
   const money = v.paymentType !== 'BARTER';
   const barter = v.paymentType !== 'MONEY';
   const curSymbol = CURRENCY_SYMBOL[v.currency ?? 'AMD'];
-  const range = (min: number | null | undefined, max: number | null | undefined, fmt: (n: number) => string = String) =>
-    min == null && max == null ? tc('any') : `${min != null ? fmt(min) : '…'} – ${max != null ? fmt(max) : '…'}`;
+  const range = (
+    min: number | null | undefined,
+    max: number | null | undefined,
+    fmt: (n: number) => string = String,
+  ) =>
+    min == null && max == null
+      ? tc('any')
+      : `${min != null ? fmt(min) : '…'} – ${max != null ? fmt(max) : '…'}`;
 
   const targeting = {
     platforms: v.platforms,
@@ -138,24 +184,72 @@ export function DealWizard({
           {step === 0 && (
             <Stack gap={8}>
               <Section title={t('basics.title')} hint={t('basics.hint')}>
-                <Field label={t('fields.title')} error={fe(errors.title)} hint={t('fields.titleHint')} required>
-                  {({ id, describedBy, invalid }) => <Input id={id} aria-describedby={describedBy} invalid={invalid} maxLength={120} {...form.register('title')} />}
+                <Field
+                  label={t('fields.title')}
+                  error={fe(errors.title)}
+                  hint={t('fields.titleHint')}
+                  required
+                >
+                  {({ id, describedBy, invalid }) => (
+                    <Input
+                      id={id}
+                      aria-describedby={describedBy}
+                      invalid={invalid}
+                      maxLength={120}
+                      {...form.register('title')}
+                    />
+                  )}
                 </Field>
-                <Field label={t('fields.description')} error={fe(errors.description)} hint={t('fields.descriptionHint')} required>
-                  {({ id, describedBy, invalid }) => <Textarea id={id} aria-describedby={describedBy} invalid={invalid} rows={6} maxLength={5000} {...form.register('description')} />}
+                <Field
+                  label={t('fields.description')}
+                  error={fe(errors.description)}
+                  hint={t('fields.descriptionHint')}
+                  required
+                >
+                  {({ id, describedBy, invalid }) => (
+                    <Textarea
+                      id={id}
+                      aria-describedby={describedBy}
+                      invalid={invalid}
+                      rows={6}
+                      maxLength={5000}
+                      {...form.register('description')}
+                    />
+                  )}
                 </Field>
                 <Controller
                   control={form.control}
                   name="imageUrl"
-                  render={({ field }) => <ImageUpload wide kind="deal" label={t('fields.cover')} name="" value={field.value} onChange={field.onChange} />}
+                  render={({ field }) => (
+                    <ImageUpload
+                      wide
+                      kind="deal"
+                      label={t('fields.cover')}
+                      name=""
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
+                  )}
                 />
               </Section>
               <Controller
                 control={form.control}
                 name="platforms"
                 render={({ field }) => (
-                  <Field label={t('fields.platforms')} error={fe(errors.platforms as never)} required>
-                    {({ invalid }) => <ChipGroup multiple options={o.platforms} value={field.value ?? []} onChange={field.onChange} invalid={invalid} />}
+                  <Field
+                    label={t('fields.platforms')}
+                    error={fe(errors.platforms as never)}
+                    required
+                  >
+                    {({ invalid }) => (
+                      <ChipGroup
+                        multiple
+                        options={o.platforms}
+                        value={field.value ?? []}
+                        onChange={field.onChange}
+                        invalid={invalid}
+                      />
+                    )}
                   </Field>
                 )}
               />
@@ -163,8 +257,20 @@ export function DealWizard({
                 control={form.control}
                 name="contentFormats"
                 render={({ field }) => (
-                  <Field label={t('fields.formats')} error={fe(errors.contentFormats as never)} required>
-                    {({ invalid }) => <ChipGroup multiple options={o.formats} value={field.value ?? []} onChange={field.onChange} invalid={invalid} />}
+                  <Field
+                    label={t('fields.formats')}
+                    error={fe(errors.contentFormats as never)}
+                    required
+                  >
+                    {({ invalid }) => (
+                      <ChipGroup
+                        multiple
+                        options={o.formats}
+                        value={field.value ?? []}
+                        onChange={field.onChange}
+                        invalid={invalid}
+                      />
+                    )}
                   </Field>
                 )}
               />
@@ -173,7 +279,14 @@ export function DealWizard({
                 name="niches"
                 render={({ field }) => (
                   <Field label={t('fields.niches')} aside={tc('optional')}>
-                    {() => <ChipGroup multiple options={o.niches} value={(field.value ?? []) as string[]} onChange={field.onChange} />}
+                    {() => (
+                      <ChipGroup
+                        multiple
+                        options={o.niches}
+                        value={(field.value ?? []) as string[]}
+                        onChange={field.onChange}
+                      />
+                    )}
                   </Field>
                 )}
               />
@@ -184,7 +297,11 @@ export function DealWizard({
                   <Field label={t('fields.collaboration')} hint={t('fields.collaborationHint')}>
                     {() => (
                       <ChipGroup
-                        options={COLLABORATION_TYPES.map((c) => ({ value: c, label: te(`collaboration.${c}`), icon: c === 'LONG_TERM' ? ('repeat' as const) : ('clock' as const) }))}
+                        options={COLLABORATION_TYPES.map((c) => ({
+                          value: c,
+                          label: te(`collaboration.${c}`),
+                          icon: c === 'LONG_TERM' ? ('repeat' as const) : ('clock' as const),
+                        }))}
                         value={field.value ?? 'ONE_TIME'}
                         onChange={field.onChange}
                       />
@@ -198,7 +315,12 @@ export function DealWizard({
                 name="isConfidential"
                 render={({ field }) => (
                   <div className="rounded-card border border-line p-4">
-                    <Switch checked={!!field.value} onChange={field.onChange} label={t('fields.confidential')} description={t('fields.confidentialHint')} />
+                    <Switch
+                      checked={!!field.value}
+                      onChange={field.onChange}
+                      label={t('fields.confidential')}
+                      description={t('fields.confidentialHint')}
+                    />
                   </div>
                 )}
               />
@@ -212,7 +334,11 @@ export function DealWizard({
                   control={form.control}
                   name="countries"
                   render={({ field }) => (
-                    <Field label={t('fields.countries')} error={fe(errors.countries as never)} required>
+                    <Field
+                      label={t('fields.countries')}
+                      error={fe(errors.countries as never)}
+                      required
+                    >
                       {({ invalid }) => (
                         <ChipGroup
                           multiple
@@ -221,7 +347,10 @@ export function DealWizard({
                           onChange={(c) => {
                             field.onChange(c);
                             const allowed = new Set(o.citiesOf(c).map((x) => x.value));
-                            form.setValue('cities', (form.getValues('cities') ?? []).filter((x) => allowed.has(x)));
+                            form.setValue(
+                              'cities',
+                              (form.getValues('cities') ?? []).filter((x) => allowed.has(x)),
+                            );
                           }}
                           invalid={invalid}
                         />
@@ -235,7 +364,14 @@ export function DealWizard({
                     name="cities"
                     render={({ field }) => (
                       <Field label={t('fields.cities')} hint={t('fields.citiesHint')}>
-                        {() => <ChipGroup multiple options={o.citiesOf(v.countries ?? [])} value={field.value ?? []} onChange={field.onChange} />}
+                        {() => (
+                          <ChipGroup
+                            multiple
+                            options={o.citiesOf(v.countries ?? [])}
+                            value={field.value ?? []}
+                            onChange={field.onChange}
+                          />
+                        )}
                       </Field>
                     )}
                   />
@@ -245,7 +381,10 @@ export function DealWizard({
               <Section title={t('targeting.size')} hint={t('targeting.sizeHint')}>
                 <ChipGroup
                   options={[
-                    ...(Object.keys(AUDIENCE_SIZE_PRESETS) as AudienceSizePreset[]).map((k) => ({ value: k, label: te(`audienceSize.${k}`) })),
+                    ...(Object.keys(AUDIENCE_SIZE_PRESETS) as AudienceSizePreset[]).map((k) => ({
+                      value: k,
+                      label: te(`audienceSize.${k}`),
+                    })),
                     { value: 'custom' as const, label: te('audienceSize.custom') },
                   ]}
                   value={preset}
@@ -266,11 +405,30 @@ export function DealWizard({
                 {preset === 'custom' && (
                   <FieldGrid cols={2} gap={4}>
                     <Field label={t('fields.minFollowers')}>
-                      {({ id }) => <Input id={id} type="number" inputMode="numeric" min={0} {...form.register('minFollowers', { setValueAs: (x) => (x === '' || x == null ? null : Number(x)) })} />}
+                      {({ id }) => (
+                        <Input
+                          id={id}
+                          type="number"
+                          inputMode="numeric"
+                          min={0}
+                          {...form.register('minFollowers', {
+                            setValueAs: (x) => (x === '' || x == null ? null : Number(x)),
+                          })}
+                        />
+                      )}
                     </Field>
                     <Field label={t('fields.maxFollowers')} error={fe(errors.maxFollowers)}>
                       {({ id, invalid }) => (
-                        <Input id={id} type="number" inputMode="numeric" min={0} invalid={invalid} {...form.register('maxFollowers', { setValueAs: (x) => (x === '' || x == null ? null : Number(x)) })} />
+                        <Input
+                          id={id}
+                          type="number"
+                          inputMode="numeric"
+                          min={0}
+                          invalid={invalid}
+                          {...form.register('maxFollowers', {
+                            setValueAs: (x) => (x === '' || x == null ? null : Number(x)),
+                          })}
+                        />
                       )}
                     </Field>
                   </FieldGrid>
@@ -295,7 +453,15 @@ export function DealWizard({
                   control={form.control}
                   name="influencerGender"
                   render={({ field }) => (
-                    <Field label={t('fields.bloggerGender')}>{() => <ChipGroup options={genderOptions('genderFilter')} value={field.value ?? 'ANY'} onChange={field.onChange} />}</Field>
+                    <Field label={t('fields.bloggerGender')}>
+                      {() => (
+                        <ChipGroup
+                          options={genderOptions('genderFilter')}
+                          value={field.value ?? 'ANY'}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    </Field>
                   )}
                 />
                 <Field label={t('fields.bloggerAge')} error={fe(errors.influencerAgeMax)}>
@@ -319,7 +485,15 @@ export function DealWizard({
                   control={form.control}
                   name="audienceGender"
                   render={({ field }) => (
-                    <Field label={t('fields.audienceGender')}>{() => <ChipGroup options={genderOptions('audienceGender')} value={field.value ?? 'ANY'} onChange={field.onChange} />}</Field>
+                    <Field label={t('fields.audienceGender')}>
+                      {() => (
+                        <ChipGroup
+                          options={genderOptions('audienceGender')}
+                          value={field.value ?? 'ANY'}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    </Field>
                   )}
                 />
                 <Field label={t('fields.audienceAge')} error={fe(errors.audienceAgeMax)}>
@@ -339,7 +513,12 @@ export function DealWizard({
                 <FieldGrid cols={{ base: 1, md: 2 }} gap={4}>
                   <Field label={t('fields.audienceCountry')}>
                     {({ id }) => (
-                      <Select id={id} {...form.register('audienceCountry', { setValueAs: (x) => (x === '' ? null : x) })}>
+                      <Select
+                        id={id}
+                        {...form.register('audienceCountry', {
+                          setValueAs: (x) => (x === '' ? null : x),
+                        })}
+                      >
                         <option value="">{tc('any')}</option>
                         {o.countries.map((c) => (
                           <option key={c.value} value={c.value}>
@@ -355,7 +534,14 @@ export function DealWizard({
                   name="languages"
                   render={({ field }) => (
                     <Field label={t('fields.languages')} aside={tc('optional')}>
-                      {() => <ChipGroup multiple options={o.languages} value={(field.value ?? []) as string[]} onChange={field.onChange} />}
+                      {() => (
+                        <ChipGroup
+                          multiple
+                          options={o.languages}
+                          value={(field.value ?? []) as string[]}
+                          onChange={field.onChange}
+                        />
+                      )}
                     </Field>
                   )}
                 />
@@ -370,7 +556,13 @@ export function DealWizard({
                 name="paymentType"
                 render={({ field }) => (
                   <Field label={t('fields.paymentType')} required>
-                    {() => <ChipGroup options={o.paymentTypes} value={field.value} onChange={(x: PaymentType) => field.onChange(x)} />}
+                    {() => (
+                      <ChipGroup
+                        options={o.paymentTypes}
+                        value={field.value}
+                        onChange={(x: PaymentType) => field.onChange(x)}
+                      />
+                    )}
                   </Field>
                 )}
               />
@@ -379,12 +571,32 @@ export function DealWizard({
                   <FieldGrid cols={{ base: 1, sm: 3 }} gap={4}>
                     <Field label={t('fields.budgetMin')} error={fe(errors.budgetMin)}>
                       {({ id, invalid }) => (
-                        <Input id={id} type="number" inputMode="numeric" min={0} suffix={curSymbol} invalid={invalid} {...form.register('budgetMin', { setValueAs: (x) => (x === '' || x == null ? null : Number(x)) })} />
+                        <Input
+                          id={id}
+                          type="number"
+                          inputMode="numeric"
+                          min={0}
+                          suffix={curSymbol}
+                          invalid={invalid}
+                          {...form.register('budgetMin', {
+                            setValueAs: (x) => (x === '' || x == null ? null : Number(x)),
+                          })}
+                        />
                       )}
                     </Field>
                     <Field label={t('fields.budgetMax')} error={fe(errors.budgetMax)}>
                       {({ id, invalid }) => (
-                        <Input id={id} type="number" inputMode="numeric" min={0} suffix={curSymbol} invalid={invalid} {...form.register('budgetMax', { setValueAs: (x) => (x === '' || x == null ? null : Number(x)) })} />
+                        <Input
+                          id={id}
+                          type="number"
+                          inputMode="numeric"
+                          min={0}
+                          suffix={curSymbol}
+                          invalid={invalid}
+                          {...form.register('budgetMax', {
+                            setValueAs: (x) => (x === '' || x == null ? null : Number(x)),
+                          })}
+                        />
                       )}
                     </Field>
                     <Field label={t('fields.currency')}>
@@ -406,24 +618,86 @@ export function DealWizard({
               )}
               {barter && (
                 <Section title={t('compensation.barter')}>
-                  <Field label={t('fields.barterDescription')} hint={t('fields.barterHint')} error={fe(errors.barterDescription)} required>
-                    {({ id, describedBy, invalid }) => <Textarea id={id} aria-describedby={describedBy} invalid={invalid} rows={3} maxLength={1000} {...form.register('barterDescription')} />}
+                  <Field
+                    label={t('fields.barterDescription')}
+                    hint={t('fields.barterHint')}
+                    error={fe(errors.barterDescription)}
+                    required
+                  >
+                    {({ id, describedBy, invalid }) => (
+                      <Textarea
+                        id={id}
+                        aria-describedby={describedBy}
+                        invalid={invalid}
+                        rows={3}
+                        maxLength={1000}
+                        {...form.register('barterDescription')}
+                      />
+                    )}
                   </Field>
                   <Field label={t('fields.barterValue')} aside={tc('optional')}>
-                    {({ id }) => <Input id={id} type="number" inputMode="numeric" min={0} suffix={curSymbol} {...form.register('barterValue', { setValueAs: (x) => (x === '' || x == null ? null : Number(x)) })} />}
+                    {({ id }) => (
+                      <Input
+                        id={id}
+                        type="number"
+                        inputMode="numeric"
+                        min={0}
+                        suffix={curSymbol}
+                        {...form.register('barterValue', {
+                          setValueAs: (x) => (x === '' || x == null ? null : Number(x)),
+                        })}
+                      />
+                    )}
                   </Field>
                 </Section>
               )}
               <Section title={t('compensation.timing')}>
                 <FieldGrid cols={{ base: 1, sm: 3 }} gap={4}>
-                  <Field label={t('fields.slots')} hint={t('fields.slotsHint')} error={fe(errors.slots)} required>
-                    {({ id, invalid }) => <Input id={id} type="number" inputMode="numeric" min={1} max={500} invalid={invalid} {...form.register('slots', { valueAsNumber: true })} />}
+                  <Field
+                    label={t('fields.slots')}
+                    hint={t('fields.slotsHint')}
+                    error={fe(errors.slots)}
+                    required
+                  >
+                    {({ id, invalid }) => (
+                      <Input
+                        id={id}
+                        type="number"
+                        inputMode="numeric"
+                        min={1}
+                        max={500}
+                        invalid={invalid}
+                        {...form.register('slots', { valueAsNumber: true })}
+                      />
+                    )}
                   </Field>
-                  <Field label={t('fields.deadline')} error={fe(errors.applicationDeadline)} required>
-                    {({ id, invalid }) => <Input id={id} type="date" invalid={invalid} {...form.register('applicationDeadline')} />}
+                  <Field
+                    label={t('fields.deadline')}
+                    error={fe(errors.applicationDeadline)}
+                    required
+                  >
+                    {({ id, invalid }) => (
+                      <Input
+                        id={id}
+                        type="date"
+                        invalid={invalid}
+                        {...form.register('applicationDeadline')}
+                      />
+                    )}
                   </Field>
-                  <Field label={t('fields.publishBy')} error={fe(errors.publishBy)} aside={tc('optional')}>
-                    {({ id, invalid }) => <Input id={id} type="date" invalid={invalid} {...form.register('publishBy')} />}
+                  <Field
+                    label={t('fields.publishBy')}
+                    error={fe(errors.publishBy)}
+                    aside={tc('optional')}
+                  >
+                    {({ id, invalid }) => (
+                      <Input
+                        id={id}
+                        type="date"
+                        invalid={invalid}
+                        {...form.register('publishBy')}
+                      />
+                    )}
                   </Field>
                 </FieldGrid>
               </Section>
@@ -438,18 +712,59 @@ export function DealWizard({
               </Text>
               <DescriptionList
                 items={[
-                  { label: t('fields.platforms'), value: v.platforms.map((p) => te(`platform.${p}`)).join(', ') },
-                  { label: t('fields.formats'), value: v.contentFormats.map((x) => te(`contentFormat.${x}`)).join(', ') || '—' },
-                  { label: t('fields.countries'), value: [v.countries.map(o.country).join(', '), (v.cities ?? []).join(', ')].filter(Boolean).join(' · ') },
-                  { label: t('targeting.size'), value: range(v.minFollowers, v.maxFollowers, f.compact) },
-                  { label: t('fields.bloggerAge'), value: range(v.influencerAgeMin, v.influencerAgeMax) },
-                  { label: t('fields.collaboration'), value: te(`collaboration.${v.collaborationType ?? 'ONE_TIME'}`) },
-                  { label: t('fields.confidentialShort'), value: v.isConfidential ? t('fields.confidentialOn') : t('fields.confidentialOff') },
+                  {
+                    label: t('fields.platforms'),
+                    value: v.platforms.map((p) => te(`platform.${p}`)).join(', '),
+                  },
+                  {
+                    label: t('fields.formats'),
+                    value: v.contentFormats.map((x) => te(`contentFormat.${x}`)).join(', ') || '—',
+                  },
+                  {
+                    label: t('fields.countries'),
+                    value: [v.countries.map(o.country).join(', '), (v.cities ?? []).join(', ')]
+                      .filter(Boolean)
+                      .join(' · '),
+                  },
+                  {
+                    label: t('targeting.size'),
+                    value: range(v.minFollowers, v.maxFollowers, f.compact),
+                  },
+                  {
+                    label: t('fields.bloggerAge'),
+                    value: range(v.influencerAgeMin, v.influencerAgeMax),
+                  },
+                  {
+                    label: t('fields.collaboration'),
+                    value: te(`collaboration.${v.collaborationType ?? 'ONE_TIME'}`),
+                  },
+                  {
+                    label: t('fields.confidentialShort'),
+                    value: v.isConfidential
+                      ? t('fields.confidentialOn')
+                      : t('fields.confidentialOff'),
+                  },
                   { label: t('fields.paymentType'), value: te(`paymentType.${v.paymentType}`) },
-                  ...(money ? [{ label: t('compensation.money'), value: range(v.budgetMin, v.budgetMax, (n) => f.money(n * 100, v.currency ?? 'AMD')) }] : []),
-                  ...(barter ? [{ label: t('compensation.barter'), value: v.barterDescription || '—' }] : []),
+                  ...(money
+                    ? [
+                        {
+                          label: t('compensation.money'),
+                          value: range(v.budgetMin, v.budgetMax, (n) =>
+                            f.money(n * 100, v.currency ?? 'AMD'),
+                          ),
+                        },
+                      ]
+                    : []),
+                  ...(barter
+                    ? [{ label: t('compensation.barter'), value: v.barterDescription || '—' }]
+                    : []),
                   { label: t('fields.slots'), value: String(v.slots) },
-                  { label: t('fields.deadline'), value: v.applicationDeadline ? f.date(`${v.applicationDeadline}T12:00:00+04:00`) : '—' },
+                  {
+                    label: t('fields.deadline'),
+                    value: v.applicationDeadline
+                      ? f.date(`${v.applicationDeadline}T12:00:00+04:00`)
+                      : '—',
+                  },
                 ]}
               />
             </Stack>
@@ -457,11 +772,21 @@ export function DealWizard({
         </Card>
 
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
-          <Button variant="ghost" icon="arrow-left" disabled={step === 0} onClick={() => setStep((s) => s - 1)}>
+          <Button
+            variant="ghost"
+            icon="arrow-left"
+            disabled={step === 0}
+            onClick={() => setStep((s) => s - 1)}
+          >
             {tc('back')}
           </Button>
           <div className="flex flex-col-reverse gap-2 sm:flex-row">
-            <Button variant="secondary" loading={submitting === 'draft'} disabled={!!submitting} onClick={() => submit(false)}>
+            <Button
+              variant="secondary"
+              loading={submitting === 'draft'}
+              disabled={!!submitting}
+              onClick={() => submit(false)}
+            >
               {t('saveDraft')}
             </Button>
             {step < 3 ? (
@@ -469,12 +794,21 @@ export function DealWizard({
                 {tc('next')}
               </Button>
             ) : (
-              <Button loading={submitting === 'publish'} disabled={!!submitting} onClick={() => submit(true)}>
+              <Button
+                loading={submitting === 'publish'}
+                disabled={!!submitting}
+                onClick={() => submit(true)}
+              >
                 {t('publish')}
               </Button>
             )}
           </div>
         </div>
+        {step === 3 && (
+          <Text size="small" tone="muted" className="sm:text-right">
+            {t('reviewHint')}
+          </Text>
+        )}
       </Stack>
 
       <aside className="order-first lg:order-none">

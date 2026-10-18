@@ -22,13 +22,23 @@ import { DIGEST, renderDigestEmail } from '../notifications/emails/templates';
 
 const INTL = { en: 'en-GB', ru: 'ru-RU', hy: 'hy-AM' } as const;
 /** Brief line for digests: confidential briefs never show the brand name. */
-const digestLine = (d: { title: string; isConfidential: boolean; brand: { companyName: string } }) =>
-  d.isConfidential ? d.title : `${d.brand.companyName}: ${d.title}`;
-const localeOf = (v: string | null | undefined): NotificationLocale => (isNotificationLocale(v) ? v : 'en');
+const digestLine = (d: {
+  title: string;
+  isConfidential: boolean;
+  brand: { companyName: string };
+}) => (d.isConfidential ? d.title : `${d.brand.companyName}: ${d.title}`);
+const localeOf = (v: string | null | undefined): NotificationLocale =>
+  isNotificationLocale(v) ? v : 'en';
 import { NotificationsService } from '../notifications/notifications.service';
 import { SocialService } from '../social/social.service';
 
-export const JOB_NAMES = ['expire-deals', 'billing-daily', 'social-sync', 'digests', 'rates'] as const;
+export const JOB_NAMES = [
+  'expire-deals',
+  'billing-daily',
+  'social-sync',
+  'digests',
+  'rates',
+] as const;
 export type JobName = (typeof JOB_NAMES)[number];
 
 /**
@@ -108,16 +118,22 @@ export class JobsService {
   async expireDeals() {
     const now = this.clock.now();
     const due = await this.prisma.deal.findMany({
-      where: { status: { in: ['ACTIVE', 'PAUSED'] }, applicationDeadline: { lte: now } },
+      where: {
+        status: { in: ['ACTIVE', 'PAUSED', 'IN_REVIEW', 'REJECTED'] },
+        applicationDeadline: { lte: now },
+      },
       include: { brand: { select: { userId: true } } },
     });
     for (const d of due.filter((x) => shouldExpire(x, now))) {
       const { count } = await this.prisma.deal.updateMany({
-        where: { id: d.id, status: { in: ['ACTIVE', 'PAUSED'] } },
+        where: { id: d.id, status: { in: ['ACTIVE', 'PAUSED', 'IN_REVIEW', 'REJECTED'] } },
         data: { status: 'EXPIRED' },
       });
       if (count) {
-        await this.notifications.notify(d.brand.userId, 'DEAL_EXPIRED', { params: { deal: d.title }, link: `/brand/deals/${d.id}/applicants` });
+        await this.notifications.notify(d.brand.userId, 'DEAL_EXPIRED', {
+          params: { deal: d.title },
+          link: `/brand/deals/${d.id}/applicants`,
+        });
       }
     }
     return { expired: due.length };
@@ -134,7 +150,10 @@ export class JobsService {
     if (!deals.length) return 0;
     const influencers = await this.prisma.influencerProfile.findMany({
       where: { status: 'APPROVED', user: { blockedAt: null } },
-      include: { socialAccounts: true, user: { select: { email: true, digestEmails: true, locale: true } } },
+      include: {
+        socialAccounts: true,
+        user: { select: { email: true, digestEmails: true, locale: true } },
+      },
     });
     let sent = 0;
     for (const p of influencers) {
@@ -156,7 +175,9 @@ export class JobsService {
             title: digestLine(d),
             subtitle: [
               d.platforms.map((x) => PLATFORM_LABELS[x]).join(', '),
-              d.budgetMax != null ? `${DIGEST.upTo[L]} ${formatMoney(d.budgetMax, d.currency, INTL[L])}` : DIGEST.barter[L],
+              d.budgetMax != null
+                ? `${DIGEST.upTo[L]} ${formatMoney(d.budgetMax, d.currency, INTL[L])}`
+                : DIGEST.barter[L],
               `${DIGEST.applyBy[L]} ${d.applicationDeadline.toLocaleDateString(INTL[L], { timeZone: TIMEZONE })}`,
             ].join(' · '),
             url: `${this.env.WEB_URL}/influencer/deals/${d.id}`,
@@ -177,7 +198,19 @@ export class JobsService {
       where: { createdAt: { gte: since }, status: { not: 'WITHDRAWN' } },
       include: {
         influencer: { select: { displayName: true } },
-        deal: { select: { id: true, title: true, brand: { select: { user: { select: { email: true, digestEmails: true, blockedAt: true, locale: true } } } } } },
+        deal: {
+          select: {
+            id: true,
+            title: true,
+            brand: {
+              select: {
+                user: {
+                  select: { email: true, digestEmails: true, blockedAt: true, locale: true },
+                },
+              },
+            },
+          },
+        },
       },
     });
     const byBrand = new Map<string, typeof apps>();

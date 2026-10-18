@@ -1,10 +1,26 @@
 'use client';
-import type { ApplicationStatus, CollaborationType, DealStatus, PaymentStatus, Platform, SubscriptionStatus, VerificationStatus } from '@briefluence/shared';
+import type {
+  ApplicationStatus,
+  CollaborationType,
+  DealStatus,
+  PaymentStatus,
+  Platform,
+  SubscriptionStatus,
+  VerificationStatus,
+} from '@briefluence/shared';
 import { Badge, type BadgeTone } from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
 import { PLATFORM_ICON } from '@/lib/hooks/options';
 
-const DEAL: Record<DealStatus, BadgeTone> = { DRAFT: 'neutral', ACTIVE: 'success', PAUSED: 'primary', CLOSED: 'ink', EXPIRED: 'neutral' };
+const DEAL: Record<DealStatus, BadgeTone> = {
+  DRAFT: 'neutral',
+  IN_REVIEW: 'primary',
+  REJECTED: 'danger',
+  ACTIVE: 'success',
+  PAUSED: 'primary',
+  CLOSED: 'ink',
+  EXPIRED: 'neutral',
+};
 const APP: Record<ApplicationStatus, BadgeTone> = {
   APPLIED: 'neutral',
   VIEWED: 'neutral',
@@ -14,9 +30,25 @@ const APP: Record<ApplicationStatus, BadgeTone> = {
   WITHDRAWN: 'neutral',
   COMPLETED: 'success',
 };
-const VER: Record<VerificationStatus, BadgeTone> = { DRAFT: 'neutral', PENDING_REVIEW: 'primary', APPROVED: 'success', REJECTED: 'danger' };
-const SUB: Record<SubscriptionStatus, BadgeTone> = { TRIALING: 'primary', ACTIVE: 'success', PAST_DUE: 'danger', CANCELED: 'neutral', EXPIRED: 'neutral' };
-const PAY: Record<PaymentStatus, BadgeTone> = { PENDING: 'neutral', SUCCEEDED: 'success', FAILED: 'danger', REFUNDED: 'neutral' };
+const VER: Record<VerificationStatus, BadgeTone> = {
+  DRAFT: 'neutral',
+  PENDING_REVIEW: 'primary',
+  APPROVED: 'success',
+  REJECTED: 'danger',
+};
+const SUB: Record<SubscriptionStatus, BadgeTone> = {
+  TRIALING: 'primary',
+  ACTIVE: 'success',
+  PAST_DUE: 'danger',
+  CANCELED: 'neutral',
+  EXPIRED: 'neutral',
+};
+const PAY: Record<PaymentStatus, BadgeTone> = {
+  PENDING: 'neutral',
+  SUCCEEDED: 'success',
+  FAILED: 'danger',
+  REFUNDED: 'neutral',
+};
 
 export function DealStatusBadge({ status }: { status: DealStatus }) {
   const t = useTranslations('enums.dealStatus');
@@ -53,7 +85,10 @@ export function PlatformBadge({ platform }: { platform: Platform }) {
 export function CollaborationBadge({ type }: { type: CollaborationType }) {
   const t = useTranslations('enums.collaboration');
   return (
-    <Badge tone={type === 'LONG_TERM' ? 'primary' : 'neutral'} icon={type === 'LONG_TERM' ? 'repeat' : 'clock'}>
+    <Badge
+      tone={type === 'LONG_TERM' ? 'primary' : 'neutral'}
+      icon={type === 'LONG_TERM' ? 'repeat' : 'clock'}
+    >
       {t(type)}
     </Badge>
   );

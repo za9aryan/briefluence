@@ -14,6 +14,24 @@
     "reason": "Reason",
     "reasonHint": "The blogger sees this. Say what to fix."
   },
+  "briefReview": {
+    "title": "Brief review",
+    "lead": "Every brief is checked before bloggers see it. Approve it or send it back with a reason.",
+    "empty": "Nothing to review",
+    "submitted": "Sent {date}",
+    "confidential": "Brand hidden",
+    "pays": "Pays",
+    "slots": "Bloggers needed",
+    "deadline": "Apply by",
+    "previousReason": "Previous reason: {reason}",
+    "approve": "Approve and publish",
+    "reject": "Send back",
+    "approved": "Brief is live. The brand got a notification.",
+    "rejected": "Sent back. The brand will see your reason.",
+    "rejectTitle": "Send the brief back",
+    "reason": "What to fix",
+    "reasonHint": "The brand sees this text. Be specific: what is wrong and how to fix it."
+  },
   "deals": {
     "title": "Briefs",
     "search": "Title or brand",

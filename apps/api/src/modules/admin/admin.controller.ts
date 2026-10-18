@@ -75,6 +75,22 @@ export class AdminController {
     return this.admin.deals(pick<DealStatus>(DEAL_STATUSES, status), q?.slice(0, 100));
   }
 
+  @Post('deals/:id/approve')
+  @HttpCode(204)
+  approveDeal(@Param('id') id: string) {
+    return this.admin.approveDeal(id);
+  }
+
+  @Post('deals/:id/reject')
+  @HttpCode(204)
+  @ApiZodBody(verificationDecisionSchema)
+  rejectDeal(
+    @Param('id') id: string,
+    @ZodBody(verificationDecisionSchema) body: VerificationDecisionInput,
+  ) {
+    return this.admin.rejectDeal(id, body.reason);
+  }
+
   @Post('deals/:id/close')
   @HttpCode(200)
   closeDeal(@Param('id') id: string) {

@@ -75,6 +75,14 @@
   "reachHint": "Counts verified bloggers who pass the location, platform, followers, gender and age filters.",
   "saveDraft": "Save draft",
   "publish": "Publish",
+  "sendForReview": "Send for review",
+  "sendAgain": "Send again",
+  "reviewHint": "We check every brief before bloggers see it, usually within a day.",
+  "review": {
+    "inReview": "In review. We check every brief before bloggers see it, usually within a day. You can still edit it.",
+    "rejected": "Needs changes: {reason}",
+    "fix": "Edit and send again"
+  },
   "resume": "Resume",
   "pause": "Pause",
   "close": "Close brief",
@@ -95,6 +103,7 @@
   "actions": "Actions",
   "toast": {
     "publish": "Brief is live",
+    "sentForReview": "Sent for review. We will let you know when it is live.",
     "pause": "Brief paused",
     "close": "Brief closed"
   }

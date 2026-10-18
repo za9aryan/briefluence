@@ -75,6 +75,8 @@
   },
   "dealStatus": {
     "DRAFT": "Черновик",
+    "IN_REVIEW": "На проверке",
+    "REJECTED": "Нужны правки",
     "ACTIVE": "Активно",
     "PAUSED": "На паузе",
     "CLOSED": "Закрыто",

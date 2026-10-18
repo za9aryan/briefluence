@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import type { DealStatus, Role, VerificationStatus } from '@briefluence/shared';
+import {
+  dealReviewKey,
+  type DealStatus,
+  type Role,
+  type VerificationStatus,
+} from '@briefluence/shared';
 import type { Prisma } from '@prisma/client';
 import { AppError, notFound } from '../../common/app-error';
 import { Clock } from '../../common/clock';
@@ -70,6 +75,55 @@ export class AdminService {
     });
   }
 
+  /** Admin approves a brief: it goes live and the approved content is fingerprinted. */
+  async approveDeal(id: string) {
+    const deal = await this.prisma.deal.findUnique({
+      where: { id },
+      include: { brand: { select: { userId: true } } },
+    });
+    if (!deal) throw notFound('Deal');
+    if (deal.status !== 'IN_REVIEW')
+      throw new AppError('INVALID_TRANSITION', 'This brief is not waiting for review');
+    const now = this.clock.now();
+    if (deal.applicationDeadline <= now)
+      throw new AppError('VALIDATION_FAILED', 'The application deadline has passed');
+    const { count } = await this.prisma.deal.updateMany({
+      where: { id, status: 'IN_REVIEW' },
+      data: {
+        status: 'ACTIVE',
+        publishedAt: deal.publishedAt ?? now,
+        reviewedAt: now,
+        reviewNote: null,
+        approvedKey: dealReviewKey(deal),
+      },
+    });
+    if (count)
+      await this.notifications.notify(deal.brand.userId, 'DEAL_APPROVED', {
+        params: { deal: deal.title },
+        link: `/brand/deals/${id}/applicants`,
+      });
+  }
+
+  /** Admin sends a brief back with a reason; the brand edits it and sends it again. */
+  async rejectDeal(id: string, reason: string) {
+    const deal = await this.prisma.deal.findUnique({
+      where: { id },
+      include: { brand: { select: { userId: true } } },
+    });
+    if (!deal) throw notFound('Deal');
+    if (deal.status !== 'IN_REVIEW')
+      throw new AppError('INVALID_TRANSITION', 'This brief is not waiting for review');
+    const { count } = await this.prisma.deal.updateMany({
+      where: { id, status: 'IN_REVIEW' },
+      data: { status: 'REJECTED', reviewedAt: this.clock.now(), reviewNote: reason },
+    });
+    if (count)
+      await this.notifications.notify(deal.brand.userId, 'DEAL_REJECTED', {
+        params: { deal: deal.title, reason },
+        link: `/brand/deals/${id}/edit`,
+      });
+  }
+
   async deals(status?: DealStatus, q?: string) {
     const where: Prisma.DealWhereInput = {
       ...(status ? { status } : {}),
@@ -84,10 +138,19 @@ export class AdminService {
     };
     const deals = await this.prisma.deal.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      // The review queue is first come, first served.
+      orderBy: status === 'IN_REVIEW' ? { submittedAt: 'asc' } : { createdAt: 'desc' },
       take: 200,
       include: {
-        brand: { select: { id: true, companyName: true } },
+        brand: {
+          select: {
+            id: true,
+            companyName: true,
+            website: true,
+            instagramUrl: true,
+            user: { select: { email: true } },
+          },
+        },
         _count: { select: { applications: true } },
       },
     });

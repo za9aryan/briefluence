@@ -19,6 +19,9 @@ export const EMAIL_POLICY: Record<NotificationType, 'instant' | 'digest' | 'none
   NEW_APPLICANT: 'digest',
   DEAL_FILLED: 'none',
   DEAL_EXPIRED: 'none',
+  DEAL_REVIEW_PENDING: 'instant',
+  DEAL_APPROVED: 'instant',
+  DEAL_REJECTED: 'instant',
   TRIAL_ENDING: 'instant',
   PAYMENT_SUCCEEDED: 'instant',
   PAYMENT_FAILED: 'instant',
@@ -26,4 +29,3 @@ export const EMAIL_POLICY: Record<NotificationType, 'instant' | 'digest' | 'none
   SOCIAL_TOKEN_REVOKED: 'instant',
   POST_SUBMITTED: 'none',
 };
-

@@ -7,6 +7,8 @@ import {
   checkEligibility,
   FILLED_STATUSES,
   isDealEditable,
+  isDealHiddenFromBloggers,
+  publishTarget,
   matchScore,
   type DealData,
   type DealStatus,
@@ -21,10 +23,13 @@ import { Clock } from '../../common/clock';
 import { PrismaService } from '../../common/prisma.service';
 import { BrandsService } from '../brands/brands.service';
 import { RatesService } from '../currency/rates.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { forBlogger } from './confidential';
 import { dealHardFilterWhere, toMatchDeal, toMatchInfluencer } from './match-input';
 
-const brandCard = { select: { id: true, companyName: true, logoUrl: true, website: true, instagramUrl: true } } as const;
+const brandCard = {
+  select: { id: true, companyName: true, logoUrl: true, website: true, instagramUrl: true },
+} as const;
 const ACTIVE_APPLICATION = { status: { not: 'WITHDRAWN' as const } };
 
 @Injectable()
@@ -34,6 +39,7 @@ export class DealsService {
     private readonly brands: BrandsService,
     private readonly clock: Clock,
     private readonly rates: RatesService,
+    private readonly notifications: NotificationsService,
   ) {}
 
   // ─── Brand side ──────────────────────────────────────────
@@ -44,7 +50,10 @@ export class DealsService {
   }
 
   async ownedDeal(userId: string, dealId: string): Promise<Deal> {
-    const deal = await this.prisma.deal.findUnique({ where: { id: dealId }, include: { brand: { select: { userId: true } } } });
+    const deal = await this.prisma.deal.findUnique({
+      where: { id: dealId },
+      include: { brand: { select: { userId: true } } },
+    });
     if (!deal) throw notFound('Deal');
     if (deal.brand.userId !== userId) throw forbidden();
     const { brand: _brand, ...rest } = deal;
@@ -59,18 +68,45 @@ export class DealsService {
     return this.prisma.deal.update({ where: { id: deal.id }, data });
   }
 
+  /**
+   * "Publish" sends the brief for admin review, unless its key content was already approved
+   * (resuming a paused brief that was not changed in ways that matter).
+   */
+  async publish(userId: string, dealId: string) {
+    const deal = await this.ownedDeal(userId, dealId);
+    const to = publishTarget(deal);
+    if (to === 'ACTIVE') return this.transition(userId, dealId, 'ACTIVE');
+    const updated = await this.transition(userId, dealId, 'IN_REVIEW');
+    const brand = await this.prisma.brandProfile.findUniqueOrThrow({
+      where: { id: deal.brandId },
+      select: { companyName: true },
+    });
+    await this.notifications.notifyAdmins('DEAL_REVIEW_PENDING', {
+      params: { brand: brand.companyName, deal: deal.title },
+      link: '/admin/brief-review',
+    });
+    return updated;
+  }
+
   async transition(userId: string, dealId: string, to: DealStatus) {
     const deal = await this.ownedDeal(userId, dealId);
     if (!canDealTransition(deal.status, to)) {
-      throw new AppError('INVALID_TRANSITION', `Cannot change a ${deal.status.toLowerCase()} deal to ${to.toLowerCase()}`);
+      throw new AppError(
+        'INVALID_TRANSITION',
+        `Cannot change a ${deal.status.toLowerCase()} deal to ${to.toLowerCase()}`,
+      );
     }
     const now = this.clock.now();
-    if (to === 'ACTIVE' && deal.applicationDeadline <= now) {
+    if ((to === 'ACTIVE' || to === 'IN_REVIEW') && deal.applicationDeadline <= now) {
       throw new AppError('VALIDATION_FAILED', 'Application deadline must be in the future');
     }
     return this.prisma.deal.update({
       where: { id: deal.id },
-      data: { status: to, ...(to === 'ACTIVE' && !deal.publishedAt ? { publishedAt: now } : {}) },
+      data: {
+        status: to,
+        ...(to === 'ACTIVE' && !deal.publishedAt ? { publishedAt: now } : {}),
+        ...(to === 'IN_REVIEW' ? { submittedAt: now } : {}),
+      },
     });
   }
 
@@ -124,7 +160,10 @@ export class DealsService {
   // ─── Influencer side ─────────────────────────────────────
 
   private async influencerFor(userId: string) {
-    const p = await this.prisma.influencerProfile.findUnique({ where: { userId }, include: { socialAccounts: true } });
+    const p = await this.prisma.influencerProfile.findUnique({
+      where: { userId },
+      include: { socialAccounts: true },
+    });
     if (!p) throw new AppError('PROFILE_INCOMPLETE', 'Complete your profile first');
     return p;
   }
@@ -133,7 +172,8 @@ export class DealsService {
     const profile = await this.influencerFor(userId);
     const inf = toMatchInfluencer(profile);
     const now = this.clock.now();
-    if (inf.accounts.length === 0) return { items: [], total: 0, page: q.page, pageSize: q.pageSize };
+    if (inf.accounts.length === 0)
+      return { items: [], total: 0, page: q.page, pageSize: q.pageSize };
 
     const userFilters: Prisma.DealWhereInput[] = [];
     if (q.platform?.length) userFilters.push({ platforms: { hasSome: q.platform } });
@@ -147,14 +187,16 @@ export class DealsService {
       userFilters.push({
         OR: CURRENCIES.map((currency) => {
           const min = convertMinor(q.budgetMin!, q.budgetCurrency, currency, rates);
-          return { currency, OR: [{ budgetMax: { gte: min } }, { budgetMax: null, budgetMin: { gte: min } }] };
+          return {
+            currency,
+            OR: [{ budgetMax: { gte: min } }, { budgetMax: null, budgetMin: { gte: min } }],
+          };
         }),
       });
     }
     if (q.deadlineBefore) userFilters.push({ applicationDeadline: { lte: q.deadlineBefore } });
 
     if (q.page === 1) void this.recordSearch(profile.id, q, now);
-
 
     const hard = dealHardFilterWhere(inf, now);
     const deals = await this.prisma.deal.findMany({
@@ -182,7 +224,8 @@ export class DealsService {
       });
     const sorters = {
       match: (a: (typeof scored)[number], b: (typeof scored)[number]) =>
-        b.matchScore - a.matchScore || a.applicationDeadline.getTime() - b.applicationDeadline.getTime(),
+        b.matchScore - a.matchScore ||
+        a.applicationDeadline.getTime() - b.applicationDeadline.getTime(),
       deadline: (a: (typeof scored)[number], b: (typeof scored)[number]) =>
         a.applicationDeadline.getTime() - b.applicationDeadline.getTime(),
       newest: (a: (typeof scored)[number], b: (typeof scored)[number]) =>
@@ -190,7 +233,12 @@ export class DealsService {
     };
     scored.sort(sorters[q.sort]);
     const start = (q.page - 1) * q.pageSize;
-    return { items: scored.slice(start, start + q.pageSize), total: scored.length, page: q.page, pageSize: q.pageSize };
+    return {
+      items: scored.slice(start, start + q.pageSize),
+      total: scored.length,
+      page: q.page,
+      pageSize: q.pageSize,
+    };
   }
 
   /**
@@ -209,12 +257,19 @@ export class DealsService {
     };
     try {
       // Stored in AMD so insights compare searches made in different currencies.
-      if (q.budgetMin != null) data.budgetMin = convertMinor(q.budgetMin, q.budgetCurrency, 'AMD', (await this.rates.get()).rates);
+      if (q.budgetMin != null)
+        data.budgetMin = convertMinor(
+          q.budgetMin,
+          q.budgetCurrency,
+          'AMD',
+          (await this.rates.get()).rates,
+        );
       const recent = await this.prisma.feedSearch.findFirst({
         where: { influencerId, createdAt: { gte: new Date(now.getTime() - 10 * 60_000) } },
         orderBy: { createdAt: 'desc' },
       });
-      const same = (a: unknown[], b: unknown[]) => a.length === b.length && a.every((x) => b.includes(x));
+      const same = (a: unknown[], b: unknown[]) =>
+        a.length === b.length && a.every((x) => b.includes(x));
       if (
         recent &&
         same(recent.platforms, data.platforms) &&
@@ -235,8 +290,15 @@ export class DealsService {
   /** Counts one view per blogger per day (Yerevan time); brands and admins are not counted. */
   private async recordView(dealId: string, influencerId: string) {
     const day = new Intl.DateTimeFormat('en-CA', { timeZone: TIMEZONE }).format(this.clock.now());
-    const { count } = await this.prisma.dealView.createMany({ data: [{ dealId, influencerId, day }], skipDuplicates: true });
-    if (count > 0) await this.prisma.deal.update({ where: { id: dealId }, data: { viewCount: { increment: 1 } } });
+    const { count } = await this.prisma.dealView.createMany({
+      data: [{ dealId, influencerId, day }],
+      skipDuplicates: true,
+    });
+    if (count > 0)
+      await this.prisma.deal.update({
+        where: { id: dealId },
+        data: { viewCount: { increment: 1 } },
+      });
   }
 
   /** Deal detail for any role: owner and admin see everything; influencers see published, eligible deals. */
@@ -244,14 +306,24 @@ export class DealsService {
     const deal = await this.prisma.deal.findUnique({
       where: { id: dealId },
       include: {
-        brand: { select: { ...brandCard.select, userId: true, description: true, country: true, city: true } },
+        brand: {
+          select: {
+            ...brandCard.select,
+            userId: true,
+            description: true,
+            country: true,
+            city: true,
+          },
+        },
         _count: { select: { applications: { where: ACTIVE_APPLICATION } } },
       },
     });
     if (!deal) throw notFound('Deal');
     const { brand, _count, ...rest } = deal;
     const { userId: brandUserId, ...brandPublic } = brand;
-    const filled = await this.prisma.application.count({ where: { dealId, status: { in: FILLED_STATUSES } } });
+    const filled = await this.prisma.application.count({
+      where: { dealId, status: { in: FILLED_STATUSES } },
+    });
     const base = { ...rest, brand: brandPublic, applicantCount: _count.applications, filled };
 
     if (viewer.role === 'ADMIN') return base;
@@ -267,17 +339,31 @@ export class DealsService {
     // Influencers can always see deals they applied to; otherwise only published, eligible ones,
     // and only once they have started the free month.
     if (!myApplication) {
-      const sub = await this.prisma.subscription.findUnique({ where: { userId: viewer.id }, select: { id: true } });
+      const sub = await this.prisma.subscription.findUnique({
+        where: { userId: viewer.id },
+        select: { id: true },
+      });
       if (!sub) throw new AppError('TRIAL_NOT_STARTED', 'Start your free month to see briefs');
-      if (deal.status === 'DRAFT') throw notFound('Deal');
-      const failure = checkEligibility(toMatchDeal(deal), toMatchInfluencer(profile), this.clock.now());
-      if (failure && failure !== 'DEADLINE_PASSED' && failure !== 'NOT_ACTIVE') throw notFound('Deal');
+      if (isDealHiddenFromBloggers(deal.status)) throw notFound('Deal');
+      const failure = checkEligibility(
+        toMatchDeal(deal),
+        toMatchInfluencer(profile),
+        this.clock.now(),
+      );
+      if (failure && failure !== 'DEADLINE_PASSED' && failure !== 'NOT_ACTIVE')
+        throw notFound('Deal');
     }
     const inf = toMatchInfluencer(profile);
     const accounts = profile.socialAccounts
       .filter((a) => !a.tokenRevokedAt)
-      .map((a) => ({ id: a.id, platform: a.platform, username: a.username, followers: a.followers, score: matchScore(toMatchDeal(deal), inf, a.id)?.score ?? null }));
-    if (deal.status !== 'DRAFT') await this.recordView(deal.id, profile.id);
+      .map((a) => ({
+        id: a.id,
+        platform: a.platform,
+        username: a.username,
+        followers: a.followers,
+        score: matchScore(toMatchDeal(deal), inf, a.id)?.score ?? null,
+      }));
+    if (!isDealHiddenFromBloggers(deal.status)) await this.recordView(deal.id, profile.id);
     const masked = forBlogger(base, base.brand, myApplication?.status);
     return {
       ...masked.deal,

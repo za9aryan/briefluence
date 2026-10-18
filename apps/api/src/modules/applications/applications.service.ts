@@ -37,24 +37,39 @@ export class ApplicationsService {
 
   // ─── Influencer ──────────────────────────────────────────
 
-  async apply(userId: string, dealId: string, input: ApplyInput & { proposedPrice: number | null }) {
-    const profile = await this.prisma.influencerProfile.findUnique({ where: { userId }, include: { socialAccounts: true } });
+  async apply(
+    userId: string,
+    dealId: string,
+    input: ApplyInput & { proposedPrice: number | null },
+  ) {
+    const profile = await this.prisma.influencerProfile.findUnique({
+      where: { userId },
+      include: { socialAccounts: true },
+    });
     if (!profile) throw new AppError('PROFILE_INCOMPLETE', 'Complete your profile first');
-    const deal = await this.prisma.deal.findUnique({ where: { id: dealId }, include: { brand: { select: { userId: true } } } });
+    const deal = await this.prisma.deal.findUnique({
+      where: { id: dealId },
+      include: { brand: { select: { userId: true } } },
+    });
     if (!deal) throw notFound('Deal');
 
     const now = this.clock.now();
     const inf = toMatchInfluencer(profile);
     const failure = checkEligibility(toMatchDeal(deal), inf, now);
-    if (failure) throw new AppError('NOT_ELIGIBLE', 'You are not eligible for this deal', { reason: failure });
+    if (failure)
+      throw new AppError('NOT_ELIGIBLE', 'You are not eligible for this deal', { reason: failure });
     // The blogger does not pick an account: the best-matching one is used for the score, and the
     // brand sees all connected accounts. An explicit account id is still honoured if sent.
     if (input.socialAccountId) {
       const chosen = profile.socialAccounts.find((a) => a.id === input.socialAccountId);
-      if (!chosen || chosen.tokenRevokedAt) throw new AppError('VALIDATION_FAILED', 'Choose one of your connected accounts');
+      if (!chosen || chosen.tokenRevokedAt)
+        throw new AppError('VALIDATION_FAILED', 'Choose one of your connected accounts');
     }
     const match = matchScore(toMatchDeal(deal), inf, input.socialAccountId);
-    if (!match) throw new AppError('NOT_ELIGIBLE', 'No connected account fits the deal requirements', { reason: 'PLATFORM_OR_FOLLOWERS' });
+    if (!match)
+      throw new AppError('NOT_ELIGIBLE', 'No connected account fits the deal requirements', {
+        reason: 'PLATFORM_OR_FOLLOWERS',
+      });
     const account = { id: match.accountId };
 
     const data = {
@@ -68,14 +83,17 @@ export class ApplicationsService {
     });
     let application: Application;
     if (existing) {
-      if (existing.status !== 'WITHDRAWN') throw new AppError('ALREADY_APPLIED', 'You already applied to this deal');
+      if (existing.status !== 'WITHDRAWN')
+        throw new AppError('ALREADY_APPLIED', 'You already applied to this deal');
       application = await this.prisma.application.update({
         where: { id: existing.id },
         data: { ...data, status: 'APPLIED', rejectionReason: null, postUrl: null },
       });
     } else {
       try {
-        application = await this.prisma.application.create({ data: { ...data, dealId, influencerId: profile.id } });
+        application = await this.prisma.application.create({
+          data: { ...data, dealId, influencerId: profile.id },
+        });
       } catch (err) {
         if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
           throw new AppError('ALREADY_APPLIED', 'You already applied to this deal');
@@ -136,7 +154,12 @@ export class ApplicationsService {
           brand: a.deal.isConfidential && !brandRevealed(a.status) ? HIDDEN_BRAND : brand,
         },
         brandContact: contactsRevealed(a.status)
-          ? { name: contactName, position: contactPosition, method: contactMethod, value: contactValue }
+          ? {
+              name: contactName,
+              position: contactPosition,
+              method: contactMethod,
+              value: contactValue,
+            }
           : null,
       };
     });
@@ -145,7 +168,10 @@ export class ApplicationsService {
   private async ownApplication(userId: string, id: string) {
     const app = await this.prisma.application.findUnique({
       where: { id },
-      include: { influencer: { select: { userId: true, displayName: true } }, deal: { include: { brand: { select: { userId: true } } } } },
+      include: {
+        influencer: { select: { userId: true, displayName: true } },
+        deal: { include: { brand: { select: { userId: true } } } },
+      },
     });
     if (!app || app.influencer.userId !== userId) throw notFound('Application');
     return app;
@@ -153,13 +179,15 @@ export class ApplicationsService {
 
   async withdraw(userId: string, id: string) {
     const app = await this.ownApplication(userId, id);
-    if (!canWithdraw(app.status)) throw new AppError('INVALID_TRANSITION', 'You can only withdraw before the brand accepts');
+    if (!canWithdraw(app.status))
+      throw new AppError('INVALID_TRANSITION', 'You can only withdraw before the brand accepts');
     return this.prisma.application.update({ where: { id }, data: { status: 'WITHDRAWN' } });
   }
 
   async submitPostUrl(userId: string, id: string, postUrl: string) {
     const app = await this.ownApplication(userId, id);
-    if (!canSubmitPostUrl(app.status)) throw new AppError('INVALID_TRANSITION', 'Only accepted applications can get a post URL');
+    if (!canSubmitPostUrl(app.status))
+      throw new AppError('INVALID_TRANSITION', 'Only accepted applications can get a post URL');
     const updated = await this.prisma.application.update({ where: { id }, data: { postUrl } });
     await this.notifications.notify(app.deal.brand.userId, 'POST_SUBMITTED', {
       params: { name: app.influencer.displayName, deal: app.deal.title },
@@ -179,10 +207,16 @@ export class ApplicationsService {
       select: { id: true, influencer: { select: { userId: true } } },
     });
     if (fresh.length) {
-      await this.prisma.application.updateMany({ where: { id: { in: fresh.map((f) => f.id) } }, data: { status: 'VIEWED' } });
+      await this.prisma.application.updateMany({
+        where: { id: { in: fresh.map((f) => f.id) } },
+        data: { status: 'VIEWED' },
+      });
       await Promise.all(
         fresh.map((f) =>
-          this.notifications.notify(f.influencer.userId, 'APPLICATION_VIEWED', { params: { deal: deal.title }, link: '/influencer/applications' }),
+          this.notifications.notify(f.influencer.userId, 'APPLICATION_VIEWED', {
+            params: { deal: deal.title },
+            link: '/influencer/applications',
+          }),
         ),
       );
     }
@@ -219,16 +253,22 @@ export class ApplicationsService {
           .filter((s) => !s.tokenRevokedAt)
           .sort((x, y) => y.followers - x.followers)
           .map(publicAccount),
-        contacts: contactsRevealed(a.status) ? { method: p.contactMethod, value: p.contactValue } : null,
+        contacts: contactsRevealed(a.status)
+          ? { method: p.contactMethod, value: p.contactValue }
+          : null,
       };
     });
     const sorters = {
       match: (a: (typeof rows)[number], b: (typeof rows)[number]) => b.matchScore - a.matchScore,
-      followers: (a: (typeof rows)[number], b: (typeof rows)[number]) => (b.accounts[0]?.followers ?? 0) - (a.accounts[0]?.followers ?? 0),
-      newest: (a: (typeof rows)[number], b: (typeof rows)[number]) => b.createdAt.getTime() - a.createdAt.getTime(),
+      followers: (a: (typeof rows)[number], b: (typeof rows)[number]) =>
+        (b.accounts[0]?.followers ?? 0) - (a.accounts[0]?.followers ?? 0),
+      newest: (a: (typeof rows)[number], b: (typeof rows)[number]) =>
+        b.createdAt.getTime() - a.createdAt.getTime(),
     };
     rows.sort(sorters[q.sort]);
-    const filled = await this.prisma.application.count({ where: { dealId, status: { in: FILLED_STATUSES } } });
+    const filled = await this.prisma.application.count({
+      where: { dealId, status: { in: FILLED_STATUSES } },
+    });
     const start = (q.page - 1) * q.pageSize;
     return {
       deal: {
@@ -240,6 +280,7 @@ export class ApplicationsService {
         currency: deal.currency,
         viewCount: deal.viewCount,
         isConfidential: deal.isConfidential,
+        reviewNote: deal.reviewNote,
       },
       items: rows.slice(start, start + q.pageSize),
       total: rows.length,
@@ -251,13 +292,19 @@ export class ApplicationsService {
   async updateStatus(userId: string, id: string, input: ApplicationStatusUpdateInput) {
     const app = await this.prisma.application.findUnique({
       where: { id },
-      include: { deal: { include: { brand: { select: { userId: true } } } }, influencer: { select: { userId: true } } },
+      include: {
+        deal: { include: { brand: { select: { userId: true } } } },
+        influencer: { select: { userId: true } },
+      },
     });
     if (!app) throw notFound('Application');
     if (app.deal.brand.userId !== userId) throw forbidden();
     const to = input.status;
     if (!canBrandTransition(app.status, to)) {
-      throw new AppError('INVALID_TRANSITION', `Cannot change ${app.status.toLowerCase()} to ${to.toLowerCase()}`);
+      throw new AppError(
+        'INVALID_TRANSITION',
+        `Cannot change ${app.status.toLowerCase()} to ${to.toLowerCase()}`,
+      );
     }
     if (to === 'COMPLETED' && !canComplete(app.status, app.postUrl)) {
       throw new AppError('INVALID_TRANSITION', 'The influencer has not submitted the post URL yet');
@@ -268,19 +315,29 @@ export class ApplicationsService {
       if (to === 'ACCEPTED') {
         // Lock the deal row so two parallel accepts cannot both pass the slot check.
         await tx.$queryRaw`SELECT id FROM "Deal" WHERE id = ${app.dealId} FOR UPDATE`;
-        const filled = await tx.application.count({ where: { dealId: app.dealId, status: { in: FILLED_STATUSES } } });
+        const filled = await tx.application.count({
+          where: { dealId: app.dealId, status: { in: FILLED_STATUSES } },
+        });
         if (exceedsSlots(app.deal.slots, filled) && !input.confirmOverSlots) {
-          throw new AppError('SLOTS_EXCEEDED', `All ${app.deal.slots} slots are already filled. Confirm to accept anyway.`, {
-            slots: app.deal.slots,
-            filled,
-          });
+          throw new AppError(
+            'SLOTS_EXCEEDED',
+            `All ${app.deal.slots} slots are already filled. Confirm to accept anyway.`,
+            {
+              slots: app.deal.slots,
+              filled,
+            },
+          );
         }
         dealFilled = isFilled(app.deal.slots, filled + 1) && app.deal.status === 'ACTIVE';
-        if (dealFilled) await tx.deal.update({ where: { id: app.dealId }, data: { status: 'CLOSED' } });
+        if (dealFilled)
+          await tx.deal.update({ where: { id: app.dealId }, data: { status: 'CLOSED' } });
       }
       return tx.application.update({
         where: { id },
-        data: { status: to, rejectionReason: to === 'REJECTED' ? input.rejectionReason : app.rejectionReason },
+        data: {
+          status: to,
+          rejectionReason: to === 'REJECTED' ? input.rejectionReason : app.rejectionReason,
+        },
       });
     });
 
@@ -294,7 +351,12 @@ export class ApplicationsService {
     return updated;
   }
 
-  private async notifyStatus(influencerUserId: string, deal: Deal, status: string, reason?: RejectionReason) {
+  private async notifyStatus(
+    influencerUserId: string,
+    deal: Deal,
+    status: string,
+    reason?: RejectionReason,
+  ) {
     const types: Partial<Record<string, NotificationType>> = {
       SHORTLISTED: 'APPLICATION_SHORTLISTED',
       ACCEPTED: 'APPLICATION_ACCEPTED',
@@ -309,5 +371,4 @@ export class ApplicationsService {
       });
     }
   }
-
 }

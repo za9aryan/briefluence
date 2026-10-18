@@ -12,7 +12,11 @@ import {
 } from '@briefluence/shared';
 import type { AuthUser } from '../../common/auth-user';
 import { CurrentUser, Roles } from '../../common/decorators';
-import { EmailVerifiedGuard, TrialStartedGuard, VerifiedInfluencerGuard } from '../../common/guards';
+import {
+  EmailVerifiedGuard,
+  TrialStartedGuard,
+  VerifiedInfluencerGuard,
+} from '../../common/guards';
 import { ApiZodBody, ZodBody, ZodQuery } from '../../common/zod';
 import { DealsService } from './deals.service';
 
@@ -63,7 +67,11 @@ export class DealsController {
   @Roles('BRAND')
   @Patch(':id')
   @ApiZodBody(dealInputSchema)
-  update(@CurrentUser() user: AuthUser, @Param('id') id: string, @ZodBody(dealInputSchema) body: DealData) {
+  update(
+    @CurrentUser() user: AuthUser,
+    @Param('id') id: string,
+    @ZodBody(dealInputSchema) body: DealData,
+  ) {
     return this.deals.update(user.id, id, body);
   }
 
@@ -72,7 +80,7 @@ export class DealsController {
   @Post(':id/publish')
   @HttpCode(200)
   publish(@CurrentUser() user: AuthUser, @Param('id') id: string) {
-    return this.deals.transition(user.id, id, 'ACTIVE');
+    return this.deals.publish(user.id, id);
   }
 
   @Roles('BRAND')

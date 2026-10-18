@@ -13,6 +13,7 @@ import { faker } from '@faker-js/faker';
 import {
   CITIES,
   CONTENT_FORMATS,
+  dealReviewKey,
   NICHES,
   matchScore,
   startTrial,
@@ -39,12 +40,25 @@ const pickSome = <T>(arr: readonly T[], min: number, max: number) =>
   faker.helpers.arrayElements(arr as T[], faker.number.int({ min, max }));
 
 function audience(platform: Platform) {
-  if (platform === 'TIKTOK') return { audienceGender: Prisma.DbNull, audienceAge: Prisma.DbNull, audienceCountries: Prisma.DbNull };
+  if (platform === 'TIKTOK')
+    return {
+      audienceGender: Prisma.DbNull,
+      audienceAge: Prisma.DbNull,
+      audienceCountries: Prisma.DbNull,
+    };
   const female = faker.number.int({ min: 25, max: 80 });
   const young = faker.number.int({ min: 20, max: 45 });
   return {
     audienceGender: { male: 100 - female, female },
-    audienceAge: { '13-17': 5, '18-24': young, '25-34': 75 - young - 10, '35-44': 12, '45-54': 5, '55-64': 2, '65+': 1 },
+    audienceAge: {
+      '13-17': 5,
+      '18-24': young,
+      '25-34': 75 - young - 10,
+      '35-44': 12,
+      '45-54': 5,
+      '55-64': 2,
+      '65+': 1,
+    },
     audienceCountries: { AM: faker.number.int({ min: 50, max: 85 }), RU: 8, US: 5, FR: 2 },
   };
 }
@@ -74,7 +88,11 @@ async function guardRealData() {
   if (process.env.SEED_RESET === '1') return;
   const real = await prisma.user.count({
     where: {
-      NOT: [{ email: { endsWith: '@briefluence.local' } }, { email: { endsWith: '@e2e.test' } }, { email: env.ADMIN_EMAIL.toLowerCase() }],
+      NOT: [
+        { email: { endsWith: '@briefluence.local' } },
+        { email: { endsWith: '@e2e.test' } },
+        { email: env.ADMIN_EMAIL.toLowerCase() },
+      ],
     },
   });
   if (real > 0) {
@@ -94,11 +112,22 @@ async function main() {
   const adminHash = await argon2.hash(env.ADMIN_PASSWORD, { type: argon2.argon2id });
 
   await prisma.user.create({
-    data: { email: env.ADMIN_EMAIL.toLowerCase(), passwordHash: adminHash, role: 'ADMIN', emailVerifiedAt: now },
+    data: {
+      email: env.ADMIN_EMAIL.toLowerCase(),
+      passwordHash: adminHash,
+      role: 'ADMIN',
+      emailVerifiedAt: now,
+    },
   });
 
   // ─── Brands ────────────────────────────────────────────
-  const brandNames = ['Yerevan Roasters', 'Ararat Cosmetics', 'Sevan Sportswear', 'Gyumri Bakery', 'Dilijan Eco Resort'];
+  const brandNames = [
+    'Yerevan Roasters',
+    'Ararat Cosmetics',
+    'Sevan Sportswear',
+    'Gyumri Bakery',
+    'Dilijan Eco Resort',
+  ];
   const brands = [];
   for (const [i, companyName] of brandNames.entries()) {
     const user = await prisma.user.create({
@@ -116,9 +145,19 @@ async function main() {
             country: 'AM',
             city: faker.helpers.arrayElement(AM_CITIES.slice(0, 4)),
             contactName: faker.person.fullName(),
-            contactPosition: faker.helpers.arrayElement(['Marketing manager', 'PR manager', 'Founder', 'SMM specialist']),
+            contactPosition: faker.helpers.arrayElement([
+              'Marketing manager',
+              'PR manager',
+              'Founder',
+              'SMM specialist',
+            ]),
             contactMethod: (['TELEGRAM', 'WHATSAPP', 'PHONE', 'INSTAGRAM', 'VIBER'] as const)[i],
-            contactValue: i === 0 ? 'yerevan_roasters' : i === 3 ? 'gyumri.bakery' : `+3749${faker.string.numeric(7)}`,
+            contactValue:
+              i === 0
+                ? 'yerevan_roasters'
+                : i === 3
+                  ? 'gyumri.bakery'
+                  : `+3749${faker.string.numeric(7)}`,
           },
         },
       },
@@ -144,7 +183,9 @@ async function main() {
         role: 'INFLUENCER',
         emailVerifiedAt: i === 30 ? null : now,
         // The free month is opt-in: only bloggers 1–20 have started it.
-        ...(i <= 20 ? { subscription: { create: { status: trial.status, trialEndsAt: trial.trialEndsAt } } } : {}),
+        ...(i <= 20
+          ? { subscription: { create: { status: trial.status, trialEndsAt: trial.trialEndsAt } } }
+          : {}),
         influencer: {
           create: {
             displayName: `${firstName} ${faker.person.lastName()}`,
@@ -160,8 +201,12 @@ async function main() {
             birthYear: faker.number.int({ min: 1985, max: 2006 }),
             languages: pickSome(['hy', 'ru', 'en'], 1, 3),
             niches: pickSome(NICHES, 1, 3),
-            contactMethod: (['TELEGRAM', 'WHATSAPP', 'INSTAGRAM', 'PHONE', 'VIBER'] as const)[i % 5],
-            contactValue: [0, 2].includes(i % 5) ? `${firstName.toLowerCase()}_${i}` : `+3749${faker.string.numeric(7)}`,
+            contactMethod: (['TELEGRAM', 'WHATSAPP', 'INSTAGRAM', 'PHONE', 'VIBER'] as const)[
+              i % 5
+            ],
+            contactValue: [0, 2].includes(i % 5)
+              ? `${firstName.toLowerCase()}_${i}`
+              : `+3749${faker.string.numeric(7)}`,
             status,
             approvedAt: status === 'APPROVED' ? now : null,
             submittedAt: status !== 'DRAFT' ? addDays(now, -1) : null,
@@ -241,49 +286,79 @@ async function main() {
       [50_000, 500_000],
       [5_000, null],
     ] as const);
+    const created = await prisma.deal.create({
+      data: {
+        brandId: brand.id,
+        title: `${titles[i % titles.length]}${i >= titles.length ? ' — round 2' : ''}`,
+        description: faker.lorem.paragraphs(2),
+        platforms,
+        contentFormats: pickSome<ContentFormat>(CONTENT_FORMATS, 1, 2),
+        niches: pickSome(NICHES, 0, 2),
+        collaborationType: faker.helpers.weightedArrayElement([
+          { weight: 3, value: 'ONE_TIME' },
+          { weight: 2, value: 'LONG_TERM' },
+        ] as const),
+        // A few briefs keep the brand private (revealed only to accepted bloggers).
+        isConfidential: i % 6 === 2,
+        countries: ['AM'],
+        cities: i % 4 === 0 ? ['Yerevan'] : [],
+        languages: pickSome(['hy', 'ru', 'en'], 0, 2),
+        minFollowers: sizePreset[0],
+        maxFollowers: sizePreset[1],
+        minEngagementRate: faker.helpers.arrayElement([null, 2, 3, 4]),
+        influencerGender: faker.helpers.arrayElement([
+          'ANY',
+          'ANY',
+          'ANY',
+          'FEMALE',
+          'MALE',
+        ] as const),
+        influencerAgeMin: i % 5 === 0 ? 18 : null,
+        influencerAgeMax: i % 5 === 0 ? 35 : null,
+        audienceGender: faker.helpers.arrayElement(['ANY', 'ANY', 'FEMALE'] as const),
+        audienceAgeMin: i % 3 === 0 ? 18 : null,
+        audienceAgeMax: i % 3 === 0 ? 34 : null,
+        audienceCountry: i % 2 === 0 ? 'AM' : null,
+        paymentType,
+        budgetMin: paymentType === 'BARTER' ? null : budgetMin,
+        budgetMax: paymentType === 'BARTER' ? null : budgetMin * 2,
+        currency,
+        barterDescription:
+          paymentType === 'MONEY'
+            ? null
+            : faker.helpers.arrayElement([
+                'Dinner for two and a gift box',
+                'Full skincare set',
+                'Two-night stay for two',
+                'Sneakers + sportswear set',
+              ]),
+        barterValue:
+          paymentType === 'MONEY'
+            ? null
+            : Math.round(
+                faker.number.int({ min: 20, max: 150 }) *
+                  1_000_00 *
+                  { AMD: 1, USD: 1 / 390, RUB: 1 / 4.5 }[currency],
+              ),
+        slots: faker.number.int({ min: 1, max: 5 }),
+        applicationDeadline: addDays(
+          now,
+          status === 'CLOSED' ? -2 : faker.number.int({ min: 5, max: 30 }),
+        ),
+        publishBy: addDays(now, 40),
+        status,
+        publishedAt:
+          status === 'DRAFT' ? null : addDays(now, -faker.number.int({ min: 0, max: 5 })),
+      },
+    });
+    // Published demo briefs count as approved by the admin.
     deals.push(
-      await prisma.deal.create({
-        data: {
-          brandId: brand.id,
-          title: `${titles[i % titles.length]}${i >= titles.length ? ' — round 2' : ''}`,
-          description: faker.lorem.paragraphs(2),
-          platforms,
-          contentFormats: pickSome<ContentFormat>(CONTENT_FORMATS, 1, 2),
-          niches: pickSome(NICHES, 0, 2),
-          collaborationType: faker.helpers.weightedArrayElement([{ weight: 3, value: 'ONE_TIME' }, { weight: 2, value: 'LONG_TERM' }] as const),
-          // A few briefs keep the brand private (revealed only to accepted bloggers).
-          isConfidential: i % 6 === 2,
-          countries: ['AM'],
-          cities: i % 4 === 0 ? ['Yerevan'] : [],
-          languages: pickSome(['hy', 'ru', 'en'], 0, 2),
-          minFollowers: sizePreset[0],
-          maxFollowers: sizePreset[1],
-          minEngagementRate: faker.helpers.arrayElement([null, 2, 3, 4]),
-          influencerGender: faker.helpers.arrayElement(['ANY', 'ANY', 'ANY', 'FEMALE', 'MALE'] as const),
-          influencerAgeMin: i % 5 === 0 ? 18 : null,
-          influencerAgeMax: i % 5 === 0 ? 35 : null,
-          audienceGender: faker.helpers.arrayElement(['ANY', 'ANY', 'FEMALE'] as const),
-          audienceAgeMin: i % 3 === 0 ? 18 : null,
-          audienceAgeMax: i % 3 === 0 ? 34 : null,
-          audienceCountry: i % 2 === 0 ? 'AM' : null,
-          paymentType,
-          budgetMin: paymentType === 'BARTER' ? null : budgetMin,
-          budgetMax: paymentType === 'BARTER' ? null : budgetMin * 2,
-          currency,
-          barterDescription: paymentType === 'MONEY' ? null : faker.helpers.arrayElement([
-            'Dinner for two and a gift box',
-            'Full skincare set',
-            'Two-night stay for two',
-            'Sneakers + sportswear set',
-          ]),
-          barterValue: paymentType === 'MONEY' ? null : Math.round((faker.number.int({ min: 20, max: 150 }) * 1_000_00 * { AMD: 1, USD: 1 / 390, RUB: 1 / 4.5 }[currency])),
-          slots: faker.number.int({ min: 1, max: 5 }),
-          applicationDeadline: addDays(now, status === 'CLOSED' ? -2 : faker.number.int({ min: 5, max: 30 })),
-          publishBy: addDays(now, 40),
-          status,
-          publishedAt: status === 'DRAFT' ? null : addDays(now, -faker.number.int({ min: 0, max: 5 })),
-        },
-      }),
+      status === 'DRAFT'
+        ? created
+        : await prisma.deal.update({
+            where: { id: created.id },
+            data: { approvedKey: dealReviewKey(created), reviewedAt: created.publishedAt },
+          }),
     );
   }
 
@@ -325,7 +400,9 @@ async function main() {
     // More activity on recent days and on weekends.
     const day = addDays(now, -d);
     const weekend = [0, 6].includes(day.getUTCDay());
-    const n = Math.round((weekend ? 16 : 10) * (1 - d / 120) + faker.number.int({ min: 0, max: 6 }));
+    const n = Math.round(
+      (weekend ? 16 : 10) * (1 - d / 120) + faker.number.int({ min: 0, max: 6 }),
+    );
     for (let k = 0; k < n; k++) {
       const p = faker.helpers.arrayElement(searchers);
       searches.push({
@@ -337,8 +414,19 @@ async function main() {
           { weight: 2, value: ['INSTAGRAM', 'TIKTOK'] },
           { weight: 2, value: [] },
         ]) as Platform[],
-        niches: faker.datatype.boolean(0.7) ? pickSome(p.niches.length ? p.niches : NICHES, 1, 2) : [],
-        cities: faker.datatype.boolean(0.4) ? [faker.helpers.weightedArrayElement([{ weight: 6, value: 'Yerevan' }, { weight: 1, value: 'Gyumri' }, { weight: 1, value: 'Vanadzor' }, { weight: 1, value: 'Dilijan' }])] : [],
+        niches: faker.datatype.boolean(0.7)
+          ? pickSome(p.niches.length ? p.niches : NICHES, 1, 2)
+          : [],
+        cities: faker.datatype.boolean(0.4)
+          ? [
+              faker.helpers.weightedArrayElement([
+                { weight: 6, value: 'Yerevan' },
+                { weight: 1, value: 'Gyumri' },
+                { weight: 1, value: 'Vanadzor' },
+                { weight: 1, value: 'Dilijan' },
+              ]),
+            ]
+          : [],
         collaborationTypes: faker.helpers.weightedArrayElement([
           { weight: 3, value: ['LONG_TERM'] },
           { weight: 2, value: ['ONE_TIME'] },
@@ -350,7 +438,9 @@ async function main() {
           { weight: 2, value: ['MIXED'] },
           { weight: 3, value: [] },
         ]) as ('MONEY' | 'BARTER' | 'MIXED')[],
-        budgetMin: faker.datatype.boolean(0.35) ? faker.helpers.arrayElement([10_000, 30_000, 50_000, 80_000, 150_000, 300_000]) * 100 : null,
+        budgetMin: faker.datatype.boolean(0.35)
+          ? faker.helpers.arrayElement([10_000, 30_000, 50_000, 80_000, 150_000, 300_000]) * 100
+          : null,
         createdAt: new Date(day.getTime() - faker.number.int({ min: 0, max: 86_000_000 })),
       });
     }
@@ -364,7 +454,9 @@ async function main() {
     const n = faker.number.int({ min: 5, max: 90 });
     for (let k = 0; k < n; k++) {
       const p = faker.helpers.arrayElement(searchers);
-      const day = addDays(now, -faker.number.int({ min: 0, max: 14 })).toISOString().slice(0, 10);
+      const day = addDays(now, -faker.number.int({ min: 0, max: 14 }))
+        .toISOString()
+        .slice(0, 10);
       rows.set(`${p.id}|${day}`, { dealId: deal.id, influencerId: p.id, day });
     }
     await prisma.dealView.createMany({ data: [...rows.values()] });
@@ -372,8 +464,12 @@ async function main() {
     viewTotal += rows.size;
   }
 
-  console.log(`Seeded: 1 admin, ${brands.length} brands, ${influencers.length} influencers, ${deals.length} deals, ${count} applications, ${searches.length} feed searches, ${viewTotal} brief views`);
-  console.log(`Logins: ${env.ADMIN_EMAIL} / ${env.ADMIN_PASSWORD}; brand1@briefluence.local / ${PASSWORD}; influencer1@briefluence.local / ${PASSWORD}`);
+  console.log(
+    `Seeded: 1 admin, ${brands.length} brands, ${influencers.length} influencers, ${deals.length} deals, ${count} applications, ${searches.length} feed searches, ${viewTotal} brief views`,
+  );
+  console.log(
+    `Logins: ${env.ADMIN_EMAIL} / ${env.ADMIN_PASSWORD}; brand1@briefluence.local / ${PASSWORD}; influencer1@briefluence.local / ${PASSWORD}`,
+  );
 }
 
 main()

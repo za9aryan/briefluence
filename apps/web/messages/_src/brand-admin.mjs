@@ -243,6 +243,26 @@ export default {
     ],
     saveDraft: ['Save draft', 'Сохранить черновик', 'Պահպանել սևագիրը'],
     publish: ['Publish', 'Опубликовать', 'Հրապարակել'],
+    sendForReview: ['Send for review', 'Отправить на проверку', 'Ուղարկել ստուգման'],
+    sendAgain: ['Send again', 'Отправить снова', 'Կրկին ուղարկել'],
+    reviewHint: [
+      'We check every brief before bloggers see it, usually within a day.',
+      'Мы проверяем каждый бриф до того, как его увидят блогеры, обычно в течение дня.',
+      'Մենք ստուգում ենք յուրաքանչյուր բրիֆ, նախքան բլոգերները կտեսնեն այն, սովորաբար մեկ օրվա ընթացքում։',
+    ],
+    review: {
+      inReview: [
+        'In review. We check every brief before bloggers see it, usually within a day. You can still edit it.',
+        'На проверке. Мы проверяем каждый бриф до того, как его увидят блогеры, обычно в течение дня. Править его можно и сейчас.',
+        'Ստուգման մեջ է։ Մենք ստուգում ենք յուրաքանչյուր բրիֆ, նախքան բլոգերները կտեսնեն այն, սովորաբար մեկ օրվա ընթացքում։ Կարող ես հիմա էլ խմբագրել։',
+      ],
+      rejected: [
+        'Needs changes: {reason}',
+        'Нужны правки: {reason}',
+        'Պետք են ուղղումներ՝ {reason}',
+      ],
+      fix: ['Edit and send again', 'Исправить и отправить снова', 'Ուղղել և կրկին ուղարկել'],
+    },
     resume: ['Resume', 'Возобновить', 'Վերսկսել'],
     pause: ['Pause', 'Пауза', 'Դադար'],
     close: ['Close brief', 'Закрыть бриф', 'Փակել բրիֆը'],
@@ -291,6 +311,11 @@ export default {
     actions: ['Actions', 'Действия', 'Գործողություններ'],
     toast: {
       publish: ['Brief is live', 'Бриф опубликован', 'Բրիֆը հրապարակված է'],
+      sentForReview: [
+        'Sent for review. We will let you know when it is live.',
+        'Отправлен на проверку. Сообщим, когда он будет опубликован.',
+        'Ուղարկված է ստուգման։ Կտեղեկացնենք, երբ այն հրապարակվի։',
+      ],
       pause: ['Brief paused', 'Бриф на паузе', 'Բրիֆը դադարեցված է'],
       close: ['Brief closed', 'Бриф закрыт', 'Բրիֆը փակված է'],
     },
@@ -329,6 +354,48 @@ export default {
         'The blogger sees this. Say what to fix.',
         'Блогер увидит это. Напиши, что исправить.',
         'Բլոգերը կտեսնի սա։ Գրիր, թե ինչ ուղղել։',
+      ],
+    },
+    briefReview: {
+      title: ['Brief review', 'Проверка брифов', 'Բրիֆների ստուգում'],
+      lead: [
+        'Every brief is checked before bloggers see it. Approve it or send it back with a reason.',
+        'Каждый бриф проверяется до того, как его увидят блогеры. Одобри или верни с причиной.',
+        'Յուրաքանչյուր բրիֆ ստուգվում է, նախքան բլոգերները կտեսնեն այն։ Հաստատիր կամ վերադարձրու պատճառով։',
+      ],
+      empty: ['Nothing to review', 'Проверять нечего', 'Ստուգելու բան չկա'],
+      submitted: ['Sent {date}', 'Отправлен {date}', 'Ուղարկվել է {date}'],
+      confidential: ['Brand hidden', 'Бренд скрыт', 'Բրենդը թաքնված է'],
+      pays: ['Pays', 'Оплата', 'Վճարում'],
+      slots: ['Bloggers needed', 'Нужно блогеров', 'Անհրաժեշտ բլոգերներ'],
+      deadline: ['Apply by', 'Откликнуться до', 'Դիմել մինչև'],
+      previousReason: [
+        'Previous reason: {reason}',
+        'Прошлая причина: {reason}',
+        'Նախորդ պատճառը՝ {reason}',
+      ],
+      approve: ['Approve and publish', 'Одобрить и опубликовать', 'Հաստատել և հրապարակել'],
+      reject: ['Send back', 'Вернуть на доработку', 'Վերադարձնել լրամշակման'],
+      approved: [
+        'Brief is live. The brand got a notification.',
+        'Бриф опубликован. Бренд получил уведомление.',
+        'Բրիֆը հրապարակված է։ Բրենդը ստացավ ծանուցում։',
+      ],
+      rejected: [
+        'Sent back. The brand will see your reason.',
+        'Возвращён. Бренд увидит твою причину.',
+        'Վերադարձված է։ Բրենդը կտեսնի պատճառը։',
+      ],
+      rejectTitle: [
+        'Send the brief back',
+        'Вернуть бриф на доработку',
+        'Վերադարձնել բրիֆը լրամշակման',
+      ],
+      reason: ['What to fix', 'Что исправить', 'Ինչ ուղղել'],
+      reasonHint: [
+        'The brand sees this text. Be specific: what is wrong and how to fix it.',
+        'Бренд увидит этот текст. Пиши конкретно: что не так и как исправить.',
+        'Բրենդը կտեսնի այս տեքստը։ Գրիր կոնկրետ՝ ինչն է սխալ և ինչպես ուղղել։',
       ],
     },
     deals: {

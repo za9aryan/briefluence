@@ -25,6 +25,7 @@
   "notifications": "Ծանուցումներ",
   "admin": {
     "verifications": "Ստուգումներ",
+    "briefReview": "Բրիֆների ստուգում",
     "deals": "Բրիֆներ",
     "users": "Օգտատերեր",
     "payments": "Վճարումներ"

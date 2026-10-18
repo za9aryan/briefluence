@@ -25,7 +25,21 @@ export function forBlogger<D extends { isConfidential: boolean; brandId?: string
   deal: D,
   brand: B,
   status: ApplicationStatus | null | undefined,
-): { deal: D; brand: B | typeof HIDDEN_BRAND } {
-  if (!deal.isConfidential || brandRevealed(status)) return { deal, brand };
-  return { deal: { ...deal, brandId: null }, brand: HIDDEN_BRAND };
+): { deal: Omit<D, ModerationField>; brand: B | typeof HIDDEN_BRAND } {
+  const visible = withoutModeration(deal);
+  if (!deal.isConfidential || brandRevealed(status)) return { deal: visible, brand };
+  return { deal: { ...visible, brandId: null }, brand: HIDDEN_BRAND };
+}
+
+/** Admin review data (the reason a brief was sent back, the approval fingerprint) is for the brand and admins only. */
+type ModerationField = 'approvedKey' | 'reviewNote' | 'reviewedAt' | 'submittedAt';
+export function withoutModeration<D extends object>(deal: D): Omit<D, ModerationField> {
+  const {
+    approvedKey: _k,
+    reviewNote: _n,
+    reviewedAt: _r,
+    submittedAt: _s,
+    ...rest
+  } = deal as D & Record<ModerationField, unknown>;
+  return rest;
 }

@@ -39,7 +39,15 @@ export const CONTENT_FORMATS = values(
 );
 export type ContentFormat = (typeof CONTENT_FORMATS)[number];
 
-export const DEAL_STATUSES = values('DRAFT', 'ACTIVE', 'PAUSED', 'CLOSED', 'EXPIRED');
+export const DEAL_STATUSES = values(
+  'DRAFT',
+  'IN_REVIEW',
+  'REJECTED',
+  'ACTIVE',
+  'PAUSED',
+  'CLOSED',
+  'EXPIRED',
+);
 export type DealStatus = (typeof DEAL_STATUSES)[number];
 
 export const APPLICATION_STATUSES = values(
@@ -87,6 +95,9 @@ export const NOTIFICATION_TYPES = values(
   'SUBSCRIPTION_EXPIRED',
   'SOCIAL_TOKEN_REVOKED',
   'POST_SUBMITTED',
+  'DEAL_REVIEW_PENDING',
+  'DEAL_APPROVED',
+  'DEAL_REJECTED',
 );
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 

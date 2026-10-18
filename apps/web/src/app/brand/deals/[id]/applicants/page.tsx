@@ -1,6 +1,20 @@
 'use client';
-import type { ApplicationStatus } from '@briefluence/shared';
-import { Alert, Button, EmptyState, Inline, Modal, Progress, Select, Skeleton, Stack, Text, buttonStyles, useToast } from '@briefluence/ui';
+import { isDealEditable, type ApplicationStatus } from '@briefluence/shared';
+import { DealReviewNotice, PUBLISH_LABEL } from '@/components/brand/DealReviewNotice';
+import {
+  Alert,
+  Button,
+  EmptyState,
+  Inline,
+  Modal,
+  Progress,
+  Select,
+  Skeleton,
+  Stack,
+  Text,
+  buttonStyles,
+  useToast,
+} from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -14,7 +28,14 @@ import { useErrorMessage } from '@/lib/hooks/errors';
 import type { ApplicantsDto } from '@/lib/types';
 import { useDealActions } from '@/components/brand/useDealActions';
 
-const FILTERS: ('' | ApplicationStatus)[] = ['', 'VIEWED', 'SHORTLISTED', 'ACCEPTED', 'REJECTED', 'COMPLETED'];
+const FILTERS: ('' | ApplicationStatus)[] = [
+  '',
+  'VIEWED',
+  'SHORTLISTED',
+  'ACCEPTED',
+  'REJECTED',
+  'COMPLETED',
+];
 
 export default function ApplicantsPage() {
   const { id } = useParams<{ id: string }>();
@@ -33,11 +54,19 @@ export default function ApplicantsPage() {
 
   const data = useQuery({
     queryKey: ['applicants', id, sort, status],
-    queryFn: () => api.get<ApplicantsDto>(`/deals/${id}/applications`, { sort, status: status || undefined }),
+    queryFn: () =>
+      api.get<ApplicantsDto>(`/deals/${id}/applications`, { sort, status: status || undefined }),
   });
   const update = useMutation({
-    mutationFn: ({ appId, action, confirmOverSlots }: { appId: string; action: ApplicantAction; confirmOverSlots?: boolean }) =>
-      api.patch(`/applications/${appId}/status`, { ...action, confirmOverSlots }),
+    mutationFn: ({
+      appId,
+      action,
+      confirmOverSlots,
+    }: {
+      appId: string;
+      action: ApplicantAction;
+      confirmOverSlots?: boolean;
+    }) => api.patch(`/applications/${appId}/status`, { ...action, confirmOverSlots }),
     onSuccess: (_, { action }) => {
       void qc.invalidateQueries({ queryKey: ['applicants', id] });
       void qc.invalidateQueries({ queryKey: ['deals'] });
@@ -59,23 +88,34 @@ export default function ApplicantsPage() {
           d && (
             <Inline gap={2} wrap>
               <DealStatusBadge status={d.status} />
-              {(d.status === 'DRAFT' || d.status === 'PAUSED') && (
-                <Link href={`/brand/deals/${id}/edit`} className={buttonStyles({ variant: 'secondary', size: 'sm' })}>
+              {isDealEditable(d.status) && (
+                <Link
+                  href={`/brand/deals/${id}/edit`}
+                  className={buttonStyles({ variant: 'secondary', size: 'sm' })}
+                >
                   {tc('edit')}
                 </Link>
               )}
               {d.status === 'ACTIVE' && (
-                <Button size="sm" variant="secondary" onClick={() => act.mutate({ id, action: 'pause' })}>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => act.mutate({ id, action: 'pause' })}
+                >
                   {tf('pause')}
                 </Button>
               )}
-              {d.status === 'PAUSED' && (
+              {['DRAFT', 'PAUSED', 'REJECTED'].includes(d.status) && (
                 <Button size="sm" onClick={() => act.mutate({ id, action: 'publish' })}>
-                  {tf('resume')}
+                  {tf(PUBLISH_LABEL[d.status] ?? 'resume')}
                 </Button>
               )}
-              {['ACTIVE', 'PAUSED'].includes(d.status) && (
-                <Button size="sm" variant="ghost" onClick={() => act.mutate({ id, action: 'close' })}>
+              {['ACTIVE', 'PAUSED', 'IN_REVIEW', 'REJECTED'].includes(d.status) && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => act.mutate({ id, action: 'close' })}
+                >
                   {tf('close')}
                 </Button>
               )}
@@ -83,6 +123,7 @@ export default function ApplicantsPage() {
           )
         }
       />
+      {d && <DealReviewNotice deal={d} withFixLink={false} />}
       {d && (
         <div>
           <Inline justify="between">
@@ -93,20 +134,34 @@ export default function ApplicantsPage() {
               {tf('viewsCount', { count: d.viewCount })} · {t('total', { count: data.data!.total })}
             </Text>
           </Inline>
-          <Progress value={(d.filled / Math.max(1, d.slots)) * 100} label={t('slots', { filled: d.filled, slots: d.slots })} className="mt-2" />
+          <Progress
+            value={(d.filled / Math.max(1, d.slots)) * 100}
+            label={t('slots', { filled: d.filled, slots: d.slots })}
+            className="mt-2"
+          />
         </div>
       )}
       {d?.status === 'DRAFT' && <Alert tone="info">{t('draftNote')}</Alert>}
 
       <Inline gap={2} wrap>
-        <Select aria-label={t('filter')} value={status} onChange={(e) => setStatus(e.target.value as '' | ApplicationStatus)} className="w-auto">
+        <Select
+          aria-label={t('filter')}
+          value={status}
+          onChange={(e) => setStatus(e.target.value as '' | ApplicationStatus)}
+          className="w-auto"
+        >
           {FILTERS.map((s) => (
             <option key={s} value={s}>
               {s ? ts(s) : t('allStatuses')}
             </option>
           ))}
         </Select>
-        <Select aria-label={t('sort')} value={sort} onChange={(e) => setSort(e.target.value as typeof sort)} className="w-auto">
+        <Select
+          aria-label={t('sort')}
+          value={sort}
+          onChange={(e) => setSort(e.target.value as typeof sort)}
+          className="w-auto"
+        >
           <option value="match">{t('sortMatch')}</option>
           <option value="followers">{t('sortFollowers')}</option>
           <option value="newest">{t('sortNewest')}</option>
@@ -116,7 +171,11 @@ export default function ApplicantsPage() {
       {data.isLoading ? (
         <Skeleton className="h-64 rounded-card" />
       ) : !data.data?.items.length ? (
-        <EmptyState icon="users" title={t('emptyTitle')} description={d?.status === 'ACTIVE' ? t('emptyBody') : undefined} />
+        <EmptyState
+          icon="users"
+          title={t('emptyTitle')}
+          description={d?.status === 'ACTIVE' ? t('emptyBody') : undefined}
+        />
       ) : (
         <Stack gap={4}>
           {data.data.items.map((a) => (
@@ -144,7 +203,12 @@ export default function ApplicantsPage() {
             </Button>
             <Button
               onClick={() => {
-                if (overSlots) update.mutate({ appId: overSlots.id, action: { status: 'ACCEPTED' }, confirmOverSlots: true });
+                if (overSlots)
+                  update.mutate({
+                    appId: overSlots.id,
+                    action: { status: 'ACCEPTED' },
+                    confirmOverSlots: true,
+                  });
                 setOverSlots(null);
               }}
             >

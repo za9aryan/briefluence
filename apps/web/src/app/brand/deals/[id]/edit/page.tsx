@@ -1,6 +1,6 @@
 'use client';
 import { isDealEditable } from '@briefluence/shared';
-import { Alert, Button, Skeleton, Stack } from '@briefluence/ui';
+import { Alert, Button, Skeleton, Stack, useToast } from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
@@ -10,7 +10,8 @@ import { dealToFormValues, toDealInput } from '@/components/brand/deal-form-valu
 import { DealWizard } from '@/components/brand/DealWizard';
 import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
-import type { DealDetailDto } from '@/lib/types';
+import { DealReviewNotice } from '@/components/brand/DealReviewNotice';
+import type { DealDetailDto, DealDto } from '@/lib/types';
 
 export default function EditDealPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,9 +20,13 @@ export default function EditDealPage() {
   const router = useRouter();
   const qc = useQueryClient();
   const errorMessage = useErrorMessage();
+  const toast = useToast();
   const [submitting, setSubmitting] = useState<'draft' | 'publish' | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const deal = useQuery({ queryKey: ['deal', id], queryFn: () => api.get<DealDetailDto>(`/deals/${id}`) });
+  const deal = useQuery({
+    queryKey: ['deal', id],
+    queryFn: () => api.get<DealDetailDto>(`/deals/${id}`),
+  });
   const pause = useMutation({
     mutationFn: () => api.post(`/deals/${id}/pause`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['deal', id] }),
@@ -32,13 +37,23 @@ export default function EditDealPage() {
 
   return (
     <Stack gap={6}>
-      <PageHeader back={{ href: '/brand/deals', label: tn('deals') }} title={t('editTitle')} description={deal.data.title} />
+      <PageHeader
+        back={{ href: '/brand/deals', label: tn('deals') }}
+        title={t('editTitle')}
+        description={deal.data.title}
+      />
+      <DealReviewNotice deal={deal.data} withFixLink={false} />
       {!editable ? (
         <Alert
           tone="warning"
           action={
             deal.data.status === 'ACTIVE' ? (
-              <Button size="sm" variant="secondary" loading={pause.isPending} onClick={() => pause.mutate()}>
+              <Button
+                size="sm"
+                variant="secondary"
+                loading={pause.isPending}
+                onClick={() => pause.mutate()}
+              >
                 {t('pauseToEdit')}
               </Button>
             ) : undefined
@@ -57,7 +72,10 @@ export default function EditDealPage() {
             setError(null);
             try {
               await api.patch(`/deals/${id}`, toDealInput(values));
-              if (publish) await api.post(`/deals/${id}/publish`);
+              if (publish) {
+                const sent = await api.post<DealDto>(`/deals/${id}/publish`);
+                toast(sent.status === 'IN_REVIEW' ? t('toast.sentForReview') : t('toast.publish'));
+              }
               await qc.invalidateQueries({ queryKey: ['deals'] });
               await qc.invalidateQueries({ queryKey: ['deal', id] });
               router.push(publish ? `/brand/deals/${id}/applicants` : '/brand/deals');

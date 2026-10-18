@@ -115,6 +115,8 @@ export interface DealDto {
   status: DealStatus;
   publishedAt: string | null;
   createdAt: string;
+  /** Brand + admin only: why the admin sent the brief back. */
+  reviewNote?: string | null;
 }
 
 export interface FeedDealDto extends DealDto {
@@ -129,7 +131,13 @@ export interface DealDetailDto extends DealDto {
   applicantCount: number;
   filled: number;
   matchScore?: number;
-  eligibleAccounts?: { id: string; platform: Platform; username: string; followers: number; score: number | null }[];
+  eligibleAccounts?: {
+    id: string;
+    platform: Platform;
+    username: string;
+    followers: number;
+    score: number | null;
+  }[];
   myApplication?: ApplicationDto | null;
 }
 
@@ -155,9 +163,26 @@ export interface ApplicationDto {
 export interface MyApplicationDto extends ApplicationDto {
   deal: Pick<
     DealDto,
-    'id' | 'title' | 'status' | 'platforms' | 'paymentType' | 'budgetMin' | 'budgetMax' | 'currency' | 'barterDescription' | 'applicationDeadline' | 'publishBy' | 'collaborationType' | 'isConfidential'
+    | 'id'
+    | 'title'
+    | 'status'
+    | 'platforms'
+    | 'paymentType'
+    | 'budgetMin'
+    | 'budgetMax'
+    | 'currency'
+    | 'barterDescription'
+    | 'applicationDeadline'
+    | 'publishBy'
+    | 'collaborationType'
+    | 'isConfidential'
   > & { brand: BrandCardDto };
-  brandContact: { name: string | null; position: string | null; method: ContactMethod | null; value: string | null } | null;
+  brandContact: {
+    name: string | null;
+    position: string | null;
+    method: ContactMethod | null;
+    value: string | null;
+  } | null;
 }
 
 export interface ApplicantDto {
@@ -169,7 +194,15 @@ export interface ApplicantDto {
   rejectionReason: string | null;
   postUrl: string | null;
   createdAt: string;
-  influencer: { id: string; displayName: string; avatarUrl: string | null; city: string | null; country: string; niches: string[]; verified: boolean };
+  influencer: {
+    id: string;
+    displayName: string;
+    avatarUrl: string | null;
+    city: string | null;
+    country: string;
+    niches: string[];
+    verified: boolean;
+  };
   /** Account the match score was computed for. */
   matchedAccountId: string;
   /** All connected accounts, largest first. */
@@ -178,7 +211,17 @@ export interface ApplicantDto {
 }
 
 export interface ApplicantsDto {
-  deal: { id: string; title: string; status: DealStatus; slots: number; filled: number; currency: Currency; viewCount: number; isConfidential: boolean };
+  deal: {
+    id: string;
+    title: string;
+    status: DealStatus;
+    slots: number;
+    filled: number;
+    currency: Currency;
+    viewCount: number;
+    reviewNote?: string | null;
+    isConfidential: boolean;
+  };
   items: ApplicantDto[];
   total: number;
   page: number;
