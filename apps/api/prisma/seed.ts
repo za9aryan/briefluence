@@ -16,7 +16,7 @@ import {
   dealReviewKey,
   NICHES,
   matchScore,
-  startTrial,
+  startPlan,
   addDays,
   type ContentFormat,
   type Platform,
@@ -174,7 +174,7 @@ async function main() {
     const firstName = faker.person.firstName(gender === 'MALE' ? 'male' : 'female');
     const platforms = pickSome<Platform>(['INSTAGRAM', 'TIKTOK', 'YOUTUBE'], 1, 2);
     if (i === 1 && !platforms.includes('INSTAGRAM')) platforms.unshift('INSTAGRAM');
-    const trial = startTrial(addDays(now, -faker.number.int({ min: 0, max: 20 })));
+    const trial = startPlan(addDays(now, -faker.number.int({ min: 0, max: 20 })), 'BASIC');
     const user = await prisma.user.create({
       data: {
         email: `influencer${i}@briefluence.local`,

@@ -12,6 +12,7 @@ const params = {
   slots: 2,
   days: 3,
   amount: 999,
+  limit: 10,
   currency: 'USD',
   date: '2026-11-15T09:00:00Z',
   until: '2026-11-15T09:00:00Z',
@@ -34,10 +35,22 @@ describe('renderNotification', () => {
     });
   }
   it('uses plural forms and formats money and dates per language', () => {
-    expect(renderNotification('NEW_MATCHING_DEALS', { count: 1, list: '' }, 'en')!.title).toBe('1 new brief matches you');
-    expect(renderNotification('NEW_MATCHING_DEALS', { count: 5, list: '' }, 'ru')!.title).toBe('Тебе подходят 5 новых брифов');
-    expect(renderNotification('PAYMENT_SUCCEEDED', { amount: 999, currency: 'USD', until: '2026-11-15T09:00:00Z' }, 'en')!.body).toContain('$9.99');
-    expect(renderNotification('APPLICATION_REJECTED', { deal: 'X', reason: 'NICHE' }, 'hy')!.body).toContain('նիշան');
+    expect(renderNotification('NEW_MATCHING_DEALS', { count: 1, list: '' }, 'en')!.title).toBe(
+      '1 new brief matches you',
+    );
+    expect(renderNotification('NEW_MATCHING_DEALS', { count: 5, list: '' }, 'ru')!.title).toBe(
+      'Тебе подходят 5 новых брифов',
+    );
+    expect(
+      renderNotification(
+        'PAYMENT_SUCCEEDED',
+        { amount: 999, currency: 'USD', until: '2026-11-15T09:00:00Z' },
+        'en',
+      )!.body,
+    ).toContain('$9.99');
+    expect(
+      renderNotification('APPLICATION_REJECTED', { deal: 'X', reason: 'NICHE' }, 'hy')!.body,
+    ).toContain('նիշան');
   });
   it('returns null for unknown types', () => {
     expect(renderNotification('SOMETHING_ELSE', {}, 'en')).toBeNull();

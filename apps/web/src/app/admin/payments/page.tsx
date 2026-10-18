@@ -1,10 +1,23 @@
 'use client';
-import type { Currency, PaymentStatus, SubscriptionStatus } from '@briefluence/shared';
-import { EmptyState, Grid, Skeleton, Stack, Stat, TBody, TD, TH, THead, TR, Table, Text } from '@briefluence/ui';
+import type { Currency, PaymentStatus, SubscriptionStatus, PlanCode } from '@briefluence/shared';
+import {
+  EmptyState,
+  Grid,
+  Skeleton,
+  Stack,
+  Stat,
+  TBody,
+  TD,
+  TH,
+  THead,
+  TR,
+  Table,
+  Text,
+} from '@briefluence/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { PageHeader } from '@/components/app/AppShell';
-import { PaymentStatusBadge, SubscriptionBadge } from '@/components/domain/badges';
+import { PaymentStatusBadge, PlanBadge } from '@/components/domain/badges';
 import { api } from '@/lib/api';
 import { useFormat } from '@/lib/hooks/format';
 
@@ -19,7 +32,13 @@ interface PaymentsDto {
     providerOrderId: string;
     failureReason: string | null;
     createdAt: string;
-    subscription: { status: SubscriptionStatus; user: { id: string; email: string } };
+    planCode: PlanCode | null;
+    subscription: {
+      status: SubscriptionStatus;
+      planCode: PlanCode;
+      trialEndsAt: string;
+      user: { id: string; email: string };
+    };
   }[];
   totals: { currency: Currency; amount: number }[];
 }
@@ -28,14 +47,22 @@ export default function AdminPaymentsPage() {
   const t = useTranslations('admin.payments');
   const tb = useTranslations('billing');
   const f = useFormat();
-  const q = useQuery({ queryKey: ['admin', 'payments'], queryFn: () => api.get<PaymentsDto>('/admin/payments') });
+  const q = useQuery({
+    queryKey: ['admin', 'payments'],
+    queryFn: () => api.get<PaymentsDto>('/admin/payments'),
+  });
   return (
     <Stack gap={6}>
       <PageHeader title={t('title')} />
       {q.data && (
         <Grid cols={{ base: 1, sm: 3 }} gap={4}>
           {q.data.totals.map((x) => (
-            <Stat key={x.currency} label={t('collected', { currency: x.currency })} value={f.money(x.amount, x.currency)} icon="wallet" />
+            <Stat
+              key={x.currency}
+              label={t('collected', { currency: x.currency })}
+              value={f.money(x.amount, x.currency)}
+              icon="wallet"
+            />
           ))}
           <Stat label={t('count')} value={f.number(q.data.items.length)} icon="card" />
         </Grid>
@@ -73,7 +100,7 @@ export default function AdminPaymentsPage() {
                   )}
                 </TD>
                 <TD>
-                  <SubscriptionBadge status={p.subscription.status} />
+                  <PlanBadge {...p.subscription} />
                 </TD>
                 <TD className="tabular-nums text-ink-muted">
                   {p.provider} #{p.providerOrderId}

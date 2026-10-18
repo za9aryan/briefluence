@@ -1,9 +1,16 @@
 import { Body, Controller, Delete, Get, HttpCode, Inject, Post, Query, Res } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import {
+  checkoutSchema,
+  choosePlanSchema,
+  type CheckoutInput,
+  type ChoosePlanInput,
+} from '@briefluence/shared';
 import type { Response } from 'express';
 import { AppError } from '../../common/app-error';
 import type { AuthUser } from '../../common/auth-user';
 import { CurrentUser, Public, Roles } from '../../common/decorators';
+import { ApiZodBody, ZodBody } from '../../common/zod';
 import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { BillingService } from './billing.service';
@@ -25,19 +32,22 @@ export class BillingController {
     return this.billing.getForUser(user.id);
   }
 
-  /** Blogger confirms the free month (it is not started automatically). */
+  /** Blogger chooses a plan (Basic or Pro); the free Pro days start now. Not automatic. */
   @Roles('INFLUENCER')
-  @Post('trial')
+  @Post('plan')
   @HttpCode(200)
-  trial(@CurrentUser() user: AuthUser) {
-    return this.billing.startTrial(user.id);
+  @ApiZodBody(choosePlanSchema)
+  choosePlan(@CurrentUser() user: AuthUser, @ZodBody(choosePlanSchema) body: ChoosePlanInput) {
+    return this.billing.choosePlan(user.id, body.plan);
   }
 
+  /** Pays for a Pro plan (monthly or yearly) on the bank page. */
   @Roles('INFLUENCER')
   @Post('checkout')
   @HttpCode(200)
-  checkout(@CurrentUser() user: AuthUser) {
-    return this.billing.checkout(user.id);
+  @ApiZodBody(checkoutSchema)
+  checkout(@CurrentUser() user: AuthUser, @ZodBody(checkoutSchema) body: CheckoutInput) {
+    return this.billing.checkout(user.id, body.plan);
   }
 
   /** Bank redirect target. Public because the access cookie may expire while the user is on the bank page. */
@@ -86,8 +96,10 @@ export class BillingController {
   @Post('mock/complete')
   @HttpCode(200)
   mockComplete(@Body() body: { paymentID?: string; card?: MockCard }) {
-    if (!(this.provider instanceof MockPaymentProvider)) throw new AppError('NOT_FOUND', 'Not found');
-    const card: MockCard = body.card === 'decline' || body.card === 'renewal_decline' ? body.card : 'success';
+    if (!(this.provider instanceof MockPaymentProvider))
+      throw new AppError('NOT_FOUND', 'Not found');
+    const card: MockCard =
+      body.card === 'decline' || body.card === 'renewal_decline' ? body.card : 'success';
     const next = body.paymentID ? this.provider.complete(body.paymentID, card) : null;
     if (!next) throw new AppError('NOT_FOUND', 'Unknown payment');
     return { redirectUrl: next };

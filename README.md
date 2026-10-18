@@ -70,6 +70,16 @@ and their content fine for brands. Accounts present at the first profile review 
 accounts added later go to **Admin → Accounts**. Until approved, an account is not used for matching, applying
 or shown to brands. Changing a manual account's platform or username, or fixing a rejected one, sends it back.
 
+## Blogger plans
+
+- **Basic**: free, a limited number of applications per rolling 30 days (default 10).
+- **Pro** (monthly) and **Pro yearly**: unlimited applications.
+
+Every blogger picks a plan and first gets **30 days of Pro for free**. Choosing Pro opens the bank page right away;
+the paid period starts when the free days end. Without payment (or after a cancelled / failed renewal) the blogger
+moves to Basic — nobody loses access. Prices, currency, Basic's limit and which Pro plans are offered are edited in
+**Admin → Plans**. Prices are never shown on public pages.
+
 ## Re-registration warning
 
 Every link of a social account to a profile is kept in `SocialAccountLink` (also after the account or user is

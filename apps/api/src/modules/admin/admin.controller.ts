@@ -6,12 +6,17 @@ import {
   HttpCode,
   Inject,
   Param,
+  Patch,
   Post,
   Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import {
   ACCOUNT_REVIEW_STATUSES,
+  PLAN_CODES,
+  planUpdateSchema,
+  type PlanCode,
+  type PlanUpdateInput,
   DEAL_STATUSES,
   ROLES,
   VERIFICATION_STATUSES,
@@ -22,12 +27,14 @@ import {
   type VerificationDecisionInput,
   type VerificationStatus,
 } from '@briefluence/shared';
+import { AppError } from '../../common/app-error';
 import { Clock } from '../../common/clock';
 import { Roles } from '../../common/decorators';
 import { ApiZodBody, ZodBody } from '../../common/zod';
 import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { JobsService, type JobName } from '../jobs/jobs.service';
+import { PlansService } from '../billing/plans.service';
 import { AdminService, USER_STATES } from './admin.service';
 import {
   ANALYTICS_PERIODS,
@@ -45,6 +52,7 @@ export class AdminController {
   constructor(
     private readonly admin: AdminService,
     private readonly analyticsService: AdminAnalyticsService,
+    private readonly plansService: PlansService,
     private readonly jobs: JobsService,
     private readonly clock: Clock,
     @Inject(ENV) private readonly env: Env,
@@ -55,6 +63,20 @@ export class AdminController {
   analytics(@Query('days') days?: string) {
     const d = Number(days) as AnalyticsPeriod;
     return this.analyticsService.overview(ANALYTICS_PERIODS.includes(d) ? d : 30);
+  }
+
+  /** Blogger plans: prices, currency, Basic's application limit, on/off. */
+  @Get('plans')
+  plans() {
+    return this.plansService.all();
+  }
+
+  @Patch('plans/:code')
+  @ApiZodBody(planUpdateSchema)
+  updatePlan(@Param('code') code: string, @ZodBody(planUpdateSchema) body: PlanUpdateInput) {
+    const plan = pick<PlanCode>(PLAN_CODES, code);
+    if (!plan) throw new AppError('NOT_FOUND', 'Plan not found');
+    return this.plansService.update(plan, body);
   }
 
   @Get('stats')

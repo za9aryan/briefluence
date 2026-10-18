@@ -1,5 +1,11 @@
 'use client';
-import type { Currency, Role, SubscriptionStatus, VerificationStatus } from '@briefluence/shared';
+import type {
+  Currency,
+  Role,
+  SubscriptionStatus,
+  VerificationStatus,
+  PlanCode,
+} from '@briefluence/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { api, ApiError } from '../api';
@@ -24,6 +30,9 @@ export interface Me {
   brand: { id: string; companyName: string; logoUrl: string | null } | null;
   subscription: {
     status: SubscriptionStatus;
+    planCode: PlanCode;
+    tier: 'BASIC' | 'PRO';
+    inFreeDays: boolean;
     trialEndsAt: string;
     currentPeriodEnd: string | null;
     cancelAtPeriodEnd: boolean;

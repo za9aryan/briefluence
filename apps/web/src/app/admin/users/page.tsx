@@ -4,6 +4,7 @@ import {
   type Role,
   type SubscriptionStatus,
   type VerificationStatus,
+  type PlanCode,
 } from '@briefluence/shared';
 import {
   Badge,
@@ -32,7 +33,7 @@ import { useState } from 'react';
 import type { IconName } from '@briefluence/ui';
 import { PageHeader } from '@/components/app/AppShell';
 import { ReuseBadge } from '@/components/admin/AccountReuse';
-import { SubscriptionBadge, VerificationBadge } from '@/components/domain/badges';
+import { PlanBadge, VerificationBadge } from '@/components/domain/badges';
 import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { useFormat } from '@/lib/hooks/format';
@@ -46,7 +47,7 @@ interface UserRow {
   createdAt: string;
   influencer: { id: string; displayName: string; status: VerificationStatus } | null;
   brand: { id: string; companyName: string } | null;
-  subscription: { status: SubscriptionStatus } | null;
+  subscription: { status: SubscriptionStatus; planCode: PlanCode; trialEndsAt: string } | null;
   /** Accounts of this user with an open re-registration warning. */
   reuseWarnings: string[];
 }
@@ -174,7 +175,7 @@ export default function AdminUsersPage() {
                     <ReuseBadge accountIds={u.reuseWarnings} />
                     {!u.emailVerifiedAt && <Badge>{t('emailPending')}</Badge>}
                     {u.influencer && <VerificationBadge status={u.influencer.status} />}
-                    {u.subscription && <SubscriptionBadge status={u.subscription.status} />}
+                    {u.subscription && <PlanBadge {...u.subscription} />}
                   </Inline>
                 </TD>
                 <TD>{f.date(u.createdAt)}</TD>

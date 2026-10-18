@@ -8,6 +8,8 @@ import {
   type NotificationSettingsInput,
   type ResetPasswordInput,
   type SignupInput,
+  effectiveTier,
+  inFreeDays,
 } from '@briefluence/shared';
 import type { User } from '@prisma/client';
 import * as argon2 from 'argon2';
@@ -17,6 +19,7 @@ import type { AccessTokenPayload } from '../../common/auth-user';
 import { Clock } from '../../common/clock';
 import { CryptoService } from '../../common/crypto.service';
 import { PrismaService } from '../../common/prisma.service';
+import { toState } from '../billing/billing.service';
 import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { EmailService } from '../notifications/email.service';
@@ -294,6 +297,9 @@ export class AuthService {
             trialEndsAt: sub.trialEndsAt,
             currentPeriodEnd: sub.currentPeriodEnd,
             cancelAtPeriodEnd: sub.cancelAtPeriodEnd,
+            planCode: sub.planCode,
+            tier: effectiveTier(toState(sub), now),
+            inFreeDays: inFreeDays(toState(sub), now),
             trialDaysLeft: trialDaysLeft(sub, now),
             hasAccess: hasAccess(sub, now),
           }

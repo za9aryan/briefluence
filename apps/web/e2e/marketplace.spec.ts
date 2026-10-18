@@ -52,11 +52,13 @@ test('sign-up → verify → apply → accept → done', async ({ browser }) => 
   await blogger.getByLabel('Phone number').fill('+374 91 123456');
   await blogger.getByRole('button', { name: 'Save and continue' }).click();
   await blogger.waitForURL('**/influencer/verification');
-  // The free month is opt-in: briefs stay locked until the blogger starts it.
+  // A plan is chosen on purpose: briefs stay locked until the blogger picks one.
   await blogger.goto('/influencer/deals');
   await expect(blogger.getByText('Two steps to see briefs')).toBeVisible();
-  await blogger.getByRole('button', { name: 'Start 30 free days' }).click();
-  await expect(blogger.getByText('Your 30 free days have started')).toBeVisible();
+  await blogger.getByRole('link', { name: 'See plans' }).click();
+  await blogger.waitForURL('**/influencer/billing');
+  await blogger.getByRole('button', { name: 'Start with Basic' }).click();
+  await expect(blogger.getByText('Your 30 free Pro days have started')).toBeVisible();
   await verifyEmailViaLink(blogger, bloggerEmail);
   await blogger.goto('/influencer/verification');
   await blogger.getByRole('link', { name: 'Connect Instagram' }).click();

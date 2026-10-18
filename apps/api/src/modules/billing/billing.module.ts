@@ -3,6 +3,7 @@ import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { BillingController } from './billing.controller';
 import { BillingService } from './billing.service';
+import { PlansService } from './plans.service';
 import { AmeriaProvider } from './providers/ameria.provider';
 import { MockPaymentProvider } from './providers/mock.provider';
 import { PAYMENT_PROVIDER } from './providers/types';
@@ -11,12 +12,16 @@ import { PAYMENT_PROVIDER } from './providers/types';
   controllers: [BillingController],
   providers: [
     BillingService,
+    PlansService,
     {
       provide: PAYMENT_PROVIDER,
       inject: [ENV],
-      useFactory: (env: Env) => (env.PAYMENT_PROVIDER === 'ameriabank' ? new AmeriaProvider(env) : new MockPaymentProvider(env)),
+      useFactory: (env: Env) =>
+        env.PAYMENT_PROVIDER === 'ameriabank'
+          ? new AmeriaProvider(env)
+          : new MockPaymentProvider(env),
     },
   ],
-  exports: [BillingService, PAYMENT_PROVIDER],
+  exports: [BillingService, PlansService, PAYMENT_PROVIDER],
 })
 export class BillingModule {}

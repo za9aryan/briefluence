@@ -19,7 +19,11 @@ test.use({
   },
 });
 
-test('trial → pay → renew with the saved card', async ({ page, playwright, baseURL }) => {
+test('free Pro days → Basic → upgrade to Pro → renew with the saved card', async ({
+  page,
+  playwright,
+  baseURL,
+}) => {
   const id = uid();
   const email = `trial-${id}@e2e.test`;
   const adminCtx = await playwright.request.newContext({ baseURL });
@@ -32,23 +36,27 @@ test('trial → pay → renew with the saved card', async ({ page, playwright, b
     await page.getByRole('button', { name: 'Save and continue' }).click();
     await page.waitForURL('**/influencer/verification');
 
+    // Prices are only shown once signed in; every plan starts with free Pro days.
     await page.goto('/influencer/billing');
-    await page.getByRole('button', { name: 'Start my 30 free days' }).click();
-    await expect(page.getByText('Your 30 free days have started')).toBeVisible();
-    await expect(page.getByText(/Free period: 30 days left/)).toBeVisible();
+    await expect(page.getByText('Choose your plan')).toBeVisible();
+    await page.getByRole('button', { name: 'Start with Basic' }).click();
+    await expect(page.getByText('Your 30 free Pro days have started')).toBeVisible();
+    await expect(page.getByText(/Pro for free: 30 days left/)).toBeVisible();
+    await expect(page.getByText('After that: Basic.')).toBeVisible();
 
-    // Trial runs out.
+    // Free days run out: the blogger is on Basic with its application limit.
     await admin.advanceDays(31);
     await admin.runJob('billing-daily');
     await page.reload();
-    await expect(page.getByText('Your plan is not active.')).toBeVisible();
+    await expect(page.getByText('0 of 10 applications used in the last 30 days.')).toBeVisible();
+    await expect(page.getByText('Upgrade to Pro')).toBeVisible();
 
-    // Pay through the (mock) bank page.
-    await page.getByRole('button', { name: /Subscribe again for/ }).click();
+    // Upgrade to Pro through the (mock) bank page.
+    await page.getByRole('button', { name: 'Choose Pro', exact: true }).click();
     await page.waitForURL('**/billing/mock-checkout**');
     await page.getByRole('button', { name: 'Pay' }).click();
     await page.waitForURL('**/influencer/billing**');
-    await expect(page.getByText('Payment received. Your plan is active.')).toBeVisible();
+    await expect(page.getByText('Payment received. Pro is on.')).toBeVisible();
     await expect(page.getByText(/Renews on/)).toBeVisible();
 
     // A month later the daily job charges the saved card.

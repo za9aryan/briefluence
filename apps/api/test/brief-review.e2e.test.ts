@@ -28,7 +28,7 @@ describe('brief review (e2e)', () => {
     const admin = await createAdmin(ctx);
     const inf = await signup(ctx, 'INFLUENCER');
     await inf.agent.put(`${API}/influencers/me`).send(influencerProfile).expect(200);
-    await inf.agent.post(`${API}/billing/trial`).expect(200);
+    await inf.agent.post(`${API}/billing/plan`).send({ plan: 'BASIC' }).expect(200);
     await connectMock(ctx, inf.agent, 'instagram');
     await inf.agent.post(`${API}/influencers/me/submit`).expect(200);
     const queue = await admin.agent.get(`${API}/admin/verifications`).expect(200);

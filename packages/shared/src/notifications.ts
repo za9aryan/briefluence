@@ -362,19 +362,19 @@ const CATALOG: Record<NotificationType, { cta: L3; render: Record<NotificationLo
       },
     },
     TRIAL_ENDING: {
-      cta: { en: 'Subscribe', ru: 'Оформить подписку', hy: 'Բաժանորդագրվել' },
+      cta: { en: 'Choose Pro', ru: 'Выбрать Pro', hy: 'Ընտրել Pro' },
       render: {
         en: (p, h) => ({
-          title: `Your free period ends in ${h.plural(Number(p.days), { one: '# day', other: '# days' })}`,
-          body: `Subscribe for ${h.money(p.amount, p.currency)}/month to keep applying after ${h.date(p.date)}.`,
+          title: `Your free Pro days end in ${h.plural(Number(p.days), { one: '# day', other: '# days' })}`,
+          body: `After ${h.date(p.date)} you move to the free Basic plan. Choose Pro for ${h.money(p.amount, p.currency)}/month to keep unlimited applications.`,
         }),
         ru: (p, h) => ({
-          title: `Бесплатный период закончится через ${h.plural(Number(p.days), { one: '# день', few: '# дня', many: '# дней', other: '# дня' })}`,
-          body: `Оформи подписку за ${h.money(p.amount, p.currency)} в месяц, чтобы откликаться и после ${h.date(p.date)}.`,
+          title: `Бесплатные дни Pro закончатся через ${h.plural(Number(p.days), { one: '# день', few: '# дня', many: '# дней', other: '# дня' })}`,
+          body: `После ${h.date(p.date)} ты перейдёшь на бесплатный тариф Basic. Выбери Pro за ${h.money(p.amount, p.currency)} в месяц, чтобы откликаться без ограничений.`,
         }),
         hy: (p, h) => ({
-          title: `Անվճար ժամկետն ավարտվում է ${s(p.days)} օրից`,
-          body: `Բաժանորդագրվիր ամսական ${h.money(p.amount, p.currency)}-ով, որ շարունակես դիմել ${h.date(p.date)}-ից հետո։`,
+          title: `Pro-ի անվճար օրերն ավարտվում են ${s(p.days)} օրից`,
+          body: `${h.date(p.date)}-ից հետո կանցնես անվճար Basic փաթեթին։ Ընտրիր Pro ամսական ${h.money(p.amount, p.currency)}-ով՝ առանց սահմանափակման դիմելու համար։`,
         }),
       },
     },
@@ -419,21 +419,19 @@ const CATALOG: Record<NotificationType, { cta: L3; render: Record<NotificationLo
       },
     },
     SUBSCRIPTION_EXPIRED: {
-      cta: { en: 'Resubscribe', ru: 'Подписаться снова', hy: 'Կրկին բաժանորդագրվել' },
+      cta: { en: 'Choose Pro', ru: 'Выбрать Pro', hy: 'Ընտրել Pro' },
       render: {
         en: (p, h) => ({
-          title:
-            p.reason === 'trial' ? 'Your 30 free days have ended' : 'Your subscription has ended',
-          body: `${p.reason === 'retries' ? 'We could not charge your card after several tries. ' : ''}You can still browse briefs. Subscribe for ${h.money(p.amount, p.currency)}/month to apply again.`,
+          title: p.reason === 'trial' ? 'Your free Pro days have ended' : 'Your Pro plan has ended',
+          body: `${p.reason === 'retries' ? 'We could not charge your card after several tries. ' : ''}You are on the free Basic plan now: ${s(p.limit)} applications per 30 days. Choose Pro for ${h.money(p.amount, p.currency)}/month for unlimited applications.`,
         }),
         ru: (p, h) => ({
-          title: p.reason === 'trial' ? '30 бесплатных дней закончились' : 'Подписка закончилась',
-          body: `${p.reason === 'retries' ? 'Не получилось списать оплату после нескольких попыток. ' : ''}Брифы можно смотреть и дальше. Оформи подписку за ${h.money(p.amount, p.currency)} в месяц, чтобы снова откликаться.`,
+          title: p.reason === 'trial' ? 'Бесплатные дни Pro закончились' : 'Тариф Pro закончился',
+          body: `${p.reason === 'retries' ? 'Не получилось списать оплату после нескольких попыток. ' : ''}Теперь у тебя бесплатный тариф Basic: ${s(p.limit)} откликов за 30 дней. Выбери Pro за ${h.money(p.amount, p.currency)} в месяц — откликайся без ограничений.`,
         }),
         hy: (p, h) => ({
-          title:
-            p.reason === 'trial' ? '30 անվճար օրն ավարտվել է' : 'Բաժանորդագրությունն ավարտվել է',
-          body: `${p.reason === 'retries' ? 'Մի քանի փորձից հետո չհաջողվեց գանձել քարտից։ ' : ''}Բրիֆները կարող ես շարունակել դիտել։ Բաժանորդագրվիր ամսական ${h.money(p.amount, p.currency)}-ով՝ կրկին դիմելու համար։`,
+          title: p.reason === 'trial' ? 'Pro-ի անվճար օրերն ավարտվել են' : 'Pro փաթեթն ավարտվել է',
+          body: `${p.reason === 'retries' ? 'Մի քանի փորձից հետո չհաջողվեց գանձել քարտից։ ' : ''}Այժմ դու անվճար Basic փաթեթում ես՝ ${s(p.limit)} դիմում 30 օրում։ Ընտրիր Pro ամսական ${h.money(p.amount, p.currency)}-ով՝ առանց սահմանափակման դիմելու համար։`,
         }),
       },
     },

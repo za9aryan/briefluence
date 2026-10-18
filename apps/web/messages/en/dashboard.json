@@ -25,7 +25,7 @@
     "accepted": "Accepted",
     "profileViews": "Profile views",
     "plan": "Plan",
-    "daysLeft": "{count, plural, one {# day free} other {# days free}}"
+    "daysLeft": "{count, plural, one {Pro · # day free} other {Pro · # days free}}"
   },
   "topMatches": "Best matches for you",
   "noMatchesTitle": "No matching briefs right now",

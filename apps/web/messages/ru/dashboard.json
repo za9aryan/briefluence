@@ -25,7 +25,7 @@
     "accepted": "Приняты",
     "profileViews": "Просмотры профиля",
     "plan": "Подписка",
-    "daysLeft": "{count, plural, one {# день бесплатно} few {# дня бесплатно} many {# дней бесплатно} other {# дня бесплатно}}"
+    "daysLeft": "{count, plural, one {Pro · # день бесплатно} few {Pro · # дня бесплатно} many {Pro · # дней бесплатно} other {Pro · # дня бесплатно}}"
   },
   "topMatches": "Лучшие совпадения",
   "noMatchesTitle": "Сейчас нет подходящих брифов",

@@ -105,8 +105,6 @@ export const envSchema = z
     PAYMENT_PROVIDER: z.enum(['mock', 'ameriabank']).default('mock'),
     /** Staging / early launch: allow simulated social login and payments with NODE_ENV=production. */
     ALLOW_MOCKS_IN_PRODUCTION: bool,
-    SUBSCRIPTION_PRICE_MINOR: z.coerce.number().int().positive().default(999),
-    SUBSCRIPTION_CURRENCY: z.enum(['AMD', 'USD']).default('USD'),
     AMERIA_TEST_MODE: z
       .enum(['true', 'false', '1', '0', ''])
       .default('true')

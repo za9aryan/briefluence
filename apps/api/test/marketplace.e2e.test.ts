@@ -29,7 +29,7 @@ describe('marketplace core loop (e2e)', () => {
   async function approvedInfluencer() {
     const inf = await signup(ctx, 'INFLUENCER');
     await inf.agent.put(`${API}/influencers/me`).send(influencerProfile).expect(200);
-    await inf.agent.post(`${API}/billing/trial`).expect(200);
+    await inf.agent.post(`${API}/billing/plan`).send({ plan: 'BASIC' }).expect(200);
     const back = await connectMock(ctx, inf.agent, 'instagram');
     expect(back.searchParams.get('connected')).toBe('instagram');
     await inf.agent.post(`${API}/influencers/me/submit`).expect(200);
@@ -54,13 +54,13 @@ describe('marketplace core loop (e2e)', () => {
   it('free month starts only when the blogger confirms it; verification needs a connected account and admin approval', async () => {
     const inf = await signup(ctx, 'INFLUENCER');
     await inf.agent.get(`${API}/deals/feed`).expect(403);
-    await inf.agent.post(`${API}/billing/trial`).expect(403); // profile first
+    await inf.agent.post(`${API}/billing/plan`).send({ plan: 'BASIC' }).expect(403); // profile first
     await inf.agent.put(`${API}/influencers/me`).send(influencerProfile).expect(200);
     expect((await inf.agent.get(`${API}/auth/me`)).body.subscription).toBeNull();
     const locked = await inf.agent.get(`${API}/deals/feed`).expect(403);
     expect(locked.body.error.code).toBe('TRIAL_NOT_STARTED');
-    await inf.agent.post(`${API}/billing/trial`).expect(200);
-    await inf.agent.post(`${API}/billing/trial`).expect(200); // idempotent
+    await inf.agent.post(`${API}/billing/plan`).send({ plan: 'BASIC' }).expect(200);
+    await inf.agent.post(`${API}/billing/plan`).send({ plan: 'BASIC' }).expect(200); // idempotent
     const me = await inf.agent.get(`${API}/auth/me`).expect(200);
     expect(me.body.subscription).toMatchObject({
       status: 'TRIALING',

@@ -7,6 +7,7 @@ import type {
   Platform,
   SubscriptionStatus,
   VerificationStatus,
+  PlanCode,
 } from '@briefluence/shared';
 import { Badge, type BadgeTone } from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
@@ -69,6 +70,23 @@ export function VerificationBadge({ status }: { status: VerificationStatus }) {
 export function SubscriptionBadge({ status }: { status: SubscriptionStatus }) {
   const t = useTranslations('enums.subscriptionStatus');
   return <Badge tone={SUB[status]}>{t(status)}</Badge>;
+}
+/** Blogger plan: free Pro days, Basic, Pro or Pro yearly; a failed renewal shows as such. */
+export function PlanBadge({
+  status,
+  planCode,
+  trialEndsAt,
+}: {
+  status: SubscriptionStatus;
+  planCode: PlanCode;
+  trialEndsAt: string;
+}) {
+  const tp = useTranslations('billing.plans.name');
+  const ts = useTranslations('enums.subscriptionStatus');
+  if (status === 'PAST_DUE') return <Badge tone="danger">{ts('PAST_DUE')}</Badge>;
+  if (status === 'TRIALING' && new Date(trialEndsAt).getTime() > Date.now())
+    return <Badge tone="primary">{ts('TRIALING')}</Badge>;
+  return <Badge tone={planCode === 'BASIC' ? 'neutral' : 'success'}>{tp(planCode)}</Badge>;
 }
 export function PaymentStatusBadge({ status }: { status: PaymentStatus }) {
   const t = useTranslations('enums.paymentStatus');

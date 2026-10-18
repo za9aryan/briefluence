@@ -123,6 +123,13 @@ enum SubscriptionStatus {
   EXPIRED
 }
 
+/// Blogger plans (admin edits prices and the Basic limit in the Plans table).
+enum PlanCode {
+  BASIC
+  PRO_MONTHLY
+  PRO_YEARLY
+}
+
 enum PaymentStatus {
   PENDING
   SUCCEEDED
@@ -328,6 +335,10 @@ model Subscription {
   userId              String             @unique
   user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   status              SubscriptionStatus
+  /// Chosen / current plan. Free Pro days come first for every plan; unpaid Pro falls back to BASIC.
+  planCode            PlanCode           @default(BASIC)
+  /// When the blogger moved to Basic; its limit counts applications from then on.
+  basicSince          DateTime?
   trialEndsAt         DateTime
   currentPeriodEnd    DateTime?
   cancelAtPeriodEnd   Boolean            @default(false)
@@ -347,6 +358,7 @@ model Payment {
   subscription      Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
   orderNumber       Int           @unique @default(autoincrement()) // spec+: Ameria OrderID must be an integer
   kind              String        @default("checkout") // spec+: "checkout" | "renewal"
+  planCode          PlanCode? // spec+: which plan this payment was for
   amount            Int // minor units
   currency          Currency
   provider          String // "ameriabank" | "mock"
@@ -448,4 +460,15 @@ model SocialAccountLink {
   @@index([platform, handle])
   @@index([platform, externalId])
   @@index([socialAccountId])
+}
+
+/// spec+: plan settings managed by admins. BASIC is free; its limit is applications per 30 days.
+model Plan {
+  code             PlanCode @id
+  priceMinor       Int
+  currency         Currency
+  /// Applications per rolling 30 days; null = unlimited (Pro).
+  applicationLimit Int?
+  isActive         Boolean  @default(true)
+  updatedAt        DateTime @default(now()) @updatedAt
 }

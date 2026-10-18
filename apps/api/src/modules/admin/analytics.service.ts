@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { planTier, TIMEZONE, type PlanTier } from '@briefluence/shared';
+import { planSegment, TIMEZONE, type PlanSegment } from '@briefluence/shared';
 import { Prisma } from '@prisma/client';
 import { Clock } from '../../common/clock';
 import { PrismaService } from '../../common/prisma.service';
@@ -104,6 +104,8 @@ export class AdminAnalyticsService {
           bindingId: true,
           failedAttempts: true,
           pastDueSince: true,
+          planCode: true,
+          basicSince: true,
         },
       }),
       this.prisma.user.count({ where: { role: 'INFLUENCER', subscription: null } }),
@@ -137,8 +139,14 @@ export class AdminAnalyticsService {
       return buckets.map((key) => ({ key, count: counts.get(key) ?? 0 }));
     };
 
-    const tiers: Record<PlanTier, number> = { FREE: 0, PAID: 0, NONE: bloggersWithoutPlan };
-    for (const s of subscriptions) tiers[planTier(s, now)]++;
+    // Free Pro days, paid Pro, Basic, or no plan chosen yet.
+    const tiers: Record<PlanSegment, number> = {
+      TRIAL: 0,
+      PRO: 0,
+      BASIC: 0,
+      NONE: bloggersWithoutPlan,
+    };
+    for (const s of subscriptions) tiers[planSegment(s, now)]++;
 
     const verified = verification.find((v) => v.status === 'APPROVED')?._count ?? 0;
     const inReview = verification.find((v) => v.status === 'PENDING_REVIEW')?._count ?? 0;

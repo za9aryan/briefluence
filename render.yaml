@@ -82,10 +82,6 @@ envVarGroups:
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
-      - key: SUBSCRIPTION_PRICE_MINOR
-        value: "999"
-      - key: SUBSCRIPTION_CURRENCY
-        value: USD
       - key: AMERIA_TEST_MODE
         value: "true"
       - key: AMERIA_CLIENT_ID

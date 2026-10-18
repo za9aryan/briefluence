@@ -27,7 +27,7 @@ interface AnalyticsDto {
   days: Period;
   unit: Unit;
   kpis: Record<'bloggers' | 'brands' | 'briefs' | 'applications' | 'shortlisted' | 'accepted', Kpi>;
-  plans: Record<'FREE' | 'PAID' | 'NONE', number>;
+  plans: Record<'TRIAL' | 'PRO' | 'BASIC' | 'NONE', number>;
   verification: Record<'APPROVED' | 'PENDING_REVIEW' | 'NOT_VERIFIED', number>;
   funnel: Record<'sent' | 'shortlisted' | 'accepted' | 'completed', number>;
   outcomes: Record<'WAITING' | 'ACCEPTED' | 'NOT_SELECTED', number>;
@@ -198,13 +198,13 @@ export default function AdminOverviewPage() {
             />
             <Stat
               label={t('kpi.free')}
-              value={n(d.plans.FREE)}
+              value={n(d.plans.TRIAL)}
               icon="gift"
               hint={t('ofBloggers', { count: n(d.kpis.bloggers.total) })}
             />
             <Stat
               label={t('kpi.paid')}
-              value={n(d.plans.PAID)}
+              value={n(d.plans.PRO)}
               icon="wallet"
               hint={t('ofBloggers', { count: n(d.kpis.bloggers.total) })}
             />
@@ -220,8 +220,8 @@ export default function AdminOverviewPage() {
           <Grid cols={{ base: 1, lg: 2 }} gap={6}>
             {donut(
               t('charts.plans'),
-              t('charts.plansSubtitle'),
-              (['FREE', 'PAID', 'NONE'] as const).map((k) => ({
+              t('noPlan', { count: n(d.plans.NONE) }),
+              (['TRIAL', 'PRO', 'BASIC'] as const).map((k) => ({
                 key: k,
                 label: t(`plan.${k}`),
                 value: d.plans[k],

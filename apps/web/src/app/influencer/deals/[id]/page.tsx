@@ -21,10 +21,15 @@ import {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
-import { BrandAvatar, ConfidentialNote, isHiddenBrand, useBrandName } from '@/components/domain/BrandIdentity';
+import {
+  BrandAvatar,
+  ConfidentialNote,
+  isHiddenBrand,
+  useBrandName,
+} from '@/components/domain/BrandIdentity';
 import { ApplicationStatusBadge, CollaborationBadge } from '@/components/domain/badges';
 import { Compensation } from '@/components/domain/Compensation';
 import { ApplyModal } from '@/components/influencer/ApplyModal';
@@ -48,9 +53,14 @@ export default function DealDetailPage() {
   const errorMessage = useErrorMessage();
   const qc = useQueryClient();
   const { data: me } = useMe();
+  const router = useRouter();
   const [applyOpen, setApplyOpen] = useState(false);
-  const [paywall, setPaywall] = useState(false);
-  const deal = useQuery({ queryKey: ['deal', id], queryFn: () => api.get<DealDetailDto>(`/deals/${id}`) });
+  // Basic plan limit reached (value = the limit, for the message).
+  const [paywall, setPaywall] = useState<number | null | false>(false);
+  const deal = useQuery({
+    queryKey: ['deal', id],
+    queryFn: () => api.get<DealDetailDto>(`/deals/${id}`),
+  });
   const withdraw = useMutation({
     mutationFn: (appId: string) => api.post(`/applications/${appId}/withdraw`),
     onSuccess: () => {
@@ -61,33 +71,79 @@ export default function DealDetailPage() {
   });
 
   if (deal.isLoading) return <Skeleton className="h-[70vh] rounded-card" />;
-  if (deal.error instanceof ApiError && deal.error.code === 'TRIAL_NOT_STARTED') return <BriefsChecklist />;
-  if (deal.isError || !deal.data) return <ErrorState title={tc('notFoundTitle')} retry={<Link href="/influencer/deals" className={buttonStyles({})}>{t('backToFeed')}</Link>} />;
+  if (deal.error instanceof ApiError && deal.error.code === 'TRIAL_NOT_STARTED')
+    return <BriefsChecklist />;
+  if (deal.isError || !deal.data)
+    return (
+      <ErrorState
+        title={tc('notFoundTitle')}
+        retry={
+          <Link href="/influencer/deals" className={buttonStyles({})}>
+            {t('backToFeed')}
+          </Link>
+        }
+      />
+    );
   const d = deal.data;
   const app = d.myApplication;
   const open = d.status === 'ACTIVE' && new Date(d.applicationDeadline) > new Date();
-  const canApply = open && (!app || app.status === 'WITHDRAWN') && (d.eligibleAccounts?.length ?? 0) > 0;
+  const canApply =
+    open && (!app || app.status === 'WITHDRAWN') && (d.eligibleAccounts?.length ?? 0) > 0;
   const hasAccess = me?.subscription?.hasAccess ?? false;
   const range = (min: number | null, max: number | null, fmt: (n: number) => string = String) =>
-    min == null && max == null ? tc('any') : min != null && max != null ? `${fmt(min)}–${fmt(max)}` : min != null ? `${fmt(min)}+` : `≤ ${fmt(max!)}`;
+    min == null && max == null
+      ? tc('any')
+      : min != null && max != null
+        ? `${fmt(min)}–${fmt(max)}`
+        : min != null
+          ? `${fmt(min)}+`
+          : `≤ ${fmt(max!)}`;
 
   const requirements = [
     { label: t('req.platforms'), value: d.platforms.map((p) => te(`platform.${p}`)).join(', ') },
-    { label: t('req.formats'), value: d.contentFormats.map((x) => te(`contentFormat.${x}`)).join(', ') },
-    { label: t('req.location'), value: [d.countries.map(o.country).join(', '), d.cities.join(', ')].filter(Boolean).join(' · ') },
+    {
+      label: t('req.formats'),
+      value: d.contentFormats.map((x) => te(`contentFormat.${x}`)).join(', '),
+    },
+    {
+      label: t('req.location'),
+      value: [d.countries.map(o.country).join(', '), d.cities.join(', ')]
+        .filter(Boolean)
+        .join(' · '),
+    },
     { label: t('req.followers'), value: range(d.minFollowers, d.maxFollowers, f.compact) },
-    ...(d.minEngagementRate ? [{ label: t('req.engagement'), value: `≥ ${f.percent(d.minEngagementRate)}` }] : []),
-    ...(d.niches.length ? [{ label: t('req.niches'), value: d.niches.map(o.niche).join(', ') }] : []),
-    ...(d.languages.length ? [{ label: t('req.languages'), value: d.languages.map(o.language).join(', ') }] : []),
-    ...(d.influencerGender !== 'ANY' ? [{ label: t('req.bloggerGender'), value: te(`genderFilter.${d.influencerGender}`) }] : []),
-    ...(d.influencerAgeMin != null || d.influencerAgeMax != null ? [{ label: t('req.bloggerAge'), value: range(d.influencerAgeMin, d.influencerAgeMax) }] : []),
-    ...(d.audienceGender !== 'ANY' ? [{ label: t('req.audienceGender'), value: te(`audienceGender.${d.audienceGender}`) }] : []),
-    ...(d.audienceAgeMin != null || d.audienceAgeMax != null ? [{ label: t('req.audienceAge'), value: range(d.audienceAgeMin, d.audienceAgeMax) }] : []),
-    ...(d.audienceCountry ? [{ label: t('req.audienceCountry'), value: o.country(d.audienceCountry) }] : []),
+    ...(d.minEngagementRate
+      ? [{ label: t('req.engagement'), value: `≥ ${f.percent(d.minEngagementRate)}` }]
+      : []),
+    ...(d.niches.length
+      ? [{ label: t('req.niches'), value: d.niches.map(o.niche).join(', ') }]
+      : []),
+    ...(d.languages.length
+      ? [{ label: t('req.languages'), value: d.languages.map(o.language).join(', ') }]
+      : []),
+    ...(d.influencerGender !== 'ANY'
+      ? [{ label: t('req.bloggerGender'), value: te(`genderFilter.${d.influencerGender}`) }]
+      : []),
+    ...(d.influencerAgeMin != null || d.influencerAgeMax != null
+      ? [{ label: t('req.bloggerAge'), value: range(d.influencerAgeMin, d.influencerAgeMax) }]
+      : []),
+    ...(d.audienceGender !== 'ANY'
+      ? [{ label: t('req.audienceGender'), value: te(`audienceGender.${d.audienceGender}`) }]
+      : []),
+    ...(d.audienceAgeMin != null || d.audienceAgeMax != null
+      ? [{ label: t('req.audienceAge'), value: range(d.audienceAgeMin, d.audienceAgeMax) }]
+      : []),
+    ...(d.audienceCountry
+      ? [{ label: t('req.audienceCountry'), value: o.country(d.audienceCountry) }]
+      : []),
   ];
 
   const applyButton = canApply ? (
-    <Button size="lg" block onClick={() => (hasAccess ? setApplyOpen(true) : setPaywall(true))}>
+    <Button
+      size="lg"
+      block
+      onClick={() => (hasAccess ? setApplyOpen(true) : router.push('/influencer/billing'))}
+    >
       {t('applyCta')}
     </Button>
   ) : null;
@@ -108,7 +164,13 @@ export default function DealDetailPage() {
       />
       <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">
         <Stack gap={6} className="min-w-0">
-          {d.imageUrl && <img src={d.imageUrl} alt="" className="aspect-[16/9] w-full rounded-card object-cover" />}
+          {d.imageUrl && (
+            <img
+              src={d.imageUrl}
+              alt=""
+              className="aspect-[16/9] w-full rounded-card object-cover"
+            />
+          )}
           <Card>
             <CardHeader title={t('about')} />
             <Text className="whitespace-pre-line">{d.description}</Text>
@@ -129,7 +191,9 @@ export default function DealDetailPage() {
                   </Text>
                   <Compensation {...d} />
                 </Stack>
-                {d.matchScore != null && <ScoreMeter size="lg" value={d.matchScore} label={t('match')} />}
+                {d.matchScore != null && (
+                  <ScoreMeter size="lg" value={d.matchScore} label={t('match')} />
+                )}
               </Inline>
               {d.barterValue != null && d.paymentType !== 'MONEY' && (
                 <Text size="small" tone="muted">
@@ -140,7 +204,10 @@ export default function DealDetailPage() {
                 items={[
                   { label: t('deadlineLabel'), value: f.date(d.applicationDeadline) },
                   ...(d.publishBy ? [{ label: t('publishBy'), value: f.date(d.publishBy) }] : []),
-                  { label: t('slots'), value: t('slotsValue', { filled: d.filled, slots: d.slots }) },
+                  {
+                    label: t('slots'),
+                    value: t('slotsValue', { filled: d.filled, slots: d.slots }),
+                  },
                   { label: t('applicantsLabel'), value: f.number(d.applicantCount) },
                 ]}
               />
@@ -153,11 +220,19 @@ export default function DealDetailPage() {
                     <ApplicationStatusBadge status={app.status} />
                   </Inline>
                   {['APPLIED', 'VIEWED', 'SHORTLISTED'].includes(app.status) && (
-                    <Button variant="ghost" size="sm" loading={withdraw.isPending} onClick={() => withdraw.mutate(app.id)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      loading={withdraw.isPending}
+                      onClick={() => withdraw.mutate(app.id)}
+                    >
                       {t('withdraw')}
                     </Button>
                   )}
-                  <Link href="/influencer/applications" className={buttonStyles({ variant: 'secondary', block: true })}>
+                  <Link
+                    href="/influencer/applications"
+                    className={buttonStyles({ variant: 'secondary', block: true })}
+                  >
                     {t('openApplications')}
                   </Link>
                 </Stack>
@@ -210,12 +285,20 @@ export default function DealDetailPage() {
       </div>
 
       {/* Sticky apply bar on phones */}
-      {applyButton && <div className="sticky bottom-0 -mx-4 border-t border-line bg-surface-raised p-4 lg:hidden">{applyButton}</div>}
+      {applyButton && (
+        <div className="sticky bottom-0 -mx-4 border-t border-line bg-surface-raised p-4 lg:hidden">
+          {applyButton}
+        </div>
+      )}
 
       <ApplyModal
         deal={d}
         open={applyOpen}
         onClose={() => setApplyOpen(false)}
+        onLimit={(limit) => {
+          setApplyOpen(false);
+          setPaywall(limit);
+        }}
         onApplied={() => {
           setApplyOpen(false);
           void qc.invalidateQueries({ queryKey: ['deal', id] });
@@ -224,7 +307,7 @@ export default function DealDetailPage() {
       />
 
       <Modal
-        open={paywall}
+        open={paywall !== false}
         onClose={() => setPaywall(false)}
         size="sm"
         closeLabel={tc('close')}
@@ -240,7 +323,7 @@ export default function DealDetailPage() {
             <Icon name="card" size="lg" tone="accent" />
           </span>
           <Heading level={3}>{t('paywall.headline')}</Heading>
-          <Text tone="muted">{t('paywall.body')}</Text>
+          <Text tone="muted">{t('paywall.body', { limit: paywall || '' })}</Text>
         </Stack>
       </Modal>
     </Stack>

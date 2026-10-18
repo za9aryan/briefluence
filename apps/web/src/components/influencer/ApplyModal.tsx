@@ -4,12 +4,25 @@ import { Alert, Button, Field, Input, Modal, Stack, Text, Textarea } from '@brie
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { api } from '@/lib/api';
+import { ApiError, api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { useFormat } from '@/lib/hooks/format';
 import type { DealDetailDto } from '@/lib/types';
 
-export function ApplyModal({ deal, open, onClose, onApplied }: { deal: DealDetailDto; open: boolean; onClose: () => void; onApplied: () => void }) {
+export function ApplyModal({
+  deal,
+  open,
+  onClose,
+  onApplied,
+  onLimit,
+}: {
+  deal: DealDetailDto;
+  open: boolean;
+  onClose: () => void;
+  onApplied: () => void;
+  /** Basic plan limit reached: the page shows the upgrade message instead of an error. */
+  onLimit?: (limit: number | null) => void;
+}) {
   const t = useTranslations('deals.apply');
   const tc = useTranslations('common');
   const f = useFormat();
@@ -31,7 +44,13 @@ export function ApplyModal({ deal, open, onClose, onApplied }: { deal: DealDetai
       void qc.invalidateQueries({ queryKey: ['applications'] });
       onApplied();
     },
-    onError: (e) => setError(errorMessage(e)),
+    onError: (e) => {
+      if (e instanceof ApiError && e.code === 'APPLICATION_LIMIT_REACHED' && onLimit) {
+        onLimit((e.details as { limit?: number | null } | undefined)?.limit ?? null);
+        return;
+      }
+      setError(errorMessage(e));
+    },
   });
   const pitchOk = pitch.trim().length >= 10;
 
@@ -55,19 +74,45 @@ export function ApplyModal({ deal, open, onClose, onApplied }: { deal: DealDetai
     >
       <Stack gap={4}>
         {error && <Alert tone="danger">{error}</Alert>}
-        <Field label={t('pitch')} hint={t('pitchHint')} aside={`${pitch.length}/${PITCH_MAX_LENGTH}`} required>
+        <Field
+          label={t('pitch')}
+          hint={t('pitchHint')}
+          aside={`${pitch.length}/${PITCH_MAX_LENGTH}`}
+          required
+        >
           {({ id, describedBy }) => (
-            <Textarea id={id} aria-describedby={describedBy} rows={5} maxLength={PITCH_MAX_LENGTH} value={pitch} onChange={(e) => setPitch(e.target.value)} placeholder={t('pitchPlaceholder')} />
+            <Textarea
+              id={id}
+              aria-describedby={describedBy}
+              rows={5}
+              maxLength={PITCH_MAX_LENGTH}
+              value={pitch}
+              onChange={(e) => setPitch(e.target.value)}
+              placeholder={t('pitchPlaceholder')}
+            />
           )}
         </Field>
         {paid && (
           <Field
             label={t('price')}
-            hint={price && deal.currency !== f.displayCurrency ? `${f.display(toMinor(Number(price)), deal.currency).main} · ${t('priceHint')}` : t('priceHint')}
+            hint={
+              price && deal.currency !== f.displayCurrency
+                ? `${f.display(toMinor(Number(price)), deal.currency).main} · ${t('priceHint')}`
+                : t('priceHint')
+            }
             aside={tc('optional')}
           >
             {({ id, describedBy }) => (
-              <Input id={id} aria-describedby={describedBy} type="number" inputMode="numeric" min={0} suffix={CURRENCY_SYMBOL[deal.currency]} value={price} onChange={(e) => setPrice(e.target.value)} />
+              <Input
+                id={id}
+                aria-describedby={describedBy}
+                type="number"
+                inputMode="numeric"
+                min={0}
+                suffix={CURRENCY_SYMBOL[deal.currency]}
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
             )}
           </Field>
         )}

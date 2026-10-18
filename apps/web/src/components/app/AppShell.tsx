@@ -46,6 +46,7 @@ function useNav(role: Role): NavItem[] {
     { href: '/admin/brief-review', label: t('admin.briefReview'), icon: 'shield' },
     { href: '/admin/deals', label: t('admin.deals'), icon: 'briefcase' },
     { href: '/admin/users', label: t('admin.users'), icon: 'users' },
+    { href: '/admin/plans', label: t('admin.plans'), icon: 'star' },
     { href: '/admin/payments', label: t('admin.payments'), icon: 'wallet' },
   ];
 }
@@ -131,26 +132,11 @@ function Banners({ me }: { me: Me }) {
               href="/influencer/billing"
               className="text-small font-bold text-primary-text underline"
             >
-              {tb('subscribe')}
+              {tb('plans.choosePro')}
             </Link>
           }
         >
           {tb('trialBanner', { count: sub.trialDaysLeft })}
-        </Alert>
-      )}
-      {me.role === 'INFLUENCER' && sub && !sub.hasAccess && (
-        <Alert
-          tone="danger"
-          action={
-            <Link
-              href="/influencer/billing"
-              className="text-small font-bold text-primary-text underline"
-            >
-              {tb('subscribe')}
-            </Link>
-          }
-        >
-          {tb('expiredBanner')}
         </Alert>
       )}
     </>

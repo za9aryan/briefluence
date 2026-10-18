@@ -58,10 +58,11 @@
       "count": "Count"
     },
     "plan": {
-      "FREE": "Free trial",
-      "PAID": "Paid",
-      "NONE": "No active plan"
+      "TRIAL": "Free Pro days",
+      "PRO": "Pro (paid)",
+      "BASIC": "Basic"
     },
+    "noPlan": "Right now · {count} have not chosen a plan yet",
     "verificationState": {
       "APPROVED": "Verified",
       "PENDING_REVIEW": "In review",
@@ -83,6 +84,18 @@
     "chart": "Chart",
     "category": "Category",
     "ofSent": "{value} of sent"
+  },
+  "plans": {
+    "title": "Plans",
+    "lead": "Prices and limits of blogger plans. Changes apply to new payments and renewals; Basic is free and always on.",
+    "price": "Price",
+    "currency": "Currency",
+    "limit": "Applications per 30 days",
+    "unlimited": "Unlimited applications",
+    "active": "Offered to bloggers",
+    "free": "Free",
+    "save": "Save",
+    "saved": "Plan saved"
   },
   "reuse": {
     "badge": "Possible re-registration",

@@ -61,9 +61,9 @@ export default {
       profileViews: ['Profile views', 'Просмотры профиля', 'Պրոֆիլի դիտումներ'],
       plan: ['Plan', 'Подписка', 'Բաժանորդագրություն'],
       daysLeft: [
-        '{count, plural, one {# day free} other {# days free}}',
-        '{count, plural, one {# день бесплатно} few {# дня бесплатно} many {# дней бесплатно} other {# дня бесплатно}}',
-        '{count, plural, one {# օր անվճար} other {# օր անվճար}}',
+        '{count, plural, one {Pro · # day free} other {Pro · # days free}}',
+        '{count, plural, one {Pro · # день бесплатно} few {Pro · # дня бесплатно} many {Pro · # дней бесплатно} other {Pro · # дня бесплатно}}',
+        '{count, plural, one {Pro · # օր անվճար} other {Pro · # օր անվճար}}',
       ],
     },
     topMatches: ['Best matches for you', 'Лучшие совпадения', 'Լավագույն համընկնումները'],
@@ -428,10 +428,15 @@ export default {
         count: ['Count', 'Количество', 'Քանակ'],
       },
       plan: {
-        FREE: ['Free trial', 'Бесплатный период', 'Անվճար ժամկետ'],
-        PAID: ['Paid', 'Платный', 'Վճարովի'],
-        NONE: ['No active plan', 'Без активного тарифа', 'Առանց ակտիվ փաթեթի'],
+        TRIAL: ['Free Pro days', 'Бесплатные дни Pro', 'Pro-ի անվճար օրեր'],
+        PRO: ['Pro (paid)', 'Pro (платный)', 'Pro (վճարովի)'],
+        BASIC: ['Basic', 'Basic', 'Basic'],
       },
+      noPlan: [
+        'Right now · {count} have not chosen a plan yet',
+        'Сейчас · {count} ещё не выбрали тариф',
+        'Հիմա · {count}-ը դեռ փաթեթ չեն ընտրել',
+      ],
       verificationState: {
         APPROVED: ['Verified', 'Проверены', 'Ստուգված'],
         PENDING_REVIEW: ['In review', 'На проверке', 'Ստուգման մեջ'],
@@ -461,6 +466,26 @@ export default {
       chart: ['Chart', 'График', 'Գծապատկեր'],
       category: ['Category', 'Категория', 'Կատեգորիա'],
       ofSent: ['{value} of sent', '{value} от отправленных', 'ուղարկվածների {value}-ը'],
+    },
+    plans: {
+      title: ['Plans', 'Тарифы', 'Փաթեթներ'],
+      lead: [
+        'Prices and limits of blogger plans. Changes apply to new payments and renewals; Basic is free and always on.',
+        'Цены и лимиты тарифов блогеров. Изменения действуют для новых оплат и продлений; Basic бесплатный и всегда включён.',
+        'Բլոգերների փաթեթների գներն ու սահմանաչափերը։ Փոփոխությունները գործում են նոր վճարումների և երկարաձգումների համար․ Basic-ն անվճար է և միշտ միացված։',
+      ],
+      price: ['Price', 'Цена', 'Գին'],
+      currency: ['Currency', 'Валюта', 'Արժույթ'],
+      limit: ['Applications per 30 days', 'Откликов за 30 дней', 'Դիմումներ 30 օրում'],
+      unlimited: [
+        'Unlimited applications',
+        'Отклики без ограничений',
+        'Դիմումներ առանց սահմանափակման',
+      ],
+      active: ['Offered to bloggers', 'Доступен блогерам', 'Հասանելի է բլոգերներին'],
+      free: ['Free', 'Бесплатно', 'Անվճար'],
+      save: ['Save', 'Сохранить', 'Պահպանել'],
+      saved: ['Plan saved', 'Тариф сохранён', 'Փաթեթը պահպանված է'],
     },
     reuse: {
       badge: [

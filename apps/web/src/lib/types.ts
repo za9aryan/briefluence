@@ -12,6 +12,7 @@ import type {
   Platform,
   SubscriptionStatus,
   VerificationStatus,
+  PlanCode,
 } from '@briefluence/shared';
 
 /** API response shapes (dates arrive as ISO strings). */
@@ -251,9 +252,23 @@ export interface NotificationDto {
   createdAt: string;
 }
 
+/** A plan as bloggers see it (only active plans are listed). */
+export interface PlanDto {
+  code: PlanCode;
+  priceMinor: number;
+  currency: Currency;
+  applicationLimit: number | null;
+  windowDays: number;
+}
+
 export interface SubscriptionDto {
   subscription: {
     status: SubscriptionStatus;
+    planCode: PlanCode;
+    tier: 'BASIC' | 'PRO';
+    inFreeDays: boolean;
+    plan: PlanDto | null;
+    applications: { used: number; limit: number | null; left: number | null };
     trialEndsAt: string;
     currentPeriodEnd: string | null;
     cancelAtPeriodEnd: boolean;
@@ -264,7 +279,7 @@ export interface SubscriptionDto {
     nextChargeAt: string | null;
     canCheckout: boolean;
   } | null;
-  price: { amount: number; currency: Currency };
+  plans: PlanDto[];
   provider: 'mock' | 'ameriabank';
 }
 
@@ -274,6 +289,7 @@ export interface PaymentDto {
   currency: Currency;
   status: PaymentStatus;
   kind: 'checkout' | 'renewal';
+  planCode: PlanCode | null;
   failureReason: string | null;
   createdAt: string;
   providerOrderId: string;

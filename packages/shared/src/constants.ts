@@ -52,7 +52,15 @@ export const CITIES: Partial<Record<Country, readonly string[]>> = {
   IR: ['Tehran'],
 };
 
-export const AUDIENCE_AGE_BUCKETS = ['13-17', '18-24', '25-34', '35-44', '45-54', '55-64', '65+'] as const;
+export const AUDIENCE_AGE_BUCKETS = [
+  '13-17',
+  '18-24',
+  '25-34',
+  '35-44',
+  '45-54',
+  '55-64',
+  '65+',
+] as const;
 
 export const AUDIENCE_SIZE_PRESETS = {
   nano: { min: 1_000, max: 10_000 },
@@ -64,7 +72,10 @@ export type AudienceSizePreset = keyof typeof AUDIENCE_SIZE_PRESETS;
 
 export const INFLUENCER_AGE_RANGE = { min: 16, max: 65 } as const;
 export const PITCH_MAX_LENGTH = 500;
+/** Free Pro days every blogger gets when they choose a plan. */
 export const TRIAL_DAYS = 30;
+/** Basic's application limit counts applications in this rolling window. */
+export const PLAN_WINDOW_DAYS = 30;
 export const TRIAL_REMINDER_DAYS_BEFORE = 3;
 /** Days after the first failed renewal on which the charge is retried. */
 export const RENEWAL_RETRY_DAYS = [1, 3, 5] as const;

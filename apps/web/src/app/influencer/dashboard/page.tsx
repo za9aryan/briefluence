@@ -1,6 +1,20 @@
 'use client';
-import type { ApplicationStatus, SubscriptionStatus, VerificationStatus } from '@briefluence/shared';
-import { Card, CardHeader, EmptyState, Grid, Inline, Skeleton, Stack, Stat, Text } from '@briefluence/ui';
+import type {
+  ApplicationStatus,
+  SubscriptionStatus,
+  VerificationStatus,
+} from '@briefluence/shared';
+import {
+  Card,
+  CardHeader,
+  EmptyState,
+  Grid,
+  Inline,
+  Skeleton,
+  Stack,
+  Stat,
+  Text,
+} from '@briefluence/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -29,23 +43,32 @@ interface DashboardDto {
 export default function InfluencerDashboardPage() {
   const t = useTranslations('dashboard');
   const tn = useTranslations('nav');
-  const tb = useTranslations('enums.subscriptionStatus');
+  const tp = useTranslations('billing.plans');
   const f = useFormat();
   const brandName = useBrandName();
   const { data: me } = useMe();
-  const stats = useQuery({ queryKey: ['influencer', 'dashboard'], queryFn: () => api.get<DashboardDto>('/influencers/me/dashboard') });
+  const stats = useQuery({
+    queryKey: ['influencer', 'dashboard'],
+    queryFn: () => api.get<DashboardDto>('/influencers/me/dashboard'),
+  });
   const approved = stats.data?.verificationStatus === 'APPROVED' && !!me?.subscription;
   const feed = useQuery({
     queryKey: ['feed', 'top'],
     queryFn: () => api.get<Paginated<FeedDealDto>>('/deals/feed', { pageSize: 3, sort: 'match' }),
     enabled: approved,
   });
-  const apps = useQuery({ queryKey: ['applications', 'mine'], queryFn: () => api.get<MyApplicationDto[]>('/applications/mine') });
+  const apps = useQuery({
+    queryKey: ['applications', 'mine'],
+    queryFn: () => api.get<MyApplicationDto[]>('/applications/mine'),
+  });
   const s = stats.data;
 
   return (
     <Stack gap={6}>
-      <PageHeader title={t('hello', { name: me?.influencer?.displayName.split(' ')[0] ?? '' })} description={t('influencerLead')} />
+      <PageHeader
+        title={t('hello', { name: me?.influencer?.displayName.split(' ')[0] ?? '' })}
+        description={t('influencerLead')}
+      />
 
       <BriefsChecklist />
 
@@ -59,7 +82,13 @@ export default function InfluencerDashboardPage() {
             <Stat label={t('stats.profileViews')} value={f.number(s.profileViews)} icon="eye" />
             <Stat
               label={t('stats.plan')}
-              value={s.subscriptionStatus === 'TRIALING' ? t('stats.daysLeft', { count: s.trialDaysLeft }) : s.subscriptionStatus ? tb(s.subscriptionStatus) : '—'}
+              value={
+                !me?.subscription
+                  ? '—'
+                  : me.subscription.status === 'TRIALING'
+                    ? t('stats.daysLeft', { count: me.subscription.trialDaysLeft })
+                    : tp(`name.${me.subscription.planCode}`)
+              }
               icon="card"
             />
           </>
@@ -70,7 +99,10 @@ export default function InfluencerDashboardPage() {
         <Stack gap={4}>
           <Inline justify="between">
             <h2 className="text-h2 font-bold text-ink">{t('topMatches')}</h2>
-            <Link href="/influencer/deals" className="text-small font-bold text-primary-text hover:underline">
+            <Link
+              href="/influencer/deals"
+              className="text-small font-bold text-primary-text hover:underline"
+            >
               {tn('findDeals')}
             </Link>
           </Inline>
@@ -87,7 +119,11 @@ export default function InfluencerDashboardPage() {
               ))}
             </Grid>
           ) : (
-            <EmptyState icon="search" title={t('noMatchesTitle')} description={t('noMatchesBody')} />
+            <EmptyState
+              icon="search"
+              title={t('noMatchesTitle')}
+              description={t('noMatchesBody')}
+            />
           )}
         </Stack>
       )}
@@ -96,7 +132,10 @@ export default function InfluencerDashboardPage() {
         <CardHeader
           title={t('recentApplications')}
           actions={
-            <Link href="/influencer/applications" className="text-small font-bold text-primary-text hover:underline">
+            <Link
+              href="/influencer/applications"
+              className="text-small font-bold text-primary-text hover:underline"
+            >
               {tn('myApplications')}
             </Link>
           }
@@ -104,7 +143,10 @@ export default function InfluencerDashboardPage() {
         {apps.data?.length ? (
           <ul className="divide-y divide-line">
             {apps.data.slice(0, 5).map((a) => (
-              <li key={a.id} className="flex flex-col gap-1 py-2 sm:flex-row sm:items-center sm:justify-between">
+              <li
+                key={a.id}
+                className="flex flex-col gap-1 py-2 sm:flex-row sm:items-center sm:justify-between"
+              >
                 <div className="min-w-0">
                   <Text weight="bold" truncate>
                     {a.deal.title}

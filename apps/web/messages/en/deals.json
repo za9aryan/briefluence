@@ -78,9 +78,9 @@
   "website": "Website",
   "appliedToast": "Application sent. The brand will see it right away.",
   "paywall": {
-    "title": "Subscription needed",
-    "headline": "Keep applying for 9.99 a month",
-    "body": "Your 30 free days are over. Browsing stays free; applying needs a subscription.",
-    "cta": "Subscribe"
+    "title": "Basic limit reached",
+    "headline": "Unlimited applications with Pro",
+    "body": "You used all {limit} applications of the Basic plan in the last 30 days. Choose Pro to keep applying now.",
+    "cta": "See plans"
   }
 }

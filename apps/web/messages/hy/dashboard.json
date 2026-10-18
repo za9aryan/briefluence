@@ -25,7 +25,7 @@
     "accepted": "Ընդունված",
     "profileViews": "Պրոֆիլի դիտումներ",
     "plan": "Բաժանորդագրություն",
-    "daysLeft": "{count, plural, one {# օր անվճար} other {# օր անվճար}}"
+    "daysLeft": "{count, plural, one {Pro · # օր անվճար} other {Pro · # օր անվճար}}"
   },
   "topMatches": "Լավագույն համընկնումները",
   "noMatchesTitle": "Հիմա հարմար բրիֆներ չկան",

@@ -317,7 +317,7 @@ export class AdminService {
           },
         },
         brand: { select: { id: true, companyName: true } },
-        subscription: { select: { status: true } },
+        subscription: { select: { status: true, planCode: true, trialEndsAt: true } },
       },
     });
     const flagged = await this.links.flaggedIds(
@@ -397,7 +397,15 @@ export class AdminService {
         providerOrderId: true,
         failureReason: true,
         createdAt: true,
-        subscription: { select: { status: true, user: { select: { id: true, email: true } } } },
+        planCode: true,
+        subscription: {
+          select: {
+            status: true,
+            planCode: true,
+            trialEndsAt: true,
+            user: { select: { id: true, email: true } },
+          },
+        },
       },
     });
     const totals = await this.prisma.payment.groupBy({

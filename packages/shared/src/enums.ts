@@ -61,6 +61,10 @@ export const APPLICATION_STATUSES = values(
 );
 export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
 
+/** Blogger plans. BASIC is free with a monthly application limit; PRO is unlimited. */
+export const PLAN_CODES = values('BASIC', 'PRO_MONTHLY', 'PRO_YEARLY');
+export type PlanCode = (typeof PLAN_CODES)[number];
+
 export const SUBSCRIPTION_STATUSES = values(
   'TRIALING',
   'ACTIVE',

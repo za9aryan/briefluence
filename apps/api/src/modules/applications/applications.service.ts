@@ -98,7 +98,8 @@ export class ApplicationsService {
     } else {
       try {
         application = await this.prisma.application.create({
-          data: { ...data, dealId, influencerId: profile.id },
+          // Dated by the app clock: Basic's 30-day limit compares against it.
+          data: { ...data, dealId, influencerId: profile.id, createdAt: this.clock.now() },
         });
       } catch (err) {
         if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {

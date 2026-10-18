@@ -31,7 +31,7 @@ describe('admin analytics (e2e)', () => {
     for (let i = 0; i < 2; i++) {
       const inf = await signup(ctx, 'INFLUENCER');
       await inf.agent.put(`${API}/influencers/me`).send(influencerProfile).expect(200);
-      await inf.agent.post(`${API}/billing/trial`).expect(200);
+      await inf.agent.post(`${API}/billing/plan`).send({ plan: 'BASIC' }).expect(200);
       await connectMock(ctx, inf.agent, 'instagram');
       await inf.agent.post(`${API}/influencers/me/submit`).expect(200);
       bloggers.push(inf);
@@ -84,7 +84,7 @@ describe('admin analytics (e2e)', () => {
         shortlisted: { period: 1, total: 1 },
         accepted: { period: 1, total: 1 },
       },
-      plans: { FREE: 2, PAID: 0, NONE: 1 },
+      plans: { TRIAL: 2, PRO: 0, BASIC: 0, NONE: 1 },
       verification: { APPROVED: 2, PENDING_REVIEW: 0, NOT_VERIFIED: 1 },
       funnel: { sent: 2, shortlisted: 1, accepted: 1, completed: 0 },
       outcomes: { WAITING: 0, ACCEPTED: 1, NOT_SELECTED: 1 },

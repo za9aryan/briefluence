@@ -56,6 +56,32 @@ export async function resetDb(prisma: PrismaService) {
   await prisma.$executeRawUnsafe(
     `TRUNCATE ${tables.map((t) => `"${t}"`).join(', ')} RESTART IDENTITY CASCADE`,
   );
+  // Plans are settings, not data: restore the defaults the migration created.
+  const plans = [
+    {
+      code: 'BASIC' as const,
+      priceMinor: 0,
+      currency: 'USD' as const,
+      applicationLimit: 10,
+      isActive: true,
+    },
+    {
+      code: 'PRO_MONTHLY' as const,
+      priceMinor: 999,
+      currency: 'USD' as const,
+      applicationLimit: null,
+      isActive: true,
+    },
+    {
+      code: 'PRO_YEARLY' as const,
+      priceMinor: 9999,
+      currency: 'USD' as const,
+      applicationLimit: null,
+      isActive: true,
+    },
+  ];
+  for (const p of plans)
+    await prisma.plan.upsert({ where: { code: p.code }, create: p, update: p });
 }
 
 export const API = '/api/v1';
