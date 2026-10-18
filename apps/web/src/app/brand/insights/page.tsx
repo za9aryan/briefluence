@@ -67,8 +67,6 @@ export default function BrandInsightsPage() {
     category: t('category'),
   };
   const n = (v: number) => f.number(v);
-  const split = (x?: { searches: number; opens: number }) =>
-    x ? t('split', { searches: n(x.searches), opens: n(x.opens) }) : undefined;
   const byKey = (
     rows: Signal[],
     keys: readonly string[],
@@ -76,12 +74,13 @@ export default function BrandInsightsPage() {
   ): ChartRow[] =>
     keys.map((k) => {
       const r = rows.find((x) => x.key === k);
-      return { key: k, label: label(k), value: r?.count ?? 0, detail: split(r) };
+      return { key: k, label: label(k), value: r?.count ?? 0 };
     });
   const signalRows = (rows: Signal[], label: (k: string) => string): ChartRow[] =>
-    rows.map((x) => ({ key: x.key, label: label(x.key), value: x.count, detail: split(x) }));
+    rows.map((x) => ({ key: x.key, label: label(x.key), value: x.count }));
 
   const topNiche = d?.niches[0];
+  const topFormat = d?.contentFormats[0];
   // Bucket bounds are AMD; show them in the viewer's currency.
   const amd = (v: number) => f.display(v * 100, 'AMD').main.replace('≈ ', '');
 
@@ -113,12 +112,7 @@ export default function BrandInsightsPage() {
           className={q.isFetching ? 'opacity-60 transition-opacity' : 'transition-opacity'}
         >
           <Grid cols={{ base: 2, lg: 4 }} gap={{ base: 2, md: 4 }}>
-            <Stat
-              label={t('kpi.searches')}
-              value={n(d.totalSignals)}
-              icon="search"
-              hint={split({ searches: d.totalSearches, opens: d.totalOpens })}
-            />
+            <Stat label={t('kpi.searches')} value={n(d.totalSignals)} icon="heart" />
             <Stat
               label={t('kpi.bloggers')}
               value={n(d.activeBloggers)}
@@ -126,10 +120,9 @@ export default function BrandInsightsPage() {
               hint={t('kpi.ofVerified', { count: d.verifiedBloggers })}
             />
             <Stat
-              label={t('kpi.opened')}
-              value={n(d.briefsOpened)}
-              icon="eye"
-              hint={t('kpi.openedHint', { count: n(d.totalOpens) })}
+              label={t('kpi.topFormat')}
+              value={topFormat ? te(`contentFormat.${topFormat.key}`) : '—'}
+              icon="sparkles"
             />
             <Stat
               label={t('kpi.topNiche')}
@@ -148,7 +141,6 @@ export default function BrandInsightsPage() {
               key: x.date,
               label: f.date(`${x.date}T12:00:00+04:00`),
               value: x.count,
-              detail: split(x),
             }))}
           >
             <ColumnChart
@@ -156,7 +148,7 @@ export default function BrandInsightsPage() {
               rows={d.perDay.map((x) => ({
                 key: x.date,
                 label: new Date(`${x.date}T12:00:00+04:00`).getDate().toString(),
-                detail: `${f.date(`${x.date}T12:00:00+04:00`)} · ${split(x)}`,
+                detail: `${f.date(`${x.date}T12:00:00+04:00`)}`,
                 value: x.count,
               }))}
             />
@@ -260,7 +252,6 @@ export default function BrandInsightsPage() {
                 key: String(b.min),
                 label: b.max == null ? `${amd(b.min)}+` : `${amd(b.min)}–${amd(b.max)}`,
                 value: b.count,
-                detail: split(b),
               }));
               return (
                 <ChartCard
@@ -280,7 +271,7 @@ export default function BrandInsightsPage() {
                         b.max == null
                           ? `${f.compact(f.toDisplay(b.min * 100, 'AMD') / 100)}+`
                           : `${f.compact(f.toDisplay(b.min * 100, 'AMD') / 100)}–${f.compact(f.toDisplay(b.max * 100, 'AMD') / 100)}`,
-                      detail: `${b.max == null ? `${amd(b.min)}+` : `${amd(b.min)}–${amd(b.max)}`} · ${split(b)}`,
+                      detail: `${b.max == null ? `${amd(b.min)}+` : `${amd(b.min)}–${amd(b.max)}`}`,
                       value: b.count,
                     }))}
                   />

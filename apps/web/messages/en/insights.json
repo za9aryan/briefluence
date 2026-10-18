@@ -1,48 +1,45 @@
 {
   "title": "What bloggers are looking for",
-  "lead": "Two signals in one: the filters verified bloggers search with, and the briefs they open. Shape your next brief around them.",
+  "lead": "What verified bloggers are interested in right now. Shape your next brief around it.",
   "period": "Period",
   "lastDays": "Last {count} days",
-  "searches": "Searches",
   "total": "Total",
-  "signals": "Searches + opens",
-  "split": "{searches} searches · {opens} opens",
+  "signals": "Interest",
   "category": "Category",
   "showTable": "Table",
   "showChart": "Chart",
   "empty": "No activity in this period yet.",
   "kpi": {
-    "searches": "Searches + opens",
+    "searches": "Interest",
     "bloggers": "Active bloggers",
-    "opened": "Briefs opened",
-    "openedHint": "{count} opens",
     "ofVerified": "of {count} verified",
+    "topFormat": "Top format",
     "topNiche": "Top niche"
   },
   "perDay": {
-    "title": "Activity per day",
-    "subtitle": "Searches and brief opens together."
+    "title": "Interest per day",
+    "subtitle": "How active bloggers are."
   },
   "platforms": {
     "title": "Platforms",
-    "subtitle": "Platforms bloggers filter for and open."
+    "subtitle": "Platforms bloggers are interested in."
   },
   "payment": {
     "title": "Money or barter",
-    "subtitle": "Compensation bloggers look for and open."
+    "subtitle": "Compensation bloggers are interested in."
   },
   "collaboration": {
     "title": "Short-term or long-term",
-    "subtitle": "Collaboration bloggers look for and open."
+    "subtitle": "Collaboration bloggers are interested in."
   },
   "niches": {
     "title": "Niches",
-    "subtitle": "Topics bloggers filter for and open."
+    "subtitle": "Topics bloggers are interested in."
   },
   "budget": {
     "title": "Budget",
-    "subtitle": "Minimum budget in searches and the budget of opened briefs, AMD.",
-    "note": "Counts searches with a budget filter and opened briefs that pay money (top of the range)."
+    "subtitle": "Budgets bloggers are interested in, AMD.",
+    "note": "Only collaborations paid with money are counted."
   },
   "cities": {
     "title": "Cities",
@@ -50,7 +47,7 @@
   },
   "formats": {
     "title": "Content formats",
-    "subtitle": "Formats in the briefs bloggers open."
+    "subtitle": "Formats bloggers are interested in."
   },
-  "privacy": "Anonymous totals across all verified bloggers and all briefs. A search or an opened brief counts in every category it matches; one blogger opening a brief counts once a day."
+  "privacy": "Anonymous totals across all verified bloggers; one action can count in several categories."
 }
