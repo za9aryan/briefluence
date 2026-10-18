@@ -13,6 +13,8 @@ import type {
   SubscriptionStatus,
   VerificationStatus,
   PlanCode,
+  OfferStatus,
+  OfferRequestStatus,
 } from '@briefluence/shared';
 
 /** API response shapes (dates arrive as ISO strings). */
@@ -258,6 +260,7 @@ export interface PlanDto {
   priceMinor: number;
   currency: Currency;
   applicationLimit: number | null;
+  offerLimit: number | null;
   windowDays: number;
 }
 
@@ -293,4 +296,98 @@ export interface PaymentDto {
   failureReason: string | null;
   createdAt: string;
   providerOrderId: string;
+}
+
+/** Blogger offer ("1 Story for 10,000 AMD"). Review fields only reach the owner and admins. */
+export interface OfferDto {
+  id: string;
+  influencerId: string;
+  title: string;
+  description: string;
+  priceMinor: number | null;
+  currency: Currency;
+  collaborationType: CollaborationType;
+  platforms: Platform[];
+  contentFormats: ContentFormat[];
+  niches: string[];
+  idealBrands: string | null;
+  status: OfferStatus;
+  reviewNote?: string | null;
+  submittedAt?: string | null;
+  publishedAt: string | null;
+  viewCount: number;
+  createdAt: string;
+}
+
+export interface OfferBloggerDto {
+  id: string;
+  displayName: string;
+  avatarUrl: string | null;
+  country: string;
+  city: string | null;
+  niches: string[];
+  verified: boolean;
+  socialAccounts: SocialAccountDto[];
+}
+
+export interface MyOfferDto extends OfferDto {
+  requestCount: number;
+  newRequestCount: number;
+}
+
+export interface FeedOfferDto extends OfferDto {
+  blogger: OfferBloggerDto;
+  myRequest: { id: string; status: OfferRequestStatus } | null;
+}
+
+export interface OfferDetailDto extends OfferDto {
+  blogger: OfferBloggerDto;
+  myRequest?: {
+    id: string;
+    status: OfferRequestStatus;
+    message: string;
+    proposedBudget: number | null;
+    contacts: { method: ContactMethod | null; value: string | null } | null;
+  } | null;
+}
+
+export interface OfferRequestDto {
+  id: string;
+  message: string;
+  proposedBudget: number | null;
+  status: OfferRequestStatus;
+  createdAt: string;
+  brand: {
+    id: string;
+    companyName: string;
+    logoUrl: string | null;
+    website: string | null;
+    instagramUrl: string | null;
+    description: string | null;
+    city: string | null;
+  };
+  contacts: {
+    name: string | null;
+    position: string | null;
+    method: ContactMethod | null;
+    value: string | null;
+  } | null;
+}
+
+export interface MyOfferRequestDto {
+  id: string;
+  message: string;
+  proposedBudget: number | null;
+  status: OfferRequestStatus;
+  updatedAt: string;
+  offer: {
+    id: string;
+    title: string;
+    priceMinor: number | null;
+    currency: Currency;
+    collaborationType: CollaborationType;
+    status: OfferStatus;
+  };
+  blogger: { id: string; displayName: string; avatarUrl: string | null };
+  contacts: { method: ContactMethod | null; value: string | null } | null;
 }

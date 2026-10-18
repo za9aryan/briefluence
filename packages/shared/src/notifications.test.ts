@@ -13,6 +13,8 @@ const params = {
   days: 3,
   amount: 999,
   limit: 10,
+  offer: '1 Story for your cafe',
+  brand: 'Ararat Cafe',
   currency: 'USD',
   date: '2026-11-15T09:00:00Z',
   until: '2026-11-15T09:00:00Z',

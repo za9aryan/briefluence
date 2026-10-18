@@ -5,3 +5,4 @@ export * from './deals';
 export * from './applications';
 export * from './social';
 export * from './billing';
+export * from './offers';

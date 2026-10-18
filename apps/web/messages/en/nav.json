@@ -30,9 +30,12 @@
     "deals": "Briefs",
     "users": "Users",
     "payments": "Payments",
-    "plans": "Plans"
+    "plans": "Plans",
+    "offerReview": "Offer review"
   },
   "insights": "Insights",
   "language": "Language",
-  "currency": "Currency"
+  "currency": "Currency",
+  "myOffers": "My offers",
+  "bloggerOffers": "Blogger offers"
 }

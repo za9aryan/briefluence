@@ -477,6 +477,8 @@ export default {
       price: ['Price', 'Цена', 'Գին'],
       currency: ['Currency', 'Валюта', 'Արժույթ'],
       limit: ['Applications per 30 days', 'Откликов за 30 дней', 'Դիմումներ 30 օրում'],
+      offerLimit: ['Live offers', 'Активных предложений', 'Ակտիվ առաջարկներ'],
+      unlimitedOffers: ['Unlimited offers', 'Без ограничений', 'Առանց սահմանափակման'],
       unlimited: [
         'Unlimited applications',
         'Отклики без ограничений',

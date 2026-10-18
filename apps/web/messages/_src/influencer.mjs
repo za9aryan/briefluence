@@ -661,6 +661,16 @@ export default {
           'Одна оплата на 12 месяцев',
           'Մեկ վճարում 12 ամսվա համար',
         ],
+        offers: [
+          '{count, plural, one {# live offer for brands} other {# live offers for brands}}',
+          '{count, plural, one {# активное предложение для брендов} few {# активных предложения для брендов} many {# активных предложений для брендов} other {# активного предложения для брендов}}',
+          '{count} ակտիվ առաջարկ բրենդների համար',
+        ],
+        offersUnlimited: [
+          'Unlimited offers for brands',
+          'Предложения для брендов без ограничений',
+          'Առաջարկներ բրենդների համար՝ առանց սահմանափակման',
+        ],
       },
       chooseBasic: ['Start with Basic', 'Начать с Basic', 'Սկսել Basic-ով'],
       choosePro: ['Choose Pro', 'Выбрать Pro', 'Ընտրել Pro'],

@@ -25,6 +25,7 @@ function useNav(role: Role): NavItem[] {
       { href: '/influencer/dashboard', label: t('dashboard'), icon: 'dashboard' },
       { href: '/influencer/deals', label: t('findDeals'), icon: 'search' },
       { href: '/influencer/applications', label: t('myApplications'), icon: 'send' },
+      { href: '/influencer/offers', label: t('myOffers'), icon: 'sparkles' },
       { href: '/influencer/verification', label: t('verification'), icon: 'verified' },
       { href: '/influencer/billing', label: t('billing'), icon: 'card' },
       { href: '/influencer/account', label: t('settings'), icon: 'settings' },
@@ -35,6 +36,7 @@ function useNav(role: Role): NavItem[] {
       { href: '/brand/dashboard', label: t('dashboard'), icon: 'dashboard' },
       { href: '/brand/deals', label: t('deals'), icon: 'briefcase' },
       { href: '/brand/deals/new', label: t('newDeal'), icon: 'plus' },
+      { href: '/brand/offers', label: t('bloggerOffers'), icon: 'sparkles' },
       { href: '/brand/insights', label: t('insights'), icon: 'chart' },
       { href: '/brand/account', label: t('brandProfile'), icon: 'building' },
     ];
@@ -44,6 +46,7 @@ function useNav(role: Role): NavItem[] {
     { href: '/admin/verifications', label: t('admin.verifications'), icon: 'verified' },
     { href: '/admin/accounts', label: t('admin.accounts'), icon: 'link' },
     { href: '/admin/brief-review', label: t('admin.briefReview'), icon: 'shield' },
+    { href: '/admin/offer-review', label: t('admin.offerReview'), icon: 'sparkles' },
     { href: '/admin/deals', label: t('admin.deals'), icon: 'briefcase' },
     { href: '/admin/users', label: t('admin.users'), icon: 'users' },
     { href: '/admin/plans', label: t('admin.plans'), icon: 'star' },

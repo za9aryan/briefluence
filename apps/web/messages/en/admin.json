@@ -91,6 +91,8 @@
     "price": "Price",
     "currency": "Currency",
     "limit": "Applications per 30 days",
+    "offerLimit": "Live offers",
+    "unlimitedOffers": "Unlimited offers",
     "unlimited": "Unlimited applications",
     "active": "Offered to bloggers",
     "free": "Free",

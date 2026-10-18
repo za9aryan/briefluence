@@ -80,6 +80,16 @@ the paid period starts when the free days end. Without payment (or after a cance
 moves to Basic — nobody loses access. Prices, currency, Basic's limit and which Pro plans are offered are edited in
 **Admin → Plans**. Prices are never shown on public pages.
 
+## Blogger offers
+
+Besides applying to briefs, bloggers can publish **offers** ("1 Story for 10,000 AMD", "Long-term work with real
+estate brokers"): title, description, price or "price on request", one-off / long-term, platforms, formats, niches
+and who they want to work with. Offers are reviewed by admins (**Admin → Offer review**) like briefs. Brands browse
+them in **Blogger offers**, send a request with a message (and an optional budget); the blogger accepts or
+declines, and on accept both see each other's contacts. Views are counted once per brand per day. Basic allows a
+limited number of live offers (default 1, **Admin → Plans**); Pro is unlimited. Accepting requests does not use
+Basic's application limit.
+
 ## Re-registration warning
 
 Every link of a social account to a profile is kept in `SocialAccountLink` (also after the account or user is

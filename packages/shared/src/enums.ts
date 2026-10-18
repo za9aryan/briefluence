@@ -106,7 +106,26 @@ export const NOTIFICATION_TYPES = values(
   'SOCIAL_ACCOUNT_APPROVED',
   'SOCIAL_ACCOUNT_REJECTED',
   'SOCIAL_ACCOUNT_REUSED',
+  'OFFER_REVIEW_PENDING',
+  'OFFER_APPROVED',
+  'OFFER_REJECTED',
+  'OFFER_REQUEST_NEW',
+  'OFFER_REQUEST_ACCEPTED',
+  'OFFER_REQUEST_DECLINED',
 );
+
+/** Blogger offers ("1 Story for 10,000 AMD"), moderated like briefs. */
+export const OFFER_STATUSES = values(
+  'DRAFT',
+  'IN_REVIEW',
+  'REJECTED',
+  'ACTIVE',
+  'PAUSED',
+  'CLOSED',
+);
+export type OfferStatus = (typeof OFFER_STATUSES)[number];
+export const OFFER_REQUEST_STATUSES = values('PENDING', 'ACCEPTED', 'DECLINED', 'WITHDRAWN');
+export type OfferRequestStatus = (typeof OFFER_REQUEST_STATUSES)[number];
 
 export const ACCOUNT_REVIEW_STATUSES = values('PENDING', 'APPROVED', 'REJECTED');
 export type AccountReviewStatus = (typeof ACCOUNT_REVIEW_STATUSES)[number];

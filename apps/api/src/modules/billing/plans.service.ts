@@ -42,7 +42,13 @@ export class PlansService {
     }
     return this.prisma.plan.update({
       where: { code },
-      data: { ...input, applicationLimit: code === 'BASIC' ? input.applicationLimit : null },
+      data: {
+        ...input,
+        applicationLimit: code === 'BASIC' ? input.applicationLimit : null,
+        // Pro is unlimited; Basic keeps its offer limit unless a new one is sent.
+        offerLimit:
+          code === 'BASIC' ? (input.offerLimit === undefined ? undefined : input.offerLimit) : null,
+      },
     });
   }
 }

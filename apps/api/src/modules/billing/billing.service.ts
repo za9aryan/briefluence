@@ -63,6 +63,7 @@ const publicPlan = (p: Plan) => ({
   priceMinor: p.priceMinor,
   currency: p.currency,
   applicationLimit: p.applicationLimit,
+  offerLimit: p.offerLimit,
   windowDays: PLAN_WINDOW_DAYS,
 });
 

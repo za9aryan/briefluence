@@ -25,7 +25,9 @@
     "PROVIDER_ERROR": "The external service is unavailable. Try again in a minute.",
     "INTERNAL": "Something went wrong on our side.",
     "SOCIAL_ACCOUNT_TAKEN": "This account is already added. If it is yours and someone else added it, write to support.",
-    "SOCIAL_PLATFORM_TAKEN": "You already have an account on this platform. Remove it first to add another one."
+    "SOCIAL_PLATFORM_TAKEN": "You already have an account on this platform. Remove it first to add another one.",
+    "OFFER_LIMIT_REACHED": "Your plan allows no more live offers. Close one or choose Pro.",
+    "APPLICATION_LIMIT_REACHED": "You used all applications of the Basic plan for now. Choose Pro for unlimited applications."
   },
   "field": {
     "required": "This field is required.",

@@ -19,7 +19,9 @@
       "feed": "Full brief feed with match scores",
       "unlimited": "Unlimited applications",
       "cancel": "Cancel any time",
-      "yearly": "One payment for 12 months"
+      "yearly": "One payment for 12 months",
+      "offers": "{count, plural, one {# live offer for brands} other {# live offers for brands}}",
+      "offersUnlimited": "Unlimited offers for brands"
     },
     "chooseBasic": "Start with Basic",
     "choosePro": "Choose Pro",

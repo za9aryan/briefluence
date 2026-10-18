@@ -26,6 +26,7 @@ interface PlanRow {
   priceMinor: number;
   currency: Currency;
   applicationLimit: number | null;
+  offerLimit: number | null;
   isActive: boolean;
 }
 
@@ -40,6 +41,7 @@ function PlanEditor({ plan }: { plan: PlanRow }) {
   const [price, setPrice] = useState(String(plan.priceMinor / 100));
   const [currency, setCurrency] = useState<Currency>(plan.currency);
   const [limit, setLimit] = useState(String(plan.applicationLimit ?? 10));
+  const [offers, setOffers] = useState(String(plan.offerLimit ?? 1));
   const [active, setActive] = useState(plan.isActive);
   const save = useMutation({
     mutationFn: () =>
@@ -47,6 +49,7 @@ function PlanEditor({ plan }: { plan: PlanRow }) {
         priceMinor: basic ? 0 : Math.round(Number(price) * 100),
         currency,
         applicationLimit: basic ? Math.round(Number(limit)) : null,
+        offerLimit: basic ? Math.round(Number(offers)) : null,
         isActive: basic ? true : active,
       }),
     onSuccess: () => {
@@ -55,7 +58,7 @@ function PlanEditor({ plan }: { plan: PlanRow }) {
     },
     onError: (e) => toast(errorMessage(e), 'danger'),
   });
-  const valid = basic ? Number(limit) >= 1 : Number(price) > 0;
+  const valid = basic ? Number(limit) >= 1 && Number(offers) >= 0 : Number(price) > 0;
 
   return (
     <Card>
@@ -72,7 +75,7 @@ function PlanEditor({ plan }: { plan: PlanRow }) {
             </Text>
             {!basic && <Switch checked={active} onChange={setActive} label={t('active')} />}
           </Inline>
-          <FieldGrid cols={{ base: 1, sm: 3 }}>
+          <FieldGrid cols={{ base: 1, sm: 2, lg: 4 }}>
             <Field label={t('price')}>
               {({ id }) =>
                 basic ? (
@@ -122,6 +125,22 @@ function PlanEditor({ plan }: { plan: PlanRow }) {
                 )
               }
             </Field>
+            <Field label={t('offerLimit')}>
+              {({ id }) =>
+                basic ? (
+                  <Input
+                    id={id}
+                    type="number"
+                    inputMode="numeric"
+                    min={0}
+                    value={offers}
+                    onChange={(e) => setOffers(e.target.value)}
+                  />
+                ) : (
+                  <Input id={id} value={t('unlimitedOffers')} disabled />
+                )
+              }
+            </Field>
           </FieldGrid>
           <Inline justify="end">
             <Button type="submit" disabled={!valid} loading={save.isPending}>
@@ -149,7 +168,7 @@ export default function AdminPlansPage() {
         <Stack gap={4}>
           {plans.data.map((p) => (
             <PlanEditor
-              key={`${p.code}-${p.priceMinor}-${p.currency}-${p.applicationLimit}-${p.isActive}`}
+              key={`${p.code}-${p.priceMinor}-${p.currency}-${p.applicationLimit}-${p.offerLimit}-${p.isActive}`}
               plan={p}
             />
           ))}

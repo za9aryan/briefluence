@@ -39,6 +39,10 @@ export async function createTestApp(): Promise<TestCtx> {
 export async function resetDb(prisma: PrismaService) {
   const tables = [
     'AuthIdentity',
+    'OfferView',
+    'OfferRequest',
+    'Offer',
+    'SocialAccountLink',
     'DealView',
     'ExchangeRate',
     'FeedSearch',
@@ -63,6 +67,7 @@ export async function resetDb(prisma: PrismaService) {
       priceMinor: 0,
       currency: 'USD' as const,
       applicationLimit: 10,
+      offerLimit: 1,
       isActive: true,
     },
     {
@@ -70,6 +75,7 @@ export async function resetDb(prisma: PrismaService) {
       priceMinor: 999,
       currency: 'USD' as const,
       applicationLimit: null,
+      offerLimit: null,
       isActive: true,
     },
     {
@@ -77,6 +83,7 @@ export async function resetDb(prisma: PrismaService) {
       priceMinor: 9999,
       currency: 'USD' as const,
       applicationLimit: null,
+      offerLimit: null,
       isActive: true,
     },
   ];

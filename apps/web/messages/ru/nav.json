@@ -30,9 +30,12 @@
     "deals": "Брифы",
     "users": "Пользователи",
     "payments": "Платежи",
-    "plans": "Тарифы"
+    "plans": "Тарифы",
+    "offerReview": "Проверка предложений"
   },
   "insights": "Аналитика",
   "language": "Язык",
-  "currency": "Валюта"
+  "currency": "Валюта",
+  "myOffers": "Мои предложения",
+  "bloggerOffers": "Предложения блогеров"
 }

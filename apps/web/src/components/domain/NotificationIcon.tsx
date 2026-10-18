@@ -28,6 +28,12 @@ const ICON: Record<NotificationType, { icon: IconName; tone: IconBubbleTone }> =
   SOCIAL_ACCOUNT_APPROVED: { icon: 'check-circle', tone: 'success' },
   SOCIAL_ACCOUNT_REJECTED: { icon: 'x-circle', tone: 'primary' },
   SOCIAL_ACCOUNT_REUSED: { icon: 'warning', tone: 'primary' },
+  OFFER_REVIEW_PENDING: { icon: 'shield', tone: 'neutral' },
+  OFFER_APPROVED: { icon: 'check-circle', tone: 'success' },
+  OFFER_REJECTED: { icon: 'edit', tone: 'primary' },
+  OFFER_REQUEST_NEW: { icon: 'building', tone: 'primary' },
+  OFFER_REQUEST_ACCEPTED: { icon: 'check-circle', tone: 'success' },
+  OFFER_REQUEST_DECLINED: { icon: 'x-circle', tone: 'neutral' },
 };
 
 export function NotificationIcon({ type, size }: { type: string; size?: 'sm' | 'md' }) {

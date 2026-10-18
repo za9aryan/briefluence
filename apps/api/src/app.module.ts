@@ -16,6 +16,7 @@ import { BillingModule } from './modules/billing/billing.module';
 import { BrandsModule } from './modules/brands/brands.module';
 import { CurrencyModule } from './modules/currency/currency.module';
 import { DealsModule } from './modules/deals/deals.module';
+import { OffersModule } from './modules/offers/offers.module';
 import { HealthController } from './modules/health/health.controller';
 import { InfluencersModule } from './modules/influencers/influencers.module';
 import { JobsModule } from './modules/jobs/jobs.module';
@@ -46,6 +47,7 @@ const env = loadEnv();
     SocialModule,
     BrandsModule,
     DealsModule,
+    OffersModule,
     ApplicationsModule,
     BillingModule,
     AdminModule,

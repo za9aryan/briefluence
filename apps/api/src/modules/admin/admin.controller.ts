@@ -35,6 +35,7 @@ import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { JobsService, type JobName } from '../jobs/jobs.service';
 import { PlansService } from '../billing/plans.service';
+import { OffersService } from '../offers/offers.service';
 import { AdminService, USER_STATES } from './admin.service';
 import {
   ANALYTICS_PERIODS,
@@ -53,6 +54,7 @@ export class AdminController {
     private readonly admin: AdminService,
     private readonly analyticsService: AdminAnalyticsService,
     private readonly plansService: PlansService,
+    private readonly offersService: OffersService,
     private readonly jobs: JobsService,
     private readonly clock: Clock,
     @Inject(ENV) private readonly env: Env,
@@ -66,6 +68,28 @@ export class AdminController {
   }
 
   /** Blogger plans: prices, currency, Basic's application limit, on/off. */
+  /** Offer review queue (blogger offers are checked before brands see them). */
+  @Get('offers')
+  offers(@Query('status') status?: string) {
+    return this.offersService.reviewQueue(status === 'REJECTED' ? 'REJECTED' : 'IN_REVIEW');
+  }
+
+  @Post('offers/:id/approve')
+  @HttpCode(204)
+  approveOffer(@Param('id') id: string) {
+    return this.offersService.approve(id);
+  }
+
+  @Post('offers/:id/reject')
+  @HttpCode(204)
+  @ApiZodBody(verificationDecisionSchema)
+  rejectOffer(
+    @Param('id') id: string,
+    @ZodBody(verificationDecisionSchema) body: VerificationDecisionInput,
+  ) {
+    return this.offersService.reject(id, body.reason);
+  }
+
   @Get('plans')
   plans() {
     return this.plansService.all();

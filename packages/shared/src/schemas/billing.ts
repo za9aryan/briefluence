@@ -14,6 +14,8 @@ export const planUpdateSchema = z.object({
   priceMinor: z.number().int().min(0).max(100_000_000),
   currency: z.enum(CURRENCIES),
   applicationLimit: z.number().int().min(1).max(1000).nullable(),
+  /** Live offers; null = unlimited. Optional so older clients keep working. */
+  offerLimit: z.number().int().min(0).max(100).nullable().optional(),
   isActive: z.boolean(),
 });
 export type PlanUpdateInput = z.infer<typeof planUpdateSchema>;

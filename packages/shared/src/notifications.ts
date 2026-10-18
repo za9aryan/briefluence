@@ -486,6 +486,108 @@ const CATALOG: Record<NotificationType, { cta: L3; render: Record<NotificationLo
         }),
       },
     },
+    OFFER_REVIEW_PENDING: {
+      cta: { en: 'Open review queue', ru: 'Открыть очередь проверки', hy: 'Բացել ստուգման հերթը' },
+      render: {
+        en: (p) => ({
+          title: 'New offer waiting for review',
+          body: `${s(p.name)}: "${s(p.offer)}"`,
+        }),
+        ru: (p) => ({
+          title: 'Новое предложение ждёт проверки',
+          body: `${s(p.name)}: «${s(p.offer)}»`,
+        }),
+        hy: (p) => ({
+          title: 'Նոր առաջարկը սպասում է ստուգման',
+          body: `${s(p.name)}՝ «${s(p.offer)}»`,
+        }),
+      },
+    },
+    OFFER_APPROVED: {
+      cta: { en: 'Open my offers', ru: 'Открыть мои предложения', hy: 'Բացել իմ առաջարկները' },
+      render: {
+        en: (p) => ({
+          title: 'Your offer is live',
+          body: `"${s(p.offer)}" passed the check. Brands can see it and send requests.`,
+        }),
+        ru: (p) => ({
+          title: 'Предложение опубликовано',
+          body: `«${s(p.offer)}» прошло проверку. Бренды видят его и могут отправлять запросы.`,
+        }),
+        hy: (p) => ({
+          title: 'Առաջարկը հրապարակված է',
+          body: `«${s(p.offer)}»-ն անցավ ստուգումը։ Բրենդները տեսնում են այն և կարող են հարցումներ ուղարկել։`,
+        }),
+      },
+    },
+    OFFER_REJECTED: {
+      cta: { en: 'Edit offer', ru: 'Изменить предложение', hy: 'Խմբագրել առաջարկը' },
+      render: {
+        en: (p) => ({
+          title: 'Your offer needs changes',
+          body: `"${s(p.offer)}"\nReason: ${s(p.reason)}\nFix it and send it again.`,
+        }),
+        ru: (p) => ({
+          title: 'Предложение нужно доработать',
+          body: `«${s(p.offer)}»\nПричина: ${s(p.reason)}\nИсправь и отправь снова.`,
+        }),
+        hy: (p) => ({
+          title: 'Առաջարկը պետք է լրամշակել',
+          body: `«${s(p.offer)}»\nՊատճառը՝ ${s(p.reason)}\nՈւղղիր և կրկին ուղարկիր։`,
+        }),
+      },
+    },
+    OFFER_REQUEST_NEW: {
+      cta: { en: 'See the request', ru: 'Посмотреть запрос', hy: 'Դիտել հարցումը' },
+      render: {
+        en: (p) => ({
+          title: 'A brand wants to work with you',
+          body: `${s(p.brand)} sent a request for "${s(p.offer)}".`,
+        }),
+        ru: (p) => ({
+          title: 'Бренд хочет поработать с тобой',
+          body: `${s(p.brand)} отправил запрос на «${s(p.offer)}».`,
+        }),
+        hy: (p) => ({
+          title: 'Բրենդը ցանկանում է աշխատել քեզ հետ',
+          body: `${s(p.brand)}-ն հարցում է ուղարկել «${s(p.offer)}»-ի համար։`,
+        }),
+      },
+    },
+    OFFER_REQUEST_ACCEPTED: {
+      cta: { en: 'See contacts', ru: 'Посмотреть контакты', hy: 'Դիտել կոնտակտները' },
+      render: {
+        en: (p) => ({
+          title: 'Your request was accepted',
+          body: `${s(p.name)} accepted your request for "${s(p.offer)}". Their contacts are now in Blogger offers → My requests.`,
+        }),
+        ru: (p) => ({
+          title: 'Запрос принят',
+          body: `${s(p.name)} принял(а) запрос на «${s(p.offer)}». Контакты — в разделе «Предложения блогеров» → «Мои запросы».`,
+        }),
+        hy: (p) => ({
+          title: 'Հարցումն ընդունվել է',
+          body: `${s(p.name)}-ն ընդունել է «${s(p.offer)}»-ի հարցումը։ Կոնտակտները՝ «Բլոգերների առաջարկներ» → «Իմ հարցումները» բաժնում։`,
+        }),
+      },
+    },
+    OFFER_REQUEST_DECLINED: {
+      cta: { en: 'Browse offers', ru: 'Смотреть предложения', hy: 'Դիտել առաջարկները' },
+      render: {
+        en: (p) => ({
+          title: 'Not this time',
+          body: `${s(p.name)} could not take your request for "${s(p.offer)}".`,
+        }),
+        ru: (p) => ({
+          title: 'В этот раз не получилось',
+          body: `${s(p.name)} не смог(ла) принять запрос на «${s(p.offer)}».`,
+        }),
+        hy: (p) => ({
+          title: 'Այս անգամ՝ ոչ',
+          body: `${s(p.name)}-ն չկարողացավ ընդունել «${s(p.offer)}»-ի հարցումը։`,
+        }),
+      },
+    },
     SOCIAL_ACCOUNT_REUSED: {
       cta: { en: 'Check the account', ru: 'Проверить аккаунт', hy: 'Ստուգել հաշիվը' },
       render: {

@@ -85,11 +85,13 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
       ? [
           t('features.freeDays'),
           t('features.limit', { count: p.applicationLimit ?? 0 }),
+          ...(p.offerLimit != null ? [t('features.offers', { count: p.offerLimit })] : []),
           t('features.feed'),
         ]
       : [
           ...(mode === 'start' ? [t('features.freeDays')] : []),
           t('features.unlimited'),
+          t('features.offersUnlimited'),
           p.code === 'PRO_YEARLY' ? t('features.yearly') : t('features.cancel'),
         ];
   const cta: Record<PlanCode, string> = {
