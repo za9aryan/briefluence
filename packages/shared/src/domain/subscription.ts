@@ -67,7 +67,10 @@ export function hasAccess(s: SubscriptionState | null, now: Date): boolean {
   }
 }
 
-export function trialDaysLeft(s: Pick<SubscriptionState, 'status' | 'trialEndsAt'>, now: Date): number {
+export function trialDaysLeft(
+  s: Pick<SubscriptionState, 'status' | 'trialEndsAt'>,
+  now: Date,
+): number {
   if (s.status !== 'TRIALING') return 0;
   return Math.max(0, Math.ceil((s.trialEndsAt.getTime() - now.getTime()) / DAY));
 }
@@ -80,7 +83,8 @@ export function applyPaymentSucceeded(
 ): SubscriptionState {
   // A renewal (ACTIVE / PAST_DUE) extends from the previous period end so the billing date
   // stays stable; a first checkout (trial, canceled, expired) starts the period now.
-  const isRenewal = (s.status === 'ACTIVE' || s.status === 'PAST_DUE') && s.currentPeriodEnd != null;
+  const isRenewal =
+    (s.status === 'ACTIVE' || s.status === 'PAST_DUE') && s.currentPeriodEnd != null;
   let periodEnd = addMonths(isRenewal ? s.currentPeriodEnd! : now, 1);
   if (periodEnd.getTime() <= now.getTime()) periodEnd = addMonths(now, 1);
   return {
@@ -152,5 +156,18 @@ export function applyResume(s: SubscriptionState): SubscriptionState {
 /** Whether a checkout (first payment / resubscribe) is allowed right now. */
 export function canCheckout(s: SubscriptionState | null): boolean {
   if (!s) return false;
-  return s.status === 'TRIALING' || s.status === 'EXPIRED' || s.status === 'PAST_DUE' || s.status === 'CANCELED';
+  return (
+    s.status === 'TRIALING' ||
+    s.status === 'EXPIRED' ||
+    s.status === 'PAST_DUE' ||
+    s.status === 'CANCELED'
+  );
+}
+
+export type PlanTier = 'FREE' | 'PAID' | 'NONE';
+
+/** Which plan a blogger is on right now, for analytics: free trial, paid, or no access. */
+export function planTier(s: SubscriptionState | null, now: Date): PlanTier {
+  if (!s || !hasAccess(s, now)) return 'NONE';
+  return s.status === 'TRIALING' ? 'FREE' : 'PAID';
 }

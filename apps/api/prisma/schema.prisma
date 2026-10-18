@@ -307,6 +307,9 @@ model Application {
   proposedPrice   Int? // minor units, in the deal's currency
   matchScore      Int // 0-100, frozen at apply time
   status          ApplicationStatus @default(APPLIED)
+  /// When the brand shortlisted / accepted it (kept after later status changes, for the funnel).
+  shortlistedAt   DateTime?
+  acceptedAt      DateTime?
   rejectionReason String?
   postUrl         String? // proof of publication
   createdAt       DateTime          @default(now())

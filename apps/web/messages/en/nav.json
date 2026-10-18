@@ -24,6 +24,7 @@
   "brandProfile": "Brand profile",
   "notifications": "Notifications",
   "admin": {
+    "overview": "Overview",
     "verifications": "Verifications",
     "accounts": "Accounts",
     "briefReview": "Brief review",

@@ -70,7 +70,10 @@ test('sign-up → verify → apply → accept → done', async ({ browser }) => 
   await admin.getByLabel('Email').fill('admin@briefluence.local');
   await admin.getByLabel('Password', { exact: true }).fill('Admin12345');
   await admin.getByRole('button', { name: 'Log in' }).click();
-  await admin.waitForURL('**/admin/verifications');
+  // Admins land on the overview dashboard.
+  await admin.waitForURL('**/admin/overview');
+  await expect(admin.getByText('Bloggers by plan')).toBeVisible();
+  await admin.goto('/admin/verifications');
   const card = admin
     .locator('div', { hasText: bloggerEmail })
     .filter({ has: admin.getByRole('button', { name: 'Approve' }) })

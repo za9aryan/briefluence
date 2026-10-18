@@ -78,7 +78,9 @@ There is no public admin sign-up. The admin account comes from `ADMIN_EMAIL` / `
 pnpm admin:create     # creates the admin, or resets its password; touches no other data (safe in production)
 ```
 
-Then log in at `/login` with those credentials; admins land on **Verifications** (approve / reject bloggers),
+Then log in at `/login` with those credentials; admins land on **Overview** (sign-ups, briefs, applications,
+the shortlist → accept funnel, bloggers on free trial vs paid, over 30 days / 90 days / 12 months), then
+**Verifications** (approve / reject bloggers),
 with **Brief review**, **Briefs**, **Users** (block, confirm email, send reset link, sign out everywhere) and
 **Payments** in the sidebar.
 

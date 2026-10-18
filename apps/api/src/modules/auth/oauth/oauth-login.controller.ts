@@ -28,7 +28,7 @@ const COOKIE_PATH = '/api/v1/auth/oauth';
 const HOME = {
   INFLUENCER: '/influencer/dashboard',
   BRAND: '/brand/dashboard',
-  ADMIN: '/admin/verifications',
+  ADMIN: '/admin/overview',
 } as const;
 
 const completeSchema = z.object({

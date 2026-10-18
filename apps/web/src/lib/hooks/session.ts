@@ -53,7 +53,7 @@ export function useMe() {
 export const HOME_BY_ROLE: Record<Role, string> = {
   INFLUENCER: '/influencer/dashboard',
   BRAND: '/brand/dashboard',
-  ADMIN: '/admin/verifications',
+  ADMIN: '/admin/overview',
 };
 
 /** Where to send a user right after sign-in: unfinished onboarding first. */

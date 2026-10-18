@@ -14,6 +14,76 @@
     "reason": "Reason",
     "reasonHint": "The blogger sees this. Say what to fix."
   },
+  "overview": {
+    "title": "Overview",
+    "lead": "How the marketplace is doing.",
+    "period": "Period",
+    "last30": "Last 30 days",
+    "last90": "Last 90 days",
+    "last365": "Last 12 months",
+    "allTime": "{count} all time",
+    "ofBloggers": "of {count} bloggers",
+    "kpi": {
+      "bloggers": "New bloggers",
+      "brands": "New brands",
+      "briefs": "Briefs published",
+      "applications": "Applications",
+      "shortlisted": "Shortlisted",
+      "accepted": "Bloggers accepted",
+      "free": "On free trial",
+      "paid": "Paying"
+    },
+    "charts": {
+      "applications": "Applications over time",
+      "briefs": "Briefs published over time",
+      "signups": "Sign-ups over time",
+      "signupsSubtitle": "Bloggers and brands together",
+      "who": "Who signed up",
+      "plans": "Bloggers by plan",
+      "plansSubtitle": "Right now",
+      "verification": "Blogger verification",
+      "outcomes": "What happened to applications",
+      "outcomesSubtitle": "Applications sent in this period",
+      "funnel": "Application funnel",
+      "dealStatuses": "Briefs by status",
+      "platforms": "Platforms in published briefs",
+      "formats": "Content formats in published briefs"
+    },
+    "series": {
+      "applications": "Applications",
+      "briefs": "Briefs",
+      "signups": "Sign-ups",
+      "bloggers": "Bloggers",
+      "brands": "Brands",
+      "count": "Count"
+    },
+    "plan": {
+      "FREE": "Free trial",
+      "PAID": "Paid",
+      "NONE": "No active plan"
+    },
+    "verificationState": {
+      "APPROVED": "Verified",
+      "PENDING_REVIEW": "In review",
+      "NOT_VERIFIED": "Not verified yet"
+    },
+    "outcome": {
+      "WAITING": "Waiting",
+      "ACCEPTED": "Accepted",
+      "NOT_SELECTED": "Not selected or withdrawn"
+    },
+    "funnelStep": {
+      "sent": "Sent",
+      "shortlisted": "Shortlisted",
+      "accepted": "Accepted",
+      "completed": "Completed"
+    },
+    "empty": "No data in this period yet.",
+    "table": "Table",
+    "chart": "Chart",
+    "category": "Category",
+    "ofSent": "{value} of sent"
+  },
   "accounts": {
     "title": "Account review",
     "lead": "Accounts bloggers added after their profile was approved. Open each one: it must be public and its content fine for brands.",

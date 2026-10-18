@@ -4,11 +4,15 @@ import { NextResponse, type NextRequest } from 'next/server';
  * Role-based routing (Next.js 16 "proxy", formerly middleware). Reads the non-secret `bf_role`
  * hint cookie set by the API; the API itself enforces every permission.
  */
-const AREA_ROLE: Record<string, string> = { influencer: 'INFLUENCER', brand: 'BRAND', admin: 'ADMIN' };
+const AREA_ROLE: Record<string, string> = {
+  influencer: 'INFLUENCER',
+  brand: 'BRAND',
+  admin: 'ADMIN',
+};
 const HOME: Record<string, string> = {
   INFLUENCER: '/influencer/dashboard',
   BRAND: '/brand/dashboard',
-  ADMIN: '/admin/verifications',
+  ADMIN: '/admin/overview',
 };
 
 export function proxy(req: NextRequest) {
@@ -23,7 +27,8 @@ export function proxy(req: NextRequest) {
       return NextResponse.redirect(url);
     }
     const required = AREA_ROLE[area];
-    if (required && role !== required) return NextResponse.redirect(new URL(HOME[role] ?? '/', req.url));
+    if (required && role !== required)
+      return NextResponse.redirect(new URL(HOME[role] ?? '/', req.url));
   }
 
   if ((pathname === '/login' || pathname === '/signup') && role && HOME[role]) {
@@ -33,5 +38,12 @@ export function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/influencer/:path*', '/brand/:path*', '/admin/:path*', '/notifications/:path*', '/login', '/signup'],
+  matcher: [
+    '/influencer/:path*',
+    '/brand/:path*',
+    '/admin/:path*',
+    '/notifications/:path*',
+    '/login',
+    '/signup',
+  ],
 };

@@ -29,6 +29,11 @@ import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { JobsService, type JobName } from '../jobs/jobs.service';
 import { AdminService, USER_STATES } from './admin.service';
+import {
+  ANALYTICS_PERIODS,
+  AdminAnalyticsService,
+  type AnalyticsPeriod,
+} from './analytics.service';
 
 const pick = <T extends string>(list: readonly T[], v?: string) =>
   list.includes(v as T) ? (v as T) : undefined;
@@ -39,10 +44,18 @@ const pick = <T extends string>(list: readonly T[], v?: string) =>
 export class AdminController {
   constructor(
     private readonly admin: AdminService,
+    private readonly analyticsService: AdminAnalyticsService,
     private readonly jobs: JobsService,
     private readonly clock: Clock,
     @Inject(ENV) private readonly env: Env,
   ) {}
+
+  /** Overview dashboard: activity in the last 30 / 90 / 365 days and the current state. */
+  @Get('analytics')
+  analytics(@Query('days') days?: string) {
+    const d = Number(days) as AnalyticsPeriod;
+    return this.analyticsService.overview(ANALYTICS_PERIODS.includes(d) ? d : 30);
+  }
 
   @Get('stats')
   stats() {

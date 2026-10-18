@@ -86,7 +86,14 @@ export class ApplicationsService {
         throw new AppError('ALREADY_APPLIED', 'You already applied to this deal');
       application = await this.prisma.application.update({
         where: { id: existing.id },
-        data: { ...data, status: 'APPLIED', rejectionReason: null, postUrl: null },
+        data: {
+          ...data,
+          status: 'APPLIED',
+          rejectionReason: null,
+          postUrl: null,
+          shortlistedAt: null,
+          acceptedAt: null,
+        },
       });
     } else {
       try {
@@ -321,6 +328,11 @@ export class ApplicationsService {
         data: {
           status: to,
           rejectionReason: to === 'REJECTED' ? input.rejectionReason : app.rejectionReason,
+          // Funnel dates survive later status changes (first time only).
+          ...(to === 'SHORTLISTED' && !app.shortlistedAt
+            ? { shortlistedAt: this.clock.now() }
+            : {}),
+          ...(to === 'ACCEPTED' && !app.acceptedAt ? { acceptedAt: this.clock.now() } : {}),
         },
       });
     });

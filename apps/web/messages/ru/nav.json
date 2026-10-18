@@ -24,6 +24,7 @@
   "brandProfile": "Профиль бренда",
   "notifications": "Уведомления",
   "admin": {
+    "overview": "Обзор",
     "verifications": "Верификация",
     "accounts": "Аккаунты",
     "briefReview": "Проверка брифов",
