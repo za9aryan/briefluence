@@ -86,6 +86,8 @@ export class SocialController {
       if (!(err instanceof AppError))
         this.logger.error(`OAuth callback failed: ${(err as Error).message}`);
       back.searchParams.set('error', message);
+      // The code lets the page show the message in the user's language.
+      if (err instanceof AppError) back.searchParams.set('code', err.code);
     }
     res.clearCookie(NONCE_COOKIE, { path: '/api/v1/social', domain: this.env.COOKIE_DOMAIN });
     res.redirect(302, back.toString());

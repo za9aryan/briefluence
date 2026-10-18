@@ -124,6 +124,8 @@ export class SocialService implements OnModuleInit {
     if (existing && existing.influencerId !== profile.id) {
       throw new AppError('CONFLICT', 'This account is already connected to another profile');
     }
+    // Reconnecting the same account is fine; a second account on this platform is not.
+    if (!existing) await this.assertPlatformFree(profile.id, platform);
     const data = {
       ...this.statsData(stats),
       ...this.tokenData(tokens),
@@ -170,6 +172,7 @@ export class SocialService implements OnModuleInit {
       select: { id: true },
     });
     if (!profile) throw new AppError('PROFILE_INCOMPLETE', 'Complete your profile first');
+    await this.assertPlatformFree(profile.id, input.platform);
     const sameHandle = await this.prisma.socialAccount.findFirst({
       where: {
         platform: input.platform,
@@ -202,6 +205,8 @@ export class SocialService implements OnModuleInit {
     const acc = await this.owned(userId, accountId);
     if (acc.source !== 'MANUAL')
       throw new AppError('CONFLICT', 'Connected accounts update from the platform');
+    if (input.platform !== acc.platform)
+      await this.assertPlatformFree(acc.influencerId, input.platform);
     if (
       input.platform !== acc.platform ||
       input.username.toLowerCase() !== acc.username.toLowerCase()
@@ -244,6 +249,19 @@ export class SocialService implements OnModuleInit {
       params: { name: profile.displayName, platform: account.platform, username: account.username },
       link: '/admin/accounts',
     });
+  }
+
+  /** One account per platform per blogger (also enforced by a unique index). */
+  private async assertPlatformFree(influencerId: string, platform: Platform) {
+    const has = await this.prisma.socialAccount.findFirst({
+      where: { influencerId, platform },
+      select: { id: true },
+    });
+    if (has)
+      throw new AppError(
+        'SOCIAL_PLATFORM_TAKEN',
+        `You already have a ${platform.toLowerCase()} account. Remove it first to add another one.`,
+      );
   }
 
   private manualData(i: ManualAccountInput) {

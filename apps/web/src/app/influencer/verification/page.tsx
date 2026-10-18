@@ -1,5 +1,5 @@
 'use client';
-import { PLATFORMS, type Platform } from '@briefluence/shared';
+import { PLATFORMS, type Platform, type ErrorCode } from '@briefluence/shared';
 import {
   Alert,
   Button,
@@ -24,7 +24,7 @@ import { PageHeader } from '@/components/app/AppShell';
 import { AccountLine, AccountStats } from '@/components/domain/AccountStats';
 import { ManualAccountModal } from '@/components/influencer/ManualAccountModal';
 import { VerificationBadge } from '@/components/domain/badges';
-import { API_BASE, api } from '@/lib/api';
+import { API_BASE, ApiError, api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { useFormat } from '@/lib/hooks/format';
 import { PLATFORM_ICON } from '@/lib/hooks/options';
@@ -37,6 +37,7 @@ function OAuthResult() {
   const toast = useToast();
   const t = useTranslations('verification');
   const tp = useTranslations('enums.platform');
+  const errorMessage = useErrorMessage();
   const handled = useRef(false);
   useEffect(() => {
     if (handled.current) return;
@@ -46,9 +47,11 @@ function OAuthResult() {
     handled.current = true;
     if (connected)
       toast(t('connectedToast', { platform: tp(connected.toUpperCase() as Platform) }));
-    if (error) toast(error, 'danger');
+    const code = params.get('code');
+    if (error)
+      toast(code ? errorMessage(new ApiError(400, code as ErrorCode, error)) : error, 'danger');
     router.replace('/influencer/verification');
-  }, [params, router, toast, t, tp]);
+  }, [params, router, toast, t, tp, errorMessage]);
   return null;
 }
 
@@ -98,6 +101,7 @@ export default function VerificationPage() {
 
   const p = profile.data;
   const accounts = p?.socialAccounts ?? [];
+  const usedPlatforms = accounts.map((a) => a.platform);
   const status = p?.status ?? 'DRAFT';
   const step =
     status === 'APPROVED' ? 3 : status === 'PENDING_REVIEW' ? 2 : accounts.length ? 2 : 1;
@@ -141,16 +145,32 @@ export default function VerificationPage() {
           {t('publicNote')}
         </Alert>
         <Grid cols={{ base: 1, sm: 3 }} gap={2}>
-          {PLATFORMS.map((pl) => (
-            <a
-              key={pl}
-              href={`${API_BASE}/social/${pl.toLowerCase()}/connect`}
-              className={buttonStyles({ variant: 'secondary', block: true })}
-            >
-              <Icon name={PLATFORM_ICON[pl]} />
-              {t('connect', { platform: tp(pl) })}
-            </a>
-          ))}
+          {PLATFORMS.map((pl) =>
+            // One account per platform: a platform already added shows as done.
+            usedPlatforms.includes(pl) ? (
+              <span
+                key={pl}
+                aria-disabled
+                className={buttonStyles({
+                  variant: 'secondary',
+                  block: true,
+                  className: 'pointer-events-none opacity-50',
+                })}
+              >
+                <Icon name="check" />
+                {t('platformAdded', { platform: tp(pl) })}
+              </span>
+            ) : (
+              <a
+                key={pl}
+                href={`${API_BASE}/social/${pl.toLowerCase()}/connect`}
+                className={buttonStyles({ variant: 'secondary', block: true })}
+              >
+                <Icon name={PLATFORM_ICON[pl]} />
+                {t('connect', { platform: tp(pl) })}
+              </a>
+            ),
+          )}
         </Grid>
         <Text size="small" tone="muted" className="mt-4">
           {t('instagramNote')}
@@ -163,6 +183,7 @@ export default function VerificationPage() {
             variant="secondary"
             icon="plus"
             className="shrink-0"
+            disabled={usedPlatforms.length >= PLATFORMS.length}
             onClick={() => setManual({ account: null })}
           >
             {t('manual.button')}
@@ -283,6 +304,7 @@ export default function VerificationPage() {
       <ManualAccountModal
         open={!!manual}
         account={manual?.account ?? null}
+        usedPlatforms={usedPlatforms}
         onClose={() => setManual(null)}
         onSaved={refresh}
       />

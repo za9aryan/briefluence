@@ -15,11 +15,12 @@
   "connectTitle": "Connect an account",
   "connectLead": "At least one is needed to apply.",
   "connect": "Connect {platform}",
+  "platformAdded": "{platform} added",
   "instagramNote": "Instagram works with Business or Creator accounts. You can switch for free in the Instagram settings.",
   "accountsTitle": "Your accounts",
   "noAccounts": "No accounts yet.",
   "sync": "Update",
-  "publicNote": "Accounts must be public. We check every account before brands see it.",
+  "publicNote": "Accounts must be public, one per platform. We check every account before brands see it.",
   "review": {
     "pending": "In review",
     "rejected": "Not approved",

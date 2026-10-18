@@ -64,7 +64,8 @@ Besides connecting through the official login, a blogger can **Add manually** on
 platform, username and followers are required; views, engagement and audience are optional. These accounts are
 never synced, can be edited by the blogger, and carry an **Added manually** label for admins and brands.
 
-Every social account (connected or manual) is reviewed by an admin before it counts: accounts must be public
+Each blogger can have one account per platform (enforced in the database). Every social account (connected or
+manual) is reviewed by an admin before it counts: accounts must be public
 and their content fine for brands. Accounts present at the first profile review are approved with the profile;
 accounts added later go to **Admin → Accounts**. Until approved, an account is not used for matching, applying
 or shown to brands. Changing a manual account's platform or username, or fixing a rejected one, sends it back.

@@ -42,6 +42,16 @@ test('blogger adds a social account by hand and edits it', async ({ page }) => {
   await expect(page.getByText(`@${handle}`)).toBeVisible();
   await expect(page.getByText('Added manually')).toBeVisible();
 
+  // One account per platform: TikTok is now shown as added and not offered again.
+  await expect(page.getByText('TikTok added')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Connect TikTok' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Add manually' }).click();
+  await expect(dialog.getByLabel('Platform').locator('option')).toHaveText([
+    'Instagram',
+    'YouTube',
+  ]);
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+
   await page.getByRole('button', { name: 'Edit' }).click();
   await expect(dialog.getByLabel('Followers')).toHaveValue('15400');
   await dialog.getByLabel('Followers').fill('16000');

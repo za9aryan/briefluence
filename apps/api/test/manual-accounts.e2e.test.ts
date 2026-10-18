@@ -71,6 +71,23 @@ describe('manually added social accounts (e2e)', () => {
       audienceAge: { '18-24': 45 },
     });
 
+    // One account per platform: a second TikTok is refused, Instagram is fine, and an edit cannot move onto a taken platform.
+    const second = await inf.agent
+      .post(`${API}/social/accounts/manual`)
+      .send({ platform: 'TIKTOK', username: 'ani.second', followers: 5 })
+      .expect(409);
+    expect(second.body.error.code).toBe('SOCIAL_PLATFORM_TAKEN');
+    const insta = await inf.agent
+      .post(`${API}/social/accounts/manual`)
+      .send({ platform: 'INSTAGRAM', username: 'ani.insta', followers: 5 })
+      .expect(201);
+    const move = await inf.agent
+      .patch(`${API}/social/accounts/${insta.body.id}`)
+      .send({ platform: 'TIKTOK', username: 'ani.insta', followers: 5 })
+      .expect(409);
+    expect(move.body.error.code).toBe('SOCIAL_PLATFORM_TAKEN');
+    await inf.agent.delete(`${API}/social/accounts/${insta.body.id}`).expect(204);
+
     // No platform sync for manual accounts.
     await inf.agent.post(`${API}/social/accounts/${added.body.id}/sync`).expect(409);
 

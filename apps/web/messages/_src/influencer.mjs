@@ -181,6 +181,7 @@ export default {
       'Դիմելու համար պետք է առնվազն մեկը։',
     ],
     connect: ['Connect {platform}', 'Подключить {platform}', 'Միացնել {platform}'],
+    platformAdded: ['{platform} added', '{platform} добавлен', '{platform}-ն ավելացված է'],
     instagramNote: [
       'Instagram works with Business or Creator accounts. You can switch for free in the Instagram settings.',
       'Instagram работает с бизнес-аккаунтами и аккаунтами автора. Переключиться можно бесплатно в настройках Instagram.',
@@ -190,9 +191,9 @@ export default {
     noAccounts: ['No accounts yet.', 'Пока нет аккаунтов.', 'Դեռ հաշիվներ չկան։'],
     sync: ['Update', 'Обновить', 'Թարմացնել'],
     publicNote: [
-      'Accounts must be public. We check every account before brands see it.',
-      'Аккаунты должны быть публичными. Мы проверяем каждый аккаунт, прежде чем его увидят бренды.',
-      'Հաշիվները պետք է լինեն հրապարակային։ Մենք ստուգում ենք յուրաքանչյուր հաշիվ, նախքան բրենդները կտեսնեն այն։',
+      'Accounts must be public, one per platform. We check every account before brands see it.',
+      'Аккаунты должны быть публичными, по одному на платформу. Мы проверяем каждый аккаунт, прежде чем его увидят бренды.',
+      'Հաշիվները պետք է լինեն հրապարակային՝ մեկական յուրաքանչյուր հարթակում։ Մենք ստուգում ենք յուրաքանչյուր հաշիվ, նախքան բրենդները կտեսնեն այն։',
     ],
     review: {
       pending: ['In review', 'На проверке', 'Ստուգման մեջ'],

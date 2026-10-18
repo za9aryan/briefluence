@@ -3,7 +3,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   AUDIENCE_AGE_BUCKETS,
   manualAccountSchema,
+  PLATFORMS,
   type ManualAccountInput,
+  type Platform,
 } from '@briefluence/shared';
 import { Button, FieldGrid, Modal, Stack, Text, useToast } from '@briefluence/ui';
 import { useMutation } from '@tanstack/react-query';
@@ -46,6 +48,8 @@ function toValues(a: SocialAccountDto): FormValues {
 interface Props {
   open: boolean;
   account: SocialAccountDto | null;
+  /** Platforms the blogger already has an account on (one per platform). */
+  usedPlatforms: Platform[];
   onClose: () => void;
   onSaved: () => void;
 }
@@ -55,15 +59,17 @@ export function ManualAccountModal(props: Props) {
   return props.open ? <ManualAccountDialog key={props.account?.id ?? 'new'} {...props} /> : null;
 }
 
-function ManualAccountDialog({ open, account, onClose, onSaved }: Props) {
+function ManualAccountDialog({ open, account, usedPlatforms, onClose, onSaved }: Props) {
   const t = useTranslations('verification.manual');
   const tc = useTranslations('common');
   const o = useOptions();
+  // When adding, only platforms without an account; when editing, also this account's own platform.
+  const free = PLATFORMS.filter((p) => p === account?.platform || !usedPlatforms.includes(p));
   const toast = useToast();
   const [error, setError] = useState<string | null>(null);
   const form = useForm<FormValues, unknown, ManualAccountInput>({
     resolver: zodResolver(manualAccountSchema),
-    defaultValues: account ? toValues(account) : EMPTY,
+    defaultValues: account ? toValues(account) : { ...EMPTY, platform: free[0] ?? EMPTY.platform },
   });
   const serverError = useServerErrors(form.setError);
   const errors = form.formState.errors;
@@ -122,7 +128,7 @@ function ManualAccountDialog({ open, account, onClose, onSaved }: Props) {
               required
               register={form.register}
               error={errors.platform}
-              options={o.platforms}
+              options={o.platforms.filter((x) => free.includes(x.value))}
             />
             <TextField
               name="username"
