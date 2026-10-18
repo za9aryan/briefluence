@@ -454,6 +454,57 @@ const CATALOG: Record<NotificationType, { cta: L3; render: Record<NotificationLo
         }),
       },
     },
+    SOCIAL_ACCOUNT_PENDING: {
+      cta: { en: 'Open review queue', ru: 'Открыть очередь проверки', hy: 'Բացել ստուգման հերթը' },
+      render: {
+        en: (p) => ({
+          title: 'New account waiting for review',
+          body: `${s(p.name)} added ${PLATFORMS[s(p.platform)]?.en ?? s(p.platform)} @${s(p.username)}.`,
+        }),
+        ru: (p) => ({
+          title: 'Новый аккаунт ждёт проверки',
+          body: `${s(p.name)} добавил(а) ${PLATFORMS[s(p.platform)]?.ru ?? s(p.platform)} @${s(p.username)}.`,
+        }),
+        hy: (p) => ({
+          title: 'Նոր հաշիվը սպասում է ստուգման',
+          body: `${s(p.name)}-ը ավելացրել է ${PLATFORMS[s(p.platform)]?.hy ?? s(p.platform)} @${s(p.username)}։`,
+        }),
+      },
+    },
+    SOCIAL_ACCOUNT_APPROVED: {
+      cta: { en: 'Find briefs', ru: 'Найти брифы', hy: 'Գտնել բրիֆներ' },
+      render: {
+        en: (p) => ({
+          title: 'Account approved',
+          body: `${PLATFORMS[s(p.platform)]?.en ?? s(p.platform)} @${s(p.username)} passed the check. You can apply with it now.`,
+        }),
+        ru: (p) => ({
+          title: 'Аккаунт одобрен',
+          body: `${PLATFORMS[s(p.platform)]?.ru ?? s(p.platform)} @${s(p.username)} прошёл проверку. Теперь с ним можно откликаться.`,
+        }),
+        hy: (p) => ({
+          title: 'Հաշիվը հաստատված է',
+          body: `${PLATFORMS[s(p.platform)]?.hy ?? s(p.platform)} @${s(p.username)}-ն անցավ ստուգումը։ Այժմ կարող ես դրանով դիմել։`,
+        }),
+      },
+    },
+    SOCIAL_ACCOUNT_REJECTED: {
+      cta: { en: 'Open verification', ru: 'Открыть верификацию', hy: 'Բացել ստուգումը' },
+      render: {
+        en: (p) => ({
+          title: 'Account not approved',
+          body: `${PLATFORMS[s(p.platform)]?.en ?? s(p.platform)} @${s(p.username)}\nReason: ${s(p.reason)}`,
+        }),
+        ru: (p) => ({
+          title: 'Аккаунт не одобрен',
+          body: `${PLATFORMS[s(p.platform)]?.ru ?? s(p.platform)} @${s(p.username)}\nПричина: ${s(p.reason)}`,
+        }),
+        hy: (p) => ({
+          title: 'Հաշիվը չի հաստատվել',
+          body: `${PLATFORMS[s(p.platform)]?.hy ?? s(p.platform)} @${s(p.username)}\nՊատճառը՝ ${s(p.reason)}`,
+        }),
+      },
+    },
   };
 
 /** Renders a notification in a language; unknown types return null (callers fall back to stored text). */

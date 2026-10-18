@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   canBrandTransition,
   canWithdraw,
+  isAccountUsable,
   checkEligibility,
   contactsRevealed,
   exceedsSlots,
@@ -60,7 +61,7 @@ export class ApplicationsService {
     // brand sees all connected accounts. An explicit account id is still honoured if sent.
     if (input.socialAccountId) {
       const chosen = profile.socialAccounts.find((a) => a.id === input.socialAccountId);
-      if (!chosen || chosen.tokenRevokedAt)
+      if (!chosen || !isAccountUsable(chosen))
         throw new AppError('VALIDATION_FAILED', 'Choose one of your connected accounts');
     }
     const match = matchScore(toMatchDeal(deal), inf, input.socialAccountId);
@@ -236,7 +237,7 @@ export class ApplicationsService {
         matchedAccountId: a.socialAccountId,
         /** All connected accounts (largest first) so the brand can evaluate further collaboration. */
         accounts: p.socialAccounts
-          .filter((s) => !s.tokenRevokedAt)
+          .filter(isAccountUsable)
           .sort((x, y) => y.followers - x.followers)
           .map(publicAccount),
         contacts: contactsRevealed(a.status)

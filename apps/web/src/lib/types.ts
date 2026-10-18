@@ -20,6 +20,9 @@ export interface SocialAccountDto {
   platform: Platform;
   /** MANUAL = numbers typed in by the blogger. */
   source: 'OAUTH' | 'MANUAL';
+  /** Admin review of the account (content, public profile). Only APPROVED ones count. */
+  reviewStatus: 'PENDING' | 'APPROVED' | 'REJECTED';
+  reviewNote: string | null;
   username: string;
   profileUrl: string;
   avatarUrl: string | null;

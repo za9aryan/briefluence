@@ -25,6 +25,7 @@
   "notifications": "Уведомления",
   "admin": {
     "verifications": "Верификация",
+    "accounts": "Аккаунты",
     "briefReview": "Проверка брифов",
     "deals": "Брифы",
     "users": "Пользователи",

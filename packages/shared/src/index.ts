@@ -10,3 +10,4 @@ export * from './domain/matching';
 export * from './domain/subscription';
 export * from './domain/applications';
 export * from './domain/deals';
+export * from './domain/accounts';

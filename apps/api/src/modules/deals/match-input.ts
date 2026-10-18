@@ -1,10 +1,11 @@
-import type {
-  AudienceAge,
-  AudienceCountries,
-  AudienceGender,
-  MatchAccount,
-  MatchDeal,
-  MatchInfluencer,
+import {
+  isAccountUsable,
+  type AudienceAge,
+  type AudienceCountries,
+  type AudienceGender,
+  type MatchAccount,
+  type MatchDeal,
+  type MatchInfluencer,
 } from '@briefluence/shared';
 import type { Deal, InfluencerProfile, Prisma, SocialAccount } from '@prisma/client';
 
@@ -43,7 +44,9 @@ export function toMatchAccount(a: SocialAccount): MatchAccount {
 }
 
 /** Accounts with a revoked token are excluded: their stats can no longer be trusted. */
-export function toMatchInfluencer(p: InfluencerProfile & { socialAccounts: SocialAccount[] }): MatchInfluencer {
+export function toMatchInfluencer(
+  p: InfluencerProfile & { socialAccounts: SocialAccount[] },
+): MatchInfluencer {
   return {
     country: p.country,
     city: p.city,
@@ -51,7 +54,7 @@ export function toMatchInfluencer(p: InfluencerProfile & { socialAccounts: Socia
     birthYear: p.birthYear,
     niches: p.niches,
     languages: p.languages,
-    accounts: p.socialAccounts.filter((a) => !a.tokenRevokedAt).map(toMatchAccount),
+    accounts: p.socialAccounts.filter(isAccountUsable).map(toMatchAccount),
   };
 }
 

@@ -27,6 +27,13 @@ enum AccountSource {
   MANUAL
 }
 
+/// Every social account is checked by an admin (content, public profile) before it is used.
+enum AccountReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum VerificationStatus {
   DRAFT
   PENDING_REVIEW
@@ -202,6 +209,9 @@ model SocialAccount {
   audienceAge       Json? // { "18-24": 30.1, "25-34": 41.0, ... }
   audienceCountries Json? // { "AM": 72.4, "RU": 9.1, ... }
   source            AccountSource     @default(OAUTH) // spec+
+  reviewStatus      AccountReviewStatus @default(PENDING) // spec+
+  reviewNote        String? // admin's reason when rejected
+  reviewedAt        DateTime?
   accessTokenEnc    String? // AES-256-GCM encrypted; null for MANUAL accounts
   refreshTokenEnc   String?
   tokenExpiresAt    DateTime?
@@ -211,6 +221,7 @@ model SocialAccount {
 
   @@unique([platform, externalId])
   @@index([influencerId])
+  @@index([reviewStatus])
 }
 
 model BrandProfile {

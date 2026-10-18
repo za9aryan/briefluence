@@ -39,6 +39,16 @@ export function AccountLine({
         {t('followersShort', { count: f.compact(account.followers) })}
         {account.engagementRate != null && ` · ER ${f.percent(account.engagementRate)}`}
       </Text>
+      {account.reviewStatus === 'PENDING' && (
+        <Badge tone="neutral" icon="clock">
+          {t('review.pending')}
+        </Badge>
+      )}
+      {account.reviewStatus === 'REJECTED' && (
+        <Badge tone="danger" icon="x-circle">
+          {t('review.rejected')}
+        </Badge>
+      )}
       {account.source === 'MANUAL' && (
         <Badge tone="neutral" icon="edit">
           {t('manual.badge')}
@@ -116,7 +126,7 @@ export function AccountStats({ account }: { account: SocialAccountDto }) {
         </Stack>
       ) : (
         <Text size="small" tone="muted">
-          {t('noDemographics')}
+          {account.source === 'MANUAL' ? t('manual.noAudience') : t('noDemographics')}
         </Text>
       )}
     </Stack>

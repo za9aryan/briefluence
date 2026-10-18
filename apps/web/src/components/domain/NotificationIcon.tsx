@@ -24,6 +24,9 @@ const ICON: Record<NotificationType, { icon: IconName; tone: IconBubbleTone }> =
   SUBSCRIPTION_EXPIRED: { icon: 'card', tone: 'neutral' },
   SOCIAL_TOKEN_REVOKED: { icon: 'link', tone: 'primary' },
   POST_SUBMITTED: { icon: 'link', tone: 'neutral' },
+  SOCIAL_ACCOUNT_PENDING: { icon: 'shield', tone: 'neutral' },
+  SOCIAL_ACCOUNT_APPROVED: { icon: 'check-circle', tone: 'success' },
+  SOCIAL_ACCOUNT_REJECTED: { icon: 'x-circle', tone: 'primary' },
 };
 
 export function NotificationIcon({ type, size }: { type: string; size?: 'sm' | 'md' }) {

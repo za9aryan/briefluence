@@ -5,6 +5,7 @@ import {
   trialDaysLeft,
   type ApplicationStatus,
   type InfluencerProfileData,
+  isAccountUsable,
 } from '@briefluence/shared';
 import { Prisma } from '@prisma/client';
 import { AppError, notFound } from '../../common/app-error';
@@ -34,7 +35,11 @@ export class InfluencersService {
 
   /** Creates or updates the profile. The free month is started separately, by the blogger (POST /billing/trial). */
   async upsertMine(userId: string, data: InfluencerProfileData) {
-    await this.prisma.influencerProfile.upsert({ where: { userId }, create: { userId, ...data }, update: data });
+    await this.prisma.influencerProfile.upsert({
+      where: { userId },
+      create: { userId, ...data },
+      update: data,
+    });
     return this.getMine(userId);
   }
 
@@ -54,7 +59,10 @@ export class InfluencersService {
       where: { id: p.id },
       data: { status: 'PENDING_REVIEW', submittedAt: this.clock.now(), rejectionReason: null },
     });
-    await this.notifications.notifyAdmins('VERIFICATION_PENDING', { params: { name: p.displayName }, link: '/admin/verifications' });
+    await this.notifications.notifyAdmins('VERIFICATION_PENDING', {
+      params: { name: p.displayName },
+      link: '/admin/verifications',
+    });
     return this.getMine(userId);
   }
 
@@ -69,10 +77,17 @@ export class InfluencersService {
     const p = await this.prisma.influencerProfile.findUnique({ where: { userId } });
     if (!p) throw new AppError('PROFILE_INCOMPLETE', 'Complete your profile first');
     const [groups, sub] = await Promise.all([
-      this.prisma.application.groupBy({ by: ['status'], where: { influencerId: p.id }, _count: true }),
+      this.prisma.application.groupBy({
+        by: ['status'],
+        where: { influencerId: p.id },
+        _count: true,
+      }),
       this.prisma.subscription.findUnique({ where: { userId } }),
     ]);
-    const byStatus = Object.fromEntries(APPLICATION_STATUSES.map((s) => [s, 0])) as Record<ApplicationStatus, number>;
+    const byStatus = Object.fromEntries(APPLICATION_STATUSES.map((s) => [s, 0])) as Record<
+      ApplicationStatus,
+      number
+    >;
     for (const g of groups) byStatus[g.status] = g._count;
     const now = this.clock.now();
     return {
@@ -110,7 +125,10 @@ export class InfluencersService {
         select: { id: true },
       });
       showContacts = !!accepted;
-      await this.prisma.influencerProfile.update({ where: { id: p.id }, data: { profileViews: { increment: 1 } } });
+      await this.prisma.influencerProfile.update({
+        where: { id: p.id },
+        data: { profileViews: { increment: 1 } },
+      });
     }
     return {
       id: p.id,
@@ -125,10 +143,11 @@ export class InfluencersService {
       niches: p.niches,
       verified: p.status === 'APPROVED',
       approvedAt: p.approvedAt,
-      socialAccounts: p.socialAccounts.map(publicAccount),
-      contacts: showContacts
-        ? { method: p.contactMethod, value: p.contactValue }
-        : null,
+      // Brands see only accounts an admin approved.
+      socialAccounts: p.socialAccounts
+        .filter((a) => viewer.role === 'ADMIN' || isAccountUsable(a))
+        .map(publicAccount),
+      contacts: showContacts ? { method: p.contactMethod, value: p.contactValue } : null,
     };
   }
 }

@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import {
+  needsAccountReview,
   PLATFORMS,
   profileUrlFor,
   type ManualAccountInput,
@@ -129,11 +130,20 @@ export class SocialService implements OnModuleInit {
       tokenRevokedAt: null,
       lastSyncedAt: this.clock.now(),
     };
+    // New accounts start in review; reconnecting a rejected one asks for a new review.
+    const toReview = !existing || existing.reviewStatus === 'REJECTED';
     const account = existing
-      ? await this.prisma.socialAccount.update({ where: { id: existing.id }, data })
+      ? await this.prisma.socialAccount.update({
+          where: { id: existing.id },
+          data: {
+            ...data,
+            ...(toReview ? { reviewStatus: 'PENDING' as const, reviewNote: null } : {}),
+          },
+        })
       : await this.prisma.socialAccount.create({
           data: { influencerId: profile.id, platform, ...data },
         });
+    if (toReview) await this.askForReview(account);
     return publicAccount(account);
   }
 
@@ -184,6 +194,7 @@ export class SocialService implements OnModuleInit {
         ...this.manualData(input),
       },
     });
+    await this.askForReview(account);
     return publicAccount(account);
   }
 
@@ -205,15 +216,34 @@ export class SocialService implements OnModuleInit {
       });
       if (taken) throw new AppError('SOCIAL_ACCOUNT_TAKEN', 'This account is already added');
     }
+    const review = needsAccountReview(acc, input);
     const updated = await this.prisma.socialAccount.update({
       where: { id: acc.id },
       data: {
         platform: input.platform,
         externalId: `manual:${input.username.toLowerCase()}`,
         ...this.manualData(input),
+        ...(review ? { reviewStatus: 'PENDING' as const, reviewNote: null } : {}),
       },
     });
+    if (review) await this.askForReview(updated);
     return publicAccount(updated);
+  }
+
+  /**
+   * New or changed accounts of an already approved blogger go to the admin account queue. Accounts
+   * added before the first approval are reviewed together with the profile.
+   */
+  private async askForReview(account: SocialAccount) {
+    const profile = await this.prisma.influencerProfile.findUnique({
+      where: { id: account.influencerId },
+      select: { status: true, displayName: true },
+    });
+    if (profile?.status !== 'APPROVED') return;
+    await this.notifications.notifyAdmins('SOCIAL_ACCOUNT_PENDING', {
+      params: { name: profile.displayName, platform: account.platform, username: account.username },
+      link: '/admin/accounts',
+    });
   }
 
   private manualData(i: ManualAccountInput) {

@@ -25,6 +25,7 @@
   "notifications": "Notifications",
   "admin": {
     "verifications": "Verifications",
+    "accounts": "Accounts",
     "briefReview": "Brief review",
     "deals": "Briefs",
     "users": "Users",

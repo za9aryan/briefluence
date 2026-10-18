@@ -11,10 +11,12 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import {
+  ACCOUNT_REVIEW_STATUSES,
   DEAL_STATUSES,
   ROLES,
   VERIFICATION_STATUSES,
   verificationDecisionSchema,
+  type AccountReviewStatus,
   type DealStatus,
   type Role,
   type VerificationDecisionInput,
@@ -68,6 +70,29 @@ export class AdminController {
     @ZodBody(verificationDecisionSchema) body: VerificationDecisionInput,
   ) {
     return this.admin.reject(id, body.reason);
+  }
+
+  @Get('accounts')
+  accounts(@Query('status') status?: string) {
+    return this.admin.accounts(
+      pick<AccountReviewStatus>(ACCOUNT_REVIEW_STATUSES, status) ?? 'PENDING',
+    );
+  }
+
+  @Post('accounts/:id/approve')
+  @HttpCode(204)
+  approveAccount(@Param('id') id: string) {
+    return this.admin.approveAccount(id);
+  }
+
+  @Post('accounts/:id/reject')
+  @HttpCode(204)
+  @ApiZodBody(verificationDecisionSchema)
+  rejectAccount(
+    @Param('id') id: string,
+    @ZodBody(verificationDecisionSchema) body: VerificationDecisionInput,
+  ) {
+    return this.admin.rejectAccount(id, body.reason);
   }
 
   @Get('deals')

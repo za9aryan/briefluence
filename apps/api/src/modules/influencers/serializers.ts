@@ -7,6 +7,9 @@ export function publicAccount(a: SocialAccount) {
     platform: a.platform,
     /** MANUAL = numbers typed in by the blogger, not read from the platform. */
     source: a.source,
+    /** Admin review of the account itself (content, public profile). */
+    reviewStatus: a.reviewStatus,
+    reviewNote: a.reviewNote,
     username: a.username,
     profileUrl: a.profileUrl,
     avatarUrl: a.avatarUrl,

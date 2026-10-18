@@ -19,12 +19,20 @@
   "accountsTitle": "Your accounts",
   "noAccounts": "No accounts yet.",
   "sync": "Update",
+  "publicNote": "Accounts must be public. We check every account before brands see it.",
+  "review": {
+    "pending": "In review",
+    "rejected": "Not approved",
+    "pendingHint": "We are checking this account. It will count for briefs once approved.",
+    "rejectedManual": "Not approved: {reason} Fix it and save again, or remove the account.",
+    "rejectedConnected": "Not approved: {reason} Fix it and connect it again, or remove the account."
+  },
   "manual": {
     "button": "Add manually",
     "hint": "Or you can add the account manually. We check it during review.",
     "title": "Add an account manually",
     "editTitle": "Edit account",
-    "lead": "Only the username and followers are required. The more you fill in, the better we match you with briefs. Brands see that you added these numbers yourself.",
+    "lead": "The account must be public. Only the username and followers are required; the more you fill in, the better we match you with briefs. Brands see that you added these numbers yourself.",
     "platform": "Platform",
     "username": "Username",
     "followers": "Followers",
@@ -43,7 +51,8 @@
     "save": "Save",
     "addedToast": "Account added",
     "savedToast": "Account updated",
-    "badge": "Added manually"
+    "badge": "Added manually",
+    "noAudience": "No audience data added yet."
   },
   "lastSynced": "Updated {date}",
   "submitTitle": "Ready for review?",

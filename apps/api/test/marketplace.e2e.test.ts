@@ -428,6 +428,9 @@ describe('marketplace core loop (e2e)', () => {
   it('applies without choosing an account and shows the brand all connected accounts', async () => {
     const inf = await approvedInfluencer();
     await connectMock(ctx, inf.agent, 'tiktok');
+    // Accounts added after approval are reviewed one by one.
+    const pending = await inf.admin.agent.get(`${API}/admin/accounts`).expect(200);
+    await inf.admin.agent.post(`${API}/admin/accounts/${pending.body[0].id}/approve`).expect(204);
     const brand = await brandWithDeal({ platforms: ['INSTAGRAM', 'TIKTOK'] });
     await inf.agent
       .post(`${API}/deals/${brand.dealId}/applications`)

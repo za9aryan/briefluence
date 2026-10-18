@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   dealReviewKey,
+  type AccountReviewStatus,
   type DealStatus,
   type Role,
   type VerificationStatus,
@@ -55,6 +56,11 @@ export class AdminService {
       where: { id: p.id },
       data: { status: 'APPROVED', approvedAt: this.clock.now(), rejectionReason: null },
     });
+    // The admin saw these accounts on the profile card; approving the blogger approves them.
+    await this.prisma.socialAccount.updateMany({
+      where: { influencerId: p.id, reviewStatus: 'PENDING' },
+      data: { reviewStatus: 'APPROVED', reviewedAt: this.clock.now(), reviewNote: null },
+    });
     await this.notifications.notify(p.userId, 'VERIFICATION_APPROVED', {
       link: '/influencer/deals',
     });
@@ -73,6 +79,70 @@ export class AdminService {
       params: { reason },
       link: '/influencer/verification',
     });
+  }
+
+  /** Accounts added or changed by already approved bloggers (first-time ones are reviewed with the profile). */
+  async accounts(status: AccountReviewStatus = 'PENDING') {
+    const rows = await this.prisma.socialAccount.findMany({
+      where: { reviewStatus: status, influencer: { status: 'APPROVED' } },
+      orderBy: status === 'PENDING' ? { createdAt: 'asc' } : { reviewedAt: 'desc' },
+      take: 200,
+      include: {
+        influencer: {
+          select: {
+            id: true,
+            displayName: true,
+            avatarUrl: true,
+            user: { select: { email: true } },
+          },
+        },
+      },
+    });
+    return rows.map(({ influencer, ...a }) => ({
+      ...publicAccount(a),
+      createdAt: a.createdAt,
+      influencer: {
+        id: influencer.id,
+        displayName: influencer.displayName,
+        avatarUrl: influencer.avatarUrl,
+        email: influencer.user.email,
+      },
+    }));
+  }
+
+  async approveAccount(id: string) {
+    const acc = await this.pendingAccount(id);
+    await this.prisma.socialAccount.update({
+      where: { id },
+      data: { reviewStatus: 'APPROVED', reviewedAt: this.clock.now(), reviewNote: null },
+    });
+    await this.notifications.notify(acc.influencer.userId, 'SOCIAL_ACCOUNT_APPROVED', {
+      params: { platform: acc.platform, username: acc.username },
+      link: '/influencer/deals',
+    });
+  }
+
+  async rejectAccount(id: string, reason: string) {
+    const acc = await this.pendingAccount(id);
+    await this.prisma.socialAccount.update({
+      where: { id },
+      data: { reviewStatus: 'REJECTED', reviewedAt: this.clock.now(), reviewNote: reason },
+    });
+    await this.notifications.notify(acc.influencer.userId, 'SOCIAL_ACCOUNT_REJECTED', {
+      params: { platform: acc.platform, username: acc.username, reason },
+      link: '/influencer/verification',
+    });
+  }
+
+  private async pendingAccount(id: string) {
+    const acc = await this.prisma.socialAccount.findUnique({
+      where: { id },
+      include: { influencer: { select: { userId: true } } },
+    });
+    if (!acc) throw notFound('Social account');
+    if (acc.reviewStatus !== 'PENDING')
+      throw new AppError('INVALID_TRANSITION', 'This account is not waiting for review');
+    return acc;
   }
 
   /** Admin approves a brief: it goes live and the approved content is fingerprinted. */

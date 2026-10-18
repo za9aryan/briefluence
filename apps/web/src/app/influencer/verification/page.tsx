@@ -137,6 +137,9 @@ export default function VerificationPage() {
 
       <Card>
         <CardHeader title={t('connectTitle')} description={t('connectLead')} />
+        <Alert tone="info" className="mb-4">
+          {t('publicNote')}
+        </Alert>
         <Grid cols={{ base: 1, sm: 3 }} gap={2}>
           {PLATFORMS.map((pl) => (
             <a
@@ -209,6 +212,19 @@ export default function VerificationPage() {
                     </Button>
                   </Inline>
                 </Inline>
+                {a.reviewStatus === 'REJECTED' && (
+                  <Alert tone="warning">
+                    {t(
+                      a.source === 'MANUAL' ? 'review.rejectedManual' : 'review.rejectedConnected',
+                      { reason: a.reviewNote ?? '' },
+                    )}
+                  </Alert>
+                )}
+                {a.reviewStatus === 'PENDING' && status === 'APPROVED' && (
+                  <Text size="small" tone="muted">
+                    {t('review.pendingHint')}
+                  </Text>
+                )}
                 <AccountStats account={a} />
                 {a.lastSyncedAt && (
                   <Text size="small" tone="muted">

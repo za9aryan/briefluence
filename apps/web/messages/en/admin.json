@@ -14,6 +14,24 @@
     "reason": "Reason",
     "reasonHint": "The blogger sees this. Say what to fix."
   },
+  "accounts": {
+    "title": "Account review",
+    "lead": "Accounts bloggers added after their profile was approved. Open each one: it must be public and its content fine for brands.",
+    "tabPending": "Waiting",
+    "tabRejected": "Rejected",
+    "tabApproved": "Approved",
+    "empty": "Nothing to review",
+    "added": "Added {date}",
+    "openProfile": "Open the account",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approved": "Account approved. The blogger got a notification.",
+    "rejected": "Account rejected. The blogger will see your reason.",
+    "rejectTitle": "Reject the account",
+    "reason": "Reason",
+    "reasonHint": "The blogger sees this text. For example: the account is private, or the content is not suitable for brands.",
+    "previousReason": "Reason: {reason}"
+  },
   "briefReview": {
     "title": "Brief review",
     "lead": "Every brief is checked before bloggers see it. Approve it or send it back with a reason.",

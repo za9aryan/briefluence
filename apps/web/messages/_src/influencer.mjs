@@ -189,6 +189,30 @@ export default {
     accountsTitle: ['Your accounts', 'Твои аккаунты', 'Քո հաշիվները'],
     noAccounts: ['No accounts yet.', 'Пока нет аккаунтов.', 'Դեռ հաշիվներ չկան։'],
     sync: ['Update', 'Обновить', 'Թարմացնել'],
+    publicNote: [
+      'Accounts must be public. We check every account before brands see it.',
+      'Аккаунты должны быть публичными. Мы проверяем каждый аккаунт, прежде чем его увидят бренды.',
+      'Հաշիվները պետք է լինեն հրապարակային։ Մենք ստուգում ենք յուրաքանչյուր հաշիվ, նախքան բրենդները կտեսնեն այն։',
+    ],
+    review: {
+      pending: ['In review', 'На проверке', 'Ստուգման մեջ'],
+      rejected: ['Not approved', 'Не одобрен', 'Չի հաստատվել'],
+      pendingHint: [
+        'We are checking this account. It will count for briefs once approved.',
+        'Мы проверяем этот аккаунт. Он начнёт учитываться в брифах после одобрения.',
+        'Մենք ստուգում ենք այս հաշիվը։ Այն հաշվի կառնվի բրիֆներում հաստատումից հետո։',
+      ],
+      rejectedManual: [
+        'Not approved: {reason} Fix it and save again, or remove the account.',
+        'Не одобрен: {reason} Исправь и сохрани снова или удали аккаунт.',
+        'Չի հաստատվել՝ {reason} Ուղղիր և կրկին պահպանիր կամ հեռացրու հաշիվը։',
+      ],
+      rejectedConnected: [
+        'Not approved: {reason} Fix it and connect it again, or remove the account.',
+        'Не одобрен: {reason} Исправь и подключи снова или удали аккаунт.',
+        'Չի հաստատվել՝ {reason} Ուղղիր և կրկին միացրու կամ հեռացրու հաշիվը։',
+      ],
+    },
     manual: {
       button: ['Add manually', 'Добавить вручную', 'Ավելացնել ձեռքով'],
       hint: [
@@ -199,9 +223,9 @@ export default {
       title: ['Add an account manually', 'Добавить аккаунт вручную', 'Ավելացնել հաշիվ ձեռքով'],
       editTitle: ['Edit account', 'Изменить аккаунт', 'Խմբագրել հաշիվը'],
       lead: [
-        'Only the username and followers are required. The more you fill in, the better we match you with briefs. Brands see that you added these numbers yourself.',
-        'Обязательны только имя пользователя и подписчики. Чем больше заполнишь, тем точнее подберём брифы. Бренды увидят, что эти цифры ты указал сам.',
-        'Պարտադիր են միայն օգտանունը և հետևորդները։ Որքան շատ լրացնես, այնքան ճշգրիտ կընտրենք բրիֆները։ Բրենդները կտեսնեն, որ այս թվերը նշել ես ինքդ։',
+        'The account must be public. Only the username and followers are required; the more you fill in, the better we match you with briefs. Brands see that you added these numbers yourself.',
+        'Аккаунт должен быть публичным. Обязательны только имя пользователя и подписчики; чем больше заполнишь, тем точнее подберём брифы. Бренды увидят, что эти цифры ты указал сам.',
+        'Հաշիվը պետք է լինի հրապարակային։ Պարտադիր են միայն օգտանունը և հետևորդները. որքան շատ լրացնես, այնքան ճշգրիտ կընտրենք բրիֆները։ Բրենդները կտեսնեն, որ այս թվերը նշել ես ինքդ։',
       ],
       platform: ['Platform', 'Платформа', 'Հարթակ'],
       username: ['Username', 'Имя пользователя', 'Օգտանուն'],
@@ -226,6 +250,11 @@ export default {
       addedToast: ['Account added', 'Аккаунт добавлен', 'Հաշիվն ավելացված է'],
       savedToast: ['Account updated', 'Аккаунт обновлён', 'Հաշիվը թարմացված է'],
       badge: ['Added manually', 'Добавлен вручную', 'Ավելացված է ձեռքով'],
+      noAudience: [
+        'No audience data added yet.',
+        'Данные об аудитории пока не добавлены.',
+        'Լսարանի տվյալներ դեռ ավելացված չեն։',
+      ],
     },
     lastSynced: ['Updated {date}', 'Обновлено {date}', 'Թարմացվել է {date}'],
     submitTitle: ['Ready for review?', 'Готов к проверке?', 'Պատրա՞ստ ես ստուգման'],

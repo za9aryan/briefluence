@@ -98,7 +98,13 @@ export const NOTIFICATION_TYPES = values(
   'DEAL_REVIEW_PENDING',
   'DEAL_APPROVED',
   'DEAL_REJECTED',
+  'SOCIAL_ACCOUNT_PENDING',
+  'SOCIAL_ACCOUNT_APPROVED',
+  'SOCIAL_ACCOUNT_REJECTED',
 );
+
+export const ACCOUNT_REVIEW_STATUSES = values('PENDING', 'APPROVED', 'REJECTED');
+export type AccountReviewStatus = (typeof ACCOUNT_REVIEW_STATUSES)[number];
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 
 export const CONTACT_METHODS = values(

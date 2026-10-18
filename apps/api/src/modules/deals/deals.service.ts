@@ -7,6 +7,7 @@ import {
   checkEligibility,
   FILLED_STATUSES,
   isDealEditable,
+  isAccountUsable,
   isDealHiddenFromBloggers,
   publishTarget,
   matchScore,
@@ -146,6 +147,7 @@ export class DealsService {
       socialAccounts: {
         some: {
           tokenRevokedAt: null,
+          reviewStatus: 'APPROVED',
           platform: { in: t.platforms },
           followers: {
             ...(t.minFollowers != null ? { gte: t.minFollowers } : {}),
@@ -354,15 +356,13 @@ export class DealsService {
         throw notFound('Deal');
     }
     const inf = toMatchInfluencer(profile);
-    const accounts = profile.socialAccounts
-      .filter((a) => !a.tokenRevokedAt)
-      .map((a) => ({
-        id: a.id,
-        platform: a.platform,
-        username: a.username,
-        followers: a.followers,
-        score: matchScore(toMatchDeal(deal), inf, a.id)?.score ?? null,
-      }));
+    const accounts = profile.socialAccounts.filter(isAccountUsable).map((a) => ({
+      id: a.id,
+      platform: a.platform,
+      username: a.username,
+      followers: a.followers,
+      score: matchScore(toMatchDeal(deal), inf, a.id)?.score ?? null,
+    }));
     if (!isDealHiddenFromBloggers(deal.status)) await this.recordView(deal.id, profile.id);
     const masked = forBlogger(base, base.brand, myApplication?.status);
     return {

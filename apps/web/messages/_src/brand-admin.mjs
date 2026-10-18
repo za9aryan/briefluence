@@ -356,6 +356,40 @@ export default {
         'Բլոգերը կտեսնի սա։ Գրիր, թե ինչ ուղղել։',
       ],
     },
+    accounts: {
+      title: ['Account review', 'Проверка аккаунтов', 'Հաշիվների ստուգում'],
+      lead: [
+        'Accounts bloggers added after their profile was approved. Open each one: it must be public and its content fine for brands.',
+        'Аккаунты, которые блогеры добавили после одобрения профиля. Открой каждый: он должен быть публичным, а контент подходящим для брендов.',
+        'Հաշիվներ, որոնք բլոգերներն ավելացրել են պրոֆիլի հաստատումից հետո։ Բացիր յուրաքանչյուրը՝ այն պետք է լինի հրապարակային, իսկ բովանդակությունը՝ պատշաճ բրենդների համար։',
+      ],
+      tabPending: ['Waiting', 'Ждут проверки', 'Սպասում են'],
+      tabRejected: ['Rejected', 'Отклонены', 'Մերժված'],
+      tabApproved: ['Approved', 'Одобрены', 'Հաստատված'],
+      empty: ['Nothing to review', 'Проверять нечего', 'Ստուգելու բան չկա'],
+      added: ['Added {date}', 'Добавлен {date}', 'Ավելացվել է {date}'],
+      openProfile: ['Open the account', 'Открыть аккаунт', 'Բացել հաշիվը'],
+      approve: ['Approve', 'Одобрить', 'Հաստատել'],
+      reject: ['Reject', 'Отклонить', 'Մերժել'],
+      approved: [
+        'Account approved. The blogger got a notification.',
+        'Аккаунт одобрен. Блогер получил уведомление.',
+        'Հաշիվը հաստատված է։ Բլոգերը ստացավ ծանուցում։',
+      ],
+      rejected: [
+        'Account rejected. The blogger will see your reason.',
+        'Аккаунт отклонён. Блогер увидит причину.',
+        'Հաշիվը մերժված է։ Բլոգերը կտեսնի պատճառը։',
+      ],
+      rejectTitle: ['Reject the account', 'Отклонить аккаунт', 'Մերժել հաշիվը'],
+      reason: ['Reason', 'Причина', 'Պատճառ'],
+      reasonHint: [
+        'The blogger sees this text. For example: the account is private, or the content is not suitable for brands.',
+        'Блогер увидит этот текст. Например: аккаунт закрыт или контент не подходит для брендов.',
+        'Բլոգերը կտեսնի այս տեքստը։ Օրինակ՝ հաշիվը փակ է կամ բովանդակությունը հարմար չէ բրենդների համար։',
+      ],
+      previousReason: ['Reason: {reason}', 'Причина: {reason}', 'Պատճառը՝ {reason}'],
+    },
     briefReview: {
       title: ['Brief review', 'Проверка брифов', 'Բրիֆների ստուգում'],
       lead: [
