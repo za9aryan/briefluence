@@ -25,14 +25,5 @@ export function contactsRevealed(status: ApplicationStatus): boolean {
   return status === 'ACCEPTED' || status === 'COMPLETED';
 }
 
-/** Completion requires the influencer to have submitted the post URL first. */
-export function canComplete(status: ApplicationStatus, postUrl: string | null): boolean {
-  return status === 'ACCEPTED' && !!postUrl;
-}
-
-export function canSubmitPostUrl(status: ApplicationStatus): boolean {
-  return status === 'ACCEPTED';
-}
-
 /** Applications that count against a deal's slots. */
 export const FILLED_STATUSES: ApplicationStatus[] = ['ACCEPTED', 'COMPLETED'];

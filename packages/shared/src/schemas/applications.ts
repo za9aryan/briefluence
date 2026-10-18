@@ -7,7 +7,10 @@ export const applySchema = z.object({
   /** Optional: by default the best-matching connected account is used; brands see all accounts. */
   socialAccountId: idSchema.optional(),
   pitch: z.string().trim().min(10).max(PITCH_MAX_LENGTH),
-  proposedPrice: minorAmount.nullable().optional().transform((v) => v ?? null),
+  proposedPrice: minorAmount
+    .nullable()
+    .optional()
+    .transform((v) => v ?? null),
 });
 export type ApplyInput = z.input<typeof applySchema>;
 
@@ -23,9 +26,6 @@ export const applicationStatusUpdateSchema = z
     path: ['rejectionReason'],
   });
 export type ApplicationStatusUpdateInput = z.infer<typeof applicationStatusUpdateSchema>;
-
-export const postUrlSchema = z.object({ postUrl: z.url({ protocol: /^https?$/ }).max(500) });
-export type PostUrlInput = z.infer<typeof postUrlSchema>;
 
 export const applicantsQuerySchema = paginationSchema.extend({
   status: z.enum(APPLICATION_STATUSES).optional(),

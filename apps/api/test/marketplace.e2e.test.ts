@@ -188,15 +188,6 @@ describe('marketplace core loop (e2e)', () => {
     expect((await lastEmailTo(ctx, inf.email))?.subject).toBe('Your application is approved');
 
     await inf.agent.post(`${API}/applications/${appId}/withdraw`).expect(409);
-    const early = await brand.agent
-      .patch(`${API}/applications/${appId}/status`)
-      .send({ status: 'COMPLETED' })
-      .expect(409);
-    expect(early.body.error.code).toBe('INVALID_TRANSITION');
-    await inf.agent
-      .patch(`${API}/applications/${appId}/post-url`)
-      .send({ postUrl: 'https://instagram.com/p/abc' })
-      .expect(200);
     await brand.agent
       .patch(`${API}/applications/${appId}/status`)
       .send({ status: 'COMPLETED' })

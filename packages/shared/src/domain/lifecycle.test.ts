@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canBrandTransition, canComplete, canWithdraw, contactsRevealed } from './applications';
+import { canBrandTransition, canWithdraw, contactsRevealed } from './applications';
 import {
   canDealTransition,
   dealReviewKey,
@@ -26,8 +26,9 @@ describe('application lifecycle', () => {
   it('reveals contacts after acceptance; completion needs a post URL', () => {
     expect(contactsRevealed('SHORTLISTED')).toBe(false);
     expect(contactsRevealed('ACCEPTED')).toBe(true);
-    expect(canComplete('ACCEPTED', null)).toBe(false);
-    expect(canComplete('ACCEPTED', 'https://instagram.com/p/x')).toBe(true);
+    // The rest of a collab happens between brand and blogger; the brand just marks it done.
+    expect(canBrandTransition('ACCEPTED', 'COMPLETED')).toBe(true);
+    expect(canBrandTransition('SHORTLISTED', 'COMPLETED')).toBe(false);
   });
 });
 

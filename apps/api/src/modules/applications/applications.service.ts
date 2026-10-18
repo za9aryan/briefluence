@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
   canBrandTransition,
-  canComplete,
-  canSubmitPostUrl,
   canWithdraw,
   checkEligibility,
   contactsRevealed,
@@ -184,18 +182,6 @@ export class ApplicationsService {
     return this.prisma.application.update({ where: { id }, data: { status: 'WITHDRAWN' } });
   }
 
-  async submitPostUrl(userId: string, id: string, postUrl: string) {
-    const app = await this.ownApplication(userId, id);
-    if (!canSubmitPostUrl(app.status))
-      throw new AppError('INVALID_TRANSITION', 'Only accepted applications can get a post URL');
-    const updated = await this.prisma.application.update({ where: { id }, data: { postUrl } });
-    await this.notifications.notify(app.deal.brand.userId, 'POST_SUBMITTED', {
-      params: { name: app.influencer.displayName, deal: app.deal.title },
-      link: `/brand/deals/${app.dealId}/applicants`,
-    });
-    return updated;
-  }
-
   // ─── Brand ───────────────────────────────────────────────
 
   async listForDeal(userId: string, dealId: string, q: ApplicantsQuery) {
@@ -305,9 +291,6 @@ export class ApplicationsService {
         'INVALID_TRANSITION',
         `Cannot change ${app.status.toLowerCase()} to ${to.toLowerCase()}`,
       );
-    }
-    if (to === 'COMPLETED' && !canComplete(app.status, app.postUrl)) {
-      throw new AppError('INVALID_TRANSITION', 'The influencer has not submitted the post URL yet');
     }
 
     let dealFilled = false;

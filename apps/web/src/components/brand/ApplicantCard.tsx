@@ -1,6 +1,19 @@
 'use client';
 import { REJECTION_REASONS, type Currency, type RejectionReason } from '@briefluence/shared';
-import { Alert, Avatar, Badge, Button, Card, ChipGroup, Inline, Modal, ScoreMeter, Stack, Text, buttonStyles } from '@briefluence/ui';
+import {
+  Alert,
+  Avatar,
+  Badge,
+  Button,
+  Card,
+  ChipGroup,
+  Inline,
+  Modal,
+  ScoreMeter,
+  Stack,
+  Text,
+  buttonStyles,
+} from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -11,7 +24,10 @@ import { useFormat } from '@/lib/hooks/format';
 import { useOptions } from '@/lib/hooks/options';
 import type { ApplicantDto } from '@/lib/types';
 
-export type ApplicantAction = { status: 'SHORTLISTED' | 'ACCEPTED' | 'REJECTED' | 'COMPLETED'; rejectionReason?: RejectionReason };
+export type ApplicantAction = {
+  status: 'SHORTLISTED' | 'ACCEPTED' | 'REJECTED' | 'COMPLETED';
+  rejectionReason?: RejectionReason;
+};
 
 export function ApplicantCard({
   a,
@@ -42,13 +58,18 @@ export function ApplicantCard({
             <Avatar size="lg" name={a.influencer.displayName} src={a.influencer.avatarUrl} />
             <Stack gap={1} className="min-w-0">
               <Inline gap={2} wrap>
-                <Link href={`/brand/influencers/${a.influencer.id}`} className="text-h2 font-bold text-ink hover:text-primary-text">
+                <Link
+                  href={`/brand/influencers/${a.influencer.id}`}
+                  className="text-h2 font-bold text-ink hover:text-primary-text"
+                >
                   {a.influencer.displayName}
                 </Link>
                 {a.influencer.verified && <VerifiedBadge />}
               </Inline>
               <Text size="small" tone="muted">
-                {[a.influencer.city, a.influencer.niches.map(o.niche).join(', ')].filter(Boolean).join(' · ')}
+                {[a.influencer.city, a.influencer.niches.map(o.niche).join(', ')]
+                  .filter(Boolean)
+                  .join(' · ')}
               </Text>
               {a.accounts.length > 1 && (
                 <Text size="small" tone="muted">
@@ -67,7 +88,8 @@ export function ApplicantCard({
           <Text className="whitespace-pre-line">{a.pitch}</Text>
           <Text size="small" tone="muted" className="mt-2">
             {f.relative(a.createdAt)}
-            {a.proposedPrice != null && ` · ${t('price', { price: f.display(a.proposedPrice, currency).main })}`}
+            {a.proposedPrice != null &&
+              ` · ${t('price', { price: f.display(a.proposedPrice, currency).main })}`}
           </Text>
         </div>
 
@@ -77,10 +99,17 @@ export function ApplicantCard({
             {a.accounts.map((acc) => (
               <Inline key={acc.id} gap={2} wrap>
                 <AccountLine account={acc} />
-                {acc.id === a.matchedAccountId && a.accounts.length > 1 && <Badge tone="primary">{t('bestMatch')}</Badge>}
+                {acc.id === a.matchedAccountId && a.accounts.length > 1 && (
+                  <Badge tone="primary">{t('bestMatch')}</Badge>
+                )}
               </Inline>
             ))}
-            <button type="button" className="min-h-11 self-start text-small font-bold text-primary-text hover:underline" onClick={() => setExpanded((x) => !x)} aria-expanded={expanded}>
+            <button
+              type="button"
+              className="min-h-11 self-start text-small font-bold text-primary-text hover:underline"
+              onClick={() => setExpanded((x) => !x)}
+              aria-expanded={expanded}
+            >
               {expanded ? t('hideStats') : t('showStats')}
             </button>
             {expanded && (
@@ -100,7 +129,11 @@ export function ApplicantCard({
 
         {a.contacts && (
           <Alert tone="success" title={t('contacts')}>
-            {a.contacts.method && a.contacts.value ? <ContactLink method={a.contacts.method} value={a.contacts.value} /> : t('noContact')}
+            {a.contacts.method && a.contacts.value ? (
+              <ContactLink method={a.contacts.method} value={a.contacts.value} />
+            ) : (
+              t('noContact')
+            )}
           </Alert>
         )}
 
@@ -111,7 +144,12 @@ export function ApplicantCard({
         )}
 
         {a.postUrl && (
-          <a href={a.postUrl} target="_blank" rel="noopener noreferrer" className={buttonStyles({ variant: 'link', className: 'self-start' })}>
+          <a
+            href={a.postUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonStyles({ variant: 'link', className: 'self-start' })}
+          >
             {t('openPost')}
           </a>
         )}
@@ -123,7 +161,12 @@ export function ApplicantCard({
             </Button>
           )}
           {open && a.status !== 'SHORTLISTED' && (
-            <Button variant="secondary" size="sm" disabled={busy} onClick={() => onAction({ status: 'SHORTLISTED' })}>
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={busy}
+              onClick={() => onAction({ status: 'SHORTLISTED' })}
+            >
               {t('shortlist')}
             </Button>
           )}
@@ -133,8 +176,8 @@ export function ApplicantCard({
             </Button>
           )}
           {a.status === 'ACCEPTED' && (
-            <Button size="sm" disabled={!a.postUrl} loading={busy} onClick={() => onAction({ status: 'COMPLETED' })}>
-              {a.postUrl ? t('complete') : t('waitingPost')}
+            <Button size="sm" loading={busy} onClick={() => onAction({ status: 'COMPLETED' })}>
+              {t('complete')}
             </Button>
           )}
         </Inline>
@@ -169,7 +212,11 @@ export function ApplicantCard({
           <Text size="small" tone="muted">
             {t('rejectHint')}
           </Text>
-          <ChipGroup options={REJECTION_REASONS.map((r) => ({ value: r, label: tr(r) }))} value={reason} onChange={setReason} />
+          <ChipGroup
+            options={REJECTION_REASONS.map((r) => ({ value: r, label: tr(r) }))}
+            value={reason}
+            onChange={setReason}
+          />
         </Stack>
       </Modal>
     </Card>

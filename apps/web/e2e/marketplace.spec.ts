@@ -19,7 +19,7 @@ test.use({
   },
 });
 
-test('sign-up → verify → apply → accept → post link', async ({ browser }) => {
+test('sign-up → verify → apply → accept → done', async ({ browser }) => {
   const id = uid();
   const bloggerEmail = `blogger-${id}@e2e.test`;
   const brandEmail = `brand-${id}@e2e.test`;
@@ -131,17 +131,14 @@ test('sign-up → verify → apply → accept → post link', async ({ browser }
     'https://wa.me/37491123456',
   );
 
-  // ── Blogger sees brand contacts and sends the post link ──
+  // ── Blogger sees the brand contacts ──
   await blogger.goto('/influencer/applications');
   await blogger.getByRole('tab', { name: /Accepted/ }).click();
-  await expect(blogger.getByText('Brand contacts')).toBeVisible();
+  await expect(blogger.getByText('Have a great collab!')).toBeVisible();
   await expect(blogger.getByRole('link', { name: /Telegram: @e2e_cafe/ })).toHaveAttribute(
     'href',
     'https://t.me/e2e_cafe',
   );
-  await blogger.getByLabel('Link to your post').fill('https://www.instagram.com/p/e2e123/');
-  await blogger.getByRole('button', { name: 'Send link' }).click();
-  await expect(blogger.getByText('Link sent to the brand')).toBeVisible();
 
   // ── Brand marks it done ──
   await brand.reload();

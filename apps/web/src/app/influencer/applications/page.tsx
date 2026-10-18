@@ -1,6 +1,19 @@
 'use client';
-import { contactDisplay, contactHref, postUrlSchema, type ApplicationStatus } from '@briefluence/shared';
-import { Alert, Button, Icon, Card, EmptyState, Field, Inline, Input, Skeleton, Stack, Tabs, Text, buttonStyles, useToast } from '@briefluence/ui';
+import { contactDisplay, contactHref, type ApplicationStatus } from '@briefluence/shared';
+import {
+  Alert,
+  Button,
+  Icon,
+  Card,
+  EmptyState,
+  Inline,
+  Skeleton,
+  Stack,
+  Tabs,
+  Text,
+  buttonStyles,
+  useToast,
+} from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -21,39 +34,6 @@ const GROUPS: Record<'active' | 'accepted' | 'closed', ApplicationStatus[]> = {
   closed: ['REJECTED', 'WITHDRAWN'],
 };
 
-function PostUrlForm({ app }: { app: MyApplicationDto }) {
-  const t = useTranslations('applications');
-  const toast = useToast();
-  const errorMessage = useErrorMessage();
-  const qc = useQueryClient();
-  const [url, setUrl] = useState(app.postUrl ?? '');
-  const valid = postUrlSchema.safeParse({ postUrl: url }).success;
-  const save = useMutation({
-    mutationFn: () => api.patch(`/applications/${app.id}/post-url`, { postUrl: url }),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ['applications'] });
-      toast(t('postSaved'));
-    },
-    onError: (e) => toast(errorMessage(e), 'danger'),
-  });
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (valid) save.mutate();
-      }}
-      className="flex flex-col gap-2 sm:flex-row sm:items-end"
-    >
-      <Field label={t('postUrl')} hint={t('postUrlHint')} className="flex-1">
-        {({ id, describedBy }) => <Input id={id} aria-describedby={describedBy} type="url" icon="link" placeholder="https://" value={url} onChange={(e) => setUrl(e.target.value)} />}
-      </Field>
-      <Button type="submit" disabled={!valid} loading={save.isPending} className="sm:mb-6">
-        {app.postUrl ? t('updatePost') : t('submitPost')}
-      </Button>
-    </form>
-  );
-}
-
 export default function MyApplicationsPage() {
   const t = useTranslations('applications');
   const tr = useTranslations('enums.rejectionReason');
@@ -64,7 +44,10 @@ export default function MyApplicationsPage() {
   const errorMessage = useErrorMessage();
   const qc = useQueryClient();
   const [tab, setTab] = useState<keyof typeof GROUPS>('active');
-  const apps = useQuery({ queryKey: ['applications', 'mine'], queryFn: () => api.get<MyApplicationDto[]>('/applications/mine') });
+  const apps = useQuery({
+    queryKey: ['applications', 'mine'],
+    queryFn: () => api.get<MyApplicationDto[]>('/applications/mine'),
+  });
   const withdraw = useMutation({
     mutationFn: (id: string) => api.post(`/applications/${id}/withdraw`),
     onSuccess: () => {
@@ -111,11 +94,15 @@ export default function MyApplicationsPage() {
                   <Inline gap={2} align="start" className="min-w-0">
                     <BrandAvatar brand={a.deal.brand} />
                     <div className="min-w-0">
-                      <Link href={`/influencer/deals/${a.deal.id}`} className="text-h2 font-bold text-ink hover:text-primary-text">
+                      <Link
+                        href={`/influencer/deals/${a.deal.id}`}
+                        className="text-h2 font-bold text-ink hover:text-primary-text"
+                      >
                         {a.deal.title}
                       </Link>
                       <Text size="small" tone="muted">
-                        {brandName(a.deal.brand)} · {t('appliedOn', { date: f.date(a.createdAt) })} · {t('matchValue', { score: a.matchScore })}
+                        {brandName(a.deal.brand)} · {t('appliedOn', { date: f.date(a.createdAt) })}{' '}
+                        · {t('matchValue', { score: a.matchScore })}
                       </Text>
                     </div>
                   </Inline>
@@ -128,38 +115,66 @@ export default function MyApplicationsPage() {
                   </Text>
                 )}
                 {a.status === 'REJECTED' && (
-                  <Alert tone="info">{t('rejectedReason', { reason: a.rejectionReason ? tr(a.rejectionReason as 'OTHER') : tr('OTHER') })}</Alert>
+                  <Alert tone="info">
+                    {t('rejectedReason', {
+                      reason: a.rejectionReason ? tr(a.rejectionReason as 'OTHER') : tr('OTHER'),
+                    })}
+                  </Alert>
                 )}
                 {a.brandContact && (
-                  <Alert tone="success" title={t('contactsTitle')}>
+                  <Alert
+                    tone="success"
+                    title={a.status === 'COMPLETED' ? t('doneTitle') : t('collabTitle')}
+                  >
                     <Stack gap={1}>
+                      <span className="mb-1">
+                        {a.status === 'COMPLETED' ? t('doneBody') : t('collabBody')}
+                      </span>
                       {(a.brandContact.name || a.brandContact.position) && (
-                        <span>{[a.brandContact.name, a.brandContact.position].filter(Boolean).join(' · ')}</span>
+                        <span>
+                          {[a.brandContact.name, a.brandContact.position]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </span>
                       )}
                       {a.brandContact.method && a.brandContact.value && (
                         <a
-                          href={contactHref(a.brandContact.method, a.brandContact.value) ?? undefined}
+                          href={
+                            contactHref(a.brandContact.method, a.brandContact.value) ?? undefined
+                          }
                           target={a.brandContact.method === 'PHONE' ? undefined : '_blank'}
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 font-bold underline"
                         >
                           <Icon name={CONTACT_ICON[a.brandContact.method]} />
-                          {tm(a.brandContact.method)}: {contactDisplay(a.brandContact.method, a.brandContact.value)}
+                          {tm(a.brandContact.method)}:{' '}
+                          {contactDisplay(a.brandContact.method, a.brandContact.value)}
                         </a>
                       )}
-                      {a.deal.publishBy && <span>{t('publishBy', { date: f.date(a.deal.publishBy) })}</span>}
+                      {a.deal.publishBy && (
+                        <span>{t('publishBy', { date: f.date(a.deal.publishBy) })}</span>
+                      )}
                     </Stack>
                   </Alert>
                 )}
-                {a.status === 'ACCEPTED' && <PostUrlForm app={a} />}
                 {a.status === 'COMPLETED' && a.postUrl && (
-                  <a href={a.postUrl} target="_blank" rel="noopener noreferrer" className="text-small font-bold text-primary-text hover:underline">
+                  <a
+                    href={a.postUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-small font-bold text-primary-text hover:underline"
+                  >
                     {t('viewPost')}
                   </a>
                 )}
                 {GROUPS.active.includes(a.status) && (
                   <div className="flex justify-end">
-                    <Button variant="ghost" size="sm" loading={withdraw.isPending && withdraw.variables === a.id} onClick={() => withdraw.mutate(a.id)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      loading={withdraw.isPending && withdraw.variables === a.id}
+                      onClick={() => withdraw.mutate(a.id)}
+                    >
                       {t('withdraw')}
                     </Button>
                   </div>
