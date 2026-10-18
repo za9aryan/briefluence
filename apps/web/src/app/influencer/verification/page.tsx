@@ -1,12 +1,28 @@
 'use client';
 import { PLATFORMS, type Platform } from '@briefluence/shared';
-import { Alert, Button, Card, CardHeader, Grid, Icon, Inline, Modal, Skeleton, Stack, Stepper, Text, buttonStyles, useToast } from '@briefluence/ui';
+import {
+  Alert,
+  Button,
+  Card,
+  CardHeader,
+  Grid,
+  Icon,
+  Inline,
+  Modal,
+  Skeleton,
+  Stack,
+  Stepper,
+  Text,
+  buttonStyles,
+  useToast,
+} from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
 import { AccountLine, AccountStats } from '@/components/domain/AccountStats';
+import { ManualAccountModal } from '@/components/influencer/ManualAccountModal';
 import { VerificationBadge } from '@/components/domain/badges';
 import { API_BASE, api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
@@ -28,7 +44,8 @@ function OAuthResult() {
     const error = params.get('error');
     if (!connected && !error) return;
     handled.current = true;
-    if (connected) toast(t('connectedToast', { platform: tp(connected.toUpperCase() as Platform) }));
+    if (connected)
+      toast(t('connectedToast', { platform: tp(connected.toUpperCase() as Platform) }));
     if (error) toast(error, 'danger');
     router.replace('/influencer/verification');
   }, [params, router, toast, t, tp]);
@@ -44,7 +61,11 @@ export default function VerificationPage() {
   const f = useFormat();
   const qc = useQueryClient();
   const [removing, setRemoving] = useState<SocialAccountDto | null>(null);
-  const profile = useQuery({ queryKey: ['influencer', 'me'], queryFn: () => api.get<InfluencerProfileDto>('/influencers/me') });
+  const [manual, setManual] = useState<{ account: SocialAccountDto | null } | null>(null);
+  const profile = useQuery({
+    queryKey: ['influencer', 'me'],
+    queryFn: () => api.get<InfluencerProfileDto>('/influencers/me'),
+  });
 
   const refresh = () => {
     void qc.invalidateQueries({ queryKey: ['influencer', 'me'] });
@@ -78,16 +99,25 @@ export default function VerificationPage() {
   const p = profile.data;
   const accounts = p?.socialAccounts ?? [];
   const status = p?.status ?? 'DRAFT';
-  const step = status === 'APPROVED' ? 3 : status === 'PENDING_REVIEW' ? 2 : accounts.length ? 2 : 1;
-  const canSubmit = (status === 'DRAFT' || status === 'REJECTED') && accounts.some((a) => !a.needsReconnect);
+  const step =
+    status === 'APPROVED' ? 3 : status === 'PENDING_REVIEW' ? 2 : accounts.length ? 2 : 1;
+  const canSubmit =
+    (status === 'DRAFT' || status === 'REJECTED') && accounts.some((a) => !a.needsReconnect);
 
   return (
     <Stack gap={6}>
       <Suspense>
         <OAuthResult />
       </Suspense>
-      <Stepper steps={[t('stepProfile'), t('stepConnect'), t('stepReview')]} current={Math.min(step, 2)} />
-      <PageHeader title={t('title')} description={t('lead')} actions={p && <VerificationBadge status={status} />} />
+      <Stepper
+        steps={[t('stepProfile'), t('stepConnect'), t('stepReview')]}
+        current={Math.min(step, 2)}
+      />
+      <PageHeader
+        title={t('title')}
+        description={t('lead')}
+        actions={p && <VerificationBadge status={status} />}
+      />
 
       {status === 'REJECTED' && p?.rejectionReason && (
         <Alert tone="danger" title={t('rejectedTitle')}>
@@ -109,7 +139,11 @@ export default function VerificationPage() {
         <CardHeader title={t('connectTitle')} description={t('connectLead')} />
         <Grid cols={{ base: 1, sm: 3 }} gap={2}>
           {PLATFORMS.map((pl) => (
-            <a key={pl} href={`${API_BASE}/social/${pl.toLowerCase()}/connect`} className={buttonStyles({ variant: 'secondary', block: true })}>
+            <a
+              key={pl}
+              href={`${API_BASE}/social/${pl.toLowerCase()}/connect`}
+              className={buttonStyles({ variant: 'secondary', block: true })}
+            >
               <Icon name={PLATFORM_ICON[pl]} />
               {t('connect', { platform: tp(pl) })}
             </a>
@@ -118,6 +152,19 @@ export default function VerificationPage() {
         <Text size="small" tone="muted" className="mt-4">
           {t('instagramNote')}
         </Text>
+        <div className="mt-4 flex flex-col gap-2 border-t border-line pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <Text size="small" tone="muted">
+            {t('manual.hint')}
+          </Text>
+          <Button
+            variant="secondary"
+            icon="plus"
+            className="shrink-0"
+            onClick={() => setManual({ account: null })}
+          >
+            {t('manual.button')}
+          </Button>
+        </div>
       </Card>
 
       <Card>
@@ -129,13 +176,34 @@ export default function VerificationPage() {
         ) : (
           <Stack gap={6}>
             {accounts.map((a) => (
-              <Stack key={a.id} gap={4} className="border-b border-line pb-6 last:border-0 last:pb-0">
+              <Stack
+                key={a.id}
+                gap={4}
+                className="border-b border-line pb-6 last:border-0 last:pb-0"
+              >
                 <Inline justify="between" gap={2} wrap>
                   <AccountLine account={a} />
                   <Inline gap={1}>
-                    <Button variant="ghost" size="sm" icon="refresh" loading={sync.isPending && sync.variables === a.id} onClick={() => sync.mutate(a.id)}>
-                      {t('sync')}
-                    </Button>
+                    {a.source === 'MANUAL' ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon="edit"
+                        onClick={() => setManual({ account: a })}
+                      >
+                        {tc('edit')}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon="refresh"
+                        loading={sync.isPending && sync.variables === a.id}
+                        onClick={() => sync.mutate(a.id)}
+                      >
+                        {t('sync')}
+                      </Button>
+                    )}
                     <Button variant="ghost" size="sm" icon="trash" onClick={() => setRemoving(a)}>
                       {tc('remove')}
                     </Button>
@@ -161,7 +229,13 @@ export default function VerificationPage() {
               {canSubmit ? t('submitReady') : t('submitNeedsAccount')}
             </Text>
           </Stack>
-          <Button size="lg" disabled={!canSubmit} loading={submit.isPending} onClick={() => submit.mutate()} className="w-full sm:w-auto">
+          <Button
+            size="lg"
+            disabled={!canSubmit}
+            loading={submit.isPending}
+            onClick={() => submit.mutate()}
+            className="w-full sm:w-auto"
+          >
             {t('submit')}
           </Button>
         </Card>
@@ -178,7 +252,11 @@ export default function VerificationPage() {
             <Button variant="ghost" onClick={() => setRemoving(null)}>
               {tc('cancel')}
             </Button>
-            <Button variant="danger" loading={remove.isPending} onClick={() => removing && remove.mutate(removing.id)}>
+            <Button
+              variant="danger"
+              loading={remove.isPending}
+              onClick={() => removing && remove.mutate(removing.id)}
+            >
               {tc('remove')}
             </Button>
           </>
@@ -186,6 +264,12 @@ export default function VerificationPage() {
       >
         <Text tone="muted">{t('removeBody')}</Text>
       </Modal>
+      <ManualAccountModal
+        open={!!manual}
+        account={manual?.account ?? null}
+        onClose={() => setManual(null)}
+        onSaved={refresh}
+      />
     </Stack>
   );
 }

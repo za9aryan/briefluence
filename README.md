@@ -58,6 +58,12 @@ pnpm dev                        # web on :3000, API on :4000
 
 The login and sign-up pages have "Continue with Google / Apple". Locally they are simulated (`OAUTH_LOGIN_MOCK=true`): you type any email on a test page. To make them real, see [docs/social-login-setup.md](docs/social-login-setup.md).
 
+## Manually added social accounts
+
+Besides connecting through the official login, a blogger can **Add manually** on the Verification page:
+platform, username and followers are required; views, engagement and audience are optional. These accounts are
+never synced, can be edited by the blogger, and carry an **Added manually** label for admins and brands.
+
 ## Admin access
 
 There is no public admin sign-up. The admin account comes from `ADMIN_EMAIL` / `ADMIN_PASSWORD` in `.env`:

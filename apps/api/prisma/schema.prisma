@@ -21,6 +21,12 @@ enum Platform {
   YOUTUBE
 }
 
+/// How a social account got its numbers: platform API (OAuth) or typed in by the blogger.
+enum AccountSource {
+  OAUTH
+  MANUAL
+}
+
 enum VerificationStatus {
   DRAFT
   PENDING_REVIEW
@@ -195,7 +201,8 @@ model SocialAccount {
   audienceGender    Json? // { male: 38.2, female: 61.8 }
   audienceAge       Json? // { "18-24": 30.1, "25-34": 41.0, ... }
   audienceCountries Json? // { "AM": 72.4, "RU": 9.1, ... }
-  accessTokenEnc    String // AES-256-GCM encrypted
+  source            AccountSource     @default(OAUTH) // spec+
+  accessTokenEnc    String? // AES-256-GCM encrypted; null for MANUAL accounts
   refreshTokenEnc   String?
   tokenExpiresAt    DateTime?
   tokenRevokedAt    DateTime? // spec+: flagged when a sync finds the token revoked

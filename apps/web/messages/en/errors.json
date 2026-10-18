@@ -23,7 +23,8 @@
     "DEAL_NOT_EDITABLE": "Pause the brief before editing it.",
     "PAYMENT_FAILED": "The payment didn't go through.",
     "PROVIDER_ERROR": "The external service is unavailable. Try again in a minute.",
-    "INTERNAL": "Something went wrong on our side."
+    "INTERNAL": "Something went wrong on our side.",
+    "SOCIAL_ACCOUNT_TAKEN": "This account is already added. If it is yours and someone else added it, write to support."
   },
   "field": {
     "required": "This field is required.",
@@ -42,6 +43,7 @@
     "passwordDigit": "Add at least one digit.",
     "acceptTerms": "Please accept the terms.",
     "passwordsMismatch": "Passwords do not match.",
-    "contactInvalid": "Check the format for this contact method."
+    "contactInvalid": "Check the format for this contact method.",
+    "invalidUsername": "Use letters, numbers, dots, dashes or underscores, no spaces."
   }
 }

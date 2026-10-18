@@ -18,6 +18,8 @@ import type {
 export interface SocialAccountDto {
   id: string;
   platform: Platform;
+  /** MANUAL = numbers typed in by the blogger. */
+  source: 'OAUTH' | 'MANUAL';
   username: string;
   profileUrl: string;
   avatarUrl: string | null;

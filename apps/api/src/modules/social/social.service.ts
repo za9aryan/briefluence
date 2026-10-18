@@ -1,6 +1,11 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PLATFORMS, type Platform } from '@briefluence/shared';
+import {
+  PLATFORMS,
+  profileUrlFor,
+  type ManualAccountInput,
+  type Platform,
+} from '@briefluence/shared';
 import { Prisma, type SocialAccount } from '@prisma/client';
 import { AppError, notFound } from '../../common/app-error';
 import { Clock } from '../../common/clock';
@@ -14,7 +19,12 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { InstagramProvider } from './providers/instagram.provider';
 import { MockSocialProvider } from './providers/mock.provider';
 import { TikTokProvider } from './providers/tiktok.provider';
-import { TokenRevokedError, type SocialProvider, type SocialStats, type TokenSet } from './providers/types';
+import {
+  TokenRevokedError,
+  type SocialProvider,
+  type SocialStats,
+  type TokenSet,
+} from './providers/types';
 import { YouTubeProvider } from './providers/youtube.provider';
 
 export const SOCIAL_SYNC_JOB = 'social.sync';
@@ -41,12 +51,16 @@ export class SocialService implements OnModuleInit {
   ) {
     const mock = (p: Platform) => env.SOCIAL_MOCK.includes(p);
     this.providers = {
-      INSTAGRAM: mock('INSTAGRAM') ? new MockSocialProvider('INSTAGRAM') : new InstagramProvider(env),
+      INSTAGRAM: mock('INSTAGRAM')
+        ? new MockSocialProvider('INSTAGRAM')
+        : new InstagramProvider(env),
       TIKTOK: mock('TIKTOK') ? new MockSocialProvider('TIKTOK') : new TikTokProvider(env),
       YOUTUBE: mock('YOUTUBE') ? new MockSocialProvider('YOUTUBE') : new YouTubeProvider(env),
     };
     const real = PLATFORMS.filter((p) => !mock(p));
-    this.logger.log(`Social OAuth: real=[${real.join(', ') || 'none'}] mock=[${env.SOCIAL_MOCK.join(', ') || 'none'}]`);
+    this.logger.log(
+      `Social OAuth: real=[${real.join(', ') || 'none'}] mock=[${env.SOCIAL_MOCK.join(', ') || 'none'}]`,
+    );
   }
 
   onModuleInit() {
@@ -67,7 +81,10 @@ export class SocialService implements OnModuleInit {
   }
 
   async connectUrl(userId: string, platform: Platform): Promise<{ url: string; nonce: string }> {
-    const profile = await this.prisma.influencerProfile.findUnique({ where: { userId }, select: { id: true } });
+    const profile = await this.prisma.influencerProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
     if (!profile) throw new AppError('PROFILE_INCOMPLETE', 'Complete your profile first');
     const nonce = CryptoService.randomToken(16);
     const state = await this.jwt.signAsync({ sub: userId, platform, nonce } satisfies OAuthState, {
@@ -78,7 +95,12 @@ export class SocialService implements OnModuleInit {
   }
 
   /** Verifies state (signed + bound to the browser via the nonce cookie), stores tokens and stats. */
-  async handleCallback(platform: Platform, code: string, state: string, cookieNonce: string | undefined) {
+  async handleCallback(
+    platform: Platform,
+    code: string,
+    state: string,
+    cookieNonce: string | undefined,
+  ) {
     let s: OAuthState;
     try {
       s = await this.jwt.verifyAsync<OAuthState>(state, { secret: this.env.JWT_EMAIL_SECRET });
@@ -101,10 +123,17 @@ export class SocialService implements OnModuleInit {
     if (existing && existing.influencerId !== profile.id) {
       throw new AppError('CONFLICT', 'This account is already connected to another profile');
     }
-    const data = { ...this.statsData(stats), ...this.tokenData(tokens), tokenRevokedAt: null, lastSyncedAt: this.clock.now() };
+    const data = {
+      ...this.statsData(stats),
+      ...this.tokenData(tokens),
+      tokenRevokedAt: null,
+      lastSyncedAt: this.clock.now(),
+    };
     const account = existing
       ? await this.prisma.socialAccount.update({ where: { id: existing.id }, data })
-      : await this.prisma.socialAccount.create({ data: { influencerId: profile.id, platform, ...data } });
+      : await this.prisma.socialAccount.create({
+          data: { influencerId: profile.id, platform, ...data },
+        });
     return publicAccount(account);
   }
 
@@ -117,28 +146,127 @@ export class SocialService implements OnModuleInit {
   }
 
   private async owned(userId: string, accountId: string): Promise<SocialAccount> {
-    const acc = await this.prisma.socialAccount.findFirst({ where: { id: accountId, influencer: { userId } } });
+    const acc = await this.prisma.socialAccount.findFirst({
+      where: { id: accountId, influencer: { userId } },
+    });
     if (!acc) throw notFound('Social account');
     return acc;
   }
 
+  /** Blogger adds an account by hand. Its numbers are self-reported and labelled as such. */
+  async addManual(userId: string, input: ManualAccountInput) {
+    const profile = await this.prisma.influencerProfile.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+    if (!profile) throw new AppError('PROFILE_INCOMPLETE', 'Complete your profile first');
+    const sameHandle = await this.prisma.socialAccount.findFirst({
+      where: {
+        platform: input.platform,
+        username: { equals: input.username, mode: 'insensitive' },
+      },
+      select: { influencerId: true },
+    });
+    if (sameHandle) {
+      throw new AppError(
+        'SOCIAL_ACCOUNT_TAKEN',
+        sameHandle.influencerId === profile.id
+          ? 'You already added this account'
+          : 'This account is already added to another profile',
+      );
+    }
+    const account = await this.prisma.socialAccount.create({
+      data: {
+        influencerId: profile.id,
+        platform: input.platform,
+        source: 'MANUAL',
+        externalId: `manual:${input.username.toLowerCase()}`,
+        ...this.manualData(input),
+      },
+    });
+    return publicAccount(account);
+  }
+
+  async updateManual(userId: string, accountId: string, input: ManualAccountInput) {
+    const acc = await this.owned(userId, accountId);
+    if (acc.source !== 'MANUAL')
+      throw new AppError('CONFLICT', 'Connected accounts update from the platform');
+    if (
+      input.platform !== acc.platform ||
+      input.username.toLowerCase() !== acc.username.toLowerCase()
+    ) {
+      const taken = await this.prisma.socialAccount.findFirst({
+        where: {
+          id: { not: acc.id },
+          platform: input.platform,
+          username: { equals: input.username, mode: 'insensitive' },
+        },
+        select: { id: true },
+      });
+      if (taken) throw new AppError('SOCIAL_ACCOUNT_TAKEN', 'This account is already added');
+    }
+    const updated = await this.prisma.socialAccount.update({
+      where: { id: acc.id },
+      data: {
+        platform: input.platform,
+        externalId: `manual:${input.username.toLowerCase()}`,
+        ...this.manualData(input),
+      },
+    });
+    return publicAccount(updated);
+  }
+
+  private manualData(i: ManualAccountInput) {
+    const json = (v: unknown) => (v == null ? Prisma.DbNull : (v as Prisma.InputJsonValue));
+    return {
+      username: i.username,
+      profileUrl: i.profileUrl ?? profileUrlFor(i.platform, i.username),
+      followers: i.followers,
+      avgViews: i.avgViews,
+      engagementRate: i.engagementRate,
+      audienceGender: json(
+        i.audienceFemale == null
+          ? null
+          : { female: i.audienceFemale, male: Math.round((100 - i.audienceFemale) * 10) / 10 },
+      ),
+      audienceCountries: json(
+        i.topCountry && i.topCountryShare != null ? { [i.topCountry]: i.topCountryShare } : null,
+      ),
+      audienceAge: json(i.topAge && i.topAgeShare != null ? { [i.topAge]: i.topAgeShare } : null),
+      lastSyncedAt: this.clock.now(),
+    };
+  }
+
   async syncMine(userId: string, accountId: string) {
-    await this.owned(userId, accountId);
+    const own = await this.owned(userId, accountId);
+    if (own.source === 'MANUAL')
+      throw new AppError('CONFLICT', 'Manually added accounts are updated by editing them');
     const result = await this.sync(accountId);
-    if (result === 'revoked') throw new AppError('INVALID_TOKEN', 'Access was revoked. Reconnect the account.');
-    return publicAccount(await this.prisma.socialAccount.findUniqueOrThrow({ where: { id: accountId } }));
+    if (result === 'revoked')
+      throw new AppError('INVALID_TOKEN', 'Access was revoked. Reconnect the account.');
+    return publicAccount(
+      await this.prisma.socialAccount.findUniqueOrThrow({ where: { id: accountId } }),
+    );
   }
 
   async disconnect(userId: string, accountId: string) {
     const acc = await this.owned(userId, accountId);
     const activeApplications = await this.prisma.application.count({
-      where: { socialAccountId: acc.id, status: { in: ['APPLIED', 'VIEWED', 'SHORTLISTED', 'ACCEPTED'] } },
+      where: {
+        socialAccountId: acc.id,
+        status: { in: ['APPLIED', 'VIEWED', 'SHORTLISTED', 'ACCEPTED'] },
+      },
     });
     if (activeApplications > 0) {
-      throw new AppError('CONFLICT', 'This account is used in active applications. Withdraw or finish them first.');
+      throw new AppError(
+        'CONFLICT',
+        'This account is used in active applications. Withdraw or finish them first.',
+      );
     }
     await this.prisma.socialAccount.delete({ where: { id: acc.id } });
-    const remaining = await this.prisma.socialAccount.count({ where: { influencerId: acc.influencerId } });
+    const remaining = await this.prisma.socialAccount.count({
+      where: { influencerId: acc.influencerId },
+    });
     if (remaining === 0) {
       // A pending review without any accounts makes no sense; go back to draft.
       await this.prisma.influencerProfile.updateMany({
@@ -155,6 +283,7 @@ export class SocialService implements OnModuleInit {
       include: { influencer: { select: { userId: true } } },
     });
     if (!acc) return 'missing';
+    if (acc.source === 'MANUAL' || !acc.accessTokenEnc) return 'ok'; // nothing to fetch
     const provider = this.providers[acc.platform];
     const now = this.clock.now();
     try {
@@ -179,7 +308,10 @@ export class SocialService implements OnModuleInit {
     } catch (err) {
       if (!(err instanceof TokenRevokedError)) throw err;
       if (!acc.tokenRevokedAt) {
-        await this.prisma.socialAccount.update({ where: { id: acc.id }, data: { tokenRevokedAt: now } });
+        await this.prisma.socialAccount.update({
+          where: { id: acc.id },
+          data: { tokenRevokedAt: now },
+        });
         await this.notifications.notify(acc.influencer.userId, 'SOCIAL_TOKEN_REVOKED', {
           params: { platform: acc.platform, username: acc.username },
           link: '/influencer/verification',
@@ -191,7 +323,10 @@ export class SocialService implements OnModuleInit {
 
   /** Weekly job: queue a sync for every connected account. */
   async enqueueAllSyncs() {
-    const accounts = await this.prisma.socialAccount.findMany({ where: { tokenRevokedAt: null }, select: { id: true } });
+    const accounts = await this.prisma.socialAccount.findMany({
+      where: { tokenRevokedAt: null, source: 'OAUTH' },
+      select: { id: true },
+    });
     for (const a of accounts) await this.queue.add(SOCIAL_SYNC_JOB, { accountId: a.id });
     this.logger.log(`Queued ${accounts.length} social syncs`);
     return accounts.length;

@@ -5,6 +5,8 @@ export function publicAccount(a: SocialAccount) {
   return {
     id: a.id,
     platform: a.platform,
+    /** MANUAL = numbers typed in by the blogger, not read from the platform. */
+    source: a.source,
     username: a.username,
     profileUrl: a.profileUrl,
     avatarUrl: a.avatarUrl,

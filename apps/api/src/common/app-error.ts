@@ -16,6 +16,7 @@ const STATUS: Partial<Record<ErrorCode, HttpStatus>> = {
   TRIAL_NOT_STARTED: HttpStatus.FORBIDDEN,
   NOT_FOUND: HttpStatus.NOT_FOUND,
   CONFLICT: HttpStatus.CONFLICT,
+  SOCIAL_ACCOUNT_TAKEN: HttpStatus.CONFLICT,
   EMAIL_TAKEN: HttpStatus.CONFLICT,
   ALREADY_APPLIED: HttpStatus.CONFLICT,
   INVALID_TRANSITION: HttpStatus.CONFLICT,
@@ -39,4 +40,5 @@ export class AppError extends HttpException {
 }
 
 export const notFound = (what = 'Resource') => new AppError('NOT_FOUND', `${what} not found`);
-export const forbidden = (msg = 'You do not have access to this resource') => new AppError('FORBIDDEN', msg);
+export const forbidden = (msg = 'You do not have access to this resource') =>
+  new AppError('FORBIDDEN', msg);

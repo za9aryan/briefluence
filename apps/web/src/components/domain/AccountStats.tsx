@@ -6,7 +6,13 @@ import { PLATFORM_ICON, useOptions } from '@/lib/hooks/options';
 import type { SocialAccountDto } from '@/lib/types';
 
 /** One-line summary: platform, @username, followers, ER. */
-export function AccountLine({ account, link = true }: { account: SocialAccountDto; link?: boolean }) {
+export function AccountLine({
+  account,
+  link = true,
+}: {
+  account: SocialAccountDto;
+  link?: boolean;
+}) {
   const t = useTranslations('verification');
   const f = useFormat();
   const handle = (
@@ -18,7 +24,12 @@ export function AccountLine({ account, link = true }: { account: SocialAccountDt
   return (
     <Inline gap={2} wrap>
       {link ? (
-        <a href={account.profileUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
+        <a
+          href={account.profileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline"
+        >
           {handle}
         </a>
       ) : (
@@ -28,6 +39,11 @@ export function AccountLine({ account, link = true }: { account: SocialAccountDt
         {t('followersShort', { count: f.compact(account.followers) })}
         {account.engagementRate != null && ` · ER ${f.percent(account.engagementRate)}`}
       </Text>
+      {account.source === 'MANUAL' && (
+        <Badge tone="neutral" icon="edit">
+          {t('manual.badge')}
+        </Badge>
+      )}
       {account.needsReconnect && (
         <Badge tone="danger" icon="warning">
           {t('needsReconnect')}
@@ -44,9 +60,15 @@ export function AccountStats({ account }: { account: SocialAccountDto }) {
   const o = useOptions();
   const g = account.audienceGender;
   const topCountries = account.audienceCountries
-    ? Object.entries(account.audienceCountries).sort((a, b) => b[1] - a[1]).slice(0, 3)
+    ? Object.entries(account.audienceCountries)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
     : [];
-  const ages = account.audienceAge ? Object.entries(account.audienceAge).sort((a, b) => b[1] - a[1]).slice(0, 3) : [];
+  const ages = account.audienceAge
+    ? Object.entries(account.audienceAge)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+    : [];
 
   const stat = (label: string, value: string) => (
     <div className="min-w-0 rounded-sm bg-surface p-2">
@@ -59,7 +81,10 @@ export function AccountStats({ account }: { account: SocialAccountDto }) {
     <Stack gap={4}>
       <div className="grid grid-cols-3 gap-2">
         {stat(t('followers'), f.compact(account.followers))}
-        {stat(t('engagement'), account.engagementRate != null ? f.percent(account.engagementRate) : '—')}
+        {stat(
+          t('engagement'),
+          account.engagementRate != null ? f.percent(account.engagementRate) : '—',
+        )}
         {stat(t('avgViews'), account.avgViews != null ? f.compact(account.avgViews) : '—')}
       </div>
       {g || topCountries.length || ages.length ? (
@@ -84,7 +109,8 @@ export function AccountStats({ account }: { account: SocialAccountDto }) {
           )}
           {topCountries.length > 0 && (
             <Text size="small" tone="muted">
-              {t('topCountries')}: {topCountries.map(([k, v]) => `${o.country(k)} (${f.percent(v)})`).join(', ')}
+              {t('topCountries')}:{' '}
+              {topCountries.map(([k, v]) => `${o.country(k)} (${f.percent(v)})`).join(', ')}
             </Text>
           )}
         </Stack>
