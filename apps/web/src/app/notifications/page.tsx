@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
+import { NotificationIcon } from '@/components/domain/NotificationIcon';
 import { api } from '@/lib/api';
 import { useNotificationText } from '@/lib/hooks/notification-text';
 import { useFormat } from '@/lib/hooks/format';
@@ -24,15 +25,26 @@ export default function NotificationsPage() {
     refetchInterval: 30_000,
   });
   const invalidate = () => qc.invalidateQueries({ queryKey: ['notifications'] });
-  const readAll = useMutation({ mutationFn: () => api.post('/notifications/read-all'), onSuccess: invalidate });
-  const readOne = useMutation({ mutationFn: (id: string) => api.post(`/notifications/${id}/read`), onSuccess: invalidate });
+  const readAll = useMutation({
+    mutationFn: () => api.post('/notifications/read-all'),
+    onSuccess: invalidate,
+  });
+  const readOne = useMutation({
+    mutationFn: (id: string) => api.post(`/notifications/${id}/read`),
+    onSuccess: invalidate,
+  });
 
   return (
     <Stack gap={6}>
       <PageHeader
         title={t('title')}
         actions={
-          <Button variant="secondary" size="sm" loading={readAll.isPending} onClick={() => readAll.mutate()}>
+          <Button
+            variant="secondary"
+            size="sm"
+            loading={readAll.isPending}
+            onClick={() => readAll.mutate()}
+          >
             {t('markAllRead')}
           </Button>
         }
@@ -52,12 +64,22 @@ export default function NotificationsPage() {
                     if (!n.readAt) readOne.mutate(n.id);
                     if (n.link) router.push(n.link);
                   }}
-                  className={cn('flex w-full gap-4 px-4 py-4 text-left hover:bg-surface md:px-6', !n.readAt && 'bg-primary-soft/40')}
+                  className={cn(
+                    'flex w-full gap-4 px-4 py-4 text-left hover:bg-surface md:px-6',
+                    !n.readAt && 'bg-primary-soft/40',
+                  )}
                 >
-                  <span className={cn('mt-2 size-2 shrink-0 rounded-pill', n.readAt ? 'bg-line' : 'bg-primary')} />
+                  <span className="relative shrink-0">
+                    <NotificationIcon type={n.type} />
+                    {!n.readAt && (
+                      <span className="absolute -right-0.5 -top-0.5 size-3 rounded-pill bg-primary ring-2 ring-surface-raised" />
+                    )}
+                  </span>
                   <span className="min-w-0 flex-1">
                     <span className="block font-bold text-ink">{text(n).title}</span>
-                    <span className="block whitespace-pre-line text-small text-ink-muted">{text(n).body}</span>
+                    <span className="block whitespace-pre-line text-small text-ink-muted">
+                      {text(n).body}
+                    </span>
                   </span>
                   <Text as="span" size="small" tone="muted" className="shrink-0">
                     {f.relative(n.createdAt)}
@@ -77,7 +99,11 @@ export default function NotificationsPage() {
           labels={{
             prev: tc('previous'),
             next: tc('next'),
-            summary: tc('showing', { from: (page - 1) * list.data.pageSize + 1, to: Math.min(page * list.data.pageSize, list.data.total), total: list.data.total }),
+            summary: tc('showing', {
+              from: (page - 1) * list.data.pageSize + 1,
+              to: Math.min(page * list.data.pageSize, list.data.total),
+              total: list.data.total,
+            }),
           }}
         />
       )}

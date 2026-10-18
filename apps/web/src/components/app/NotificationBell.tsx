@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useNotificationText } from '@/lib/hooks/notification-text';
 import { useFormat } from '@/lib/hooks/format';
+import { NotificationIcon } from '@/components/domain/NotificationIcon';
 import type { NotificationDto, Paginated } from '@/lib/types';
 
 const POLL_MS = 30_000;
@@ -92,16 +93,16 @@ export function NotificationBell() {
                       if (n.link) router.push(n.link);
                     }}
                     className={cn(
-                      'flex w-full gap-2 border-b border-line px-4 py-2 text-left hover:bg-surface',
+                      'flex w-full gap-3 border-b border-line px-4 py-3 text-left hover:bg-surface',
                       !n.readAt && 'bg-primary-soft/40',
                     )}
                   >
-                    <span
-                      className={cn(
-                        'mt-2 size-2 shrink-0 rounded-pill',
-                        n.readAt ? 'bg-transparent' : 'bg-primary',
+                    <span className="relative mt-0.5 shrink-0">
+                      <NotificationIcon type={n.type} size="sm" />
+                      {!n.readAt && (
+                        <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-pill bg-primary ring-2 ring-surface-raised" />
                       )}
-                    />
+                    </span>
                     <span className="min-w-0">
                       <span className="block text-small font-bold text-ink">{text(n).title}</span>
                       <span className="line-clamp-2 block text-small text-ink-muted">
