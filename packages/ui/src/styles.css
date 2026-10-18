@@ -33,6 +33,16 @@
   body {
     @apply bg-surface font-sans text-body text-ink antialiased;
   }
+  /* Number fields look like text fields: no spinner arrows (typing is faster than clicking). */
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
   :focus-visible {
     outline: 2px solid var(--bf-primary);
     outline-offset: 2px;

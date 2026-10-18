@@ -33,10 +33,16 @@ export function Field({ label, hint, error, required, aside, className, children
   const inGrid = useContext(FieldGridContext);
   const hintId = `${id}-hint`;
   const errId = `${id}-err`;
-  const describedBy = [error ? errId : null, hint ? hintId : null].filter(Boolean).join(' ') || undefined;
+  const describedBy =
+    [error ? errId : null, hint ? hintId : null].filter(Boolean).join(' ') || undefined;
   const header =
     label || aside ? (
-      <div className={cn('flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5', inGrid && 'self-end')}>
+      <div
+        className={cn(
+          'flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5',
+          inGrid && 'self-end',
+        )}
+      >
         {label && (
           <Label htmlFor={id}>
             {label}
@@ -90,51 +96,90 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   invalid?: boolean;
 }
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ icon, suffix, invalid, className, ...rest }, ref) {
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  { icon, suffix, invalid, className, ...rest },
+  ref,
+) {
   return (
     <div className="relative flex items-center">
       {icon && <Icon name={icon} tone="muted" className="pointer-events-none absolute left-3" />}
       <input
         ref={ref}
         aria-invalid={invalid || undefined}
-        className={cn(control, 'h-11 px-3', icon && 'pl-9', suffix ? 'pr-14' : undefined, className)}
+        className={cn(
+          control,
+          'h-11 px-3',
+          icon && 'pl-9',
+          suffix ? 'pr-14' : undefined,
+          className,
+        )}
         {...rest}
+        // Without spinners, scrolling over a focused number field would silently change its value.
+        onWheel={
+          rest.type === 'number'
+            ? (e) => {
+                e.currentTarget.blur();
+                rest.onWheel?.(e);
+              }
+            : rest.onWheel
+        }
       />
-      {suffix && <span className="pointer-events-none absolute right-3 text-small text-ink-muted">{suffix}</span>}
+      {suffix && (
+        <span className="pointer-events-none absolute right-3 text-small text-ink-muted">
+          {suffix}
+        </span>
+      )}
     </div>
   );
 });
 
-export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement> & { invalid?: boolean }>(
-  function Textarea({ invalid, className, rows = 4, ...rest }, ref) {
-    return <textarea ref={ref} rows={rows} aria-invalid={invalid || undefined} className={cn(control, 'px-3 py-2 leading-relaxed', className)} {...rest} />;
-  },
-);
+export const Textarea = forwardRef<
+  HTMLTextAreaElement,
+  TextareaHTMLAttributes<HTMLTextAreaElement> & { invalid?: boolean }
+>(function Textarea({ invalid, className, rows = 4, ...rest }, ref) {
+  return (
+    <textarea
+      ref={ref}
+      rows={rows}
+      aria-invalid={invalid || undefined}
+      className={cn(control, 'px-3 py-2 leading-relaxed', className)}
+      {...rest}
+    />
+  );
+});
 
-export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement> & { invalid?: boolean }>(
-  function Select({ invalid, className, children, ...rest }, ref) {
-    return (
-      <div className="relative">
-        <select
-          ref={ref}
-          aria-invalid={invalid || undefined}
-          className={cn(control, 'h-11 appearance-none pl-3 pr-9', className)}
-          {...rest}
-        >
-          {children}
-        </select>
-        <Icon name="chevron-down" tone="muted" className="pointer-events-none absolute right-3 top-3" />
-      </div>
-    );
-  },
-);
+export const Select = forwardRef<
+  HTMLSelectElement,
+  SelectHTMLAttributes<HTMLSelectElement> & { invalid?: boolean }
+>(function Select({ invalid, className, children, ...rest }, ref) {
+  return (
+    <div className="relative">
+      <select
+        ref={ref}
+        aria-invalid={invalid || undefined}
+        className={cn(control, 'h-11 appearance-none pl-3 pr-9', className)}
+        {...rest}
+      >
+        {children}
+      </select>
+      <Icon
+        name="chevron-down"
+        tone="muted"
+        className="pointer-events-none absolute right-3 top-3"
+      />
+    </div>
+  );
+});
 
 export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label: ReactNode;
   description?: ReactNode;
 }
 
-export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox({ label, description, className, id, ...rest }, ref) {
+export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
+  { label, description, className, id, ...rest },
+  ref,
+) {
   const auto = useId();
   const inputId = id ?? auto;
   return (
@@ -182,7 +227,12 @@ export function Switch({ checked, onChange, label, description, disabled }: Swit
           checked ? 'bg-primary' : 'bg-line',
         )}
       >
-        <span className={cn('inline-block size-5 rounded-pill bg-surface-raised shadow transition-transform', checked ? 'translate-x-5.5' : 'translate-x-0.5')} />
+        <span
+          className={cn(
+            'inline-block size-5 rounded-pill bg-surface-raised shadow transition-transform',
+            checked ? 'translate-x-5.5' : 'translate-x-0.5',
+          )}
+        />
       </button>
     </div>
   );
