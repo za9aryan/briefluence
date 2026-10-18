@@ -353,24 +353,26 @@ describe('marketplace core loop (e2e)', () => {
     expect(res.body).toMatchObject({
       days: 7,
       totalSearches: 2,
-      searchingBloggers: 1,
+      totalOpens: 0,
+      totalSignals: 2,
+      activeBloggers: 1,
       filteredShare: 1,
       verifiedBloggers: 1,
     });
     expect(res.body.platforms).toEqual(
       expect.arrayContaining([
-        { key: 'INSTAGRAM', count: 1 },
-        { key: 'TIKTOK', count: 1 },
+        expect.objectContaining({ key: 'INSTAGRAM', count: 1, searches: 1 }),
+        expect.objectContaining({ key: 'TIKTOK', count: 1, searches: 1 }),
       ]),
     );
     expect(res.body.niches).toEqual(
       expect.arrayContaining([
-        { key: 'beauty', count: 1 },
-        { key: 'food', count: 1 },
+        expect.objectContaining({ key: 'beauty', count: 1 }),
+        expect.objectContaining({ key: 'food', count: 1 }),
       ]),
     );
-    expect(res.body.cities).toEqual([{ key: 'Yerevan', count: 1 }]);
-    expect(res.body.paymentTypes).toEqual([{ key: 'BARTER', count: 1 }]);
+    expect(res.body.cities).toEqual([{ key: 'Yerevan', count: 1, searches: 1, opens: 0 }]);
+    expect(res.body.paymentTypes).toEqual([{ key: 'BARTER', count: 1, searches: 1, opens: 0 }]);
     expect(res.body.budgetBuckets.find((b: { min: number }) => b.min === 50_000).count).toBe(1);
     expect(res.body.perDay).toHaveLength(7);
     expect(res.body.perDay.reduce((a: number, d: { count: number }) => a + d.count, 0)).toBe(2);
@@ -519,11 +521,15 @@ describe('marketplace core loop (e2e)', () => {
     expect((await a.agent.get(`${API}/deals/feed?collaboration=ONE_TIME`)).body.total).toBe(0);
     await new Promise((r) => setTimeout(r, 200));
     const ins = await brand.agent.get(`${API}/brands/me/insights?days=7`).expect(200);
+    // One summary: filter searches plus opens of briefs with that value (3 opens of a long-term brief).
+    expect(ins.body).toMatchObject({ totalOpens: 3, briefsOpened: 1 });
     expect(ins.body.collaborationTypes).toEqual(
       expect.arrayContaining([
-        { key: 'LONG_TERM', count: 1 },
-        { key: 'ONE_TIME', count: 1 },
+        { key: 'LONG_TERM', count: 4, searches: 1, opens: 3 },
+        { key: 'ONE_TIME', count: 1, searches: 1, opens: 0 },
       ]),
     );
+    expect(ins.body.contentFormats.length).toBeGreaterThan(0);
+    expect(ins.body.perDay.reduce((n: number, d: { opens: number }) => n + d.opens, 0)).toBe(3);
   });
 });

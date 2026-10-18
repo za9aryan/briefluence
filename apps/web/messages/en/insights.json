@@ -1,48 +1,56 @@
 {
   "title": "What bloggers are looking for",
-  "lead": "Filters verified bloggers use in their brief feed. Shape your next brief around them.",
+  "lead": "Two signals in one: the filters verified bloggers search with, and the briefs they open. Shape your next brief around them.",
   "period": "Period",
   "lastDays": "Last {count} days",
   "searches": "Searches",
+  "total": "Total",
+  "signals": "Searches + opens",
+  "split": "{searches} searches · {opens} opens",
   "category": "Category",
   "showTable": "Table",
   "showChart": "Chart",
-  "empty": "No searches in this period yet.",
+  "empty": "No activity in this period yet.",
   "kpi": {
-    "searches": "Feed searches",
-    "bloggers": "Bloggers searching",
+    "searches": "Searches + opens",
+    "bloggers": "Active bloggers",
+    "opened": "Briefs opened",
+    "openedHint": "{count} opens",
     "ofVerified": "of {count} verified",
-    "filtered": "Used filters",
     "topNiche": "Top niche"
   },
   "perDay": {
-    "title": "Searches per day",
-    "subtitle": "How active bloggers are in the feed."
+    "title": "Activity per day",
+    "subtitle": "Searches and brief opens together."
   },
   "platforms": {
     "title": "Platforms",
-    "subtitle": "Which platform bloggers filter for."
+    "subtitle": "Platforms bloggers filter for and open."
   },
   "payment": {
     "title": "Money or barter",
-    "subtitle": "What kind of compensation bloggers look for."
+    "subtitle": "Compensation bloggers look for and open."
   },
   "collaboration": {
     "title": "Short-term or long-term",
-    "subtitle": "What kind of collaboration bloggers look for."
+    "subtitle": "Collaboration bloggers look for and open."
   },
   "niches": {
     "title": "Niches",
-    "subtitle": "Topics bloggers filter for."
+    "subtitle": "Topics bloggers filter for and open."
   },
   "budget": {
-    "title": "Minimum budget asked",
-    "subtitle": "Lowest budget bloggers set in the filter, AMD.",
-    "note": "Only searches with a budget filter are counted."
+    "title": "Budget",
+    "subtitle": "Minimum budget in searches and the budget of opened briefs, AMD.",
+    "note": "Counts searches with a budget filter and opened briefs that pay money (top of the range)."
   },
   "cities": {
     "title": "Cities",
     "subtitle": "Where bloggers want to collaborate."
   },
-  "privacy": "Counts are anonymous totals across all verified bloggers; one search can count in several categories."
+  "formats": {
+    "title": "Content formats",
+    "subtitle": "Formats in the briefs bloggers open."
+  },
+  "privacy": "Anonymous totals across all verified bloggers and all briefs. A search or an opened brief counts in every category it matches; one blogger opening a brief counts once a day."
 }

@@ -34,12 +34,13 @@ export class BrandsController {
     return this.brands.dashboard(user.id);
   }
 
-  /** Aggregated feed-search trends for brands: what bloggers filter for. */
+  /** Aggregated trends for brands: what bloggers search for and which briefs they open, merged. */
   @Roles('BRAND', 'ADMIN')
   @Get('me/insights')
   insights(@Query('days') days?: string) {
     const d = Number(days);
-    return this.insightsService.forBrands((INSIGHT_PERIODS as readonly number[]).includes(d) ? (d as InsightPeriod) : 30);
+    const period = (INSIGHT_PERIODS as readonly number[]).includes(d) ? (d as InsightPeriod) : 30;
+    return this.insightsService.forBrands(period);
   }
 
   @Get(':id')
