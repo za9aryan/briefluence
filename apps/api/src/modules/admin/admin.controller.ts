@@ -1,4 +1,14 @@
-import { Body, Controller, ForbiddenException, Get, HttpCode, Inject, Param, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  HttpCode,
+  Inject,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import {
   DEAL_STATUSES,
@@ -16,9 +26,10 @@ import { ApiZodBody, ZodBody } from '../../common/zod';
 import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { JobsService, type JobName } from '../jobs/jobs.service';
-import { AdminService } from './admin.service';
+import { AdminService, USER_STATES } from './admin.service';
 
-const pick = <T extends string>(list: readonly T[], v?: string) => (list.includes(v as T) ? (v as T) : undefined);
+const pick = <T extends string>(list: readonly T[], v?: string) =>
+  list.includes(v as T) ? (v as T) : undefined;
 
 @ApiTags('admin')
 @Roles('ADMIN')
@@ -38,7 +49,9 @@ export class AdminController {
 
   @Get('verifications')
   verifications(@Query('status') status?: string) {
-    return this.admin.verifications(pick<VerificationStatus>(VERIFICATION_STATUSES, status) ?? 'PENDING_REVIEW');
+    return this.admin.verifications(
+      pick<VerificationStatus>(VERIFICATION_STATUSES, status) ?? 'PENDING_REVIEW',
+    );
   }
 
   @Post('verifications/:id/approve')
@@ -50,7 +63,10 @@ export class AdminController {
   @Post('verifications/:id/reject')
   @HttpCode(204)
   @ApiZodBody(verificationDecisionSchema)
-  reject(@Param('id') id: string, @ZodBody(verificationDecisionSchema) body: VerificationDecisionInput) {
+  reject(
+    @Param('id') id: string,
+    @ZodBody(verificationDecisionSchema) body: VerificationDecisionInput,
+  ) {
     return this.admin.reject(id, body.reason);
   }
 
@@ -66,8 +82,34 @@ export class AdminController {
   }
 
   @Get('users')
-  users(@Query('role') role?: string, @Query('q') q?: string) {
-    return this.admin.users(pick<Role>(ROLES, role), q?.slice(0, 100));
+  users(@Query('role') role?: string, @Query('q') q?: string, @Query('state') state?: string) {
+    return this.admin.users(pick<Role>(ROLES, role), q?.slice(0, 100), pick(USER_STATES, state));
+  }
+
+  /** Support: mark the email as confirmed (e.g. the person never got the letter). */
+  @Post('users/:id/verify-email')
+  @HttpCode(204)
+  verifyEmail(@Param('id') id: string) {
+    return this.admin.verifyEmail(id);
+  }
+
+  @Post('users/:id/resend-verification')
+  @HttpCode(204)
+  resendVerification(@Param('id') id: string) {
+    return this.admin.resendVerification(id);
+  }
+
+  @Post('users/:id/send-password-reset')
+  @HttpCode(204)
+  sendPasswordReset(@Param('id') id: string) {
+    return this.admin.sendPasswordReset(id);
+  }
+
+  /** Ends every session of the user (lost phone, shared password). */
+  @Post('users/:id/sign-out')
+  @HttpCode(204)
+  signOut(@Param('id') id: string) {
+    return this.admin.signOutEverywhere(id);
   }
 
   @Post('users/:id/block')

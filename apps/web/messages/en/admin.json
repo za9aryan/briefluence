@@ -40,7 +40,21 @@
     "blocked": "User blocked and signed out",
     "unblocked": "User unblocked",
     "isBlocked": "Blocked",
-    "emailPending": "Email not confirmed"
+    "emailPending": "Email not confirmed",
+    "allRoles": "All roles",
+    "allStates": "All states",
+    "stateFilter": "State",
+    "stateUnverified": "Email not confirmed",
+    "stateBlocked": "Blocked",
+    "actions": "Actions",
+    "verifyEmail": "Mark email as confirmed",
+    "verifiedToast": "Email confirmed",
+    "resendVerification": "Resend confirmation email",
+    "resentToast": "Confirmation email sent",
+    "sendReset": "Send password reset link",
+    "resetSentToast": "Reset link sent. It works for 1 hour.",
+    "signOut": "Sign out on all devices",
+    "signedOutToast": "Signed out on all devices"
   },
   "payments": {
     "title": "Payments",

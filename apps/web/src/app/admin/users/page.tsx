@@ -1,9 +1,35 @@
 'use client';
-import { ROLES, type Role, type SubscriptionStatus, type VerificationStatus } from '@briefluence/shared';
-import { Badge, Button, EmptyState, Inline, Input, Select, Skeleton, Stack, TBody, TD, TH, THead, TR, Table, Text, useToast } from '@briefluence/ui';
+import {
+  ROLES,
+  type Role,
+  type SubscriptionStatus,
+  type VerificationStatus,
+} from '@briefluence/shared';
+import {
+  Badge,
+  Button,
+  EmptyState,
+  Icon,
+  Inline,
+  Input,
+  Menu,
+  MenuItem,
+  Select,
+  Skeleton,
+  Stack,
+  TBody,
+  TD,
+  TH,
+  THead,
+  TR,
+  Table,
+  Text,
+  useToast,
+} from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import type { IconName } from '@briefluence/ui';
 import { PageHeader } from '@/components/app/AppShell';
 import { SubscriptionBadge, VerificationBadge } from '@/components/domain/badges';
 import { api } from '@/lib/api';
@@ -22,6 +48,22 @@ interface UserRow {
   subscription: { status: SubscriptionStatus } | null;
 }
 
+type SupportAction = 'verify-email' | 'resend-verification' | 'send-password-reset' | 'sign-out';
+
+const ACTIONS: Record<SupportAction, { label: string; toast: string; icon: IconName }> = {
+  'verify-email': { label: 'verifyEmail', toast: 'verifiedToast', icon: 'check-circle' },
+  'resend-verification': { label: 'resendVerification', toast: 'resentToast', icon: 'mail' },
+  'send-password-reset': { label: 'sendReset', toast: 'resetSentToast', icon: 'lock' },
+  'sign-out': { label: 'signOut', toast: 'signedOutToast', icon: 'logout' },
+};
+
+/** Email actions only make sense for some accounts; blocked users cannot get a reset link. */
+const supportActions = (u: UserRow): SupportAction[] => [
+  ...(u.emailVerifiedAt ? [] : (['verify-email', 'resend-verification'] as const)),
+  ...(u.blockedAt ? [] : (['send-password-reset'] as const)),
+  'sign-out',
+];
+
 export default function AdminUsersPage() {
   const t = useTranslations('admin.users');
   const tc = useTranslations('common');
@@ -32,9 +74,28 @@ export default function AdminUsersPage() {
   const qc = useQueryClient();
   const [role, setRole] = useState<'' | Role>('');
   const [q, setQ] = useState('');
-  const list = useQuery({ queryKey: ['admin', 'users', role, q], queryFn: () => api.get<UserRow[]>('/admin/users', { role: role || undefined, q: q || undefined }) });
+  const [state, setState] = useState<'' | 'unverified' | 'blocked'>('');
+  const list = useQuery({
+    queryKey: ['admin', 'users', role, q, state],
+    queryFn: () =>
+      api.get<UserRow[]>('/admin/users', {
+        role: role || undefined,
+        q: q || undefined,
+        state: state || undefined,
+      }),
+  });
+  const action = useMutation({
+    mutationFn: ({ id, path }: { id: string; path: SupportAction }) =>
+      api.post(`/admin/users/${id}/${path}`),
+    onSuccess: (_, v) => {
+      void qc.invalidateQueries({ queryKey: ['admin', 'users'] });
+      toast(t(ACTIONS[v.path].toast));
+    },
+    onError: (e) => toast(errorMessage(e), 'danger'),
+  });
   const block = useMutation({
-    mutationFn: ({ id, blocked }: { id: string; blocked: boolean }) => api.post(`/admin/users/${id}/${blocked ? 'block' : 'unblock'}`),
+    mutationFn: ({ id, blocked }: { id: string; blocked: boolean }) =>
+      api.post(`/admin/users/${id}/${blocked ? 'block' : 'unblock'}`),
     onSuccess: (_, v) => {
       void qc.invalidateQueries({ queryKey: ['admin', 'users'] });
       toast(v.blocked ? t('blocked') : t('unblocked'));
@@ -45,14 +106,36 @@ export default function AdminUsersPage() {
     <Stack gap={6}>
       <PageHeader title={t('title')} />
       <Inline gap={2} wrap>
-        <Input icon="search" aria-label={tc('search')} placeholder={t('search')} value={q} onChange={(e) => setQ(e.target.value)} className="sm:w-72" />
-        <Select aria-label={t('role')} value={role} onChange={(e) => setRole(e.target.value as '' | Role)} className="w-auto">
-          <option value="">{tc('all')}</option>
+        <Input
+          icon="search"
+          aria-label={tc('search')}
+          placeholder={t('search')}
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          className="sm:w-72"
+        />
+        <Select
+          aria-label={t('role')}
+          value={role}
+          onChange={(e) => setRole(e.target.value as '' | Role)}
+          className="w-auto"
+        >
+          <option value="">{t('allRoles')}</option>
           {ROLES.map((r) => (
             <option key={r} value={r}>
               {tr(r)}
             </option>
           ))}
+        </Select>
+        <Select
+          aria-label={t('stateFilter')}
+          value={state}
+          onChange={(e) => setState(e.target.value as typeof state)}
+          className="w-auto"
+        >
+          <option value="">{t('allStates')}</option>
+          <option value="unverified">{t('stateUnverified')}</option>
+          <option value="blocked">{t('stateBlocked')}</option>
         </Select>
       </Inline>
       {list.isLoading ? (
@@ -74,7 +157,9 @@ export default function AdminUsersPage() {
             {list.data.map((u) => (
               <TR key={u.id}>
                 <TD>
-                  <Text weight="bold">{u.influencer?.displayName ?? u.brand?.companyName ?? '—'}</Text>
+                  <Text weight="bold">
+                    {u.influencer?.displayName ?? u.brand?.companyName ?? '—'}
+                  </Text>
                   <Text size="small" tone="muted">
                     {u.email}
                   </Text>
@@ -91,9 +176,46 @@ export default function AdminUsersPage() {
                 <TD>{f.date(u.createdAt)}</TD>
                 <TD>
                   {u.role !== 'ADMIN' && (
-                    <Button size="sm" variant={u.blockedAt ? 'secondary' : 'ghost'} loading={block.isPending && block.variables?.id === u.id} onClick={() => block.mutate({ id: u.id, blocked: !u.blockedAt })}>
-                      {u.blockedAt ? t('unblock') : t('block')}
-                    </Button>
+                    <Inline gap={1} justify="end" wrap={false}>
+                      <Button
+                        size="sm"
+                        variant={u.blockedAt ? 'secondary' : 'ghost'}
+                        loading={block.isPending && block.variables?.id === u.id}
+                        onClick={() => block.mutate({ id: u.id, blocked: !u.blockedAt })}
+                      >
+                        {u.blockedAt ? t('unblock') : t('block')}
+                      </Button>
+                      <Menu
+                        trigger={(p) => (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            aria-label={t('actions')}
+                            loading={action.isPending && action.variables?.id === u.id}
+                            onClick={p.toggle}
+                            aria-expanded={p['aria-expanded']}
+                            aria-haspopup={p['aria-haspopup']}
+                          >
+                            <Icon name="menu" />
+                          </Button>
+                        )}
+                      >
+                        {(close) =>
+                          supportActions(u).map((path) => (
+                            <MenuItem
+                              key={path}
+                              className="min-h-11 whitespace-nowrap px-4"
+                              onClick={() => {
+                                close();
+                                action.mutate({ id: u.id, path });
+                              }}
+                            >
+                              <Icon name={ACTIONS[path].icon} /> {t(ACTIONS[path].label)}
+                            </MenuItem>
+                          ))
+                        }
+                      </Menu>
+                    </Inline>
                   )}
                 </TD>
               </TR>

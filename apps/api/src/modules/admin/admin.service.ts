@@ -8,6 +8,9 @@ import { AuthService } from '../auth/auth.service';
 import { publicAccount } from '../influencers/serializers';
 import { NotificationsService } from '../notifications/notifications.service';
 
+export const USER_STATES = ['unverified', 'blocked'] as const;
+export type UserState = (typeof USER_STATES)[number];
+
 @Injectable()
 export class AdminService {
   constructor(
@@ -21,47 +24,72 @@ export class AdminService {
     const rows = await this.prisma.influencerProfile.findMany({
       where: { status },
       orderBy: [{ submittedAt: 'asc' }, { createdAt: 'asc' }],
-      include: { socialAccounts: true, user: { select: { email: true, emailVerifiedAt: true, createdAt: true } } },
+      include: {
+        socialAccounts: true,
+        user: { select: { email: true, emailVerifiedAt: true, createdAt: true } },
+      },
       take: 200,
     });
-    return rows.map(({ socialAccounts, user, contactMethod, contactValue, savedFilters: _s, ...p }) => ({
-      ...p,
-      email: user.email,
-      emailVerified: !!user.emailVerifiedAt,
-      contacts: { method: contactMethod, value: contactValue },
-      socialAccounts: socialAccounts.map(publicAccount),
-    }));
+    return rows.map(
+      ({ socialAccounts, user, contactMethod, contactValue, savedFilters: _s, ...p }) => ({
+        ...p,
+        email: user.email,
+        emailVerified: !!user.emailVerifiedAt,
+        contacts: { method: contactMethod, value: contactValue },
+        socialAccounts: socialAccounts.map(publicAccount),
+      }),
+    );
   }
 
   async approve(profileId: string) {
     const p = await this.prisma.influencerProfile.findUnique({ where: { id: profileId } });
     if (!p) throw notFound('Influencer');
-    if (p.status !== 'PENDING_REVIEW') throw new AppError('INVALID_TRANSITION', 'Profile is not waiting for review');
+    if (p.status !== 'PENDING_REVIEW')
+      throw new AppError('INVALID_TRANSITION', 'Profile is not waiting for review');
     await this.prisma.influencerProfile.update({
       where: { id: p.id },
       data: { status: 'APPROVED', approvedAt: this.clock.now(), rejectionReason: null },
     });
-    await this.notifications.notify(p.userId, 'VERIFICATION_APPROVED', { link: '/influencer/deals' });
+    await this.notifications.notify(p.userId, 'VERIFICATION_APPROVED', {
+      link: '/influencer/deals',
+    });
   }
 
   async reject(profileId: string, reason: string) {
     const p = await this.prisma.influencerProfile.findUnique({ where: { id: profileId } });
     if (!p) throw notFound('Influencer');
-    if (p.status !== 'PENDING_REVIEW') throw new AppError('INVALID_TRANSITION', 'Profile is not waiting for review');
-    await this.prisma.influencerProfile.update({ where: { id: p.id }, data: { status: 'REJECTED', rejectionReason: reason } });
-    await this.notifications.notify(p.userId, 'VERIFICATION_REJECTED', { params: { reason }, link: '/influencer/verification' });
+    if (p.status !== 'PENDING_REVIEW')
+      throw new AppError('INVALID_TRANSITION', 'Profile is not waiting for review');
+    await this.prisma.influencerProfile.update({
+      where: { id: p.id },
+      data: { status: 'REJECTED', rejectionReason: reason },
+    });
+    await this.notifications.notify(p.userId, 'VERIFICATION_REJECTED', {
+      params: { reason },
+      link: '/influencer/verification',
+    });
   }
 
   async deals(status?: DealStatus, q?: string) {
     const where: Prisma.DealWhereInput = {
       ...(status ? { status } : {}),
-      ...(q ? { OR: [{ title: { contains: q, mode: 'insensitive' } }, { brand: { companyName: { contains: q, mode: 'insensitive' } } }] } : {}),
+      ...(q
+        ? {
+            OR: [
+              { title: { contains: q, mode: 'insensitive' } },
+              { brand: { companyName: { contains: q, mode: 'insensitive' } } },
+            ],
+          }
+        : {}),
     };
     const deals = await this.prisma.deal.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       take: 200,
-      include: { brand: { select: { id: true, companyName: true } }, _count: { select: { applications: true } } },
+      include: {
+        brand: { select: { id: true, companyName: true } },
+        _count: { select: { applications: true } },
+      },
     });
     return deals.map(({ _count, ...d }) => ({ ...d, applicantCount: _count.applications }));
   }
@@ -72,9 +100,14 @@ export class AdminService {
     return this.prisma.deal.update({ where: { id }, data: { status: 'CLOSED' } });
   }
 
-  async users(role?: Role, q?: string) {
+  async users(role?: Role, q?: string, state?: UserState) {
     const users = await this.prisma.user.findMany({
-      where: { ...(role ? { role } : {}), ...(q ? { email: { contains: q, mode: 'insensitive' } } : {}) },
+      where: {
+        ...(role ? { role } : {}),
+        ...(q ? { email: { contains: q, mode: 'insensitive' } } : {}),
+        ...(state === 'unverified' ? { emailVerifiedAt: null } : {}),
+        ...(state === 'blocked' ? { blockedAt: { not: null } } : {}),
+      },
       orderBy: { createdAt: 'desc' },
       take: 200,
       select: {
@@ -92,15 +125,50 @@ export class AdminService {
     return users;
   }
 
+  private async userOrThrow(id: string) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw notFound('User');
+    return user;
+  }
+
+  async verifyEmail(id: string) {
+    const user = await this.userOrThrow(id);
+    if (user.emailVerifiedAt) return;
+    await this.prisma.user.update({ where: { id }, data: { emailVerifiedAt: this.clock.now() } });
+  }
+
+  async resendVerification(id: string) {
+    const user = await this.userOrThrow(id);
+    if (user.emailVerifiedAt) throw new AppError('CONFLICT', 'This email is already confirmed');
+    await this.auth.sendVerification(user);
+  }
+
+  async sendPasswordReset(id: string) {
+    const user = await this.userOrThrow(id);
+    if (user.blockedAt) throw new AppError('ACCOUNT_BLOCKED', 'This account is blocked');
+    await this.auth.forgotPassword(user.email);
+  }
+
+  async signOutEverywhere(id: string) {
+    await this.userOrThrow(id);
+    await this.auth.revokeAllSessions(id);
+  }
+
   async setBlocked(id: string, blocked: boolean) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw notFound('User');
     if (user.role === 'ADMIN') throw new AppError('FORBIDDEN', 'Admins cannot be blocked here');
-    await this.prisma.user.update({ where: { id }, data: { blockedAt: blocked ? this.clock.now() : null } });
+    await this.prisma.user.update({
+      where: { id },
+      data: { blockedAt: blocked ? this.clock.now() : null },
+    });
     if (blocked) {
       await this.auth.revokeAllSessions(id);
       // A blocked brand's open deals disappear from feeds.
-      await this.prisma.deal.updateMany({ where: { brand: { userId: id }, status: 'ACTIVE' }, data: { status: 'PAUSED' } });
+      await this.prisma.deal.updateMany({
+        where: { brand: { userId: id }, status: 'ACTIVE' },
+        data: { status: 'PAUSED' },
+      });
     }
   }
 
@@ -121,8 +189,15 @@ export class AdminService {
         subscription: { select: { status: true, user: { select: { id: true, email: true } } } },
       },
     });
-    const totals = await this.prisma.payment.groupBy({ by: ['currency'], where: { status: 'SUCCEEDED' }, _sum: { amount: true } });
-    return { items: rows, totals: totals.map((t) => ({ currency: t.currency, amount: t._sum.amount ?? 0 })) };
+    const totals = await this.prisma.payment.groupBy({
+      by: ['currency'],
+      where: { status: 'SUCCEEDED' },
+      _sum: { amount: true },
+    });
+    return {
+      items: rows,
+      totals: totals.map((t) => ({ currency: t.currency, amount: t._sum.amount ?? 0 })),
+    };
   }
 
   async stats() {

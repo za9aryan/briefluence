@@ -40,7 +40,21 @@
     "blocked": "Пользователь заблокирован и разлогинен",
     "unblocked": "Пользователь разблокирован",
     "isBlocked": "Заблокирован",
-    "emailPending": "Email не подтверждён"
+    "emailPending": "Email не подтверждён",
+    "allRoles": "Все роли",
+    "allStates": "Любое состояние",
+    "stateFilter": "Состояние",
+    "stateUnverified": "Email не подтверждён",
+    "stateBlocked": "Заблокированы",
+    "actions": "Действия",
+    "verifyEmail": "Подтвердить email",
+    "verifiedToast": "Email подтверждён",
+    "resendVerification": "Отправить письмо подтверждения ещё раз",
+    "resentToast": "Письмо подтверждения отправлено",
+    "sendReset": "Отправить ссылку для сброса пароля",
+    "resetSentToast": "Ссылка отправлена. Она действует 1 час.",
+    "signOut": "Выйти на всех устройствах",
+    "signedOutToast": "Сессии на всех устройствах завершены"
   },
   "payments": {
     "title": "Платежи",
