@@ -10,7 +10,6 @@
   "views": "{count, plural, one {# view} other {# views}}",
   "viewsHint": "How many bloggers opened this brief",
   "feedTitle": "Briefs for you",
-  "feedLead": "Only briefs you qualify for, best matches first.",
   "filters": {
     "platform": "Platform",
     "payment": "Payment",
