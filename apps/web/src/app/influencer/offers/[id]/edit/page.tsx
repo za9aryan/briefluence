@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
 import { OfferForm } from '@/components/offers/OfferParts';
 import { OfferLimitNotice, OfferReviewNotice } from '@/components/offers/useOfferActions';
+import { BriefsChecklist, useBloggerUnlocked } from '@/components/influencer/StartTrial';
 import { ApiError, api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import type { OfferDetailDto, OfferDto } from '@/lib/types';
@@ -30,6 +31,8 @@ export default function EditOfferPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['offers', id] }),
   });
 
+  const { me, unlocked } = useBloggerUnlocked();
+  if (me && !unlocked) return <BriefsChecklist for="offers" />;
   if (!offer.data) return <Skeleton className="h-[60vh] rounded-card" />;
   const o = offer.data;
   return (

@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
 import { EMPTY_OFFER, OfferForm } from '@/components/offers/OfferParts';
 import { OfferLimitNotice } from '@/components/offers/useOfferActions';
+import { BriefsChecklist, useBloggerUnlocked } from '@/components/influencer/StartTrial';
 import { ApiError, api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import type { OfferDto } from '@/lib/types';
@@ -20,6 +21,8 @@ export default function NewOfferPage() {
   const [busy, setBusy] = useState<'draft' | 'publish' | null>(null);
   const [error, setError] = useState<React.ReactNode>(null);
 
+  const { me, unlocked } = useBloggerUnlocked();
+  if (me && !unlocked) return <BriefsChecklist for="offers" />;
   return (
     <Stack gap={6}>
       <PageHeader

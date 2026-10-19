@@ -25,6 +25,7 @@ import {
   OfferReviewNotice,
   useOfferActions,
 } from '@/components/offers/useOfferActions';
+import { BriefsChecklist, useBloggerUnlocked } from '@/components/influencer/StartTrial';
 import { api } from '@/lib/api';
 import type { MyOfferDto } from '@/lib/types';
 
@@ -32,9 +33,12 @@ const PUBLISH_LABEL = { DRAFT: 'publish', REJECTED: 'sendAgain', PAUSED: 'resume
 
 export default function MyOffersPage() {
   const t = useTranslations('offers');
+  // Like the brief feed: offers need a verified profile and a chosen plan.
+  const { me, unlocked } = useBloggerUnlocked();
   const list = useQuery({
     queryKey: ['offers', 'mine'],
     queryFn: () => api.get<MyOfferDto[]>('/offers/mine'),
+    enabled: unlocked,
   });
   const act = useOfferActions();
 
@@ -44,14 +48,20 @@ export default function MyOffersPage() {
         title={t('mineTitle')}
         description={t('mineLead')}
         actions={
-          <Link href="/influencer/offers/new" className={buttonStyles({})}>
-            <Icon name="plus" />
-            {t('newOffer')}
-          </Link>
+          unlocked && (
+            <Link href="/influencer/offers/new" className={buttonStyles({})}>
+              <Icon name="plus" />
+              {t('newOffer')}
+            </Link>
+          )
         }
       />
       {act.limit !== false && <OfferLimitNotice limit={act.limit} />}
-      {list.isLoading ? (
+      {!me ? (
+        <Skeleton className="h-48 rounded-card" />
+      ) : !unlocked ? (
+        <BriefsChecklist for="offers" />
+      ) : list.isLoading ? (
         <Skeleton className="h-48 rounded-card" />
       ) : !list.data?.length ? (
         <EmptyState

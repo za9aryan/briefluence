@@ -176,8 +176,14 @@ describe('blogger offers (e2e)', () => {
     // Unverified blogger cannot publish; live offers cannot be edited; brands cannot request one in review.
     const other = await signup(ctx, 'INFLUENCER');
     await other.agent.put(`${API}/influencers/me`).send(influencerProfile).expect(200);
-    const o = await other.agent.post(`${API}/offers`).send(offerInput()).expect(201);
-    await other.agent.post(`${API}/offers/${o.body.id}/publish`).expect(403);
+    // Not verified: no offers at all (like the brief feed).
+    const unverified = await other.agent.post(`${API}/offers`).send(offerInput()).expect(403);
+    expect(unverified.body.error.code).toBe('NOT_VERIFIED_INFLUENCER');
+    // Verified but no plan chosen: asked to choose a plan.
+    await ctx.prisma.subscription.deleteMany({ where: { user: { email: inf.email } } });
+    const noPlan = await inf.agent.post(`${API}/offers`).send(offerInput()).expect(403);
+    expect(noPlan.body.error.code).toBe('TRIAL_NOT_STARTED');
+    await inf.agent.post(`${API}/billing/plan`).send({ plan: 'BASIC' }).expect(200);
     const b = await brand();
     await b.agent
       .post(`${API}/offers/${d.body.id}/requests`)

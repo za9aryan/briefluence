@@ -28,6 +28,7 @@ export class OffersController {
   }
 
   @Roles('INFLUENCER')
+  @UseGuards(VerifiedInfluencerGuard)
   @Post('offers')
   @ApiZodBody(offerInputSchema)
   create(@CurrentUser() user: AuthUser, @ZodBody(offerInputSchema) body: OfferInput) {

@@ -32,6 +32,8 @@
   "checklist": {
     "title": "Two steps to see briefs",
     "lead": "Briefs open as soon as both are done.",
+    "offersTitle": "Two steps to post offers",
+    "offersLead": "You can post offers for brands as soon as both are done.",
     "planTitle": "Choose your plan",
     "planBody": "Every plan starts with 30 days of Pro for free.",
     "planDone": "Done.",

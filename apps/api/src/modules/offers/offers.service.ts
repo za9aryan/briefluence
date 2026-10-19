@@ -96,7 +96,15 @@ export class OffersService {
     return offer;
   }
 
+  /** Offers need a chosen plan, like the brief feed (verification is checked by the guard). */
+  private async requirePlan(userId: string) {
+    const sub = await this.prisma.subscription.findUnique({ where: { userId } });
+    if (!sub) throw new AppError('TRIAL_NOT_STARTED', 'Choose a plan to post offers');
+    return sub;
+  }
+
   async create(userId: string, data: OfferInput) {
+    await this.requirePlan(userId);
     const profile = await this.profileOf(userId);
     return this.prisma.offer.create({
       data: { ...data, influencerId: profile.id, status: 'DRAFT' },
@@ -126,8 +134,8 @@ export class OffersService {
 
   /** Live offers allowed by the blogger's current plan (Basic: admin-set, Pro: unlimited). */
   private async offerLimit(userId: string): Promise<number | null> {
-    const sub = await this.prisma.subscription.findUnique({ where: { userId } });
-    const tier = sub ? effectiveTier(toState(sub), this.clock.now()) : 'BASIC';
+    const sub = await this.requirePlan(userId);
+    const tier = effectiveTier(toState(sub), this.clock.now());
     if (tier === 'PRO') return null;
     const basic = await this.prisma.plan.findUnique({
       where: { code: 'BASIC' },

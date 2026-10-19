@@ -166,8 +166,17 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
   );
 }
 
-/** "Two steps to see briefs": choose a plan + get verified. Renders nothing when both are done. */
-export function BriefsChecklist() {
+/**
+ * "Two steps": choose a plan + get verified. Renders nothing when both are done. `for` picks the
+ * wording (seeing briefs or posting offers).
+ */
+/** Bloggers can see briefs / post offers only once verified and on a plan. */
+export function useBloggerUnlocked() {
+  const { data: me } = useMe();
+  return { me, unlocked: !!me?.subscription && me.influencer?.status === 'APPROVED' };
+}
+
+export function BriefsChecklist({ for: purpose = 'briefs' }: { for?: 'briefs' | 'offers' } = {}) {
   const t = useTranslations('billing.checklist');
   const { data: me } = useMe();
   if (!me || me.role !== 'INFLUENCER') return null;
@@ -201,10 +210,10 @@ export function BriefsChecklist() {
   return (
     <Card>
       <Heading level={2} size="h2">
-        {t('title')}
+        {purpose === 'offers' ? t('offersTitle') : t('title')}
       </Heading>
       <Text size="small" tone="muted" className="mt-1">
-        {t('lead')}
+        {purpose === 'offers' ? t('offersLead') : t('lead')}
       </Text>
       <ul className="mt-2">
         {step(
