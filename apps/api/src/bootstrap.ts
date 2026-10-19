@@ -8,14 +8,22 @@ import type { Env } from './config/env';
 /** Shared HTTP setup for main.ts and e2e tests. */
 export function configureApp(app: INestApplication, env: Env) {
   app.setGlobalPrefix('api/v1');
+  // Requests reach the API through the website (and a reverse proxy in production). Trust the
+  // private-network hops so req.ip (rate limits, logs) is the visitor, not the proxy.
+  (app.getHttpAdapter().getInstance() as express.Express).set('trust proxy', env.TRUST_PROXY);
   app.use(cookieParser());
   app.enableCors({ origin: env.CORS_ORIGINS.split(',').map((o) => o.trim()), credentials: true });
   // Local file storage driver serves uploads from the API.
-  app.use('/api/v1/files', express.static(join(process.cwd(), 'uploads'), { maxAge: '7d', fallthrough: false }));
+  app.use(
+    '/api/v1/files',
+    express.static(join(process.cwd(), 'uploads'), { maxAge: '7d', fallthrough: false }),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Briefluence API')
-    .setDescription('Influencer marketplace REST API. Auth uses httpOnly cookies set by /auth/login.')
+    .setDescription(
+      'Influencer marketplace REST API. Auth uses httpOnly cookies set by /auth/login.',
+    )
     .setVersion('1.0')
     .addCookieAuth('bf_at')
     .build();

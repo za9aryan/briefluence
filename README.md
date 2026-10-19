@@ -128,6 +128,11 @@ pnpm e2e                        # Playwright: sign-up → verify → apply → a
 Dev-only admin endpoints help test time-based flows: `POST /api/v1/admin/dev/advance-time {days}`,
 `POST /api/v1/admin/dev/reset-time`, `POST /api/v1/admin/jobs/{expire-deals|billing-daily|social-sync|digests}/run`.
 
+## Deploy for free on Oracle Cloud
+
+One free ARM server runs Postgres, the API, the website and HTTPS: see [docs/oracle-deploy.md](docs/oracle-deploy.md)
+(files in `deploy/oracle/`). The Render Blueprint (`render.yaml`) stays available as a paid alternative.
+
 ## Going live — checklist
 
 - Real OAuth apps: Meta (Instagram API with Instagram Login, `instagram_business_basic` + `instagram_business_manage_insights`),

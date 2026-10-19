@@ -20,6 +20,8 @@ export const envSchema = z
     API_URL: z.url().default('http://localhost:4000'),
     API_PORT: z.coerce.number().int().default(4000),
     CORS_ORIGINS: z.string().default('http://localhost:3000'),
+    /** Express "trust proxy": by default the private-network hops (website, reverse proxy). */
+    TRUST_PROXY: z.string().default('loopback, linklocal, uniquelocal'),
 
     DATABASE_URL: z.string().min(1),
     REDIS_URL: optional,
