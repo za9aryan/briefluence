@@ -283,6 +283,8 @@ export interface SubscriptionDto {
     canCheckout: boolean;
     renewal: 'renews' | 'ends' | null;
     needsCardToRenew: boolean;
+    /** Scheduled switch (monthly <-> yearly) at the next renewal. */
+    nextPlan: PlanDto | null;
   } | null;
   plans: PlanDto[];
   provider: 'mock' | 'ameriabank';

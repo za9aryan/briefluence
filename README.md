@@ -80,6 +80,11 @@ the paid period starts when the free days end. Without payment (or after a cance
 moves to Basic — nobody loses access. Prices, currency, Basic's limit and which Pro plans are offered are edited in
 **Admin → Plans**. Prices are never shown on public pages.
 
+On the billing page a paid Pro shows its renewal state: **Cancel subscription** (Pro stays until the paid period
+ends, then Basic), **Turn renewal back on**, and **Switch to Pro yearly / monthly**, which takes effect at the next
+renewal (charged then, no double charge). If the card was removed, **Renew** buys the next period of either Pro
+plan, starting when the paid one ends. The 30 free Pro days are given once per account.
+
 ## Blogger offers
 
 Besides applying to briefs, bloggers can publish **offers** ("1 Story for 10,000 AMD", "Long-term work with real

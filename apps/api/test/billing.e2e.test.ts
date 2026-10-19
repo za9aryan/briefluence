@@ -234,11 +234,12 @@ describe('plans, subscription & payments (e2e)', () => {
     await inf.agent.post(`${API}/billing/resume`).expect(200);
     const removed = await inf.agent.delete(`${API}/billing/card`).expect(200);
     expect(removed.body.subscription).toMatchObject({ hasCard: false, cancelAtPeriodEnd: true });
-    const again = await inf.agent
-      .post(`${API}/billing/checkout`)
-      .send({ plan: 'PRO_YEARLY' })
-      .expect(409); // Pro still running
-    expect(again.body.error.code).toBe('CONFLICT');
+    // Card gone: renewing (also into yearly) is allowed and starts when the paid month ends.
+    expect(await pay(inf.agent, 'success', 'PRO_YEARLY')).toBe('success');
+    expect((await sub(inf.agent)).subscription).toMatchObject({
+      planCode: 'PRO_YEARLY',
+      renewal: 'renews',
+    });
   });
 
   it('card removed: renewal is off; Renew Pro pays the next period and turns renewal back on', async () => {
@@ -256,14 +257,55 @@ describe('plans, subscription & payments (e2e)', () => {
       canCheckout: true,
       hasCard: false,
     });
-    // Only the same plan can be renewed while the paid period runs.
-    await inf.agent.post(`${API}/billing/checkout`).send({ plan: 'PRO_YEARLY' }).expect(409);
     expect(await pay(inf.agent, 'success')).toBe('success');
     const renewed = (await sub(inf.agent)).subscription;
     expect(renewed).toMatchObject({ renewal: 'renews', hasCard: true, cancelAtPeriodEnd: false });
     expect(new Date(renewed.currentPeriodEnd).getTime()).toBeGreaterThan(
       new Date(paid.currentPeriodEnd).getTime() + 27 * DAY,
     );
+  });
+
+  it('switches Pro monthly to yearly at the next renewal and charges the yearly price then', async () => {
+    const inf = await onboarded('BASIC');
+    ctx.clock.advance(31 * DAY);
+    await inf.admin.agent.post(`${API}/admin/jobs/billing-daily/run`).expect(200);
+    expect(await pay(inf.agent, 'success')).toBe('success');
+    const monthly = (await sub(inf.agent)).subscription;
+    const switched = (
+      await inf.agent.post(`${API}/billing/switch`).send({ plan: 'PRO_YEARLY' }).expect(200)
+    ).body.subscription;
+    expect(switched).toMatchObject({
+      planCode: 'PRO_MONTHLY',
+      nextPlan: { code: 'PRO_YEARLY', priceMinor: 9999 },
+      renewal: 'renews',
+    });
+    await inf.agent.post(`${API}/billing/switch`).send({ plan: 'BASIC' }).expect(400);
+
+    ctx.clock.advance(
+      new Date(monthly.currentPeriodEnd).getTime() - ctx.clock.now().getTime() + 1000,
+    );
+    await inf.admin.agent.post(`${API}/admin/jobs/billing-daily/run`).expect(200);
+    await ctx.queue.drain();
+    const yearly = (await sub(inf.agent)).subscription;
+    expect(yearly).toMatchObject({ planCode: 'PRO_YEARLY', nextPlan: null, renewal: 'renews' });
+    expect(
+      (new Date(yearly.currentPeriodEnd).getTime() - new Date(monthly.currentPeriodEnd).getTime()) /
+        DAY,
+    ).toBeGreaterThan(360);
+    const payments = (await inf.agent.get(`${API}/billing/payments`).expect(200)).body;
+    expect(payments[0]).toMatchObject({
+      kind: 'renewal',
+      amount: 9999,
+      planCode: 'PRO_YEARLY',
+      status: 'SUCCEEDED',
+    });
+
+    // Removing the card drops a pending switch; without a card switching is not possible (renew instead).
+    await inf.agent.post(`${API}/billing/switch`).send({ plan: 'PRO_MONTHLY' }).expect(200);
+    expect((await sub(inf.agent)).subscription.nextPlan).toMatchObject({ code: 'PRO_MONTHLY' });
+    const noCard = (await inf.agent.delete(`${API}/billing/card`).expect(200)).body.subscription;
+    expect(noCard.nextPlan).toBeNull();
+    await inf.agent.post(`${API}/billing/switch`).send({ plan: 'PRO_MONTHLY' }).expect(409);
   });
 
   it('the 30 free Pro days are given only once per account', async () => {

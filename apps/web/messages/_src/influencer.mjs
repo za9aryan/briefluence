@@ -811,6 +811,37 @@ export default {
       'Երկարաձգումն անջատված է։ Pro-ն կավարտվի {date}, հետո կանցնես անվճար Basic-ին։ Այլևս ոչինչ չի գանձվի։',
     ],
     renewPro: ['Renew Pro: {price}', 'Продлить Pro: {price}', 'Երկարաձգել Pro-ն՝ {price}'],
+    renewPlan: [
+      'Renew as {plan}: {price}',
+      'Продлить как {plan}: {price}',
+      'Երկարաձգել որպես {plan}՝ {price}',
+    ],
+    switchTo: [
+      'Switch to {plan}: {price}',
+      'Перейти на {plan}: {price}',
+      'Անցնել {plan}-ի՝ {price}',
+    ],
+    switchNote: [
+      'A switch starts on {date}, when your current period ends. Nothing is charged before that.',
+      'Смена начнётся {date}, когда закончится текущий период. До этого ничего не списывается.',
+      'Փոփոխությունը կսկսվի {date}, երբ ավարտվի ընթացիկ ժամկետը։ Մինչ այդ ոչինչ չի գանձվի։',
+    ],
+    switchScheduled: [
+      'On {date} you switch to {plan}: {price} from your saved card.',
+      '{date} ты перейдёшь на {plan}: {price} с сохранённой карты.',
+      '{date} կանցնես {plan}-ի՝ {price} պահպանված քարտից։',
+    ],
+    keepPlan: ['Keep {plan}', 'Оставить {plan}', 'Թողնել {plan}-ը'],
+    switchedToast: [
+      'Plan change scheduled',
+      'Смена тарифа запланирована',
+      'Փաթեթի փոփոխությունը պլանավորված է',
+    ],
+    switchUndoneToast: [
+      'You stay on your current plan',
+      'Остаёшься на текущем тарифе',
+      'Մնում ես ընթացիկ փաթեթում',
+    ],
     renewNote: [
       'You pay now for the next period, which starts on {date}. Your card is saved for later renewals.',
       'Оплата сейчас за следующий период, он начнётся {date}. Карта сохранится для следующих продлений.',

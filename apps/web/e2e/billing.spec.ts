@@ -68,6 +68,13 @@ test('free Pro days → Basic → upgrade to Pro → renew with the saved card',
     await page.getByRole('button', { name: 'Turn renewal back on' }).click();
     await expect(page.getByText('Auto-renewal on')).toBeVisible();
 
+    // Switch to yearly at the next renewal, then change of mind.
+    await page.getByRole('button', { name: /Switch to Pro yearly/ }).click();
+    await expect(page.getByText(/you switch to Pro yearly/)).toBeVisible();
+    await page.getByRole('button', { name: 'Keep Pro' }).click();
+    await expect(page.getByText('You stay on your current plan')).toBeVisible();
+    await expect(page.getByText(/you switch to Pro yearly/)).toHaveCount(0);
+
     // A month later the daily job charges the saved card.
     await admin.advanceDays(32);
     await admin.runJob('billing-daily');

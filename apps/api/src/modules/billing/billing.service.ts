@@ -11,6 +11,8 @@ import {
   effectiveTier,
   inFreeDays,
   isChargeDue,
+  nextChargePlan,
+  scheduleSwitch,
   needsCardToRenew,
   renewalState,
   isPaidPlan,
@@ -46,6 +48,7 @@ export const toState = (s: Subscription): SubscriptionState => ({
   failedAttempts: s.failedAttempts,
   pastDueSince: s.pastDueSince,
   basicSince: s.basicSince,
+  nextPlanCode: s.nextPlanCode ?? null,
 });
 
 const fromState = (s: SubscriptionState) => ({
@@ -58,6 +61,7 @@ const fromState = (s: SubscriptionState) => ({
   failedAttempts: s.failedAttempts,
   pastDueSince: s.pastDueSince,
   basicSince: s.basicSince,
+  nextPlanCode: s.nextPlanCode ?? null,
 });
 
 const publicPlan = (p: Plan) => ({
@@ -134,6 +138,10 @@ export class BillingService implements OnModuleInit {
         renewal: renewalState(state, now),
         /** Paid Pro without a card: "Renew Pro" pays the next period and saves a card. */
         needsCardToRenew: needsCardToRenew(state, now),
+        /** Scheduled switch (monthly <-> yearly) at the next renewal. */
+        nextPlan: sub.nextPlanCode
+          ? (plans.map(publicPlan).find((p) => p.code === sub.nextPlanCode) ?? null)
+          : null,
         plan: current ? publicPlan(current) : null,
         applications: {
           used,
@@ -208,10 +216,7 @@ export class BillingService implements OnModuleInit {
     const now = this.clock.now();
     const state = toState(sub);
     if (!canCheckout(state, now)) throw new AppError('CONFLICT', 'Your Pro plan is already active');
-    // Renewing a paid plan without a card: same plan only, so the paid days are not lost.
-    if (needsCardToRenew(state, now) && planCode !== sub.planCode) {
-      throw new AppError('CONFLICT', 'Renew your current plan; you can switch when it ends');
-    }
+    // Renewing without a card (any Pro plan): the new period starts when the paid one ends.
     const cardHolderId = `bf-${sub.id}-${Date.now().toString(36)}`;
     const payment = await this.createPayment(sub.id, 'checkout', plan, { cardHolderId });
     try {
@@ -356,6 +361,18 @@ export class BillingService implements OnModuleInit {
     return this.getForUser(userId);
   }
 
+  /** Switch Pro monthly <-> yearly; takes effect at the next renewal (choose the current plan to undo). */
+  async switchPlan(userId: string, planCode: PlanCode) {
+    const sub = await this.requireSub(userId);
+    const plan = await this.plans.get(planCode);
+    if (!plan.isActive && planCode !== sub.planCode)
+      throw new AppError('VALIDATION_FAILED', 'This plan is not available');
+    const next = scheduleSwitch(toState(sub), planCode, this.clock.now());
+    if (!next) throw new AppError('CONFLICT', 'Switching needs a paid Pro plan with a saved card');
+    await this.prisma.subscription.update({ where: { id: sub.id }, data: fromState(next) });
+    return this.getForUser(userId);
+  }
+
   async resume(userId: string) {
     const sub = await this.requireSub(userId);
     if (!sub.bindingId) throw new AppError('CONFLICT', 'Add a card by subscribing again');
@@ -372,7 +389,7 @@ export class BillingService implements OnModuleInit {
     if (!sub.bindingId) return this.getForUser(userId);
     await this.provider.removeBinding(sub.bindingId);
     const now = this.clock.now();
-    const state = { ...toState(sub), bindingId: null };
+    const state = { ...toState(sub), bindingId: null, nextPlanCode: null }; // a switch needs the card
     const next =
       sub.status === 'ACTIVE' && isPaidPlan(sub.planCode)
         ? { ...state, cancelAtPeriodEnd: true }
@@ -421,7 +438,8 @@ export class BillingService implements OnModuleInit {
     });
     if (recent) return; // another worker is charging right now
 
-    const plan = await this.plans.get(sub.planCode);
+    // A scheduled monthly <-> yearly switch is charged at this renewal.
+    const plan = await this.plans.get(nextChargePlan(toState(sub)));
     const payment = await this.createPayment(sub.id, 'renewal', plan);
     const outcome = await this.provider.chargeBinding({
       orderId: payment.providerOrderId,

@@ -340,6 +340,8 @@ model Subscription {
   status              SubscriptionStatus
   /// Chosen / current plan. Free Pro days come first for every plan; unpaid Pro falls back to BASIC.
   planCode            PlanCode           @default(BASIC)
+  /// Pro plan to switch to at the next renewal (monthly <-> yearly)
+  nextPlanCode        PlanCode?
   /// When the blogger moved to Basic; its limit counts applications from then on.
   basicSince          DateTime?
   trialEndsAt         DateTime

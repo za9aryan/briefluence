@@ -71,6 +71,15 @@ export class BillingController {
     return this.billing.cancel(user.id);
   }
 
+  /** Switch Pro monthly <-> yearly at the next renewal (send the current plan to undo). */
+  @Roles('INFLUENCER')
+  @Post('switch')
+  @HttpCode(200)
+  @ApiZodBody(checkoutSchema)
+  switchPlan(@CurrentUser() user: AuthUser, @ZodBody(checkoutSchema) body: CheckoutInput) {
+    return this.billing.switchPlan(user.id, body.plan);
+  }
+
   @Roles('INFLUENCER')
   @Post('resume')
   @HttpCode(200)

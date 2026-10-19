@@ -29,6 +29,8 @@ export interface SubscriptionState {
   pastDueSince: Date | null;
   /** When the blogger moved to Basic; Basic's limit only counts applications from then on. */
   basicSince: Date | null;
+  /** Pro plan to switch to at the next renewal (monthly ↔ yearly); null = keep the current one. */
+  nextPlanCode?: PlanCode | null;
 }
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -65,6 +67,7 @@ export function startPlan(now: Date, planCode: PlanCode): SubscriptionState {
     failedAttempts: 0,
     pastDueSince: null,
     basicSince: null,
+    nextPlanCode: null,
   };
 }
 
@@ -80,6 +83,7 @@ export function toBasic(s: SubscriptionState, now: Date): SubscriptionState {
     pastDueSince: null,
     basicSince:
       s.planCode === 'BASIC' && s.status === 'ACTIVE' && s.basicSince ? s.basicSince : now,
+    nextPlanCode: null,
   };
 }
 
@@ -126,12 +130,14 @@ export function applyPaymentSucceeded(
   binding?: { bindingId: string },
 ): SubscriptionState {
   const months = PLAN_MONTHS[planCode] || 1;
-  const isRenewal =
+  // A running paid period (renewal, scheduled switch, or renewing without a card): the new
+  // period starts where the paid one ends, so no paid days are lost.
+  const paidRunning =
     (s.status === 'ACTIVE' || s.status === 'PAST_DUE') &&
-    s.planCode === planCode &&
+    isPaidPlan(s.planCode) &&
     s.currentPeriodEnd != null;
   const freeDaysLeft = inFreeDays(s, now);
-  const start = isRenewal ? s.currentPeriodEnd! : freeDaysLeft ? s.trialEndsAt : now;
+  const start = paidRunning ? s.currentPeriodEnd! : freeDaysLeft ? s.trialEndsAt : now;
   let periodEnd = addMonths(start, months);
   if (periodEnd.getTime() <= now.getTime()) periodEnd = addMonths(now, months);
   return {
@@ -144,6 +150,7 @@ export function applyPaymentSucceeded(
     failedAttempts: 0,
     pastDueSince: null,
     basicSince: null,
+    nextPlanCode: null,
   };
 }
 
@@ -199,7 +206,8 @@ export function applyTimeTransitions(s: SubscriptionState, now: Date): Subscript
  */
 export function applyCancel(s: SubscriptionState, now: Date): SubscriptionState {
   if (s.status === 'TRIALING') return { ...s, planCode: 'BASIC' };
-  if (s.status === 'ACTIVE' && isPaidPlan(s.planCode)) return { ...s, cancelAtPeriodEnd: true };
+  if (s.status === 'ACTIVE' && isPaidPlan(s.planCode))
+    return { ...s, cancelAtPeriodEnd: true, nextPlanCode: null };
   if (s.status === 'PAST_DUE') return toBasic(s, now);
   return s;
 }
@@ -254,4 +262,28 @@ export function planSegment(s: SubscriptionState | null, now: Date): PlanSegment
   if (hasPaidPro(s, now)) return 'PRO';
   if (inFreeDays(s, now)) return 'TRIAL';
   return 'BASIC';
+}
+
+/** The plan the next renewal charges (a scheduled switch, or the current plan). */
+export function nextChargePlan(s: SubscriptionState): PlanCode {
+  return s.nextPlanCode ?? s.planCode;
+}
+
+/**
+ * Switch between Pro monthly and yearly while Pro is paid and a card is saved: takes effect at
+ * the next renewal (no double charge, no refunds). Choosing the current plan undoes a pending
+ * switch. Also turns renewal back on, since the blogger clearly wants to continue.
+ */
+export function scheduleSwitch(
+  s: SubscriptionState,
+  planCode: PlanCode,
+  now: Date,
+): SubscriptionState | null {
+  if (!isPaidPlan(planCode) || !hasPaidPro(s, now) || s.status !== 'ACTIVE' || !s.bindingId)
+    return null;
+  return {
+    ...s,
+    nextPlanCode: planCode === s.planCode ? null : planCode,
+    cancelAtPeriodEnd: false,
+  };
 }

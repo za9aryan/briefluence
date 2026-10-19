@@ -12,6 +12,8 @@ import {
   effectiveTier,
   isChargeDue,
   needsCardToRenew,
+  nextChargePlan,
+  scheduleSwitch,
   renewalState,
   nextChargeAt,
   planSegment,
@@ -129,6 +131,31 @@ describe('plans', () => {
     const pro = applyPaymentSucceeded(basic, day(40), 'PRO_MONTHLY', { bindingId: 'b' });
     expect(pro.currentPeriodEnd).toEqual(addMonths(day(40), 1));
     expect(trialDaysLeft(pro, day(40))).toBe(0);
+  });
+
+  it('switches monthly ↔ yearly at the next renewal without losing paid days', () => {
+    const monthly = applyPaymentSucceeded(
+      applyTimeTransitions(startPlan(now, 'BASIC'), day(30)),
+      day(31),
+      'PRO_MONTHLY',
+      { bindingId: 'b' },
+    );
+    const end = monthly.currentPeriodEnd!;
+    const switched = scheduleSwitch(monthly, 'PRO_YEARLY', day(35))!;
+    expect(switched).toMatchObject({ planCode: 'PRO_MONTHLY', nextPlanCode: 'PRO_YEARLY' });
+    expect(nextChargePlan(switched)).toBe('PRO_YEARLY');
+    expect(scheduleSwitch(switched, 'PRO_MONTHLY', day(36))!.nextPlanCode).toBeNull(); // undo
+    const renewed = applyPaymentSucceeded(switched, end, nextChargePlan(switched));
+    expect(renewed).toMatchObject({ planCode: 'PRO_YEARLY', nextPlanCode: null });
+    expect(renewed.currentPeriodEnd).toEqual(addMonths(end, 12));
+    // Not possible without a card or for Basic.
+    expect(scheduleSwitch({ ...monthly, bindingId: null }, 'PRO_YEARLY', day(35))).toBeNull();
+    expect(scheduleSwitch(monthly, 'BASIC', day(35))).toBeNull();
+    // Renewing without a card into yearly starts after the paid month.
+    const noCard = { ...monthly, bindingId: null, cancelAtPeriodEnd: true };
+    expect(
+      applyPaymentSucceeded(noCard, day(35), 'PRO_YEARLY', { bindingId: 'b2' }).currentPeriodEnd,
+    ).toEqual(addMonths(end, 12));
   });
 
   it('old expired subscriptions become Basic', () => {
