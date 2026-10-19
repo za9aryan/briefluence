@@ -49,7 +49,12 @@ export function Menu({ trigger, children, align = 'end', className }: MenuProps)
     };
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
     document.addEventListener('mousedown', onDown);
-    const onScroll = () => setOpen(false);
+    // The page scrolled: the fixed panel would drift, so close. Scrolling inside the panel
+    // itself (a long notification list) must not close it.
+    const onScroll = (e: Event) => {
+      if (e.type === 'scroll' && panel.current?.contains(e.target as Node)) return;
+      setOpen(false);
+    };
     document.addEventListener('keydown', onKey);
     window.addEventListener('scroll', onScroll, true);
     window.addEventListener('resize', onScroll);
