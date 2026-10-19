@@ -11,6 +11,8 @@ import {
   effectiveTier,
   inFreeDays,
   isChargeDue,
+  needsCardToRenew,
+  renewalState,
   isPaidPlan,
   nextChargeAt,
   PLAN_WINDOW_DAYS,
@@ -128,6 +130,10 @@ export class BillingService implements OnModuleInit {
         hasAccess: true,
         nextChargeAt: nextChargeAt(state),
         canCheckout: canCheckout(state, now),
+        /** renews (card saved, auto-renew on) / ends (renewal off) / null when not on paid Pro */
+        renewal: renewalState(state, now),
+        /** Paid Pro without a card: "Renew Pro" pays the next period and saves a card. */
+        needsCardToRenew: needsCardToRenew(state, now),
         plan: current ? publicPlan(current) : null,
         applications: {
           used,
@@ -199,8 +205,13 @@ export class BillingService implements OnModuleInit {
     if (!isPaidPlan(planCode)) throw new AppError('VALIDATION_FAILED', 'Basic is free');
     const plan = await this.plans.get(planCode);
     if (!plan.isActive) throw new AppError('VALIDATION_FAILED', 'This plan is not available');
-    if (!canCheckout(toState(sub), this.clock.now()))
-      throw new AppError('CONFLICT', 'Your Pro plan is already active');
+    const now = this.clock.now();
+    const state = toState(sub);
+    if (!canCheckout(state, now)) throw new AppError('CONFLICT', 'Your Pro plan is already active');
+    // Renewing a paid plan without a card: same plan only, so the paid days are not lost.
+    if (needsCardToRenew(state, now) && planCode !== sub.planCode) {
+      throw new AppError('CONFLICT', 'Renew your current plan; you can switch when it ends');
+    }
     const cardHolderId = `bf-${sub.id}-${Date.now().toString(36)}`;
     const payment = await this.createPayment(sub.id, 'checkout', plan, { cardHolderId });
     try {

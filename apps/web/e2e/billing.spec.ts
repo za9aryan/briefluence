@@ -57,7 +57,16 @@ test('free Pro days → Basic → upgrade to Pro → renew with the saved card',
     await page.getByRole('button', { name: 'Pay' }).click();
     await page.waitForURL('**/influencer/billing**');
     await expect(page.getByText('Payment received. Pro is on.')).toBeVisible();
-    await expect(page.getByText(/Renews on/)).toBeVisible();
+    await expect(page.getByText('Auto-renewal on')).toBeVisible();
+    await expect(page.getByText(/Renews automatically on/)).toBeVisible();
+
+    // Unsubscribe: renewal turns off, Pro stays until the period ends; then turn it back on.
+    await page.getByRole('button', { name: 'Cancel subscription' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Cancel subscription' }).click();
+    await expect(page.getByText('Auto-renewal off')).toBeVisible();
+    await expect(page.getByText(/Renewal is off\. Pro ends on/)).toBeVisible();
+    await page.getByRole('button', { name: 'Turn renewal back on' }).click();
+    await expect(page.getByText('Auto-renewal on')).toBeVisible();
 
     // A month later the daily job charges the saved card.
     await admin.advanceDays(32);

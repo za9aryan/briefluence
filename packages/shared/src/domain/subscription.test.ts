@@ -11,6 +11,8 @@ import {
   canCheckout,
   effectiveTier,
   isChargeDue,
+  needsCardToRenew,
+  renewalState,
   nextChargeAt,
   planSegment,
   startPlan,
@@ -103,6 +105,30 @@ describe('plans', () => {
     expect(applicationsLeft('BASIC', 10, 4)).toBe(6);
     expect(applicationsLeft('BASIC', 10, 12)).toBe(0);
     expect(applicationsLeft('PRO', 10, 50)).toBeNull();
+  });
+
+  it('removing the card stops renewal; paying again renews from the current period end', () => {
+    const paid = applyPaymentSucceeded(
+      applyTimeTransitions(startPlan(now, 'BASIC'), day(30)),
+      day(31),
+      'PRO_MONTHLY',
+      { bindingId: 'b' },
+    );
+    expect(renewalState(paid, day(32))).toBe('renews');
+    const noCard = { ...paid, bindingId: null, cancelAtPeriodEnd: true };
+    expect(renewalState(noCard, day(32))).toBe('ends');
+    expect(needsCardToRenew(noCard, day(32))).toBe(true);
+    expect(canCheckout(noCard, day(32))).toBe(true);
+    const renewed = applyPaymentSucceeded(noCard, day(33), 'PRO_MONTHLY', { bindingId: 'b2' });
+    expect(renewed.currentPeriodEnd).toEqual(addMonths(paid.currentPeriodEnd!, 1)); // no days lost
+    expect(renewalState(renewed, day(34))).toBe('renews');
+  });
+
+  it('free Pro days are given once: a later upgrade is paid from day one', () => {
+    const basic = applyTimeTransitions(startPlan(now, 'BASIC'), day(30));
+    const pro = applyPaymentSucceeded(basic, day(40), 'PRO_MONTHLY', { bindingId: 'b' });
+    expect(pro.currentPeriodEnd).toEqual(addMonths(day(40), 1));
+    expect(trialDaysLeft(pro, day(40))).toBe(0);
   });
 
   it('old expired subscriptions become Basic', () => {

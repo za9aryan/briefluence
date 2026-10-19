@@ -241,6 +241,51 @@ describe('plans, subscription & payments (e2e)', () => {
     expect(again.body.error.code).toBe('CONFLICT');
   });
 
+  it('card removed: renewal is off; Renew Pro pays the next period and turns renewal back on', async () => {
+    const inf = await onboarded('BASIC');
+    ctx.clock.advance(31 * DAY);
+    await inf.admin.agent.post(`${API}/admin/jobs/billing-daily/run`).expect(200);
+    expect(await pay(inf.agent, 'success')).toBe('success');
+    const paid = (await sub(inf.agent)).subscription;
+    expect(paid).toMatchObject({ renewal: 'renews', needsCardToRenew: false, canCheckout: false });
+
+    const removed = (await inf.agent.delete(`${API}/billing/card`).expect(200)).body.subscription;
+    expect(removed).toMatchObject({
+      renewal: 'ends',
+      needsCardToRenew: true,
+      canCheckout: true,
+      hasCard: false,
+    });
+    // Only the same plan can be renewed while the paid period runs.
+    await inf.agent.post(`${API}/billing/checkout`).send({ plan: 'PRO_YEARLY' }).expect(409);
+    expect(await pay(inf.agent, 'success')).toBe('success');
+    const renewed = (await sub(inf.agent)).subscription;
+    expect(renewed).toMatchObject({ renewal: 'renews', hasCard: true, cancelAtPeriodEnd: false });
+    expect(new Date(renewed.currentPeriodEnd).getTime()).toBeGreaterThan(
+      new Date(paid.currentPeriodEnd).getTime() + 27 * DAY,
+    );
+  });
+
+  it('the 30 free Pro days are given only once per account', async () => {
+    const inf = await onboarded('BASIC');
+    const first = (await sub(inf.agent)).subscription.trialEndsAt;
+    ctx.clock.advance(10 * DAY);
+    // Choosing again (even another plan) does not restart the free days.
+    await inf.agent.post(`${API}/billing/plan`).send({ plan: 'PRO_MONTHLY' }).expect(200);
+    expect((await sub(inf.agent)).subscription.trialEndsAt).toBe(first);
+    ctx.clock.advance(25 * DAY);
+    await inf.admin.agent.post(`${API}/admin/jobs/billing-daily/run`).expect(200);
+    await inf.agent.post(`${API}/billing/plan`).send({ plan: 'BASIC' }).expect(200);
+    const after = (await sub(inf.agent)).subscription;
+    expect(after).toMatchObject({
+      status: 'ACTIVE',
+      planCode: 'BASIC',
+      inFreeDays: false,
+      trialDaysLeft: 0,
+      trialEndsAt: first,
+    });
+  });
+
   it('admins manage plans; Basic stays free and on; turned-off plans cannot be chosen', async () => {
     const inf = await onboarded('BASIC');
     const plans = (await inf.admin.agent.get(`${API}/admin/plans`).expect(200)).body;

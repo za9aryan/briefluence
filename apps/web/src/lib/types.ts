@@ -281,6 +281,8 @@ export interface SubscriptionDto {
     hasAccess: boolean;
     nextChargeAt: string | null;
     canCheckout: boolean;
+    renewal: 'renews' | 'ends' | null;
+    needsCardToRenew: boolean;
   } | null;
   plans: PlanDto[];
   provider: 'mock' | 'ameriabank';

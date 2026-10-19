@@ -796,8 +796,41 @@ export default {
       'Оплати сейчас, чтобы сохранить Pro.',
       'Վճարիր հիմա՝ Pro-ն պահպանելու համար։',
     ],
-    cancel: ['Cancel Pro', 'Отменить Pro', 'Չեղարկել Pro-ն'],
-    resume: ['Keep Pro', 'Не отменять Pro', 'Պահպանել Pro-ն'],
+    cancel: ['Cancel subscription', 'Отменить подписку', 'Չեղարկել բաժանորդագրությունը'],
+    resume: ['Turn renewal back on', 'Снова включить продление', 'Կրկին միացնել երկարաձգումը'],
+    renewalOn: ['Auto-renewal on', 'Автопродление включено', 'Ավտոերկարաձգումը միացված է'],
+    renewalOff: ['Auto-renewal off', 'Автопродление выключено', 'Ավտոերկարաձգումն անջատված է'],
+    renewsAuto: [
+      'Renews automatically on {date}: {price} from your saved card.',
+      'Продлится автоматически {date}: {price} с сохранённой карты.',
+      'Կերկարաձգվի ավտոմատ {date}՝ {price} պահպանված քարտից։',
+    ],
+    endsOff: [
+      'Renewal is off. Pro ends on {date}, then you move to the free Basic plan. Nothing more will be charged.',
+      'Продление выключено. Pro закончится {date}, потом ты перейдёшь на бесплатный Basic. Больше ничего не спишется.',
+      'Երկարաձգումն անջատված է։ Pro-ն կավարտվի {date}, հետո կանցնես անվճար Basic-ին։ Այլևս ոչինչ չի գանձվի։',
+    ],
+    renewPro: ['Renew Pro: {price}', 'Продлить Pro: {price}', 'Երկարաձգել Pro-ն՝ {price}'],
+    renewNote: [
+      'You pay now for the next period, which starts on {date}. Your card is saved for later renewals.',
+      'Оплата сейчас за следующий период, он начнётся {date}. Карта сохранится для следующих продлений.',
+      'Վճարում ես հիմա հաջորդ ժամկետի համար, որը կսկսվի {date}։ Քարտը կպահպանվի հետագա երկարաձգումների համար։',
+    ],
+    cancelledToast: [
+      'Subscription cancelled. Pro stays until the end of the paid period.',
+      'Подписка отменена. Pro останется до конца оплаченного периода.',
+      'Բաժանորդագրությունը չեղարկված է։ Pro-ն կմնա մինչև վճարված ժամկետի ավարտը։',
+    ],
+    resumedToast: [
+      'Auto-renewal is on again',
+      'Автопродление снова включено',
+      'Ավտոերկարաձգումը կրկին միացված է',
+    ],
+    cardRemovedToast: [
+      'Card removed. Pro will not renew.',
+      'Карта удалена. Pro не продлится.',
+      'Քարտը հեռացված է։ Pro-ն չի երկարաձգվի։',
+    ],
     cardsNote: [
       'Visa, Mastercard and ArCa. Payments are processed by Ameriabank; we never see your card number.',
       'Visa, Mastercard и ArCa. Платежи обрабатывает Америабанк, номер карты мы не видим.',

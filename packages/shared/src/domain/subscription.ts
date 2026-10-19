@@ -213,7 +213,21 @@ export function applyResume(s: SubscriptionState): SubscriptionState {
 export function canCheckout(s: SubscriptionState | null, now: Date = new Date()): boolean {
   if (!s) return false;
   if (s.status === 'PAST_DUE') return true;
-  return !hasPaidPro(s, now);
+  return !hasPaidPro(s, now) || needsCardToRenew(s, now);
+}
+
+/**
+ * Pro is paid but will not renew because there is no saved card (it was removed). Paying again
+ * buys the next period (it starts when the current one ends) and saves the new card.
+ */
+export function needsCardToRenew(s: SubscriptionState, now: Date): boolean {
+  return s.status === 'ACTIVE' && hasPaidPro(s, now) && s.cancelAtPeriodEnd && !s.bindingId;
+}
+
+/** How a paid Pro plan continues: renews with the card, ends (renewal off), or n/a. */
+export function renewalState(s: SubscriptionState, now: Date): 'renews' | 'ends' | null {
+  if (!hasPaidPro(s, now) || s.status !== 'ACTIVE') return null;
+  return s.cancelAtPeriodEnd || !s.bindingId ? 'ends' : 'renews';
 }
 
 /** Start of the window Basic's limit counts in: the last 30 days, but not before Basic began. */

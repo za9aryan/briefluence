@@ -81,10 +81,16 @@ export default function BillingPage() {
   const action = useMutation({
     mutationFn: (kind: 'cancel' | 'resume' | 'card') =>
       kind === 'card' ? api.del('/billing/card') : api.post(`/billing/${kind}`),
-    onSuccess: () => {
+    onSuccess: (_, kind) => {
       setConfirm(null);
       refresh();
-      toast(tc('saved'));
+      toast(
+        kind === 'cancel'
+          ? t('cancelledToast')
+          : kind === 'resume'
+            ? t('resumedToast')
+            : t('cardRemovedToast'),
+      );
     },
     onError: (e) => toast(errorMessage(e), 'danger'),
   });
@@ -93,7 +99,15 @@ export default function BillingPage() {
   const planName = (code: PlanCode) => tp(`name.${code}`);
   const planPrice =
     s?.plan && s.plan.code !== 'BASIC' ? f.money(s.plan.priceMinor, s.plan.currency) : null;
-  const paidPro = !!s && s.planCode !== 'BASIC' && !s.canCheckout;
+  // A paid Pro period is running (renewing or ending).
+  const paidPro = !!s?.renewal;
+  const renew = useMutation({
+    mutationFn: () => api.post<{ redirectUrl: string }>('/billing/checkout', { plan: s!.planCode }),
+    onSuccess: ({ redirectUrl }) => {
+      window.location.href = redirectUrl;
+    },
+    onError: (e) => toast(errorMessage(e), 'danger'),
+  });
 
   return (
     <Stack gap={6}>
@@ -135,14 +149,28 @@ export default function BillingPage() {
                 {s.inFreeDays && !paidPro && (
                   <Text tone="muted">{t('afterFreeDays', { plan: planName(s.planCode) })}</Text>
                 )}
-                {s.status === 'ACTIVE' && paidPro && s.currentPeriodEnd && (
-                  <Text>
-                    {s.inFreeDays
-                      ? t('paidAfterFreeDays', { date: f.date(s.trialEndsAt) })
-                      : s.cancelAtPeriodEnd
-                        ? t('endsOn', { date: f.date(s.currentPeriodEnd) })
-                        : t('renewsOn', { date: f.date(s.currentPeriodEnd) })}
-                  </Text>
+                {paidPro && s.currentPeriodEnd && (
+                  <div className="rounded-card border border-line p-4">
+                    <Stack gap={2}>
+                      <Badge
+                        tone={s.renewal === 'renews' ? 'success' : 'neutral'}
+                        className="self-start"
+                      >
+                        {s.renewal === 'renews' ? t('renewalOn') : t('renewalOff')}
+                      </Badge>
+                      {s.inFreeDays && (
+                        <Text>{t('paidAfterFreeDays', { date: f.date(s.trialEndsAt) })}</Text>
+                      )}
+                      <Text>
+                        {s.renewal === 'renews'
+                          ? t('renewsAuto', {
+                              date: f.date(s.currentPeriodEnd),
+                              price: planPrice ?? '',
+                            })
+                          : t('endsOff', { date: f.date(s.currentPeriodEnd) })}
+                      </Text>
+                    </Stack>
+                  </div>
                 )}
                 {s.tier === 'BASIC' && s.applications.limit != null && (
                   <Stack gap={2}>
@@ -166,21 +194,27 @@ export default function BillingPage() {
                   </Alert>
                 )}
                 <Inline gap={2} wrap>
-                  {s.status === 'ACTIVE' && paidPro && !s.cancelAtPeriodEnd && (
-                    <Button variant="ghost" onClick={() => setConfirm('cancel')}>
+                  {s.renewal === 'renews' && (
+                    <Button variant="secondary" onClick={() => setConfirm('cancel')}>
                       {t('cancel')}
                     </Button>
                   )}
-                  {s.status === 'ACTIVE' && paidPro && s.cancelAtPeriodEnd && s.hasCard && (
-                    <Button
-                      variant="secondary"
-                      loading={action.isPending}
-                      onClick={() => action.mutate('resume')}
-                    >
+                  {s.renewal === 'ends' && s.hasCard && (
+                    <Button loading={action.isPending} onClick={() => action.mutate('resume')}>
                       {t('resume')}
                     </Button>
                   )}
+                  {s.needsCardToRenew && (
+                    <Button loading={renew.isPending} onClick={() => renew.mutate()}>
+                      {t('renewPro', { price: planPrice ?? '' })}
+                    </Button>
+                  )}
                 </Inline>
+                {s.needsCardToRenew && s.currentPeriodEnd && (
+                  <Text size="small" tone="muted">
+                    {t('renewNote', { date: f.date(s.currentPeriodEnd) })}
+                  </Text>
+                )}
                 <Text size="small" tone="muted">
                   {t('cardsNote')}
                 </Text>
@@ -210,7 +244,7 @@ export default function BillingPage() {
               )}
             </Card>
           </div>
-          {s.canCheckout && <PlanPicker mode="upgrade" />}
+          {s.canCheckout && !s.needsCardToRenew && <PlanPicker mode="upgrade" />}
         </Stack>
       )}
 
