@@ -1,14 +1,15 @@
 'use client';
 import type { CollaborationType, ContentFormat, Platform } from '@briefluence/shared';
 import {
-  Avatar,
   Button,
   Card,
   EmptyState,
   FilterDropdown,
   Grid,
+  Icon,
   Inline,
   Input,
+  MediaCover,
   Pagination,
   Select,
   Skeleton,
@@ -23,6 +24,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
+import { CollaborationBadge } from '@/components/domain/badges';
 import { ContactLink } from '@/components/domain/ContactLink';
 import { OfferCard, OfferPrice, OfferRequestBadge } from '@/components/offers/OfferParts';
 import { api } from '@/lib/api';
@@ -183,26 +185,36 @@ function MyRequests() {
   return (
     <Stack gap={4}>
       {list.data.map((r) => (
-        <Card key={r.id} p={4}>
-          <Stack gap={2}>
-            <Inline justify="between" align="start" gap={2}>
-              <Inline gap={2} align="center" className="min-w-0">
-                <Avatar name={r.blogger.displayName} src={r.blogger.avatarUrl} size="sm" />
-                <Stack gap={0} className="min-w-0">
-                  <Link
-                    href={`/brand/offers/${r.offer.id}`}
-                    className="font-bold text-ink hover:text-primary-text"
-                  >
-                    {r.offer.title}
-                  </Link>
-                  <Text size="small" tone="muted">
-                    {r.blogger.displayName} · {f.date(r.updatedAt)}
-                  </Text>
-                </Stack>
-              </Inline>
-              <OfferRequestBadge status={r.status} />
-            </Inline>
+        <Card key={r.id} p={0} className="flex flex-col overflow-hidden sm:flex-row">
+          {/* The offer cover (else the blogger's photo), with the request status on it. */}
+          <MediaCover
+            src={r.offer.imageUrl ?? r.blogger.coverUrl}
+            alt={r.offer.title}
+            className="sm:aspect-auto sm:min-h-40 sm:w-56 sm:shrink-0 lg:w-64"
+            fallback={<Icon name="sparkles" className="size-16 text-primary/25" />}
+            topLeft={<OfferRequestBadge status={r.status} />}
+            topRight={<CollaborationBadge type={r.offer.collaborationType} />}
+          />
+          <Stack gap={2} className="min-w-0 flex-1 p-4 md:p-6">
+            <Link
+              href={`/brand/offers/${r.offer.id}`}
+              className="text-h2 font-bold text-ink hover:text-primary-text"
+            >
+              {r.offer.title}
+            </Link>
+            <Text size="small" tone="muted">
+              <Link
+                href={`/brand/influencers/${r.blogger.id}`}
+                className="font-bold text-ink hover:text-primary-text hover:underline"
+              >
+                {r.blogger.displayName}
+              </Link>{' '}
+              · {f.date(r.updatedAt)}
+            </Text>
             <OfferPrice offer={r.offer} size="body" />
+            <Text size="small" tone="muted" className="line-clamp-2 whitespace-pre-line">
+              {r.message}
+            </Text>
             {r.contacts && (
               <Inline gap={2} wrap className="rounded-sm bg-success/10 p-3">
                 <Text size="small" weight="bold">

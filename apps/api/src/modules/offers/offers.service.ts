@@ -453,6 +453,12 @@ export class OffersService {
                 avatarUrl: true,
                 contactMethod: true,
                 contactValue: true,
+                portfolio: {
+                  where: { reviewStatus: 'APPROVED' },
+                  orderBy: { createdAt: 'desc' },
+                  take: 1,
+                  select: { imageUrl: true },
+                },
               },
             },
           },
@@ -470,11 +476,13 @@ export class OffersService {
           currency: o.currency,
           collaborationType: o.collaborationType,
           status: o.status,
+          imageUrl: o.imageUrl,
         },
         blogger: {
           id: influencer.id,
           displayName: influencer.displayName,
           avatarUrl: influencer.avatarUrl,
+          coverUrl: influencer.avatarUrl ?? influencer.portfolio[0]?.imageUrl ?? null,
         },
         contacts: offerContactsRevealed(r.status)
           ? { method: influencer.contactMethod, value: influencer.contactValue }

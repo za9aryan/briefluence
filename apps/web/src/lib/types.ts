@@ -424,7 +424,8 @@ export interface MyOfferRequestDto {
     currency: Currency;
     collaborationType: CollaborationType;
     status: OfferStatus;
+    imageUrl: string | null;
   };
-  blogger: { id: string; displayName: string; avatarUrl: string | null };
+  blogger: { id: string; displayName: string; avatarUrl: string | null; coverUrl: string | null };
   contacts: { method: ContactMethod | null; value: string | null } | null;
 }

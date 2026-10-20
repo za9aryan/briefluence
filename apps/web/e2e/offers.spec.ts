@@ -131,4 +131,8 @@ test('blogger offer → admin approves → brand requests → blogger accepts �
 
   await brand.goto('/brand/offers?tab=requests');
   await expect(brand.getByRole('link', { name: /Telegram: @offer_blogger/ })).toBeVisible();
+  // The request card shows the offer cover.
+  await expect(brand.getByRole('img', { name: title })).toBeVisible();
+  if (process.env.E2E_SHOTS)
+    await brand.screenshot({ path: `${process.env.E2E_SHOTS}/requests.png`, fullPage: true });
 });
