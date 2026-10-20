@@ -15,6 +15,7 @@ import {
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { FeatureItem, Section } from '@/components/common/Section';
+import { ProcessFunnel } from '@/components/landing/ProcessFunnel';
 
 export default async function LandingPage() {
   const t = await getTranslations('landing');
@@ -97,6 +98,8 @@ export default async function LandingPage() {
           </Grid>
         </Container>
       </section>
+
+      <ProcessFunnel />
 
       {/* How it works */}
       <Section raised eyebrow={t('how.eyebrow')} title={t('how.title')} lead={t('how.lead')}>

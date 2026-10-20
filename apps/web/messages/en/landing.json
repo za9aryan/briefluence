@@ -153,5 +153,24 @@
       }
     },
     "cta": "Create a blogger account"
+  },
+  "funnel": {
+    "eyebrow": "Less busywork",
+    "title": "Six chores become one brief",
+    "lead": "Finding bloggers on your own means searching, messaging, checking numbers and haggling, one blogger at a time. Here you post one brief and bloggers who fit come to you.",
+    "chores": {
+      "search": "Find bloggers",
+      "followers": "Check followers",
+      "dm": "DM and wait",
+      "screens": "Ask for screenshots",
+      "haggle": "Haggle prices",
+      "contacts": "Chase contacts"
+    },
+    "points": {
+      "verified": "Every blogger is verified before they can apply.",
+      "match": "Only bloggers who match your filters see your brief.",
+      "contacts": "Accept the one you like and you both get each other’s contacts."
+    },
+    "cta": "Post a brief for free"
   }
 }

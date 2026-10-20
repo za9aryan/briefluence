@@ -1,0 +1,133 @@
+/*
+ * Home "six chores → one brief" animation. Pure CSS, one 10s loop:
+ * chips drift around chaotically, get pulled into the center and vanish, then the logo appears.
+ * Each chip's path comes from its --x1..--y3 / --r custom properties (container query units),
+ * so the whole stage scales with its width. Reduced motion: a still, crossed-out version.
+ */
+.stage {
+  container-type: size;
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+}
+
+@media (min-width: 1024px) {
+  .stage {
+    aspect-ratio: 5 / 4;
+  }
+}
+
+.chip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  animation: chip 10s ease-in-out infinite;
+  opacity: 0;
+}
+
+/* A second, out-of-sync wobble on the inner pill makes the drift feel less mechanical. */
+.wobble {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-size: clamp(12px, 3.6cqw, 14px);
+  animation: wobble var(--w, 2.3s) ease-in-out infinite alternate;
+}
+
+.logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  animation: logo 10s ease-out infinite;
+  opacity: 0;
+}
+
+.ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70cqw;
+  height: 70cqw;
+  translate: -50% -50%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, var(--bf-primary-soft) 0%, transparent 70%);
+  animation: logo 10s ease-out infinite;
+  opacity: 0;
+}
+
+@keyframes chip {
+  0% {
+    opacity: 0;
+    transform: translate(var(--x1), var(--y1)) scale(0.8);
+  }
+  6% {
+    opacity: 1;
+    transform: translate(var(--x1), var(--y1)) scale(1);
+  }
+  22% {
+    transform: translate(var(--x2), var(--y2)) rotate(var(--r));
+  }
+  38% {
+    transform: translate(var(--x3), var(--y3)) rotate(calc(var(--r) * -1));
+  }
+  52% {
+    opacity: 1;
+    transform: translate(var(--x1), var(--y1)) rotate(0deg) scale(1);
+  }
+  62%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.2);
+  }
+}
+
+@keyframes wobble {
+  from {
+    transform: translate(-4px, 3px);
+  }
+  to {
+    transform: translate(4px, -3px);
+  }
+}
+
+@keyframes logo {
+  0%,
+  60% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  74%,
+  92% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .wobble,
+  .logo,
+  .ring {
+    animation: none;
+  }
+  .chip {
+    opacity: 0.5;
+    transform: translate(var(--x1), var(--y1));
+    text-decoration: line-through;
+  }
+  .logo,
+  .ring {
+    opacity: 1;
+  }
+}
