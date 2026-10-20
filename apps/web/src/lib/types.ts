@@ -353,6 +353,8 @@ export interface OfferBloggerDto {
   id: string;
   displayName: string;
   avatarUrl: string | null;
+  /** Card photo: profile photo, else the latest approved portfolio image. */
+  coverUrl: string | null;
   country: string;
   city: string | null;
   niches: string[];

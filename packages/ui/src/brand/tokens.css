@@ -5,28 +5,31 @@
 
 :root {
   /* Color */
-  --bf-surface: #FFFFFF;        /* page / screen background (white) */
-  --bf-surface-raised: #FFFFFF; /* cards, modals, menus (separated by --bf-line borders) */
-  --bf-line: #EEE6EF;           /* dividers, input borders */
-  --bf-ink: #241B2B;            /* primary text (deep plum) */
-  --bf-ink-muted: #6B6175;      /* secondary text, metadata */
-  --bf-primary: #C8187F;        /* brand magenta: logo, primary button, active, text >= 24px */
-  --bf-primary-text: #A3136A;   /* small accent text, links (AA on white) */
-  --bf-primary-soft: #FCE8F4;   /* tinted backgrounds, badges */
-  --bf-on-primary: #FFFFFF;     /* text/icons on primary fill */
-  --bf-sun: #FFF0A8;            /* barter & rewards only (light yellow); text on it = ink */
-  --bf-success: #1E7A4F;        /* approved / confirmed */
+  --bf-surface: #ffffff; /* page / screen background (white) */
+  --bf-surface-raised: #ffffff; /* cards, modals, menus (separated by --bf-line borders) */
+  --bf-line: #eee6ef; /* dividers, input borders */
+  --bf-ink: #241b2b; /* primary text (deep plum) */
+  --bf-ink-muted: #6b6175; /* secondary text, metadata */
+  --bf-primary: #c8187f; /* brand magenta: logo, primary button, active, text >= 24px */
+  --bf-primary-text: #a3136a; /* small accent text, links (AA on white) */
+  --bf-primary-soft: #fce8f4; /* tinted backgrounds, badges */
+  --bf-on-primary: #ffffff; /* text/icons on primary fill */
+  --bf-sun: #fff0a8; /* barter & rewards only (light yellow); text on it = ink */
+  --bf-success: #1e7a4f; /* approved / confirmed */
   --bf-link: var(--bf-primary-text);
+  /* Over photos only (card covers): same in light and dark themes, never as a surface. */
+  --bf-scrim: #160f1b; /* gradient / chip behind text on images */
+  --bf-on-scrim: #ffffff; /* text and icons on --bf-scrim */
 
   /* Chart categorical slots (fixed order; validated with the dataviz palette checker:
      CVD ΔE ≥ 9.6 all-pairs on white). Slot 3 is < 3:1 → charts always ship labels + table view. */
-  --bf-chart-1: #C8187F;
-  --bf-chart-2: #2A78D6;
-  --bf-chart-3: #1BAF7A;
+  --bf-chart-1: #c8187f;
+  --bf-chart-2: #2a78d6;
+  --bf-chart-3: #1baf7a;
 
   /* Type */
-  --bf-font-display: "Syne", "Manrope", system-ui, sans-serif;
-  --bf-font-sans: "Manrope", "Noto Sans Armenian", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --bf-font-display: 'Syne', 'Manrope', system-ui, sans-serif;
+  --bf-font-sans: 'Manrope', 'Noto Sans Armenian', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
   /* Spacing */
   --bf-space-1: 4px;
@@ -45,39 +48,39 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bf-surface: #16111A;
-    --bf-surface-raised: #211A26;
-    --bf-line: #382D3F;
-    --bf-ink: #F8F0F7;
-    --bf-ink-muted: #C2B5C7;
-    --bf-primary: #FF5CB8;
-    --bf-primary-text: #FF8BCB;
-    --bf-primary-soft: #46173A;
-    --bf-on-primary: #2A0A1F;
-    --bf-sun: #FFE27A;
-    --bf-success: #5FD39A;
-    --bf-chart-1: #FF5CB8;
-    --bf-chart-2: #3987E5;
-    --bf-chart-3: #199E70;
+  :root:not([data-theme='light']) {
+    --bf-surface: #16111a;
+    --bf-surface-raised: #211a26;
+    --bf-line: #382d3f;
+    --bf-ink: #f8f0f7;
+    --bf-ink-muted: #c2b5c7;
+    --bf-primary: #ff5cb8;
+    --bf-primary-text: #ff8bcb;
+    --bf-primary-soft: #46173a;
+    --bf-on-primary: #2a0a1f;
+    --bf-sun: #ffe27a;
+    --bf-success: #5fd39a;
+    --bf-chart-1: #ff5cb8;
+    --bf-chart-2: #3987e5;
+    --bf-chart-3: #199e70;
     color-scheme: dark;
   }
 }
 
-:root[data-theme="dark"] {
-  --bf-surface: #16111A;
-  --bf-surface-raised: #211A26;
-  --bf-line: #382D3F;
-  --bf-ink: #F8F0F7;
-  --bf-ink-muted: #C2B5C7;
-  --bf-primary: #FF5CB8;
-  --bf-primary-text: #FF8BCB;
-  --bf-primary-soft: #46173A;
-  --bf-on-primary: #2A0A1F;
-  --bf-sun: #FFE27A;
-  --bf-success: #5FD39A;
-  --bf-chart-1: #FF5CB8;
-  --bf-chart-2: #3987E5;
-  --bf-chart-3: #199E70;
+:root[data-theme='dark'] {
+  --bf-surface: #16111a;
+  --bf-surface-raised: #211a26;
+  --bf-line: #382d3f;
+  --bf-ink: #f8f0f7;
+  --bf-ink-muted: #c2b5c7;
+  --bf-primary: #ff5cb8;
+  --bf-primary-text: #ff8bcb;
+  --bf-primary-soft: #46173a;
+  --bf-on-primary: #2a0a1f;
+  --bf-sun: #ffe27a;
+  --bf-success: #5fd39a;
+  --bf-chart-1: #ff5cb8;
+  --bf-chart-2: #3987e5;
+  --bf-chart-3: #199e70;
   color-scheme: dark;
 }

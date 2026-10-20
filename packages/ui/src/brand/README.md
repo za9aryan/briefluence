@@ -4,11 +4,11 @@ The full brand book (BRAND.md) lives with the design team; this folder holds the
 
 **Palette v2 (2026-10-16):** the owner replaced coral with a magenta primary and lighter surfaces. Tokens were renamed `coral*` → `primary*` (`bg-primary`, `text-primary-text`, `bg-primary-soft`, `text-on-primary`); `sun` (barter) is now a light yellow.
 
-| File | What |
-| --- | --- |
-| `tokens.css` | All design tokens as `--bf-*` CSS variables, light + dark |
+| File              | What                                                                                                              |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `tokens.css`      | All design tokens as `--bf-*` CSS variables, light + dark                                                         |
 | `tailwind-v4.css` | Tailwind v4 `@theme` mapping → `bg-surface`, `text-ink`, `bg-primary`, `rounded-card`, `rounded-pill`, `text-h1`… |
-| `logos/` | Mark (currentColor / primary / ink / white) and app icon |
+| `logos/`          | Mark (currentColor / primary / ink / white) and app icon                                                          |
 
 ## Rules (apply to every screen)
 
@@ -25,3 +25,5 @@ The full brand book (BRAND.md) lives with the design team; this folder holds the
 10. No separate error red: errors use `primary-text` + an icon + text. Approved → `success`.
 11. Spacing scale 4 / 8 / 16 / 24 / 32 px (Tailwind 1, 2, 4, 6, 8); 12 and 16 (48 / 64 px) only for section rhythm.
 12. Voice: warm, direct, informal "you" (ru «ты», hy «դու»), no hype, no emoji, no ALL CAPS except `label` badges.
+13. Photos on cards (`MediaCover`): text over an image sits on `scrim` (gradient or chip) in `on-scrim`.
+    These two stay the same in both themes and are never used as surfaces.

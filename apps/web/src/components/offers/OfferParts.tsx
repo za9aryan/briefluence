@@ -11,17 +11,18 @@ import {
   type Platform,
 } from '@briefluence/shared';
 import {
-  Avatar,
   Badge,
   Button,
   Card,
   Checkbox,
   ChipGroup,
+  CoverChip,
   Field,
   FieldGrid,
   Icon,
   Inline,
   Input,
+  MediaCover,
   Select,
   Stack,
   Text,
@@ -103,36 +104,50 @@ export function OfferMeta({ offer }: { offer: Pick<OfferDto, 'contentFormats' | 
   );
 }
 
-/** Offer card in the brand feed. */
+/** Offer card in the brand feed: the blogger's photo on top (like a creator card), then the offer. */
 export function OfferCard({ offer, href }: { offer: FeedOfferDto; href: string }) {
   const t = useTranslations('offers');
+  const o = useOptions();
   const f = useFormat();
   const top = offer.blogger.socialAccounts[0];
   return (
-    <Card className="flex h-full flex-col">
-      <Stack gap={4} className="flex-1">
-        <Inline gap={2} justify="between" align="start">
-          <Inline gap={2} align="center" className="min-w-0">
-            <Avatar name={offer.blogger.displayName} src={offer.blogger.avatarUrl} size="sm" />
-            <Stack gap={0} className="min-w-0">
-              <Link
-                href={`/brand/influencers/${offer.blogger.id}`}
-                className="truncate text-body font-bold text-ink hover:text-primary-text hover:underline"
-              >
-                {offer.blogger.displayName}
-                {offer.blogger.verified && (
-                  <Icon name="verified" tone="success" className="ml-1 inline" />
-                )}
-              </Link>
-              {top && (
-                <Text size="small" tone="muted" truncate>
-                  @{top.username} · {f.compact(top.followers)}
-                </Text>
-              )}
-            </Stack>
-          </Inline>
-          <CollaborationBadge type={offer.collaborationType} />
-        </Inline>
+    <Card p={0} className="flex h-full flex-col overflow-hidden">
+      <MediaCover
+        aspect="photo"
+        src={offer.blogger.coverUrl}
+        alt={offer.blogger.displayName}
+        fallback={
+          <span className="text-display font-extrabold text-primary-text" aria-hidden>
+            {initials(offer.blogger.displayName)}
+          </span>
+        }
+        topLeft={
+          top && (
+            <CoverChip>
+              <Icon name={PLATFORM_ICON[top.platform]} size="xs" label={top.platform} />
+              {f.compact(top.followers)}
+            </CoverChip>
+          )
+        }
+        topRight={<CollaborationBadge type={offer.collaborationType} />}
+        bottom={
+          <Stack gap={0} className="min-w-0">
+            <Link
+              href={`/brand/influencers/${offer.blogger.id}`}
+              className="truncate text-h2 font-bold text-on-scrim hover:underline"
+            >
+              {offer.blogger.displayName}
+              {offer.blogger.verified && <Icon name="verified" className="ml-1 inline" />}
+            </Link>
+            {offer.blogger.niches.length > 0 && (
+              <span className="truncate text-small text-on-scrim/85">
+                {offer.blogger.niches.map(o.niche).join(', ')}
+              </span>
+            )}
+          </Stack>
+        }
+      />
+      <Stack gap={4} className="flex-1 p-4 md:p-6">
         <Link href={href} className="text-h2 font-bold text-ink hover:text-primary-text">
           {offer.title}
         </Link>
@@ -147,7 +162,12 @@ export function OfferCard({ offer, href }: { offer: FeedOfferDto; href: string }
         )}
         <OfferMeta offer={offer} />
       </Stack>
-      <Inline gap={2} justify="between" align="center" className="mt-4 border-t border-line pt-4">
+      <Inline
+        gap={2}
+        justify="between"
+        align="center"
+        className="mx-4 mb-4 border-t border-line pt-4 md:mx-6 md:mb-6"
+      >
         <OfferPrice offer={offer} size="body" />
         <Inline gap={2} align="center">
           <Text size="small" tone="muted">
@@ -381,4 +401,13 @@ export function OfferForm({
       </form>
     </Card>
   );
+}
+
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join('');
 }

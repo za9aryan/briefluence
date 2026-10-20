@@ -13,6 +13,8 @@
   --color-on-primary: var(--bf-on-primary);
   --color-sun: var(--bf-sun);
   --color-success: var(--bf-success);
+  --color-scrim: var(--bf-scrim);
+  --color-on-scrim: var(--bf-on-scrim);
   --color-chart-1: var(--bf-chart-1);
   --color-chart-2: var(--bf-chart-2);
   --color-chart-3: var(--bf-chart-3);

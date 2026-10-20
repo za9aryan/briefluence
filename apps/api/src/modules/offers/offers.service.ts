@@ -38,6 +38,13 @@ const BLOGGER_CARD = {
     status: true,
     userId: true,
     socialAccounts: true,
+    // Cover fallback when the blogger has no profile photo.
+    portfolio: {
+      where: { reviewStatus: 'APPROVED' },
+      orderBy: { createdAt: 'desc' },
+      take: 1,
+      select: { imageUrl: true },
+    },
   },
 } as const;
 type BloggerRow = Prisma.InfluencerProfileGetPayload<typeof BLOGGER_CARD>;
@@ -46,6 +53,8 @@ const bloggerCard = (p: BloggerRow) => ({
   id: p.id,
   displayName: p.displayName,
   avatarUrl: p.avatarUrl,
+  /** Card photo: profile photo, else the latest approved portfolio image. */
+  coverUrl: p.avatarUrl ?? p.portfolio[0]?.imageUrl ?? null,
   country: p.country,
   city: p.city,
   niches: p.niches,
