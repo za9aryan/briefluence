@@ -32,6 +32,7 @@ const ICON: Record<NotificationType, { icon: IconName; tone: IconBubbleTone }> =
   OFFER_APPROVED: { icon: 'check-circle', tone: 'success' },
   OFFER_REJECTED: { icon: 'edit', tone: 'primary' },
   PORTFOLIO_REVIEW_PENDING: { icon: 'image', tone: 'neutral' },
+  PORTFOLIO_APPROVED: { icon: 'check-circle', tone: 'success' },
   PORTFOLIO_REJECTED: { icon: 'image', tone: 'primary' },
   OFFER_REQUEST_NEW: { icon: 'building', tone: 'primary' },
   OFFER_REQUEST_ACCEPTED: { icon: 'check-circle', tone: 'success' },

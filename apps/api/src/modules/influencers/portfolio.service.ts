@@ -163,10 +163,14 @@ export class PortfolioService {
   }
 
   async approve(id: string) {
-    await this.pending(id);
+    const item = await this.pending(id);
     await this.prisma.portfolioItem.update({
       where: { id },
       data: { reviewStatus: 'APPROVED', reviewedAt: this.clock.now(), reviewNote: null },
+    });
+    await this.notifications.notify(item.influencer.userId, 'PORTFOLIO_APPROVED', {
+      params: { title: item.title },
+      link: '/influencer/account#portfolio',
     });
   }
 

@@ -34,6 +34,8 @@ export const EMAIL_POLICY: Record<NotificationType, 'instant' | 'digest' | 'none
   OFFER_REQUEST_DECLINED: 'none',
   // One per uploaded item: in-app only so admins are not emailed for each.
   PORTFOLIO_REVIEW_PENDING: 'none',
+  // In-app only: a blogger may get several approvals at once.
+  PORTFOLIO_APPROVED: 'none',
   PORTFOLIO_REJECTED: 'instant',
   TRIAL_ENDING: 'instant',
   PAYMENT_SUCCEEDED: 'instant',

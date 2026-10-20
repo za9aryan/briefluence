@@ -100,6 +100,7 @@ describe('blogger portfolio & FAQ (e2e)', () => {
     expect(queue[0].influencer.displayName).toBe(influencerProfile.displayName);
     await inf.admin.agent.post(`${API}/admin/portfolio/${created.body.id}/approve`).expect(204);
 
+    expect(await ctx.prisma.notification.count({ where: { type: 'PORTFOLIO_APPROVED' } })).toBe(1);
     view = (await brand.agent.get(`${API}/influencers/${inf.profileId}`).expect(200)).body;
     expect(view.faq).toEqual([{ key: 'brandsWorked', answer: 'Local cafes and a gym' }]);
     expect(view.portfolio).toHaveLength(1);

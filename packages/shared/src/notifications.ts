@@ -605,6 +605,23 @@ const CATALOG: Record<NotificationType, { cta: L3; render: Record<NotificationLo
         }),
       },
     },
+    PORTFOLIO_APPROVED: {
+      cta: { en: 'Open portfolio', ru: 'Открыть портфолио', hy: 'Բացել պորտֆոլիոն' },
+      render: {
+        en: (p) => ({
+          title: 'Portfolio item approved',
+          body: `"${s(p.title)}" is now visible to brands.`,
+        }),
+        ru: (p) => ({
+          title: 'Работа в портфолио одобрена',
+          body: `«${s(p.title)}» теперь видят бренды.`,
+        }),
+        hy: (p) => ({
+          title: 'Պորտֆոլիոյի աշխատանքը հաստատվել է',
+          body: `«${s(p.title)}»-ն այժմ տեսանելի է բրենդներին։`,
+        }),
+      },
+    },
     PORTFOLIO_REJECTED: {
       cta: { en: 'Open portfolio', ru: 'Открыть портфолио', hy: 'Բացել պորտֆոլիոն' },
       render: {
