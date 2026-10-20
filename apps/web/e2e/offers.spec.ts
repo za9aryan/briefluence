@@ -59,9 +59,22 @@ test('blogger offer → admin approves → brand requests → blogger accepts �
   await blogger.getByLabel('Price', { exact: true }).fill('10000');
   await blogger.getByRole('checkbox', { name: 'Instagram' }).click();
   await blogger.getByRole('checkbox', { name: 'Story' }).click();
+  // Optional cover image (1×1 PNG; the API checks the magic bytes).
+  await blogger.locator('input[type=file]').setInputFiles({
+    name: 'cover.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      'base64',
+    ),
+  });
+  await expect(blogger.getByRole('button', { name: 'Change' })).toBeVisible();
   await blogger.getByRole('button', { name: 'Send for review' }).click();
   await blogger.waitForURL('**/influencer/offers');
   await expect(blogger.getByText(/In review\. We check every offer/)).toBeVisible();
+  await expect(blogger.getByRole('img', { name: title })).toBeVisible();
+  if (process.env.E2E_SHOTS)
+    await blogger.screenshot({ path: `${process.env.E2E_SHOTS}/my-offers.png`, fullPage: true });
 
   // ── Admin approves the offer on the review page ──
   await admin.goto('/admin/offer-review');

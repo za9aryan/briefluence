@@ -25,6 +25,7 @@ import { BrandsService } from '../brands/brands.service';
 import { publicPortfolioItem } from '../influencers/portfolio.service';
 import { publicAccount } from '../influencers/serializers';
 import { NotificationsService } from '../notifications/notifications.service';
+import { StorageService } from '../storage/storage.service';
 
 /** Blogger card as brands see it: public profile + approved accounts, never contacts. */
 const BLOGGER_CARD = {
@@ -87,6 +88,7 @@ export class OffersService {
     private readonly brands: BrandsService,
     private readonly notifications: NotificationsService,
     private readonly clock: Clock,
+    private readonly storage: StorageService,
   ) {}
 
   // ─── Blogger side ────────────────────────────────────────
@@ -114,7 +116,14 @@ export class OffersService {
     return sub;
   }
 
+  /** Cover images must be files we stored for offers, not links to anywhere. */
+  private checkImage(url: string | null | undefined) {
+    if (url && !this.storage.isOwnUpload(url, 'offer'))
+      throw new AppError('VALIDATION_FAILED', 'Upload the image first', { field: 'imageUrl' });
+  }
+
   async create(userId: string, data: OfferInput) {
+    this.checkImage(data.imageUrl);
     await this.requirePlan(userId);
     const profile = await this.profileOf(userId);
     return this.prisma.offer.create({
@@ -126,6 +135,7 @@ export class OffersService {
     const offer = await this.ownOffer(userId, id);
     if (!isOfferEditable(offer.status))
       throw new AppError('DEAL_NOT_EDITABLE', 'Pause the offer before editing it');
+    if (data.imageUrl !== offer.imageUrl) this.checkImage(data.imageUrl);
     return this.prisma.offer.update({ where: { id }, data });
   }
 

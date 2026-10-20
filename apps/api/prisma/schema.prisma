@@ -540,6 +540,8 @@ model Offer {
   niches            String[]
   /// Who the blogger wants to work with, e.g. "real estate brokers"
   idealBrands       String?
+  /// Optional cover image (our own upload, kind "offer")
+  imageUrl          String?
   status            OfferStatus       @default(DRAFT)
   submittedAt       DateTime?
   reviewedAt        DateTime?

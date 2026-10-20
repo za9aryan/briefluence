@@ -36,6 +36,21 @@ describe('offers', () => {
       'IN_REVIEW',
     );
   });
+  it('a new or changed cover image needs a review; no image keeps the old key', () => {
+    const approvedKey = offerReviewKey(offer);
+    expect(offerReviewKey({ ...offer, imageUrl: null })).toBe(approvedKey);
+    expect(
+      offerPublishTarget({ ...offer, imageUrl: 'https://cdn.example/a.jpg', approvedKey }),
+    ).toBe('IN_REVIEW');
+    const withImage = offerReviewKey({ ...offer, imageUrl: 'https://cdn.example/a.jpg' });
+    expect(
+      offerPublishTarget({
+        ...offer,
+        imageUrl: 'https://cdn.example/b.jpg',
+        approvedKey: withImage,
+      }),
+    ).toBe('IN_REVIEW');
+  });
   it('enforces the plan offer limit on live offers', () => {
     expect(isOfferLive('IN_REVIEW')).toBe(true);
     expect(isOfferLive('DRAFT')).toBe(false);

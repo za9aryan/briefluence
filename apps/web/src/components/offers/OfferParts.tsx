@@ -34,6 +34,7 @@ import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import { CollaborationBadge } from '@/components/domain/badges';
 import { useFieldError } from '@/components/forms/form';
+import { ImageUpload } from '@/components/forms/ImageUpload';
 import { useFormat } from '@/lib/hooks/format';
 import { PLATFORM_ICON, useOptions } from '@/lib/hooks/options';
 import type { FeedOfferDto, OfferDto } from '@/lib/types';
@@ -114,7 +115,7 @@ export function OfferCard({ offer, href }: { offer: FeedOfferDto; href: string }
     <Card p={0} className="flex h-full flex-col overflow-hidden">
       <MediaCover
         aspect="photo"
-        src={offer.blogger.coverUrl}
+        src={offer.imageUrl ?? offer.blogger.coverUrl}
         alt={offer.blogger.displayName}
         fallback={
           <span className="text-display font-extrabold text-primary-text" aria-hidden>
@@ -192,6 +193,7 @@ export const EMPTY_OFFER: OfferFormValues = {
   contentFormats: [],
   niches: [],
   idealBrands: null,
+  imageUrl: null,
 };
 
 /** Create / edit form. Prices are typed in major units; "price on request" sends null. */
@@ -283,6 +285,19 @@ export function OfferForm({
               />
             )}
           </Field>
+          <Stack gap={1}>
+            <ImageUpload
+              kind="offer"
+              wide
+              name={v.title}
+              label={`${t('fields.image')} · ${tc('optional')}`}
+              value={v.imageUrl}
+              onChange={(url) => set('imageUrl', url)}
+            />
+            <Text size="small" tone="muted">
+              {t('fields.imageHint')}
+            </Text>
+          </Stack>
           <FieldGrid cols={{ base: 1, sm: 2 }}>
             <Field label={t('fields.price')} error={err('priceMinor')}>
               {({ id, invalid }) => (

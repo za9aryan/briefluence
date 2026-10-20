@@ -38,6 +38,7 @@ export interface OfferReviewFields {
   currency: string;
   contentFormats: string[];
   idealBrands: string | null;
+  imageUrl?: string | null;
 }
 
 export function offerReviewKey(o: OfferReviewFields): string {
@@ -48,6 +49,8 @@ export function offerReviewKey(o: OfferReviewFields): string {
     o.currency,
     [...o.contentFormats].sort(),
     o.idealBrands?.trim() || null,
+    // Appended only when set, so offers approved before covers existed keep their key.
+    ...(o.imageUrl ? [o.imageUrl] : []),
   ]);
 }
 

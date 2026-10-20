@@ -341,6 +341,8 @@ export interface OfferDto {
   contentFormats: ContentFormat[];
   niches: string[];
   idealBrands: string | null;
+  /** Optional cover image (sample of the work). */
+  imageUrl: string | null;
   status: OfferStatus;
   reviewNote?: string | null;
   submittedAt?: string | null;

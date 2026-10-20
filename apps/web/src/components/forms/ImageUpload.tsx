@@ -14,7 +14,7 @@ export function ImageUpload({
   label,
   wide,
 }: {
-  kind: 'avatar' | 'logo' | 'deal' | 'portfolio';
+  kind: 'avatar' | 'logo' | 'deal' | 'portfolio' | 'offer';
   value: string | null | undefined;
   onChange: (url: string | null) => void;
   name: string;

@@ -12,6 +12,7 @@ const KIND_ROLES: Record<UploadKind, string[]> = {
   logo: ['BRAND'],
   deal: ['BRAND'],
   portfolio: ['INFLUENCER'],
+  offer: ['INFLUENCER'],
 };
 
 @ApiTags('uploads')

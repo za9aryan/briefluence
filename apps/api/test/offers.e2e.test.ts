@@ -217,4 +217,39 @@ describe('blogger offers (e2e)', () => {
       (await inf.agent.post(`${API}/offers/${d.body.id}/publish`).expect(200)).body.status,
     ).toBe('IN_REVIEW');
   });
+
+  it('cover image: only our own uploads, and a new cover goes back to review', async () => {
+    const inf = await verifiedBlogger();
+    const png = Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+      'base64',
+    );
+    const upload = async () =>
+      (
+        await inf.agent
+          .post(`${API}/uploads/offer`)
+          .attach('file', png, { filename: 'c.png', contentType: 'image/png' })
+          .expect(201)
+      ).body.url as string;
+    await inf.agent
+      .post(`${API}/offers`)
+      .send(offerInput({ imageUrl: 'https://elsewhere.example/x.png' }))
+      .expect(400);
+    const first = await upload();
+    const created = await inf.agent
+      .post(`${API}/offers`)
+      .send(offerInput({ imageUrl: first }))
+      .expect(201);
+    await inf.agent.post(`${API}/offers/${created.body.id}/publish`).expect(200);
+    await inf.admin.agent.post(`${API}/admin/offers/${created.body.id}/approve`).expect(204);
+
+    await inf.agent.post(`${API}/offers/${created.body.id}/pause`).expect(200);
+    const second = await upload();
+    await inf.agent
+      .patch(`${API}/offers/${created.body.id}`)
+      .send(offerInput({ imageUrl: second }))
+      .expect(200);
+    const again = await inf.agent.post(`${API}/offers/${created.body.id}/publish`).expect(200);
+    expect(again.body.status).toBe('IN_REVIEW');
+  });
 });

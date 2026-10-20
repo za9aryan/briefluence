@@ -111,6 +111,13 @@ export default function MyOfferPage() {
       <OfferReviewNotice offer={o} />
       <Card>
         <Stack gap={4}>
+          {o.imageUrl && (
+            <img
+              src={o.imageUrl}
+              alt={o.title}
+              className="aspect-[16/9] w-full rounded-card object-cover"
+            />
+          )}
           <Inline gap={2} wrap>
             <CollaborationBadge type={o.collaborationType} />
             <OfferMeta offer={o} />

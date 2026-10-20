@@ -22,6 +22,12 @@ export default {
       'Կարճ և կոնկրետ՝ ինչ ես հրապարակում, որտեղ և ինչ գնով։',
     ],
     fields: {
+      image: ['Cover image', 'Обложка', 'Շապիկ'],
+      imageHint: [
+        'A photo or screenshot of this kind of work. It makes your card stand out; without it we use your profile photo.',
+        'Фото или скриншот такой работы. С ним карточка заметнее; без него покажем фото профиля.',
+        'Այսպիսի աշխատանքի լուսանկար կամ սքրինշոթ։ Դրանով քարտը ավելի նկատելի է, առանց դրա կցուցադրենք պրոֆիլի նկարը։',
+      ],
       title: ['Title', 'Название', 'Վերնագիր'],
       titleHint: [
         'For example: 1 Reel for 20,000 AMD',

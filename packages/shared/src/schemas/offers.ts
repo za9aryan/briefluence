@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { NICHES } from '../constants';
 import { COLLABORATION_TYPES, CONTENT_FORMATS, CURRENCIES, PLATFORMS } from '../enums';
-import { minorAmount, optionalText, paginationSchema } from './common';
+import { minorAmount, optionalText, optionalUrl, paginationSchema } from './common';
 
 /** What a blogger offers: "1 Reel for 20,000 AMD", "Long-term work with real estate brokers". */
 export const offerInputSchema = z.object({
@@ -18,6 +18,8 @@ export const offerInputSchema = z.object({
   contentFormats: z.array(z.enum(CONTENT_FORMATS)).min(1, 'pickOne'),
   niches: z.array(z.enum(NICHES)).default([]),
   idealBrands: optionalText(200),
+  /** Optional cover (a sample of the work), uploaded through /uploads/offer. */
+  imageUrl: optionalUrl,
 });
 export type OfferInput = z.infer<typeof offerInputSchema>;
 

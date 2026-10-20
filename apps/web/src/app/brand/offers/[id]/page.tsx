@@ -76,6 +76,13 @@ export default function BrandOfferPage() {
         <Stack gap={6}>
           <Card>
             <Stack gap={4}>
+              {d.imageUrl && (
+                <img
+                  src={d.imageUrl}
+                  alt={d.title}
+                  className="aspect-[16/9] w-full rounded-card object-cover"
+                />
+              )}
               <Inline gap={2} wrap>
                 <CollaborationBadge type={d.collaborationType} />
                 <OfferMeta offer={d} />

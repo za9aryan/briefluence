@@ -74,6 +74,7 @@ export default function EditOfferPage() {
             contentFormats: o.contentFormats,
             niches: o.niches as never,
             idealBrands: o.idealBrands,
+            imageUrl: o.imageUrl,
           }}
           busy={busy}
           error={error}

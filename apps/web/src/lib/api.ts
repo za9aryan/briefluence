@@ -86,7 +86,7 @@ export const api = {
   put: <T>(path: string, body: unknown) => request<T>('PUT', path, body),
   patch: <T>(path: string, body: unknown) => request<T>('PATCH', path, body),
   del: <T>(path: string) => request<T>('DELETE', path),
-  upload: (kind: 'avatar' | 'logo' | 'deal' | 'portfolio', file: File) => {
+  upload: (kind: 'avatar' | 'logo' | 'deal' | 'portfolio' | 'offer', file: File) => {
     const form = new FormData();
     form.append('file', file);
     return request<{ url: string }>('POST', `/uploads/${kind}`, form);

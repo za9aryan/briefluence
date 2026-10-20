@@ -1,12 +1,14 @@
 'use client';
-import { isOfferEditable } from '@briefluence/shared';
+import { isOfferEditable, isPortfolioVisible } from '@briefluence/shared';
 import {
   Badge,
   Button,
   Card,
   EmptyState,
+  Grid,
   Icon,
   Inline,
+  MediaCover,
   Menu,
   MenuItem,
   Skeleton,
@@ -25,6 +27,7 @@ import {
   OfferReviewNotice,
   useOfferActions,
 } from '@/components/offers/useOfferActions';
+import { usePortfolio } from '@/components/influencer/PortfolioSettings';
 import { BriefsChecklist, useBloggerUnlocked } from '@/components/influencer/StartTrial';
 import { api } from '@/lib/api';
 import type { MyOfferDto } from '@/lib/types';
@@ -41,6 +44,10 @@ export default function MyOffersPage() {
     enabled: unlocked,
   });
   const act = useOfferActions();
+  // Cards without their own cover use the profile photo, else the latest approved portfolio image.
+  const portfolio = usePortfolio();
+  const fallbackCover =
+    me?.influencer?.avatarUrl ?? portfolio.data?.find(isPortfolioVisible)?.imageUrl ?? null;
 
   return (
     <Stack gap={6}>
@@ -74,119 +81,141 @@ export default function MyOffersPage() {
           }
         />
       ) : (
-        <Stack gap={4}>
+        <Grid cols={{ base: 1, md: 2, xl: 3 }} gap={4}>
           {list.data.map((o) => {
             const publishLabel = PUBLISH_LABEL[o.status as keyof typeof PUBLISH_LABEL];
             return (
-              <Card key={o.id} p={4}>
-                <Stack gap={4}>
-                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                    <Stack gap={2} className="min-w-0">
-                      <Inline gap={2} wrap>
-                        <OfferStatusBadge status={o.status} />
-                        <CollaborationBadge type={o.collaborationType} />
-                        <OfferMeta offer={o} />
+              <Card key={o.id} p={0} className="flex h-full flex-col overflow-hidden">
+                <MediaCover
+                  src={o.imageUrl ?? fallbackCover}
+                  alt={o.title}
+                  fallback={<Icon name="sparkles" className="size-16 text-primary/25" />}
+                  topLeft={<OfferStatusBadge status={o.status} />}
+                  topRight={<CollaborationBadge type={o.collaborationType} />}
+                  bottom={
+                    <Link
+                      href={`/influencer/offers/${o.id}`}
+                      className="line-clamp-2 text-h2 font-bold text-on-scrim hover:underline"
+                    >
+                      {o.title}
+                    </Link>
+                  }
+                />
+                <Stack gap={4} className="flex-1 p-4">
+                  <Inline gap={2} justify="between" align="center" wrap>
+                    <OfferPrice offer={o} size="body" />
+                    <OfferMeta offer={o} />
+                  </Inline>
+                  <OfferReviewNotice offer={o} />
+                  <Stack gap={4} className="mt-auto border-t border-line pt-4">
+                    <Inline gap={2} justify="between" align="center" wrap>
+                      <Inline gap={2}>
+                        <Text weight="bold">{t('requestsCount', { count: o.requestCount })}</Text>
+                        {o.newRequestCount > 0 && (
+                          <Badge tone="primary">
+                            {t('newCount', { count: o.newRequestCount })}
+                          </Badge>
+                        )}
                       </Inline>
+                      <Text size="small" tone="muted">
+                        {t('views', { count: o.viewCount })}
+                      </Text>
+                    </Inline>
+                    <Inline gap={1}>
                       <Link
                         href={`/influencer/offers/${o.id}`}
-                        className="text-h2 font-bold text-ink hover:text-primary-text"
+                        className={buttonStyles({
+                          variant: 'secondary',
+                          size: 'sm',
+                          className: 'flex-1',
+                        })}
                       >
-                        {o.title}
+                        {t('requestsTitle')}
                       </Link>
-                      <OfferPrice offer={o} size="body" />
-                    </Stack>
-                    <Inline gap={4} justify={{ base: 'between', md: 'end' }} className="shrink-0">
-                      <Stack gap={0} className="text-right">
-                        <Inline gap={2} justify="end">
-                          <Text weight="bold">{t('requestsCount', { count: o.requestCount })}</Text>
-                          {o.newRequestCount > 0 && (
-                            <Badge tone="primary">
-                              {t('newCount', { count: o.newRequestCount })}
-                            </Badge>
-                          )}
-                        </Inline>
-                        <Text size="small" tone="muted">
-                          {t('views', { count: o.viewCount })}
-                        </Text>
-                      </Stack>
-                      <Inline gap={1}>
-                        <Link
-                          href={`/influencer/offers/${o.id}`}
-                          className={buttonStyles({ variant: 'secondary', size: 'sm' })}
-                        >
-                          {t('requestsTitle')}
-                        </Link>
-                        <Menu
-                          trigger={(p) => (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              aria-label={t('actions')}
-                              onClick={p.toggle}
-                              aria-expanded={p['aria-expanded']}
-                              aria-haspopup={p['aria-haspopup']}
-                            >
-                              <Icon name="menu" />
-                            </Button>
-                          )}
-                        >
-                          {(close) => (
-                            <>
-                              {isOfferEditable(o.status) && (
-                                <Link
-                                  href={`/influencer/offers/${o.id}/edit`}
-                                  onClick={close}
-                                  className="flex min-h-11 items-center gap-2 px-4 text-small text-ink hover:bg-surface"
-                                >
-                                  <Icon name="edit" /> {t('edit')}
-                                </Link>
-                              )}
-                              {publishLabel && (
-                                <MenuItem
-                                  className="min-h-11 whitespace-nowrap px-4"
-                                  onClick={() => {
-                                    close();
-                                    act.mutate({ id: o.id, action: 'publish' });
-                                  }}
-                                >
-                                  <Icon name="play" /> {t(publishLabel)}
-                                </MenuItem>
-                              )}
-                              {o.status === 'ACTIVE' && (
-                                <MenuItem
-                                  className="min-h-11 px-4"
-                                  onClick={() => {
-                                    close();
-                                    act.mutate({ id: o.id, action: 'pause' });
-                                  }}
-                                >
-                                  <Icon name="pause" /> {t('pause')}
-                                </MenuItem>
-                              )}
-                              {o.status !== 'CLOSED' && (
-                                <MenuItem
-                                  className="min-h-11 px-4 text-primary-text"
-                                  onClick={() => {
-                                    close();
-                                    act.mutate({ id: o.id, action: 'close' });
-                                  }}
-                                >
-                                  <Icon name="x-circle" /> {t('close')}
-                                </MenuItem>
-                              )}
-                            </>
-                          )}
-                        </Menu>
-                      </Inline>
+                      <OfferActionsMenu offer={o} publishLabel={publishLabel} act={act} />
                     </Inline>
-                  </div>
-                  <OfferReviewNotice offer={o} />
+                  </Stack>
                 </Stack>
               </Card>
             );
           })}
-        </Stack>
+        </Grid>
       )}
     </Stack>
+  );
+}
+
+function OfferActionsMenu({
+  offer: o,
+  publishLabel,
+  act,
+}: {
+  offer: MyOfferDto;
+  publishLabel: (typeof PUBLISH_LABEL)[keyof typeof PUBLISH_LABEL] | undefined;
+  act: ReturnType<typeof useOfferActions>;
+}) {
+  const t = useTranslations('offers');
+  return (
+    <Menu
+      trigger={(p) => (
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={t('actions')}
+          onClick={p.toggle}
+          aria-expanded={p['aria-expanded']}
+          aria-haspopup={p['aria-haspopup']}
+        >
+          <Icon name="menu" />
+        </Button>
+      )}
+    >
+      {(close) => (
+        <>
+          {isOfferEditable(o.status) && (
+            <Link
+              href={`/influencer/offers/${o.id}/edit`}
+              onClick={close}
+              className="flex min-h-11 items-center gap-2 px-4 text-small text-ink hover:bg-surface"
+            >
+              <Icon name="edit" /> {t('edit')}
+            </Link>
+          )}
+          {publishLabel && (
+            <MenuItem
+              className="min-h-11 whitespace-nowrap px-4"
+              onClick={() => {
+                close();
+                act.mutate({ id: o.id, action: 'publish' });
+              }}
+            >
+              <Icon name="play" /> {t(publishLabel)}
+            </MenuItem>
+          )}
+          {o.status === 'ACTIVE' && (
+            <MenuItem
+              className="min-h-11 px-4"
+              onClick={() => {
+                close();
+                act.mutate({ id: o.id, action: 'pause' });
+              }}
+            >
+              <Icon name="pause" /> {t('pause')}
+            </MenuItem>
+          )}
+          {o.status !== 'CLOSED' && (
+            <MenuItem
+              className="min-h-11 px-4 text-primary-text"
+              onClick={() => {
+                close();
+                act.mutate({ id: o.id, action: 'close' });
+              }}
+            >
+              <Icon name="x-circle" /> {t('close')}
+            </MenuItem>
+          )}
+        </>
+      )}
+    </Menu>
   );
 }

@@ -7,6 +7,8 @@
   "editTitle": "Edit offer",
   "formLead": "Keep it short and concrete: what you post, where, and the price.",
   "fields": {
+    "image": "Cover image",
+    "imageHint": "A photo or screenshot of this kind of work. It makes your card stand out; without it we use your profile photo.",
     "title": "Title",
     "titleHint": "For example: 1 Reel for 20,000 AMD",
     "description": "Description",
