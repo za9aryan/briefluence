@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   canOfferTransition,
+  answeredFaq,
   canPublishAnotherOffer,
   effectiveTier,
   isAccountUsable,
@@ -21,6 +22,7 @@ import { Clock } from '../../common/clock';
 import { PrismaService } from '../../common/prisma.service';
 import { toState } from '../billing/billing.service';
 import { BrandsService } from '../brands/brands.service';
+import { publicPortfolioItem } from '../influencers/portfolio.service';
 import { publicAccount } from '../influencers/serializers';
 import { NotificationsService } from '../notifications/notifications.service';
 
@@ -313,7 +315,11 @@ export class OffersService {
     });
     if (!offer) throw notFound('Offer');
     const { influencer, ...o } = offer;
-    if (viewer.role === 'ADMIN') return { ...o, blogger: bloggerCard(influencer) };
+    if (viewer.role === 'ADMIN')
+      return {
+        ...o,
+        blogger: { ...bloggerCard(influencer), ...(await this.aboutBlogger(influencer.id)) },
+      };
     if (viewer.role === 'INFLUENCER') {
       if (influencer.userId !== viewer.id) throw notFound('Offer');
       return { ...o, blogger: bloggerCard(influencer) };
@@ -335,12 +341,26 @@ export class OffersService {
     return {
       ...forBrand(o as Offer),
       viewCount: o.viewCount + (counted ? 1 : 0),
-      blogger: bloggerCard(influencer),
+      blogger: { ...bloggerCard(influencer), ...(await this.aboutBlogger(influencer.id)) },
       myRequest: myRequest && {
         ...myRequest,
         contacts: contacts && { method: contacts.contactMethod, value: contacts.contactValue },
       },
     };
+  }
+
+  /** Answered FAQ and approved portfolio, for the blogger card on the offer page. */
+  private async aboutBlogger(influencerId: string) {
+    const p = await this.prisma.influencerProfile.findUniqueOrThrow({
+      where: { id: influencerId },
+      select: {
+        faqBrandsWorked: true,
+        faqAudience: true,
+        faqBrandsWanted: true,
+        portfolio: { where: { reviewStatus: 'APPROVED' }, orderBy: { createdAt: 'desc' } },
+      },
+    });
+    return { faq: answeredFaq(p), portfolio: p.portfolio.map(publicPortfolioItem) };
   }
 
   private async recordView(offerId: string, brandId: string) {

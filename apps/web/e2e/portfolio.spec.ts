@@ -140,4 +140,27 @@ test('portfolio + FAQ: blogger adds work → admin approves → brand sees it an
   await expect(brand.getByText('What brands have you worked with?')).toHaveCount(0);
   await expect(brand.getByRole('link', { name: 'instagram.com' })).toBeVisible();
   if (shots) await brand.screenshot({ path: `${shots}/brand.png`, fullPage: true });
+
+  // ── The blogger card on an offer page shows the same portfolio and FAQ ──
+  const offer = await (
+    await blogger.request.post('/api/v1/offers', {
+      data: {
+        title: `1 Story ${id}`,
+        description: 'One Instagram story about your place with a link sticker.',
+        priceMinor: 1_000_000,
+        currency: 'AMD',
+        collaborationType: 'ONE_TIME',
+        platforms: ['INSTAGRAM'],
+        contentFormats: ['STORY'],
+        niches: ['food'],
+      },
+    })
+  ).json();
+  await blogger.request.post(`/api/v1/offers/${offer.id}/publish`);
+  await admin.request.post(`/api/v1/admin/offers/${offer.id}/approve`);
+  await brand.goto(`/brand/offers/${offer.id}`);
+  await expect(brand.getByRole('button', { name: `Story for a coffee shop ${id}` })).toBeVisible();
+  await brand.getByText('Who is your audience?').click();
+  await expect(brand.getByText('Women 20–30 in Yerevan who love food')).toBeVisible();
+  if (shots) await brand.screenshot({ path: `${shots}/offer.png`, fullPage: true });
 });

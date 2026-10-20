@@ -26,6 +26,7 @@ import { AccountLine, AccountStats } from '@/components/domain/AccountStats';
 import { CollaborationBadge } from '@/components/domain/badges';
 import { ContactLink } from '@/components/domain/ContactLink';
 import { OfferMeta, OfferPrice, OfferRequestBadge } from '@/components/offers/OfferParts';
+import { FaqAnswers, PortfolioGallery } from '@/components/portfolio/PortfolioParts';
 import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { useOptions } from '@/lib/hooks/options';
@@ -36,6 +37,7 @@ export default function BrandOfferPage() {
   const { id } = useParams<{ id: string }>();
   const t = useTranslations('offers');
   const tc = useTranslations('common');
+  const tp = useTranslations('portfolio.view');
   const o = useOptions();
   const toast = useToast();
   const errorMessage = useErrorMessage();
@@ -144,6 +146,22 @@ export default function BrandOfferPage() {
                 <Button size="lg" block onClick={() => setOpen(true)}>
                   {t('request')}
                 </Button>
+              )}
+              {!!d.blogger.portfolio?.length && (
+                <Stack gap={2} className="border-t border-line pt-4">
+                  <Text size="small" weight="bold">
+                    {tp('portfolio')}
+                  </Text>
+                  <PortfolioGallery items={d.blogger.portfolio} compact />
+                </Stack>
+              )}
+              {!!d.blogger.faq?.length && (
+                <Stack gap={0} className="border-t border-line pt-4">
+                  <Text size="small" weight="bold">
+                    {tp('faq')}
+                  </Text>
+                  <FaqAnswers faq={d.blogger.faq} />
+                </Stack>
               )}
             </Stack>
           </Card>

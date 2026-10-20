@@ -192,4 +192,47 @@ describe('blogger portfolio & FAQ (e2e)', () => {
     expect(list.items[0].portfolio).toHaveLength(1);
     expect(list.items[0].portfolio[0].title).toBe('Approved work');
   });
+
+  it('offer page shows the blogger’s answered FAQ and approved work to brands', async () => {
+    const inf = await approvedInfluencer();
+    const brand = await brandWithDeal(inf.admin);
+    const imageUrl = await upload(inf.agent);
+    const approved = await inf.agent
+      .post(`${API}/influencers/me/portfolio`)
+      .send({ imageUrl, title: 'Approved work' })
+      .expect(201);
+    await inf.agent
+      .post(`${API}/influencers/me/portfolio`)
+      .send({ imageUrl, title: 'Pending work' })
+      .expect(201);
+    await inf.admin.agent.post(`${API}/admin/portfolio/${approved.body.id}/approve`).expect(204);
+    await inf.agent
+      .put(`${API}/influencers/me/faq`)
+      .send({ faqBrandsWanted: 'Restaurants and hotels' })
+      .expect(200);
+    const offer = await inf.agent
+      .post(`${API}/offers`)
+      .send({
+        title: '1 Story about your place',
+        description: 'One Instagram story with a link sticker and a short review of your product.',
+        priceMinor: 1_000_000,
+        currency: 'AMD',
+        collaborationType: 'ONE_TIME',
+        platforms: ['INSTAGRAM'],
+        contentFormats: ['STORY'],
+        niches: ['food'],
+      })
+      .expect(201);
+    await inf.agent.post(`${API}/offers/${offer.body.id}/publish`).expect(200);
+    await inf.admin.agent.post(`${API}/admin/offers/${offer.body.id}/approve`).expect(204);
+
+    const view = (await brand.agent.get(`${API}/offers/${offer.body.id}`).expect(200)).body;
+    expect(view.blogger.faq).toEqual([{ key: 'brandsWanted', answer: 'Restaurants and hotels' }]);
+    expect(view.blogger.portfolio.map((i: { title: string }) => i.title)).toEqual([
+      'Approved work',
+    ]);
+    // The feed stays light: no FAQ or portfolio per card.
+    const feed = (await brand.agent.get(`${API}/offers/feed`).expect(200)).body;
+    expect(feed.items[0].blogger).not.toHaveProperty('portfolio');
+  });
 });

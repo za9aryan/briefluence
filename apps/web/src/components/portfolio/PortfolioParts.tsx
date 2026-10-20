@@ -102,16 +102,39 @@ export function PortfolioTile({
 }
 
 /** Brand-facing grid; tapping an image opens it large with the full description. */
-export function PortfolioGallery({ items }: { items: PortfolioItemDto[] }) {
+export function PortfolioGallery({
+  items,
+  compact,
+}: {
+  items: PortfolioItemDto[];
+  /** Square thumbnails only (narrow side cards); title, text and link open in the large view. */
+  compact?: boolean;
+}) {
   const t = useTranslations('portfolio.view');
   const [open, setOpen] = useState<PortfolioItemDto | null>(null);
   return (
     <>
-      <Grid cols={{ base: 2, md: 3, lg: 4 }} gap={4}>
-        {items.map((i) => (
-          <PortfolioTile key={i.id} item={i} onOpen={() => setOpen(i)} />
-        ))}
-      </Grid>
+      {compact ? (
+        <div className="grid grid-cols-3 gap-2">
+          {items.map((i) => (
+            <button
+              key={i.id}
+              type="button"
+              onClick={() => setOpen(i)}
+              aria-label={i.title}
+              className="aspect-square overflow-hidden rounded-card border border-line bg-surface transition-colors hover:border-primary/40"
+            >
+              <img src={i.imageUrl} alt="" loading="lazy" className="size-full object-cover" />
+            </button>
+          ))}
+        </div>
+      ) : (
+        <Grid cols={{ base: 2, md: 3, lg: 4 }} gap={4}>
+          {items.map((i) => (
+            <PortfolioTile key={i.id} item={i} onOpen={() => setOpen(i)} />
+          ))}
+        </Grid>
+      )}
       <Modal
         open={!!open}
         onClose={() => setOpen(null)}

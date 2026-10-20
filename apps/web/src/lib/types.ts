@@ -371,7 +371,8 @@ export interface FeedOfferDto extends OfferDto {
 }
 
 export interface OfferDetailDto extends OfferDto {
-  blogger: OfferBloggerDto;
+  /** Plus the answered FAQ and approved portfolio (offer page only, not the feed). */
+  blogger: OfferBloggerDto & { faq?: FaqAnswerDto[]; portfolio?: PortfolioItemDto[] };
   myRequest?: {
     id: string;
     status: OfferRequestStatus;
