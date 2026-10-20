@@ -11,6 +11,7 @@ export default function ForBrandsPage() {
     <AudiencePage
       ns="brands"
       cta="/signup?role=BRAND"
+      stats={['roi', 'buy', 'banner']}
       features={[
         ['targeting', 'target'],
         ['reach', 'users'],

@@ -107,7 +107,29 @@
         "body": "Accept a blogger and you both get each other's contacts. No middlemen, no commission."
       }
     },
-    "cta": "Create a brand account"
+    "cta": "Create a brand account",
+    "stats": {
+      "title": "Why brands work with bloggers",
+      "lead": "Numbers from industry research on influencer marketing.",
+      "note": "Results vary by product, audience and campaign. These are external studies, not briefluence results.",
+      "items": {
+        "roi": {
+          "value": "$5.78",
+          "label": "average return brands report for every $1 spent on influencer marketing",
+          "source": "Influencer Marketing Hub, brand survey"
+        },
+        "buy": {
+          "value": "86%",
+          "label": "of shoppers buy something an influencer inspired at least once a year",
+          "source": "Sprout Social, 2024"
+        },
+        "banner": {
+          "value": "11×",
+          "label": "higher return than banner ads in a Nielsen Catalina Solutions campaign study",
+          "source": "TapInfluence & Nielsen Catalina Solutions"
+        }
+      }
+    }
   },
   "influencers": {
     "title": "Collabs that fit your audience",
