@@ -200,7 +200,7 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
               >
                 <Icon name="menu" size="md" />
               </Button>
-              <Logo href={HOME_BY_ROLE[role]} />
+              <Logo href={HOME_BY_ROLE[role]} compact />
             </div>
             <div className="hidden lg:block" />
             <div className="flex items-center gap-1">

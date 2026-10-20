@@ -11,7 +11,9 @@ import {
   Icon,
   Card,
   EmptyState,
+  CoverChip,
   Inline,
+  MediaCover,
   Skeleton,
   Stack,
   Tabs,
@@ -26,11 +28,13 @@ import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
 import { CONTACT_ICON } from '@/components/brand/ContactMethodFields';
 import { BrandAvatar, useBrandName } from '@/components/domain/BrandIdentity';
+import { DealCoverFallback } from '@/components/domain/DealCard';
 import { ApplicationStatusBadge } from '@/components/domain/badges';
 import { Compensation } from '@/components/domain/Compensation';
 import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { useFormat } from '@/lib/hooks/format';
+import { PLATFORM_ICON } from '@/lib/hooks/options';
 import type { MyApplicationDto } from '@/lib/types';
 
 /** Tabs in the order an application moves: in progress → shortlisted → accepted, or closed. */
@@ -45,6 +49,7 @@ export default function MyApplicationsPage() {
   const t = useTranslations('applications');
   const tr = useTranslations('enums.rejectionReason');
   const tm = useTranslations('enums.contactMethod');
+  const tf = useTranslations('enums.contentFormat');
   const f = useFormat();
   const brandName = useBrandName();
   const toast = useToast();
@@ -95,8 +100,26 @@ export default function MyApplicationsPage() {
       ) : (
         <Stack gap={4}>
           {list.map((a) => (
-            <Card key={a.id}>
-              <Stack gap={4}>
+            <Card key={a.id} p={0} className="flex flex-col overflow-hidden sm:flex-row">
+              {/* Brief image on the left (on top on phones), status on it. */}
+              <MediaCover
+                src={a.deal.imageUrl}
+                alt={a.deal.title}
+                className="sm:aspect-auto sm:min-h-44 sm:w-56 sm:shrink-0 lg:w-64"
+                fallback={<DealCoverFallback brand={a.deal.brand} platforms={a.deal.platforms} />}
+                topLeft={<ApplicationStatusBadge status={a.status} />}
+                bottomLeft={
+                  <CoverChip>
+                    {a.deal.platforms.map((p) => (
+                      <Icon key={p} name={PLATFORM_ICON[p]} size="xs" label={p} />
+                    ))}
+                    <span className="truncate">
+                      {a.deal.contentFormats.map((x) => tf(x)).join(', ')}
+                    </span>
+                  </CoverChip>
+                }
+              />
+              <Stack gap={4} className="min-w-0 flex-1 p-4 md:p-6">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                   <Inline gap={2} align="start" className="min-w-0">
                     <BrandAvatar brand={a.deal.brand} />
@@ -113,7 +136,6 @@ export default function MyApplicationsPage() {
                       </Text>
                     </div>
                   </Inline>
-                  <ApplicationStatusBadge status={a.status} />
                 </div>
                 <Compensation compact {...a.deal} />
                 {a.proposedPrice != null && (

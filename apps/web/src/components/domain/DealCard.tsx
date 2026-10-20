@@ -31,18 +31,7 @@ export function DealCard({ deal }: { deal: FeedDealDto }) {
     <Card interactive p={0} className="relative flex flex-col overflow-hidden">
       <MediaCover
         src={deal.imageUrl}
-        fallback={
-          deal.brand.logoUrl && !isHiddenBrand(deal.brand) ? (
-            <BrandAvatar brand={deal.brand} size="lg" />
-          ) : (
-            <Icon
-              name={
-                isHiddenBrand(deal.brand) ? 'lock' : PLATFORM_ICON[deal.platforms[0] ?? 'INSTAGRAM']
-              }
-              className="size-16 text-primary/25"
-            />
-          )
-        }
+        fallback={<DealCoverFallback brand={deal.brand} platforms={deal.platforms} />}
         topLeft={
           <CoverChip>
             {deal.platforms.map((p) => (
@@ -113,5 +102,22 @@ export function DealCard({ deal }: { deal: FeedDealDto }) {
         </div>
       </div>
     </Card>
+  );
+}
+
+/** Cover when a brief has no image: the brand logo, a lock (confidential), or the platform icon. */
+export function DealCoverFallback({
+  brand,
+  platforms,
+}: {
+  brand: FeedDealDto['brand'];
+  platforms: FeedDealDto['platforms'];
+}) {
+  if (brand.logoUrl && !isHiddenBrand(brand)) return <BrandAvatar brand={brand} size="lg" />;
+  return (
+    <Icon
+      name={isHiddenBrand(brand) ? 'lock' : PLATFORM_ICON[platforms[0] ?? 'INSTAGRAM']}
+      className="size-16 text-primary/25"
+    />
   );
 }
