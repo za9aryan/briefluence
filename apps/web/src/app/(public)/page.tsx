@@ -99,7 +99,19 @@ export default async function LandingPage() {
         </Container>
       </section>
 
-      <ProcessFunnel />
+      <ProcessFunnel
+        ns="funnel"
+        cta="/signup?role=BRAND"
+        points={['verified', 'match', 'contacts']}
+        chores={[
+          ['search', 'search'],
+          ['followers', 'users'],
+          ['dm', 'message'],
+          ['screens', 'image'],
+          ['haggle', 'wallet'],
+          ['contacts', 'phone'],
+        ]}
+      />
 
       {/* How it works */}
       <Section raised eyebrow={t('how.eyebrow')} title={t('how.title')} lead={t('how.lead')}>
@@ -138,7 +150,10 @@ export default async function LandingPage() {
                 </Stack>
                 <Link
                   href={who === 'brands' ? '/for-brands' : '/for-influencers'}
-                  className={buttonStyles({ variant: 'link', className: 'self-start' })}
+                  className={buttonStyles({
+                    variant: 'link',
+                    className: 'self-start whitespace-normal text-left',
+                  })}
                 >
                   {t(`audiences.${who}.more`)} <Icon name="arrow-right" />
                 </Link>

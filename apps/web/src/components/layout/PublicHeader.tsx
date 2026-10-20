@@ -22,7 +22,7 @@ export function PublicHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur">
       <Container className="flex h-16 items-center justify-between gap-4">
-        <Logo />
+        <Logo compact />
         <nav className="hidden items-center gap-1 md:flex" aria-label={t('main')}>
           {links.map((l) => (
             <Link

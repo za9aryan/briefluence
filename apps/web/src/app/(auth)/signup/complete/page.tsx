@@ -80,7 +80,7 @@ function CompleteSignup() {
                   aria-checked={on}
                   onClick={() => setRole(r.value)}
                   className={cn(
-                    'flex min-h-11 flex-col items-start gap-1 rounded-card border-2 p-4 text-left transition-colors',
+                    'flex min-h-11 min-w-0 flex-col items-start gap-1 rounded-card border-2 p-4 text-left transition-colors',
                     on
                       ? 'border-primary bg-primary-soft'
                       : 'border-line bg-surface-raised hover:border-primary/40',
@@ -88,7 +88,9 @@ function CompleteSignup() {
                 >
                   <Icon name={r.icon} size="md" tone={on ? 'accent' : 'muted'} />
                   <span className="text-body font-bold text-ink">{t(`role.${r.value}.title`)}</span>
-                  <span className="text-small text-ink-muted">{t(`role.${r.value}.body`)}</span>
+                  <span className="max-w-full break-words text-small text-ink-muted">
+                    {t(`role.${r.value}.body`)}
+                  </span>
                 </button>
               );
             })}

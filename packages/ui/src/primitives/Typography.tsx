@@ -14,7 +14,12 @@ export const TONE_TEXT: Record<Tone, string> = {
   danger: 'text-primary-text', // brand: no separate error red — primary-text + icon + text
   onPrimary: 'text-on-primary',
 };
-const WEIGHT = { regular: 'font-normal', medium: 'font-medium', bold: 'font-bold', extrabold: 'font-extrabold' };
+const WEIGHT = {
+  regular: 'font-normal',
+  medium: 'font-medium',
+  bold: 'font-bold',
+  extrabold: 'font-extrabold',
+};
 const ALIGN = { left: 'text-left', center: 'text-center', right: 'text-right' };
 
 const sizeClass = (v: TypeSize) => (v === 'label' ? 'text-label uppercase' : `text-${v}`);
@@ -48,7 +53,8 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
     <Tag
       ref={ref}
       className={cn(
-        'text-balance',
+        // break-words: long Armenian/Russian words must not push the page wider than a phone.
+        'max-w-full text-balance break-words',
         level <= 2 ? 'font-extrabold' : 'font-bold',
         rx(size ?? HEADING_SIZE[level], sizeClass),
         TONE_TEXT[tone],
@@ -74,7 +80,17 @@ export interface TextProps extends HTMLAttributes<HTMLElement> {
 const CLAMP = { 1: 'line-clamp-1', 2: 'line-clamp-2', 3: 'line-clamp-3' };
 
 export const Text = forwardRef<HTMLElement, TextProps>(function Text(
-  { as: Tag = 'p', size = 'body', tone = 'default', weight, align, truncate, clamp, className, ...rest },
+  {
+    as: Tag = 'p',
+    size = 'body',
+    tone = 'default',
+    weight,
+    align,
+    truncate,
+    clamp,
+    className,
+    ...rest
+  },
   ref,
 ) {
   return (
@@ -94,12 +110,11 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
   );
 });
 
-export const Label = forwardRef<HTMLLabelElement, LabelHTMLAttributes<HTMLLabelElement>>(function Label(
-  { className, ...rest },
-  ref,
-) {
-  return <label ref={ref} className={cn('text-small font-bold text-ink', className)} {...rest} />;
-});
+export const Label = forwardRef<HTMLLabelElement, LabelHTMLAttributes<HTMLLabelElement>>(
+  function Label({ className, ...rest }, ref) {
+    return <label ref={ref} className={cn('text-small font-bold text-ink', className)} {...rest} />;
+  },
+);
 
 /** Small uppercase label above sections. */
 export function Eyebrow({ className, ...rest }: HTMLAttributes<HTMLParagraphElement>) {

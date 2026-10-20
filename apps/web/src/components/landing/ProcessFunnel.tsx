@@ -17,20 +17,19 @@ import type { CSSProperties } from 'react';
 import s from './ProcessFunnel.module.css';
 
 /**
- * The chores a brand does by hand, and each chip's drift path (cqw / cqh from the center).
- * Each chip keeps its own row so long (Armenian) labels never stack on a 360px screen.
+ * Drift path of each chip slot (cqw / cqh from the center) and its wobble speed.
+ * Each slot keeps its own row so long (Armenian) labels never stack on a 360px screen.
  */
-const CHORES: { key: string; icon: IconName; path: number[]; r: number; w: string }[] = [
-  { key: 'search', icon: 'search', path: [-14, -35, -20, -31, -8, -38], r: -6, w: '2.1s' },
-  { key: 'followers', icon: 'users', path: [16, -21, 10, -26, 20, -16], r: 5, w: '2.6s' },
-  { key: 'dm', icon: 'message', path: [-16, -7, -10, -2, -21, -11], r: 4, w: '1.9s' },
-  { key: 'screens', icon: 'image', path: [14, 7, 20, 3, 8, 11], r: -5, w: '2.4s' },
-  { key: 'haggle', icon: 'wallet', path: [-12, 21, -19, 25, -6, 17], r: 6, w: '2.8s' },
-  { key: 'contacts', icon: 'phone', path: [16, 35, 10, 31, 21, 38], r: -4, w: '2.2s' },
+const SLOTS: { path: number[]; r: number; w: string }[] = [
+  { path: [-14, -35, -20, -31, -8, -38], r: -6, w: '2.1s' },
+  { path: [16, -21, 10, -26, 20, -16], r: 5, w: '2.6s' },
+  { path: [-16, -7, -10, -2, -21, -11], r: 4, w: '1.9s' },
+  { path: [14, 7, 20, 3, 8, 11], r: -5, w: '2.4s' },
+  { path: [-12, 21, -19, 25, -6, 17], r: 6, w: '2.8s' },
+  { path: [16, 35, 10, 31, 21, 38], r: -4, w: '2.2s' },
 ];
-const POINTS = ['verified', 'match', 'contacts'] as const;
 
-function chipStyle(path: number[], r: number, w: string) {
+function chipStyle({ path, r, w }: (typeof SLOTS)[number]) {
   const [x1, y1, x2, y2, x3, y3] = path;
   return {
     '--x1': `${x1}cqw`,
@@ -44,11 +43,26 @@ function chipStyle(path: number[], r: number, w: string) {
   } as CSSProperties;
 }
 
-/** Home block: six manual chores collapse into one brief (animation left, explanation right). */
-export async function ProcessFunnel() {
-  const t = await getTranslations('landing.funnel');
+/**
+ * "Six chores → briefluence" block (animation left, explanation right). Used on the home page
+ * (brand chores) and on /for-influencers (blogger chores). Texts: `landing.<ns>`
+ * with eyebrow, title, lead, cta, chores.<key>, points.<key>.
+ */
+export async function ProcessFunnel({
+  ns,
+  chores,
+  points,
+  cta,
+}: {
+  ns: 'funnel' | 'influencers.funnel';
+  /** Up to six [key, icon] pairs, in slot order. */
+  chores: [string, IconName][];
+  points: string[];
+  cta: string;
+}) {
+  const t = await getTranslations(`landing.${ns}`);
   return (
-    <section aria-labelledby="funnel-title">
+    <section aria-labelledby={`${ns.replace('.', '-')}-title`}>
       <Container py={{ base: 8, md: 12, lg: 16 }}>
         <Grid cols={{ base: 1, lg: 2 }} gap={{ base: 8, lg: 16 }} className="items-center">
           {/* Decorative: the same chores are listed as text for screen readers below. */}
@@ -57,13 +71,13 @@ export async function ProcessFunnel() {
             className={`${s.stage} rounded-card border border-line bg-surface-raised`}
           >
             <div className={s.ring} />
-            {CHORES.map((c) => (
-              <div key={c.key} className={s.chip} style={chipStyle(c.path, c.r, c.w)}>
+            {chores.slice(0, SLOTS.length).map(([key, icon], i) => (
+              <div key={key} className={s.chip} style={chipStyle(SLOTS[i]!)}>
                 <span
                   className={`${s.wobble} rounded-pill border border-line bg-surface px-3 py-2 font-medium text-ink shadow-card`}
                 >
-                  <Icon name={c.icon} size="sm" className="text-ink-muted" />
-                  {t(`chores.${c.key}`)}
+                  <Icon name={icon} size="sm" className="text-ink-muted" />
+                  {t(`chores.${key}`)}
                 </span>
               </div>
             ))}
@@ -80,24 +94,24 @@ export async function ProcessFunnel() {
 
           <Stack gap={4} align="start">
             <Eyebrow>{t('eyebrow')}</Eyebrow>
-            <Heading level={2} id="funnel-title">
+            <Heading level={2} id={`${ns.replace('.', '-')}-title`}>
               {t('title')}
             </Heading>
             <Text tone="muted">{t('lead')}</Text>
             <ul className="sr-only">
-              {CHORES.map((c) => (
-                <li key={c.key}>{t(`chores.${c.key}`)}</li>
+              {chores.map(([key]) => (
+                <li key={key}>{t(`chores.${key}`)}</li>
               ))}
             </ul>
             <Stack gap={2}>
-              {POINTS.map((k) => (
+              {points.map((k) => (
                 <Inline key={k} gap={2} align="start">
                   <Icon name="check" tone="success" size="md" className="mt-0.5" />
                   <Text>{t(`points.${k}`)}</Text>
                 </Inline>
               ))}
             </Stack>
-            <Link href="/signup?role=BRAND" className={buttonStyles({ className: 'mt-2' })}>
+            <Link href={cta} className={buttonStyles({ className: 'mt-2' })}>
               {t('cta')}
             </Link>
           </Stack>

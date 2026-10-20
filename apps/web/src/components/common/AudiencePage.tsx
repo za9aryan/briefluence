@@ -11,6 +11,7 @@ import {
 } from '@briefluence/ui';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import { FeatureItem, Section } from './Section';
 
 /** Shared layout of /for-brands and /for-influencers. */
@@ -19,12 +20,18 @@ export async function AudiencePage({
   features,
   cta,
   stats,
+  afterHero,
+  children,
 }: {
   ns: 'brands' | 'influencers';
   features: [string, IconName][];
   cta: string;
   /** Keys of `landing.<ns>.stats.items` to show as big-number blocks. */
   stats?: string[];
+  /** Extra blocks right under the hero. */
+  afterHero?: ReactNode;
+  /** Extra blocks after the feature list. */
+  children?: ReactNode;
 }) {
   const t = await getTranslations(`landing.${ns}`);
   return (
@@ -40,6 +47,7 @@ export async function AudiencePage({
           </Stack>
         </Container>
       </section>
+      {afterHero}
       {stats?.length ? (
         <section aria-labelledby="stats-title">
           <Container size="lg" py={{ base: 8, md: 12 }}>
@@ -85,6 +93,7 @@ export async function AudiencePage({
           ))}
         </Grid>
       </Section>
+      {children}
     </>
   );
 }

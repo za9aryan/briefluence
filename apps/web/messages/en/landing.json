@@ -152,7 +152,100 @@
         "body": "Once a brand accepts you, you get its contacts and agree on the details yourselves."
       }
     },
-    "cta": "Create a blogger account"
+    "cta": "Create a blogger account",
+    "funnel": {
+      "eyebrow": "Less busywork",
+      "title": "Brands come to you",
+      "lead": "Working with brands on your own means hunting for them, sending your media kit and waiting for replies, again and again. Here brands post what they need, and briefs that fit you show up in your feed.",
+      "chores": {
+        "find": "Find brands",
+        "dm": "DM brands",
+        "kit": "Send media kit",
+        "wait": "Wait for replies",
+        "prove": "Prove your numbers",
+        "budget": "Guess the budget"
+      },
+      "points": {
+        "feed": "Briefs you qualify for land in your feed, with a match score.",
+        "budget": "Every brief shows the budget or the barter up front.",
+        "offers": "Post your services and let brands send you requests."
+      },
+      "cta": "Create a blogger account"
+    },
+    "earn": {
+      "title": "Two ways to earn",
+      "lead": "Apply to briefs from brands, or put up your own services and let brands come to you.",
+      "briefs": {
+        "title": "Apply to briefs",
+        "body": "Pick a brief that fits, write a short pitch and follow its status."
+      },
+      "offers": {
+        "title": "Post your services",
+        "body": "Say what you do and for how much. Brands send requests, and you accept the ones you like."
+      },
+      "brief": {
+        "type": "Paid",
+        "meta": "Yerevan · today",
+        "title": "Reels for a new coffee shop",
+        "budget": "30,000–50,000 AMD",
+        "match": "Match",
+        "why": "Why it fits you",
+        "reasons": {
+          "city": "Yerevan",
+          "age": "Audience 18–34",
+          "followers": "5K+ followers"
+        },
+        "apply": "Apply"
+      },
+      "offer": {
+        "title": "1 Reels about your product",
+        "body": "Shot and edited by me, posted within a week.",
+        "price": "20,000 AMD",
+        "request": "A coffee shop wants to work with you",
+        "accept": "Accept",
+        "decline": "Decline"
+      }
+    },
+    "noCatch": {
+      "title": "No catch",
+      "commission": {
+        "title": "No commission",
+        "body": "Whatever you agree with a brand is yours. We don’t take a cut."
+      },
+      "private": {
+        "title": "Your contacts stay private",
+        "body": "A brand sees how to reach you only after it accepts you."
+      },
+      "choice": {
+        "title": "You decide",
+        "body": "Withdraw an application before it’s accepted, or decline any request you don’t like."
+      }
+    },
+    "faq": {
+      "title": "Questions bloggers ask",
+      "items": {
+        "followers": {
+          "q": "How many followers do I need?",
+          "a": "There’s no fixed minimum. Each brand sets its own in the brief, and your feed shows only the briefs you qualify for."
+        },
+        "pay": {
+          "q": "Who pays me, and how?",
+          "a": "The brand pays you directly, in money or barter, as the brief says. Payments don’t go through briefluence, and we take no commission."
+        },
+        "plans": {
+          "q": "What’s the difference between Basic and Pro?",
+          "a": "Every new blogger gets 30 days of Pro for free. After that Basic stays free, with a limit on applications and live service cards. Pro has no limits."
+        },
+        "review": {
+          "q": "Why do you check my profile and accounts?",
+          "a": "So brands can trust what they see. We look at every profile and every added account before it counts. Accounts must be public. This keeps fake accounts out."
+        },
+        "noReply": {
+          "q": "What if a brand doesn’t reply?",
+          "a": "You see when a brand opens your application. If nothing happens, you can withdraw it any time before it’s accepted and focus on other briefs."
+        }
+      }
+    }
   },
   "funnel": {
     "eyebrow": "Less busywork",

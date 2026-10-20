@@ -58,6 +58,7 @@ export { RangeInput, Slider } from './components/RangeInput';
 export { Modal, type ModalProps } from './components/Modal';
 export { Menu, MenuItem } from './components/Menu';
 export { Tabs, type TabItem } from './components/Tabs';
+export { Disclosure } from './components/Disclosure';
 export { Table, THead, TBody, TR, TH, TD } from './components/Table';
 export { Alert, EmptyState, ErrorState, Skeleton, Spinner } from './components/Feedback';
 export { ToastProvider, useToast } from './components/Toast';

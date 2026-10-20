@@ -83,7 +83,7 @@ function SignupForm() {
                         aria-checked={on}
                         onClick={() => field.onChange(r.value)}
                         className={cn(
-                          'flex min-h-11 flex-col items-start gap-1 rounded-card border-2 p-4 text-left transition-colors',
+                          'flex min-h-11 min-w-0 flex-col items-start gap-1 rounded-card border-2 p-4 text-left transition-colors',
                           on
                             ? 'border-primary bg-primary-soft'
                             : 'border-line bg-surface-raised hover:border-primary/40',
@@ -93,7 +93,7 @@ function SignupForm() {
                         <span className="text-body font-bold text-ink">
                           {t(`role.${r.value}.title`)}
                         </span>
-                        <span className="text-small text-ink-muted">
+                        <span className="max-w-full break-words text-small text-ink-muted">
                           {t(`role.${r.value}.body`)}
                         </span>
                       </button>
