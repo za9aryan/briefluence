@@ -51,3 +51,45 @@
     color: inherit;
   }
 }
+
+/*
+ * Modal motion: the panel starts below the screen and slides into place; the dimmed, blurred
+ * backdrop fades with it. On close both run backwards (allow-discrete keeps the dialog visible
+ * until the transition ends). Browsers without @starting-style simply show it without motion.
+ */
+@layer components {
+  .bf-modal {
+    transform: translateY(100vh);
+    transition:
+      transform 0.2s ease-out,
+      overlay 0.2s allow-discrete,
+      display 0.2s allow-discrete;
+  }
+  .bf-modal[open] {
+    transform: translateY(0);
+  }
+  .bf-modal::backdrop {
+    opacity: 0;
+    transition:
+      opacity 0.2s ease-out,
+      overlay 0.2s allow-discrete,
+      display 0.2s allow-discrete;
+  }
+  .bf-modal[open]::backdrop {
+    opacity: 1;
+  }
+  @starting-style {
+    .bf-modal[open] {
+      transform: translateY(100vh);
+    }
+    .bf-modal[open]::backdrop {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bf-modal,
+    .bf-modal::backdrop {
+      transition: none;
+    }
+  }
+}
