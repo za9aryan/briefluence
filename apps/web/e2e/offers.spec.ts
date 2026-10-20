@@ -87,6 +87,12 @@ test('blogger offer → admin approves → brand requests → blogger accepts �
   await brand.waitForURL('**/brand/deals/new');
   await brand.goto('/brand/offers');
   await brand.getByLabel('Search offers').fill(id);
+  // The blogger's name on the card opens their profile.
+  await brand.getByRole('link', { name: 'Offer Blogger' }).first().click();
+  await brand.waitForURL('**/brand/influencers/**');
+  await expect(brand.getByRole('heading', { name: 'Offer Blogger' })).toBeVisible();
+  await brand.goBack();
+  await brand.getByLabel('Search offers').fill(id);
   await brand.getByRole('link', { name: title }).click();
   await expect(brand.getByText('1 view')).toBeVisible();
   await brand.getByRole('button', { name: 'Send request' }).click();
@@ -95,6 +101,10 @@ test('blogger offer → admin approves → brand requests → blogger accepts �
     .fill('We would love a story about our new menu next week.');
   await brand.getByRole('dialog').getByRole('button', { name: 'Send request' }).click();
   await expect(brand.getByText('Request sent. The blogger will answer here.')).toBeVisible();
+  // …and so does the name in the side card of the offer page.
+  await brand.getByRole('link', { name: 'Offer Blogger' }).click();
+  await brand.waitForURL('**/brand/influencers/**');
+  await brand.goBack();
 
   // ── Blogger accepts; both sides see contacts ──
   await blogger.goto('/influencer/offers');

@@ -18,6 +18,7 @@ import {
 } from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
@@ -114,12 +115,15 @@ export default function BrandOfferPage() {
               <Inline gap={2} align="center">
                 <Avatar name={d.blogger.displayName} src={d.blogger.avatarUrl} />
                 <Stack gap={0}>
-                  <Text weight="bold">
+                  <Link
+                    href={`/brand/influencers/${d.blogger.id}`}
+                    className="text-body font-bold text-ink hover:text-primary-text hover:underline"
+                  >
                     {d.blogger.displayName}
                     {d.blogger.verified && (
                       <Icon name="verified" tone="success" className="ml-1 inline" />
                     )}
-                  </Text>
+                  </Link>
                   <Text size="small" tone="muted">
                     {[d.blogger.city, o.country(d.blogger.country)].filter(Boolean).join(', ')}
                   </Text>

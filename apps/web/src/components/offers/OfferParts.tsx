@@ -115,12 +115,15 @@ export function OfferCard({ offer, href }: { offer: FeedOfferDto; href: string }
           <Inline gap={2} align="center" className="min-w-0">
             <Avatar name={offer.blogger.displayName} src={offer.blogger.avatarUrl} size="sm" />
             <Stack gap={0} className="min-w-0">
-              <Text weight="bold" truncate>
+              <Link
+                href={`/brand/influencers/${offer.blogger.id}`}
+                className="truncate text-body font-bold text-ink hover:text-primary-text hover:underline"
+              >
                 {offer.blogger.displayName}
                 {offer.blogger.verified && (
                   <Icon name="verified" tone="success" className="ml-1 inline" />
                 )}
-              </Text>
+              </Link>
               {top && (
                 <Text size="small" tone="muted" truncate>
                   @{top.username} · {f.compact(top.followers)}
