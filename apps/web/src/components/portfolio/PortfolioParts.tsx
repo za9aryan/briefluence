@@ -1,5 +1,16 @@
 'use client';
-import { Badge, Card, Grid, Icon, Modal, Stack, Text, cn, type BadgeTone } from '@briefluence/ui';
+import {
+  Badge,
+  Card,
+  Disclosure,
+  Grid,
+  Icon,
+  Modal,
+  Stack,
+  Text,
+  cn,
+  type BadgeTone,
+} from '@briefluence/ui';
 import type { AccountReviewStatus } from '@briefluence/shared';
 import { useTranslations } from 'next-intl';
 import { useState, type ReactNode } from 'react';
@@ -126,17 +137,16 @@ export function PortfolioGallery({ items }: { items: PortfolioItemDto[] }) {
   );
 }
 
-/** Answered "About your work" questions as a brand reads them. */
+/** Answered "About your work" questions as a brand reads them: same expandable rows as the public FAQ. */
 export function FaqAnswers({ faq }: { faq: FaqAnswerDto[] }) {
   const t = useTranslations('portfolio.view.questions');
   return (
-    <dl className="flex flex-col gap-4">
-      {faq.map((f) => (
-        <div key={f.key}>
-          <dt className="text-small font-bold text-ink-muted">{t(f.key)}</dt>
-          <dd className="mt-1 whitespace-pre-line break-words text-body text-ink">{f.answer}</dd>
-        </div>
+    <div>
+      {faq.map((f, i) => (
+        <Disclosure key={f.key} summary={t(f.key)} defaultOpen={i === 0}>
+          <span className="whitespace-pre-line break-words">{f.answer}</span>
+        </Disclosure>
       ))}
-    </dl>
+    </div>
   );
 }

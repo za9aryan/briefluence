@@ -52,9 +52,9 @@
     "portfolio": "Portfolio",
     "faq": "About the blogger",
     "questions": {
-      "brandsWorked": "Brands worked with",
-      "audience": "Audience",
-      "brandsWanted": "Would like to work with"
+      "brandsWorked": "What brands has the blogger worked with?",
+      "audience": "Who is their audience?",
+      "brandsWanted": "What brands do they want to work with?"
     },
     "openLink": "Open",
     "attached": "Attached work",

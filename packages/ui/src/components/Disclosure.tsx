@@ -9,14 +9,19 @@ import { Icon } from '../primitives/Icon';
 export function Disclosure({
   summary,
   children,
+  defaultOpen,
   className,
 }: {
   summary: ReactNode;
   children: ReactNode;
+  defaultOpen?: boolean;
   className?: string;
 }) {
   return (
-    <details className={cn('group border-b border-line last:border-0', className)}>
+    <details
+      open={defaultOpen}
+      className={cn('group border-b border-line last:border-0', className)}
+    >
       <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-4 text-body font-bold text-ink [&::-webkit-details-marker]:hidden">
         {summary}
         <Icon
