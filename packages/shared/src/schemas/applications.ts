@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { PITCH_MAX_LENGTH } from '../constants';
+import { APPLICATION_PORTFOLIO_MAX, PITCH_MAX_LENGTH } from '../constants';
 import { APPLICATION_STATUSES, REJECTION_REASONS } from '../enums';
 import { idSchema, minorAmount, paginationSchema } from './common';
 
@@ -11,6 +11,8 @@ export const applySchema = z.object({
     .nullable()
     .optional()
     .transform((v) => v ?? null),
+  /** Approved portfolio items to show the brand with this application. */
+  portfolioItemIds: z.array(idSchema).max(APPLICATION_PORTFOLIO_MAX).default([]),
 });
 export type ApplyInput = z.input<typeof applySchema>;
 

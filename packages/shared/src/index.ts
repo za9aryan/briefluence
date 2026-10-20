@@ -12,3 +12,4 @@ export * from './domain/applications';
 export * from './domain/deals';
 export * from './domain/accounts';
 export * from './domain/offers';
+export * from './domain/portfolio';

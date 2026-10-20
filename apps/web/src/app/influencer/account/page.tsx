@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { PageHeader } from '@/components/app/AppShell';
 import { ChangePasswordCard } from '@/components/forms/ChangePasswordCard';
 import { InfluencerProfileForm } from '@/components/influencer/ProfileForm';
+import { FaqCard, PortfolioCard } from '@/components/influencer/PortfolioSettings';
 import { api } from '@/lib/api';
 import { ME_KEY, useMe } from '@/lib/hooks/session';
 import type { InfluencerProfileDto } from '@/lib/types';
@@ -15,7 +16,10 @@ export default function InfluencerAccountPage() {
   const toast = useToast();
   const qc = useQueryClient();
   const { data: me } = useMe();
-  const profile = useQuery({ queryKey: ['influencer', 'me'], queryFn: () => api.get<InfluencerProfileDto>('/influencers/me') });
+  const profile = useQuery({
+    queryKey: ['influencer', 'me'],
+    queryFn: () => api.get<InfluencerProfileDto>('/influencers/me'),
+  });
   const settings = useMutation({
     mutationFn: (digestEmails: boolean) => api.patch('/auth/settings', { digestEmails }),
     onSuccess: () => {
@@ -43,6 +47,12 @@ export default function InfluencerAccountPage() {
           />
         )}
       </Card>
+      {profile.data && (
+        <>
+          <PortfolioCard />
+          <FaqCard profile={profile.data} />
+        </>
+      )}
       <Card>
         <CardHeader title={t('notifications')} />
         <Switch

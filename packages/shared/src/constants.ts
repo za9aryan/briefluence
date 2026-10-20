@@ -72,6 +72,10 @@ export type AudienceSizePreset = keyof typeof AUDIENCE_SIZE_PRESETS;
 
 export const INFLUENCER_AGE_RANGE = { min: 16, max: 65 } as const;
 export const PITCH_MAX_LENGTH = 500;
+/** Portfolio items a blogger can keep, and how many of them can go with one application. */
+export const PORTFOLIO_MAX_ITEMS = 12;
+export const APPLICATION_PORTFOLIO_MAX = 3;
+export const FAQ_ANSWER_MAX_LENGTH = 1000;
 /** Free Pro days every blogger gets when they choose a plan. */
 export const TRIAL_DAYS = 30;
 /** Basic's application limit counts applications in this rolling window. */

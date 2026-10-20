@@ -8,6 +8,7 @@ import {
   exceedsSlots,
   FILLED_STATUSES,
   isFilled,
+  isPortfolioVisible,
   matchScore,
   type ApplicantsQuery,
   type ApplicationStatusUpdateInput,
@@ -19,6 +20,7 @@ import { Prisma, type Application, type Deal } from '@prisma/client';
 import { AppError, forbidden, notFound } from '../../common/app-error';
 import { Clock } from '../../common/clock';
 import { PrismaService } from '../../common/prisma.service';
+import { publicPortfolioItem } from '../influencers/portfolio.service';
 import { publicAccount } from '../influencers/serializers';
 import { toMatchDeal, toMatchInfluencer } from '../deals/match-input';
 import { brandRevealed, HIDDEN_BRAND } from '../deals/confidential';
@@ -71,6 +73,20 @@ export class ApplicationsService {
       });
     const account = { id: match.accountId };
 
+    // Attached work must be the blogger's own and already approved.
+    const portfolioIds = [...new Set(input.portfolioItemIds ?? [])];
+    if (portfolioIds.length) {
+      const own = await this.prisma.portfolioItem.findMany({
+        where: { id: { in: portfolioIds }, influencerId: profile.id },
+        select: { id: true, reviewStatus: true },
+      });
+      if (own.length !== portfolioIds.length || !own.every(isPortfolioVisible))
+        throw new AppError('VALIDATION_FAILED', 'Attach only your approved portfolio items', {
+          field: 'portfolioItemIds',
+        });
+    }
+    const portfolio = portfolioIds.map((id) => ({ id }));
+
     const data = {
       socialAccountId: account.id,
       pitch: input.pitch,
@@ -93,13 +109,20 @@ export class ApplicationsService {
           postUrl: null,
           shortlistedAt: null,
           acceptedAt: null,
+          portfolioItems: { set: portfolio },
         },
       });
     } else {
       try {
         application = await this.prisma.application.create({
           // Dated by the app clock: Basic's 30-day limit compares against it.
-          data: { ...data, dealId, influencerId: profile.id, createdAt: this.clock.now() },
+          data: {
+            ...data,
+            dealId,
+            influencerId: profile.id,
+            createdAt: this.clock.now(),
+            portfolioItems: { connect: portfolio },
+          },
         });
       } catch (err) {
         if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
@@ -218,7 +241,10 @@ export class ApplicationsService {
 
     const apps = await this.prisma.application.findMany({
       where: { dealId, ...(q.status ? { status: q.status } : { status: { not: 'WITHDRAWN' } }) },
-      include: { influencer: { include: { socialAccounts: true } } },
+      include: {
+        influencer: { include: { socialAccounts: true } },
+        portfolioItems: { orderBy: { createdAt: 'desc' } },
+      },
     });
     const rows = apps.map((a) => {
       const p = a.influencer;
@@ -251,6 +277,8 @@ export class ApplicationsService {
         contacts: contactsRevealed(a.status)
           ? { method: p.contactMethod, value: p.contactValue }
           : null,
+        /** Work attached to this application (an item rejected later is hidden again). */
+        portfolio: a.portfolioItems.filter(isPortfolioVisible).map(publicPortfolioItem),
       };
     });
     const sorters = {

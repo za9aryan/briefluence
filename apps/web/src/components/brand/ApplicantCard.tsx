@@ -20,6 +20,7 @@ import { useState } from 'react';
 import { AccountLine, AccountStats } from '@/components/domain/AccountStats';
 import { ApplicationStatusBadge, VerifiedBadge } from '@/components/domain/badges';
 import { ContactLink } from '@/components/domain/ContactLink';
+import { PortfolioGallery } from '@/components/portfolio/PortfolioParts';
 import { useFormat } from '@/lib/hooks/format';
 import { useOptions } from '@/lib/hooks/options';
 import type { ApplicantDto } from '@/lib/types';
@@ -43,6 +44,7 @@ export function ApplicantCard({
   const t = useTranslations('applications.brand');
   const tc = useTranslations('common');
   const tr = useTranslations('enums.rejectionReason');
+  const tp = useTranslations('portfolio.view');
   const f = useFormat();
   const o = useOptions();
   const [rejecting, setRejecting] = useState(false);
@@ -92,6 +94,17 @@ export function ApplicantCard({
               ` · ${t('price', { price: f.display(a.proposedPrice, currency).main })}`}
           </Text>
         </div>
+
+        {a.portfolio.length > 0 && (
+          <Stack gap={2}>
+            <Text size="small" weight="bold">
+              {tp('attached')}
+            </Text>
+            <div className="max-w-xl">
+              <PortfolioGallery items={a.portfolio} />
+            </div>
+          </Stack>
+        )}
 
         {/* All connected accounts, so the brand can plan further collaboration beyond this brief. */}
         {a.accounts.length > 0 && (

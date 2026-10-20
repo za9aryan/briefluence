@@ -40,6 +40,7 @@ export async function resetDb(prisma: PrismaService) {
   const tables = [
     'AuthIdentity',
     'OfferView',
+    'PortfolioItem',
     'OfferRequest',
     'Offer',
     'SocialAccountLink',

@@ -1,5 +1,7 @@
 import type {
+  AccountReviewStatus,
   ApplicationStatus,
+  FaqKey,
   CollaborationType,
   ContactMethod,
   ContentFormat,
@@ -57,6 +59,28 @@ export interface InfluencerProfileDto {
   rejectionReason: string | null;
   savedFilters: { name: string; query: Record<string, unknown> }[] | null;
   socialAccounts: SocialAccountDto[];
+  faqBrandsWorked: string | null;
+  faqAudience: string | null;
+  faqBrandsWanted: string | null;
+}
+
+/** A piece of past work; brands only ever get APPROVED ones. */
+export interface PortfolioItemDto {
+  id: string;
+  imageUrl: string;
+  title: string;
+  description: string | null;
+  linkUrl: string | null;
+  reviewStatus: AccountReviewStatus;
+  reviewNote: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Answered "About your work" questions, as brands see them. */
+export interface FaqAnswerDto {
+  key: FaqKey;
+  answer: string;
 }
 
 export interface BrandProfileDto {
@@ -216,6 +240,8 @@ export interface ApplicantDto {
   /** All connected accounts, largest first. */
   accounts: SocialAccountDto[];
   contacts: { method: ContactMethod | null; value: string | null } | null;
+  /** Approved work the blogger attached to this application. */
+  portfolio: PortfolioItemDto[];
 }
 
 export interface ApplicantsDto {

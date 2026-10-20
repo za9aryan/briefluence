@@ -95,6 +95,15 @@ declines, and on accept both see each other's contacts. Views are counted once p
 limited number of live offers (default 1, **Admin → Plans**); Pro is unlimited. Accepting requests does not use
 Basic's application limit.
 
+## Portfolio and "About your work"
+
+In **Settings** bloggers keep up to 12 portfolio items: one image (uploaded, `uploads/portfolio`), a title, an
+optional description and an optional link (Reel, TikTok, YouTube, a site). We store only the image and the URL; no
+video hosting. Every item is reviewed by an admin (**Admin → Portfolio**) before brands see it, and any edit sends it
+back to review. When applying, a blogger can attach up to 3 approved items; brands see them on the application and
+on the blogger's profile. Three optional questions (brands worked with, audience, brands wanted) appear to brands
+only when answered.
+
 ## Re-registration warning
 
 Every link of a social account to a profile is kept in `SocialAccountLink` (also after the account or user is

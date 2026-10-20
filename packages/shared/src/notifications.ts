@@ -588,6 +588,40 @@ const CATALOG: Record<NotificationType, { cta: L3; render: Record<NotificationLo
         }),
       },
     },
+    PORTFOLIO_REVIEW_PENDING: {
+      cta: { en: 'Open review queue', ru: 'Открыть очередь проверки', hy: 'Բացել ստուգման հերթը' },
+      render: {
+        en: (p) => ({
+          title: 'New portfolio item to review',
+          body: `${s(p.name)}: "${s(p.title)}"`,
+        }),
+        ru: (p) => ({
+          title: 'Новая работа в портфолио ждёт проверки',
+          body: `${s(p.name)}: «${s(p.title)}»`,
+        }),
+        hy: (p) => ({
+          title: 'Պորտֆոլիոյի նոր աշխատանքը սպասում է ստուգման',
+          body: `${s(p.name)}՝ «${s(p.title)}»`,
+        }),
+      },
+    },
+    PORTFOLIO_REJECTED: {
+      cta: { en: 'Open portfolio', ru: 'Открыть портфолио', hy: 'Բացել պորտֆոլիոն' },
+      render: {
+        en: (p) => ({
+          title: 'Portfolio item not approved',
+          body: `"${s(p.title)}"\nReason: ${s(p.reason)}`,
+        }),
+        ru: (p) => ({
+          title: 'Работа в портфолио не одобрена',
+          body: `«${s(p.title)}»\nПричина: ${s(p.reason)}`,
+        }),
+        hy: (p) => ({
+          title: 'Պորտֆոլիոյի աշխատանքը չի հաստատվել',
+          body: `«${s(p.title)}»\nՊատճառը՝ ${s(p.reason)}`,
+        }),
+      },
+    },
     SOCIAL_ACCOUNT_REUSED: {
       cta: { en: 'Check the account', ru: 'Проверить аккаунт', hy: 'Ստուգել հաշիվը' },
       render: {

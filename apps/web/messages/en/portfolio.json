@@ -1,0 +1,88 @@
+{
+  "settings": {
+    "title": "Portfolio",
+    "lead": "Show work you’ve already done. Brands see approved items on your profile, and you can attach up to {max} when you apply.",
+    "add": "Add work",
+    "empty": "No work added yet",
+    "emptyLead": "Add a screenshot of a story, a photo from a shoot or a Reel cover.",
+    "limit": "You’ve added the maximum of {max} items. Delete one to add another.",
+    "reviewNote": "We check each item before brands see it. Editing an approved item sends it back to review.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteTitle": "Delete this work?",
+    "deleteBody": "It disappears from your profile and from applications it was attached to.",
+    "deleted": "Deleted",
+    "actions": "Actions",
+    "status": {
+      "PENDING": "In review",
+      "APPROVED": "Visible to brands",
+      "REJECTED": "Not approved"
+    },
+    "rejectedReason": "Reason: {reason}"
+  },
+  "form": {
+    "titleNew": "Add work",
+    "titleEdit": "Edit work",
+    "image": "Image",
+    "imageHint": "PNG, JPEG or WebP, up to 5 MB. A story screenshot works too.",
+    "imageRequired": "Add an image",
+    "name": "Title",
+    "namePlaceholder": "Story for a coffee shop",
+    "description": "Description",
+    "descriptionPlaceholder": "What you did and how it went",
+    "link": "Link",
+    "linkHint": "Where to see it: a Reel, TikTok, YouTube video or a site.",
+    "saved": "Saved. We’ll review it soon."
+  },
+  "faq": {
+    "title": "About your work",
+    "lead": "Optional. Brands see only the questions you answer.",
+    "questions": {
+      "brandsWorked": "What brands have you worked with?",
+      "audience": "Who is your audience?",
+      "brandsWanted": "What brands do you want to work with?"
+    },
+    "placeholders": {
+      "brandsWorked": "For example: two cafes in Yerevan, a gym, a clothing store",
+      "audience": "For example: women 20–30 in Yerevan who love food and travel",
+      "brandsWanted": "For example: restaurants, beauty salons, travel agencies"
+    }
+  },
+  "view": {
+    "portfolio": "Portfolio",
+    "faq": "About the blogger",
+    "questions": {
+      "brandsWorked": "Brands worked with",
+      "audience": "Audience",
+      "brandsWanted": "Would like to work with"
+    },
+    "openLink": "Open",
+    "attached": "Attached work",
+    "close": "Close"
+  },
+  "apply": {
+    "title": "Attach your work",
+    "hint": "Pick up to {max} to show the brand. Optional.",
+    "none": "Add work to your portfolio in Settings to show brands what you’ve done.",
+    "openSettings": "Open portfolio",
+    "pendingNote": "Items in review show up here once approved."
+  },
+  "admin": {
+    "title": "Portfolio review",
+    "lead": "Check each item before brands see it: the image suits brands and nothing is misleading.",
+    "tabPending": "Waiting",
+    "tabApproved": "Approved",
+    "tabRejected": "Rejected",
+    "empty": "Nothing to review",
+    "updated": "Updated {date}",
+    "openLink": "Open link",
+    "approve": "Approve",
+    "reject": "Reject",
+    "rejectTitle": "Reject this work",
+    "reason": "Reason",
+    "reasonHint": "The blogger sees this and can fix the item.",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "previousReason": "Reason: {reason}"
+  }
+}

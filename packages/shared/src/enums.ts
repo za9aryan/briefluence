@@ -112,6 +112,8 @@ export const NOTIFICATION_TYPES = values(
   'OFFER_REQUEST_NEW',
   'OFFER_REQUEST_ACCEPTED',
   'OFFER_REQUEST_DECLINED',
+  'PORTFOLIO_REVIEW_PENDING',
+  'PORTFOLIO_REJECTED',
 );
 
 /** Blogger offers ("1 Story for 10,000 AMD"), moderated like briefs. */

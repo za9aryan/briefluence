@@ -44,7 +44,13 @@ export function toQuery(q?: Query): string {
   return s ? `?${s}` : '';
 }
 
-async function request<T>(method: string, path: string, body?: unknown, query?: Query, retried = false): Promise<T> {
+async function request<T>(
+  method: string,
+  path: string,
+  body?: unknown,
+  query?: Query,
+  retried = false,
+): Promise<T> {
   const isForm = typeof FormData !== 'undefined' && body instanceof FormData;
   const res = await fetch(`${API_BASE}${path}${toQuery(query)}`, {
     method,
@@ -52,14 +58,24 @@ async function request<T>(method: string, path: string, body?: unknown, query?: 
     headers: body && !isForm ? { 'Content-Type': 'application/json' } : undefined,
     body: body == null ? undefined : isForm ? body : JSON.stringify(body),
   });
-  if (res.status === 401 && !retried && !path.startsWith('/auth/login') && !path.startsWith('/auth/refresh')) {
+  if (
+    res.status === 401 &&
+    !retried &&
+    !path.startsWith('/auth/login') &&
+    !path.startsWith('/auth/refresh')
+  ) {
     if (await refreshSession()) return request<T>(method, path, body, query, true);
   }
   if (res.status === 204) return undefined as T;
   const data = (await res.json().catch(() => null)) as unknown;
   if (!res.ok) {
     const err = (data as ApiErrorBody | null)?.error;
-    throw new ApiError(res.status, err?.code ?? 'INTERNAL', err?.message ?? res.statusText, err?.details);
+    throw new ApiError(
+      res.status,
+      err?.code ?? 'INTERNAL',
+      err?.message ?? res.statusText,
+      err?.details,
+    );
   }
   return data as T;
 }
@@ -70,7 +86,7 @@ export const api = {
   put: <T>(path: string, body: unknown) => request<T>('PUT', path, body),
   patch: <T>(path: string, body: unknown) => request<T>('PATCH', path, body),
   del: <T>(path: string) => request<T>('DELETE', path),
-  upload: (kind: 'avatar' | 'logo' | 'deal', file: File) => {
+  upload: (kind: 'avatar' | 'logo' | 'deal' | 'portfolio', file: File) => {
     const form = new FormData();
     form.append('file', file);
     return request<{ url: string }>('POST', `/uploads/${kind}`, form);

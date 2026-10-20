@@ -32,6 +32,9 @@ export const EMAIL_POLICY: Record<NotificationType, 'instant' | 'digest' | 'none
   OFFER_REQUEST_NEW: 'instant',
   OFFER_REQUEST_ACCEPTED: 'instant',
   OFFER_REQUEST_DECLINED: 'none',
+  // One per uploaded item: in-app only so admins are not emailed for each.
+  PORTFOLIO_REVIEW_PENDING: 'none',
+  PORTFOLIO_REJECTED: 'instant',
   TRIAL_ENDING: 'instant',
   PAYMENT_SUCCEEDED: 'instant',
   PAYMENT_FAILED: 'instant',

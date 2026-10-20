@@ -11,6 +11,7 @@ const KIND_ROLES: Record<UploadKind, string[]> = {
   avatar: ['INFLUENCER'],
   logo: ['BRAND'],
   deal: ['BRAND'],
+  portfolio: ['INFLUENCER'],
 };
 
 @ApiTags('uploads')
@@ -27,10 +28,12 @@ export class StorageController {
     @UploadedFile() file: Express.Multer.File | undefined,
   ) {
     if (!(kind in KIND_ROLES)) throw new AppError('NOT_FOUND', 'Unknown upload kind');
-    if (!KIND_ROLES[kind as UploadKind].includes(user.role)) throw new AppError('FORBIDDEN', 'Not allowed');
+    if (!KIND_ROLES[kind as UploadKind].includes(user.role))
+      throw new AppError('FORBIDDEN', 'Not allowed');
     if (!file) throw new AppError('VALIDATION_FAILED', 'File is required');
     const type = sniffImage(file.buffer);
-    if (!type) throw new AppError('VALIDATION_FAILED', 'Only PNG, JPEG and WebP images are allowed');
+    if (!type)
+      throw new AppError('VALIDATION_FAILED', 'Only PNG, JPEG and WebP images are allowed');
     const url = await this.storage.putImage(kind as UploadKind, file.buffer, type.mime, type.ext);
     return { url };
   }

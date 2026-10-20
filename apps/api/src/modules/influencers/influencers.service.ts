@@ -5,7 +5,9 @@ import {
   trialDaysLeft,
   type ApplicationStatus,
   type InfluencerProfileData,
+  answeredFaq,
   isAccountUsable,
+  isPortfolioVisible,
 } from '@briefluence/shared';
 import { Prisma } from '@prisma/client';
 import { AppError, notFound } from '../../common/app-error';
@@ -13,6 +15,7 @@ import type { AuthUser } from '../../common/auth-user';
 import { Clock } from '../../common/clock';
 import { PrismaService } from '../../common/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { publicPortfolioItem } from './portfolio.service';
 import { publicAccount } from './serializers';
 
 @Injectable()
@@ -110,7 +113,10 @@ export class InfluencersService {
   async getForViewer(viewer: AuthUser, influencerId: string) {
     const p = await this.prisma.influencerProfile.findUnique({
       where: { id: influencerId },
-      include: { socialAccounts: { orderBy: { followers: 'desc' } } },
+      include: {
+        socialAccounts: { orderBy: { followers: 'desc' } },
+        portfolio: { orderBy: { createdAt: 'desc' } },
+      },
     });
     if (!p || (p.status !== 'APPROVED' && viewer.role !== 'ADMIN')) throw notFound('Influencer');
 
@@ -148,6 +154,11 @@ export class InfluencersService {
         .filter((a) => viewer.role === 'ADMIN' || isAccountUsable(a))
         .map(publicAccount),
       contacts: showContacts ? { method: p.contactMethod, value: p.contactValue } : null,
+      // Only answered questions and approved work; brands see nothing for empty sections.
+      faq: answeredFaq(p),
+      portfolio: p.portfolio
+        .filter((i) => viewer.role === 'ADMIN' || isPortfolioVisible(i))
+        .map(publicPortfolioItem),
     };
   }
 }

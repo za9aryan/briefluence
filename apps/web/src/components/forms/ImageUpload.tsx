@@ -14,7 +14,7 @@ export function ImageUpload({
   label,
   wide,
 }: {
-  kind: 'avatar' | 'logo' | 'deal';
+  kind: 'avatar' | 'logo' | 'deal' | 'portfolio';
   value: string | null | undefined;
   onChange: (url: string | null) => void;
   name: string;
@@ -49,13 +49,25 @@ export function ImageUpload({
       <Inline gap={4} wrap>
         {wide ? (
           <div className="flex aspect-[16/9] w-full max-w-xs items-center justify-center overflow-hidden rounded-card border border-line bg-surface">
-            {value ? <img src={value} alt="" className="size-full object-cover" /> : <Text size="small" tone="muted">16:9</Text>}
+            {value ? (
+              <img src={value} alt="" className="size-full object-cover" />
+            ) : (
+              <Text size="small" tone="muted">
+                16:9
+              </Text>
+            )}
           </div>
         ) : (
           <Avatar size="xl" name={name || '?'} src={value} square={kind === 'logo'} />
         )}
         <Inline gap={2} wrap>
-          <Button variant="secondary" size="sm" icon="upload" loading={busy} onClick={() => input.current?.click()}>
+          <Button
+            variant="secondary"
+            size="sm"
+            icon="upload"
+            loading={busy}
+            onClick={() => input.current?.click()}
+          >
             {value ? t('change') : t('upload')}
           </Button>
           {value && (
@@ -65,7 +77,13 @@ export function ImageUpload({
           )}
         </Inline>
       </Inline>
-      <input ref={input} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(e) => pick(e.target.files?.[0])} />
+      <input
+        ref={input}
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        hidden
+        onChange={(e) => pick(e.target.files?.[0])}
+      />
     </Stack>
   );
 }

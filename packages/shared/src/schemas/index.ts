@@ -6,3 +6,4 @@ export * from './applications';
 export * from './social';
 export * from './billing';
 export * from './offers';
+export * from './portfolio';
