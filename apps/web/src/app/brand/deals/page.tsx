@@ -5,10 +5,12 @@ import {
   Badge,
   Button,
   Card,
+  CoverChip,
   EmptyState,
   Inline,
   Menu,
   MenuItem,
+  MediaCover,
   Icon,
   Skeleton,
   Stack,
@@ -27,6 +29,7 @@ import { useDealActions } from '@/components/brand/useDealActions';
 import { api } from '@/lib/api';
 import { useFormat } from '@/lib/hooks/format';
 import { PLATFORM_ICON } from '@/lib/hooks/options';
+import { useMe } from '@/lib/hooks/session';
 import type { MyDealDto } from '@/lib/types';
 
 type Tab = 'all' | DealStatus;
@@ -46,7 +49,10 @@ export default function BrandDealsPage() {
   const tn = useTranslations('nav');
   const td = useTranslations('enums.dealStatus');
   const tc = useTranslations('common');
+  const tf = useTranslations('enums.contentFormat');
   const f = useFormat();
+  // Briefs without their own image show the brand logo.
+  const logo = useMe().data?.brand?.logoUrl ?? null;
   const [tab, setTab] = useState<Tab>('all');
   const deals = useQuery({
     queryKey: ['deals', 'mine'],
@@ -93,14 +99,33 @@ export default function BrandDealsPage() {
       ) : (
         <Stack gap={4}>
           {list.map((d) => (
-            <Card key={d.id} p={4}>
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <Card key={d.id} p={0} className="flex flex-col overflow-hidden sm:flex-row">
+              {/* Brief image (else the brand logo), status and formats on it. */}
+              <MediaCover
+                src={d.imageUrl ?? logo}
+                alt={d.title}
+                className="sm:aspect-auto sm:min-h-44 sm:w-56 sm:shrink-0 lg:w-64"
+                fallback={
+                  <Icon
+                    name={PLATFORM_ICON[d.platforms[0] ?? 'INSTAGRAM']}
+                    className="size-16 text-primary/25"
+                  />
+                }
+                topLeft={<DealStatusBadge status={d.status} />}
+                bottomLeft={
+                  <CoverChip>
+                    {d.platforms.map((p) => (
+                      <Icon key={p} name={PLATFORM_ICON[p]} size="xs" label={p} />
+                    ))}
+                    <span className="truncate">
+                      {d.contentFormats.map((x) => tf(x)).join(', ')}
+                    </span>
+                  </CoverChip>
+                }
+              />
+              <div className="flex min-w-0 flex-1 flex-col gap-4 p-4 md:p-6 lg:flex-row lg:items-center lg:justify-between">
                 <Stack gap={2} className="min-w-0">
                   <Inline gap={2} wrap>
-                    <DealStatusBadge status={d.status} />
-                    {d.platforms.map((p) => (
-                      <Icon key={p} name={PLATFORM_ICON[p]} tone="muted" label={p} />
-                    ))}
                     <Text as="span" size="small" tone="muted">
                       {t('until', { date: f.date(d.applicationDeadline) })}
                     </Text>
@@ -120,9 +145,10 @@ export default function BrandDealsPage() {
                   <Compensation compact {...d} />
                   {d.status === 'REJECTED' && <DealReviewNotice deal={d} />}
                 </Stack>
-                <Inline gap={4} justify={{ base: 'between', md: 'end' }} className="shrink-0">
-                  <Stack gap={0} className="text-right">
-                    <Inline gap={2} justify="end">
+                {/* Phones: counts on one line, buttons below; desktop: side by side. */}
+                <div className="flex shrink-0 flex-col gap-4 border-t border-line pt-4 lg:flex-row lg:items-center lg:border-0 lg:pt-0">
+                  <Stack gap={0} className="lg:text-right">
+                    <Inline gap={2} justify={{ base: 'start', lg: 'end' }}>
                       <Text weight="bold">{t('applicantsCount', { count: d.applicantCount })}</Text>
                       {d.newApplicantCount > 0 && (
                         <Badge tone="primary">
@@ -138,7 +164,11 @@ export default function BrandDealsPage() {
                   <Inline gap={1}>
                     <Link
                       href={`/brand/deals/${d.id}/applicants`}
-                      className={buttonStyles({ variant: 'secondary', size: 'sm' })}
+                      className={buttonStyles({
+                        variant: 'secondary',
+                        size: 'sm',
+                        className: 'flex-1 lg:flex-none',
+                      })}
                     >
                       {t('applicants')}
                     </Link>
@@ -206,7 +236,7 @@ export default function BrandDealsPage() {
                       )}
                     </Menu>
                   </Inline>
-                </Inline>
+                </div>
               </div>
             </Card>
           ))}
