@@ -137,13 +137,13 @@ export function PortfolioGallery({ items }: { items: PortfolioItemDto[] }) {
   );
 }
 
-/** Answered "About your work" questions as a brand reads them: same expandable rows as the public FAQ. */
+/** Answered "About your work" questions as a brand reads them: the same FAQ rows as the public pages. */
 export function FaqAnswers({ faq }: { faq: FaqAnswerDto[] }) {
-  const t = useTranslations('portfolio.view.questions');
+  const t = useTranslations('portfolio.faq.questions');
   return (
     <div>
-      {faq.map((f, i) => (
-        <Disclosure key={f.key} summary={t(f.key)} defaultOpen={i === 0}>
+      {faq.map((f) => (
+        <Disclosure key={f.key} summary={t(f.key)}>
           <span className="whitespace-pre-line break-words">{f.answer}</span>
         </Disclosure>
       ))}

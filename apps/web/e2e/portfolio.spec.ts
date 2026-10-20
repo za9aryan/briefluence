@@ -133,11 +133,11 @@ test('portfolio + FAQ: blogger adds work → admin approves → brand sees it an
   await expect(brand.getByText('Attached work')).toBeVisible();
   await expect(brand.getByRole('img', { name: `Story for a coffee shop ${id}` })).toBeVisible();
   await brand.goto(`/brand/influencers/${profileId}`);
-  await expect(brand.getByText('About the blogger')).toBeVisible();
+  await expect(brand.getByRole('heading', { name: 'FAQ' })).toBeVisible();
+  await brand.getByText('Who is your audience?').click();
   await expect(brand.getByText('Women 20–30 in Yerevan who love food')).toBeVisible();
   // Unanswered questions stay hidden.
-  await expect(brand.getByText('What brands has the blogger worked with?')).toHaveCount(0);
-  await expect(brand.getByText('Who is their audience?')).toBeVisible();
+  await expect(brand.getByText('What brands have you worked with?')).toHaveCount(0);
   await expect(brand.getByRole('link', { name: 'instagram.com' })).toBeVisible();
   if (shots) await brand.screenshot({ path: `${shots}/brand.png`, fullPage: true });
 });

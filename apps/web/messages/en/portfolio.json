@@ -50,12 +50,7 @@
   },
   "view": {
     "portfolio": "Portfolio",
-    "faq": "About the blogger",
-    "questions": {
-      "brandsWorked": "What brands has the blogger worked with?",
-      "audience": "Who is their audience?",
-      "brandsWanted": "What brands do they want to work with?"
-    },
+    "faq": "FAQ",
     "openLink": "Open",
     "attached": "Attached work",
     "close": "Close"

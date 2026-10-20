@@ -6,6 +6,7 @@ import {
   CardHeader,
   ErrorState,
   Grid,
+  Heading,
   Inline,
   Skeleton,
   Stack,
@@ -98,10 +99,12 @@ export default function InfluencerProfileForBrandPage() {
         ))}
       </Grid>
       {p.faq.length > 0 && (
-        <Card>
-          <CardHeader title={tp('faq')} />
+        <section aria-labelledby="blogger-faq" className="border-t border-line pt-8">
+          <Heading level={2} id="blogger-faq" className="mb-2">
+            {tp('faq')}
+          </Heading>
           <FaqAnswers faq={p.faq} />
-        </Card>
+        </section>
       )}
       {p.portfolio.length > 0 && (
         <Card>

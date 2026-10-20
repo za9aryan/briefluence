@@ -113,20 +113,7 @@ export default {
     },
     view: {
       portfolio: ['Portfolio', 'Портфолио', 'Պորտֆոլիո'],
-      faq: ['About the blogger', 'О блогере', 'Բլոգերի մասին'],
-      questions: {
-        brandsWorked: [
-          'What brands has the blogger worked with?',
-          'С какими брендами работал блогер?',
-          'Ո՞ր բրենդների հետ է աշխատել բլոգերը։',
-        ],
-        audience: ['Who is their audience?', 'Кто аудитория блогера?', 'Ո՞վ է բլոգերի լսարանը։'],
-        brandsWanted: [
-          'What brands do they want to work with?',
-          'С какими брендами блогер хочет работать?',
-          'Ո՞ր բրենդների հետ է ուզում աշխատել բլոգերը։',
-        ],
-      },
+      faq: ['FAQ', 'Вопросы и ответы', 'Հարցեր և պատասխաններ'],
       openLink: ['Open', 'Открыть', 'Բացել'],
       attached: ['Attached work', 'Приложенные работы', 'Կցված աշխատանքներ'],
       close: ['Close', 'Закрыть', 'Փակել'],

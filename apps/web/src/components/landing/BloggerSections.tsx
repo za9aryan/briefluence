@@ -139,13 +139,13 @@ export async function BloggerFaq() {
           <Heading level={2} id="faq-title">
             {t('title')}
           </Heading>
-          <Card p={{ base: 4, md: 6 }} className="py-0 md:py-0">
+          <div>
             {FAQ.map((k) => (
               <Disclosure key={k} summary={t(`items.${k}.q`)}>
                 {t(`items.${k}.a`)}
               </Disclosure>
             ))}
-          </Card>
+          </div>
         </Stack>
       </Container>
     </section>

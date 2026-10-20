@@ -4,7 +4,7 @@ import { Icon } from '../primitives/Icon';
 
 /**
  * Expandable question/answer row (FAQ). Native <details>, so it works without JS and is
- * keyboard/screen-reader friendly. Stack several inside a bordered list.
+ * keyboard/screen-reader friendly. Each row has a line under it; "+" turns into "×" when open.
  */
 export function Disclosure({
   summary,
@@ -18,18 +18,16 @@ export function Disclosure({
   className?: string;
 }) {
   return (
-    <details
-      open={defaultOpen}
-      className={cn('group border-b border-line last:border-0', className)}
-    >
-      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-4 text-body font-bold text-ink [&::-webkit-details-marker]:hidden">
+    <details open={defaultOpen} className={cn('group border-b border-line', className)}>
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-5 text-body font-bold text-ink md:text-[18px] [&::-webkit-details-marker]:hidden">
         {summary}
         <Icon
-          name="chevron-down"
-          className="text-ink-muted transition-transform group-open:rotate-180"
+          name="plus"
+          size="lg"
+          className="text-ink transition-transform group-open:rotate-45"
         />
       </summary>
-      <div className="pb-4 text-body text-ink-muted">{children}</div>
+      <div className="pb-5 text-body text-ink-muted">{children}</div>
     </details>
   );
 }
