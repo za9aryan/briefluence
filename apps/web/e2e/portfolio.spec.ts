@@ -131,7 +131,13 @@ test('portfolio + FAQ: blogger adds work → admin approves → brand sees it an
   // ── Brand sees the attached work on the application and the profile ──
   await brand.goto(`/brand/deals/${deal.id}/applicants`);
   await expect(brand.getByText('Attached work')).toBeVisible();
-  await expect(brand.getByRole('img', { name: `Story for a coffee shop ${id}` })).toBeVisible();
+  await expect(brand.getByRole('button', { name: `Story for a coffee shop ${id}` })).toBeVisible();
+  if (shots) await brand.screenshot({ path: `${shots}/applicants.png`, fullPage: true });
+  if (shots) {
+    await brand.setViewportSize({ width: 375, height: 900 });
+    await brand.screenshot({ path: `${shots}/applicants-m.png` });
+    await brand.setViewportSize({ width: 1280, height: 720 });
+  }
   await brand.goto(`/brand/influencers/${profileId}`);
   await expect(brand.getByRole('heading', { name: 'FAQ' })).toBeVisible();
   await brand.getByText('Who is your audience?').click();

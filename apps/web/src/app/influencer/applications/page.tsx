@@ -28,7 +28,7 @@ import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
 import { CONTACT_ICON } from '@/components/brand/ContactMethodFields';
 import { BrandAvatar, useBrandName } from '@/components/domain/BrandIdentity';
-import { DealCoverFallback } from '@/components/domain/DealCard';
+import { DealCoverFallback, dealCover } from '@/components/domain/DealCard';
 import { ApplicationStatusBadge } from '@/components/domain/badges';
 import { Compensation } from '@/components/domain/Compensation';
 import { api } from '@/lib/api';
@@ -103,7 +103,7 @@ export default function MyApplicationsPage() {
             <Card key={a.id} p={0} className="flex flex-col overflow-hidden sm:flex-row">
               {/* Brief image on the left (on top on phones), status on it. */}
               <MediaCover
-                src={a.deal.imageUrl}
+                src={dealCover(a.deal)}
                 alt={a.deal.title}
                 className="sm:aspect-auto sm:min-h-44 sm:w-56 sm:shrink-0 lg:w-64"
                 fallback={<DealCoverFallback brand={a.deal.brand} platforms={a.deal.platforms} />}

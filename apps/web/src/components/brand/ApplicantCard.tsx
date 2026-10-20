@@ -2,12 +2,14 @@
 import { REJECTION_REASONS, type Currency, type RejectionReason } from '@briefluence/shared';
 import {
   Alert,
-  Avatar,
   Badge,
   Button,
   Card,
   ChipGroup,
+  CoverChip,
+  Icon,
   Inline,
+  MediaCover,
   Modal,
   ScoreMeter,
   Stack,
@@ -22,7 +24,7 @@ import { ApplicationStatusBadge, VerifiedBadge } from '@/components/domain/badge
 import { ContactLink } from '@/components/domain/ContactLink';
 import { PortfolioGallery } from '@/components/portfolio/PortfolioParts';
 import { useFormat } from '@/lib/hooks/format';
-import { useOptions } from '@/lib/hooks/options';
+import { PLATFORM_ICON, useOptions } from '@/lib/hooks/options';
 import type { ApplicantDto } from '@/lib/types';
 
 export type ApplicantAction = {
@@ -52,12 +54,33 @@ export function ApplicantCard({
   const [expanded, setExpanded] = useState(false);
   const open = ['APPLIED', 'VIEWED', 'SHORTLISTED'].includes(a.status);
 
+  const top = a.accounts[0];
   return (
-    <Card p={4}>
-      <Stack gap={4}>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <Card p={0} className="flex flex-col overflow-hidden sm:flex-row">
+      {/* The blogger's photo (else their attached work), status and reach on it. */}
+      <MediaCover
+        aspect="photo"
+        src={a.influencer.avatarUrl ?? a.portfolio[0]?.imageUrl}
+        alt={a.influencer.displayName}
+        className="sm:aspect-auto sm:min-h-56 sm:w-56 sm:shrink-0 lg:w-64"
+        fallback={
+          <span className="text-display font-extrabold text-primary-text" aria-hidden>
+            {initials(a.influencer.displayName)}
+          </span>
+        }
+        topLeft={<ApplicationStatusBadge status={a.status} />}
+        bottomLeft={
+          top && (
+            <CoverChip>
+              <Icon name={PLATFORM_ICON[top.platform]} size="xs" label={top.platform} />
+              {f.compact(top.followers)}
+            </CoverChip>
+          )
+        }
+      />
+      <Stack gap={4} className="min-w-0 flex-1 p-4 md:p-6">
+        <div className="flex items-start justify-between gap-4">
           <Inline gap={4} align="start" className="min-w-0">
-            <Avatar size="lg" name={a.influencer.displayName} src={a.influencer.avatarUrl} />
             <Stack gap={1} className="min-w-0">
               <Inline gap={2} wrap>
                 <Link
@@ -80,10 +103,7 @@ export function ApplicantCard({
               )}
             </Stack>
           </Inline>
-          <Inline gap={4} className="shrink-0">
-            <ApplicationStatusBadge status={a.status} />
-            <ScoreMeter value={a.matchScore} label={t('match')} />
-          </Inline>
+          <ScoreMeter value={a.matchScore} label={t('match')} />
         </div>
 
         <div className="rounded-card bg-surface p-4">
@@ -100,8 +120,8 @@ export function ApplicantCard({
             <Text size="small" weight="bold">
               {tp('attached')}
             </Text>
-            <div className="max-w-xl">
-              <PortfolioGallery items={a.portfolio} />
+            <div className="max-w-sm">
+              <PortfolioGallery items={a.portfolio} compact />
             </div>
           </Stack>
         )}
@@ -234,4 +254,13 @@ export function ApplicantCard({
       </Modal>
     </Card>
   );
+}
+
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join('');
 }
