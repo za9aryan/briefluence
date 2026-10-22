@@ -24,4 +24,4 @@ mkdir -p "$ROOT/backups"
 ( crontab -l 2>/dev/null | grep -v 'deploy/oracle/backup.sh' ; echo "30 3 * * * $ROOT/deploy/oracle/backup.sh >> $HOME/briefluence-backup.log 2>&1" ) | crontab -
 
 echo
-echo "Done. Log out and back in (so Docker works without sudo), then continue with step 6 of docs/oracle-deploy.md."
+echo "Done. Log out and back in (so Docker works without sudo), then continue with step 8 of docs/oracle-deploy.md."

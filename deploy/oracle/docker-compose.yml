@@ -22,6 +22,7 @@ services:
       context: ../..
       dockerfile: deploy/oracle/Dockerfile
     image: briefluence-app
+    pull_policy: build
     restart: unless-stopped
     env_file: .env
     environment:
@@ -40,7 +41,9 @@ services:
         condition: service_healthy
 
   web:
+    # Same image the api service builds; never look for it on Docker Hub.
     image: briefluence-app
+    pull_policy: never
     restart: unless-stopped
     environment:
       NODE_ENV: production
