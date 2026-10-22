@@ -1,7 +1,7 @@
 # Deploy on Oracle Cloud (Always Free)
 
-Everything runs on one free ARM server: Postgres, the API (with its daily jobs), the website and
-Caddy (automatic HTTPS). The files are in [`deploy/oracle/`](../deploy/oracle).
+Everything runs on one free ARM server: Postgres, Redis (job queue), the API (with its daily jobs),
+the website and Caddy (automatic HTTPS). The files are in [`deploy/oracle/`](../deploy/oracle).
 
 ```
 visitor ──https──▶ Caddy :443 ──▶ website (Next.js :3000) ──/api/v1──▶ API (:4000) ──▶ Postgres
@@ -133,7 +133,7 @@ cd ~/briefluence
 ./deploy/oracle/deploy.sh
 ```
 
-The first build takes 10–20 minutes. Then all four services show **Up**. Watch the API start:
+The first build takes 10–20 minutes. Then all five services (`db`, `redis`, `api`, `web`, `caddy`) show **Up**. Watch the API start:
 
 ```bash
 cd ~/briefluence/deploy/oracle && docker compose logs -f api
