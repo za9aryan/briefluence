@@ -108,11 +108,11 @@ export default function AdminBriefReviewPage() {
               <Card key={d.id}>
                 <Stack gap={4}>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                    <Stack gap={1}>
+                    <Stack gap={1} className="min-w-0">
                       <Text size="body" weight="bold">
                         {d.title}
                       </Text>
-                      <Text size="small" tone="muted">
+                      <Text size="small" tone="muted" className="wrap-anywhere">
                         {[
                           d.brand.companyName,
                           d.brand.user.email,
@@ -141,10 +141,10 @@ export default function AdminBriefReviewPage() {
                       className="aspect-video w-full max-w-md rounded-card border border-line object-cover"
                     />
                   )}
-                  <Text size="small" className="whitespace-pre-line">
+                  <Text size="small" className="whitespace-pre-line wrap-anywhere">
                     {d.description}
                   </Text>
-                  <dl className="grid grid-cols-1 gap-x-6 gap-y-2 text-small sm:grid-cols-[max-content_1fr]">
+                  <dl className="grid grid-cols-[minmax(0,1fr)] gap-x-6 gap-y-2 text-small sm:grid-cols-[max-content_minmax(0,1fr)]">
                     <dt className="text-ink-muted">{t('pays')}</dt>
                     <dd>
                       <Compensation {...d} />
@@ -152,7 +152,7 @@ export default function AdminBriefReviewPage() {
                     {rows.map((r) => (
                       <div key={r.label} className="contents">
                         <dt className="text-ink-muted">{r.label}</dt>
-                        <dd className="text-ink">{r.value}</dd>
+                        <dd className="min-w-0 text-ink wrap-anywhere">{r.value}</dd>
                       </div>
                     ))}
                   </dl>
@@ -162,7 +162,7 @@ export default function AdminBriefReviewPage() {
                     </Text>
                   )}
                   {d.status === 'IN_REVIEW' && (
-                    <Inline gap={2} justify="end">
+                    <Inline gap={2} justify="end" wrap>
                       <Button variant="ghost" onClick={() => setRejecting(d)}>
                         {t('reject')}
                       </Button>

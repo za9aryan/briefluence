@@ -125,7 +125,7 @@ export default function AdminPortfolioPage() {
                     </Text>
                   )}
                   {i.reviewStatus !== 'REJECTED' && (
-                    <Inline gap={2} justify="end" className="mt-auto">
+                    <Inline gap={2} justify="end" wrap className="mt-auto">
                       <Button variant="ghost" onClick={() => setRejecting(i)}>
                         {t('reject')}
                       </Button>

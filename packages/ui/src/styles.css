@@ -32,6 +32,8 @@
   }
   body {
     @apply bg-surface font-sans text-body text-ink antialiased;
+    /* Long handles, emails and links wrap instead of running out of their box on phones. */
+    overflow-wrap: break-word;
   }
   /* Number fields look like text fields: no spinner arrows (typing is faster than clicking). */
   input[type='number']::-webkit-inner-spin-button,

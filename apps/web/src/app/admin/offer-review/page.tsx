@@ -92,7 +92,7 @@ export default function AdminOfferReviewPage() {
                 </Inline>
                 <OfferMeta offer={o} />
                 <OfferPrice offer={o} size="body" />
-                <Text size="small" className="whitespace-pre-line">
+                <Text size="small" className="whitespace-pre-line wrap-anywhere">
                   {o.description}
                 </Text>
                 {o.idealBrands && (
@@ -104,7 +104,7 @@ export default function AdminOfferReviewPage() {
                   </Text>
                 )}
                 {o.status === 'IN_REVIEW' && (
-                  <Inline gap={2} justify="end">
+                  <Inline gap={2} justify="end" wrap>
                     <Button variant="ghost" onClick={() => setRejecting(o)}>
                       {t('reject')}
                     </Button>

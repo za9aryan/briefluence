@@ -15,9 +15,11 @@ export function AccountLine({
 }) {
   const t = useTranslations('verification');
   const f = useFormat();
+  // Long usernames wrap (anywhere) instead of pushing past the card on phones.
   const handle = (
-    <span className="inline-flex items-center gap-1 font-bold text-ink">
-      <Icon name={PLATFORM_ICON[account.platform]} />@{account.username}
+    <span className="inline-flex min-w-0 max-w-full items-center gap-1 font-bold text-ink">
+      <Icon name={PLATFORM_ICON[account.platform]} />
+      <span className="min-w-0 wrap-anywhere">@{account.username}</span>
       {link && <Icon name="external" size="xs" tone="muted" />}
     </span>
   );
@@ -28,7 +30,7 @@ export function AccountLine({
           href={account.profileUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:underline"
+          className="min-w-0 max-w-full hover:underline"
         >
           {handle}
         </a>
@@ -80,8 +82,10 @@ export function AccountStats({ account }: { account: SocialAccountDto }) {
         .slice(0, 3)
     : [];
 
+  // Boxes are at least as wide as their label, so long words (ru/hy) never split; they wrap to
+  // the next row on narrow screens instead.
   const stat = (label: string, value: string) => (
-    <div className="min-w-0 rounded-sm bg-surface p-2">
+    <div className="min-w-fit flex-1 rounded-sm bg-surface p-2">
       <p className="text-small text-ink-muted">{label}</p>
       <p className="text-body font-bold text-ink tabular-nums">{value}</p>
     </div>
@@ -89,7 +93,7 @@ export function AccountStats({ account }: { account: SocialAccountDto }) {
 
   return (
     <Stack gap={4}>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="flex flex-wrap gap-2">
         {stat(t('followers'), f.compact(account.followers))}
         {stat(
           t('engagement'),

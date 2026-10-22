@@ -91,9 +91,9 @@ export default function AdminAccountsPage() {
             <Card key={a.id}>
               <Stack gap={4}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <Inline gap={4} align="start">
+                  <Inline gap={4} align="start" className="min-w-0">
                     <Avatar name={a.influencer.displayName} src={a.influencer.avatarUrl} />
-                    <Stack gap={1}>
+                    <Stack gap={1} className="min-w-0 wrap-anywhere">
                       <Text weight="bold">{a.influencer.displayName}</Text>
                       <Text size="small" tone="muted">
                         {a.influencer.email} · {t('added', { date: f.dateTime(a.createdAt) })}
@@ -122,7 +122,7 @@ export default function AdminAccountsPage() {
                   </Text>
                 )}
                 {a.reviewStatus === 'PENDING' && (
-                  <Inline gap={2} justify="end">
+                  <Inline gap={2} justify="end" wrap>
                     <Button variant="ghost" onClick={() => setRejecting(a)}>
                       {t('reject')}
                     </Button>
