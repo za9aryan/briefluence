@@ -81,10 +81,13 @@ test('support chat on a phone opens full screen', async ({ browser }) => {
   await page.goto('/for-influencers');
   await page.getByRole('button', { name: 'Chat with support' }).click();
   const chat = page.getByRole('dialog', { name: 'Support' });
-  const box = await chat.boundingBox();
-  expect(box).toMatchObject({ x: 0, y: 0, width: 375 });
+  // It grows out of the button, then fills the screen.
+  await expect.poll(async () => (await chat.boundingBox())?.width).toBe(375);
+  expect(await chat.boundingBox()).toMatchObject({ x: 0, y: 0, width: 375 });
   if (process.env.E2E_SHOTS)
     await page.screenshot({ path: `${process.env.E2E_SHOTS}/support-mobile.png` });
   await chat.getByRole('button', { name: 'Close chat' }).click();
   await expect(chat).toBeHidden();
+  // It shrinks back into the button, which gets the focus again.
+  await expect(page.getByRole('button', { name: 'Chat with support' })).toBeFocused();
 });
