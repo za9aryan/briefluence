@@ -115,6 +115,10 @@ export const NOTIFICATION_TYPES = values(
   'PORTFOLIO_REVIEW_PENDING',
   'PORTFOLIO_APPROVED',
   'PORTFOLIO_REJECTED',
+  'SUPPORT_NEW_TICKET',
+  'SUPPORT_USER_MESSAGE',
+  'SUPPORT_ASSIGNED',
+  'SUPPORT_REPLY',
 );
 
 /** Blogger offers ("1 Story for 10,000 AMD"), moderated like briefs. */
@@ -132,6 +136,14 @@ export type OfferRequestStatus = (typeof OFFER_REQUEST_STATUSES)[number];
 
 export const ACCOUNT_REVIEW_STATUSES = values('PENDING', 'APPROVED', 'REJECTED');
 export type AccountReviewStatus = (typeof ACCOUNT_REVIEW_STATUSES)[number];
+
+/** Support chat. OPEN = waiting for support, ANSWERED = waiting for the user. */
+export const SUPPORT_TOPICS = values('ACCOUNT', 'PAYMENTS', 'BRIEFS', 'OTHER');
+export type SupportTopic = (typeof SUPPORT_TOPICS)[number];
+export const SUPPORT_STATUSES = values('OPEN', 'ANSWERED', 'CLOSED');
+export type SupportStatus = (typeof SUPPORT_STATUSES)[number];
+export const SUPPORT_AUTHORS = values('USER', 'GUEST', 'ADMIN');
+export type SupportAuthor = (typeof SUPPORT_AUTHORS)[number];
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];
 
 export const CONTACT_METHODS = values(

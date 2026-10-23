@@ -1,0 +1,87 @@
+{
+  "widget": {
+    "open": "Chat with support",
+    "close": "Close chat",
+    "title": "Support",
+    "subtitle": "Write to us and we’ll answer here.",
+    "newReply": "New reply from support"
+  },
+  "topics": {
+    "ACCOUNT": "Account",
+    "PAYMENTS": "Payments",
+    "BRIEFS": "Briefs & offers",
+    "OTHER": "Other"
+  },
+  "start": {
+    "topic": "What is it about?",
+    "email": "Your email",
+    "emailHint": "We’ll send our replies here too.",
+    "name": "Name",
+    "message": "Message",
+    "placeholder": "Tell us what happened",
+    "send": "Send",
+    "guestNote": "You’re not signed in. We’ll answer here and by email."
+  },
+  "chat": {
+    "you": "You",
+    "support": "Support",
+    "placeholder": "Write a message…",
+    "send": "Send",
+    "attach": "Attach an image",
+    "removeImage": "Remove image",
+    "image": "Image",
+    "waiting": "Thanks! We’ll reply here, and you’ll get an email too.",
+    "closed": "This conversation is closed.",
+    "newConversation": "Start a new conversation",
+    "enterHint": "Enter to send, Shift+Enter for a new line"
+  },
+  "status": {
+    "OPEN": "Waiting for support",
+    "ANSWERED": "Answered",
+    "CLOSED": "Closed"
+  },
+  "page": {
+    "title": "Support",
+    "lead": "Questions about your account, payments or anything else: write to us here.",
+    "linkInvalid": "This link doesn’t work any more. Write to us again below."
+  },
+  "admin": {
+    "title": "Support",
+    "lead": "Questions from users and visitors. Assign a conversation to yourself and reply.",
+    "boxes": {
+      "unassigned": "Unassigned",
+      "mine": "Mine",
+      "open": "All open",
+      "closed": "Closed"
+    },
+    "empty": "No conversations here",
+    "pick": "Pick a conversation to read it.",
+    "back": "All conversations",
+    "guest": "Guest",
+    "blocked": "Blocked",
+    "waiting": "Waiting {time}",
+    "assignee": "Assigned to",
+    "nobody": "Nobody",
+    "assignToMe": "Assign to me",
+    "assigned": "Assigned",
+    "replyPlaceholder": "Write a reply…",
+    "send": "Send reply",
+    "close": "Close conversation",
+    "reopen": "Reopen",
+    "closedToast": "Conversation closed",
+    "reopenedToast": "Conversation reopened",
+    "person": {
+      "title": "Who is asking",
+      "role": "Role",
+      "email": "Email",
+      "emailVerified": "Email confirmed",
+      "emailNotVerified": "Email not confirmed",
+      "plan": "Plan",
+      "joined": "Joined",
+      "verification": "Verification",
+      "matched": "Not signed in, but this email belongs to an account:",
+      "noAccount": "No account with this email.",
+      "openUser": "Open in Users"
+    }
+  }
+}

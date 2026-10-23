@@ -37,6 +37,11 @@ export const EMAIL_POLICY: Record<NotificationType, 'instant' | 'digest' | 'none
   // In-app only: a blogger may get several approvals at once.
   PORTFOLIO_APPROVED: 'none',
   PORTFOLIO_REJECTED: 'instant',
+  // Support: admins work in the inbox (in-app only); users get replies by email too.
+  SUPPORT_NEW_TICKET: 'none',
+  SUPPORT_USER_MESSAGE: 'none',
+  SUPPORT_ASSIGNED: 'none',
+  SUPPORT_REPLY: 'instant',
   TRIAL_ENDING: 'instant',
   PAYMENT_SUCCEEDED: 'instant',
   PAYMENT_FAILED: 'instant',

@@ -29,7 +29,7 @@ import {
 } from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { IconName } from '@briefluence/ui';
 import { PageHeader } from '@/components/app/AppShell';
 import { ReuseBadge } from '@/components/admin/AccountReuse';
@@ -78,6 +78,11 @@ export default function AdminUsersPage() {
   const qc = useQueryClient();
   const [role, setRole] = useState<'' | Role>('');
   const [q, setQ] = useState('');
+  // Links from other admin pages (e.g. a support ticket) open the list filtered: /admin/users?q=email
+  useEffect(() => {
+    const preset = new URLSearchParams(window.location.search).get('q');
+    if (preset) setQ(preset);
+  }, []);
   const [state, setState] = useState<'' | 'unverified' | 'blocked'>('');
   const list = useQuery({
     queryKey: ['admin', 'users', role, q, state],

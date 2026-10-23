@@ -13,6 +13,8 @@ const KIND_ROLES: Record<UploadKind, string[]> = {
   deal: ['BRAND'],
   portfolio: ['INFLUENCER'],
   offer: ['INFLUENCER'],
+  // Support images go through POST /support/attachments (guests too), not here.
+  support: [],
 };
 
 @ApiTags('uploads')

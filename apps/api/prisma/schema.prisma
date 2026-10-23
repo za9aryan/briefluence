@@ -138,20 +138,22 @@ enum PaymentStatus {
 }
 
 model User {
-  id              String             @id @default(cuid())
-  email           String             @unique
+  id              String              @id @default(cuid())
+  email           String              @unique
   passwordHash    String? // null for accounts created with Google / Apple sign-in
   role            Role
   emailVerifiedAt DateTime?
-  createdAt       DateTime           @default(now())
+  createdAt       DateTime            @default(now())
   blockedAt       DateTime? // spec+: admin moderation of users/brands
-  digestEmails    Boolean            @default(true) // spec+: notification settings page
-  currency        Currency           @default(AMD) // spec+: currency amounts are shown in
-  locale          String             @default("en") // spec+: language for emails / notifications (en | ru | hy)
+  digestEmails    Boolean             @default(true) // spec+: notification settings page
+  currency        Currency            @default(AMD) // spec+: currency amounts are shown in
+  locale          String              @default("en") // spec+: language for emails / notifications (en | ru | hy)
   influencer      InfluencerProfile?
   brand           BrandProfile?
   subscription    Subscription?
   notifications   Notification[]
+  supportTickets  SupportTicket[]     @relation("SupportTicketUser")
+  supportAssigned SupportTicket[]     @relation("SupportTicketAssignee")
   refreshTokens   RefreshToken[]
   identities      AuthIdentity[]
   accountLinks    SocialAccountLink[]
@@ -207,9 +209,9 @@ model InfluencerProfile {
 }
 
 model SocialAccount {
-  id                String            @id @default(cuid())
+  id                String              @id @default(cuid())
   influencerId      String
-  influencer        InfluencerProfile @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  influencer        InfluencerProfile   @relation(fields: [influencerId], references: [id], onDelete: Cascade)
   platform          Platform
   externalId        String
   username          String
@@ -222,7 +224,7 @@ model SocialAccount {
   audienceGender    Json? // { male: 38.2, female: 61.8 }
   audienceAge       Json? // { "18-24": 30.1, "25-34": 41.0, ... }
   audienceCountries Json? // { "AM": 72.4, "RU": 9.1, ... }
-  source            AccountSource     @default(OAUTH) // spec+
+  source            AccountSource       @default(OAUTH) // spec+
   reviewStatus      AccountReviewStatus @default(PENDING) // spec+
   reviewNote        String? // admin's reason when rejected
   reviewedAt        DateTime?
@@ -233,7 +235,7 @@ model SocialAccount {
   tokenExpiresAt    DateTime?
   tokenRevokedAt    DateTime? // spec+: flagged when a sync finds the token revoked
   lastSyncedAt      DateTime?
-  createdAt         DateTime          @default(now())
+  createdAt         DateTime            @default(now())
 
   @@unique([platform, externalId])
   @@unique([influencerId, platform]) // one account per platform per blogger
@@ -589,4 +591,71 @@ model OfferView {
 
   @@unique([offerId, brandId, day])
   @@index([offerId, createdAt])
+}
+
+enum SupportTopic {
+  ACCOUNT
+  PAYMENTS
+  BRIEFS
+  OTHER
+}
+
+/// OPEN = waiting for support, ANSWERED = waiting for the user.
+enum SupportStatus {
+  OPEN
+  ANSWERED
+  CLOSED
+}
+
+enum SupportAuthor {
+  USER
+  GUEST
+  ADMIN
+}
+
+/// Support chat conversation. Either a signed-in user (userId) or a guest (guestEmail + secret
+/// token). The guest token is stored hashed for lookup and encrypted so reply emails can link back.
+model SupportTicket {
+  id                 String           @id @default(cuid())
+  userId             String?
+  user               User?            @relation("SupportTicketUser", fields: [userId], references: [id], onDelete: SetNull)
+  guestEmail         String?
+  guestName          String?
+  guestTokenHash     String?          @unique
+  guestTokenEnc      String?
+  /// Language for emails to a guest (en | ru | hy).
+  locale             String           @default("en")
+  createdIp          String?
+  topic              SupportTopic
+  status             SupportStatus    @default(OPEN)
+  assigneeId         String?
+  assignee           User?            @relation("SupportTicketAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  lastMessageAt      DateTime
+  lastUserMessageAt  DateTime?
+  lastAdminMessageAt DateTime?
+  userLastReadAt     DateTime?
+  adminLastReadAt    DateTime?
+  closedAt           DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  messages           SupportMessage[]
+
+  @@index([status, lastMessageAt])
+  @@index([userId])
+  @@index([assigneeId])
+  @@index([guestEmail])
+}
+
+model SupportMessage {
+  id        String        @id @default(cuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author    SupportAuthor
+  /// User id for USER and ADMIN messages; null for guests.
+  authorId  String?
+  body      String
+  imageUrl  String?
+  createdAt DateTime      @default(now())
+
+  @@index([ticketId, createdAt])
 }

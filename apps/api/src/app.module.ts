@@ -23,6 +23,7 @@ import { JobsModule } from './modules/jobs/jobs.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { SocialModule } from './modules/social/social.module';
 import { StorageModule } from './modules/storage/storage.module';
+import { SupportModule } from './modules/support/support.module';
 import { QueueModule } from './queue/queue.module';
 
 const env = loadEnv();
@@ -51,6 +52,7 @@ const env = loadEnv();
     ApplicationsModule,
     BillingModule,
     AdminModule,
+    SupportModule,
     JobsModule,
   ],
   controllers: [HealthController],

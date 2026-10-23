@@ -31,6 +31,7 @@ const localeOf = (v: string | null | undefined): NotificationLocale =>
   isNotificationLocale(v) ? v : 'en';
 import { NotificationsService } from '../notifications/notifications.service';
 import { SocialService } from '../social/social.service';
+import { SupportService } from '../support/support.service';
 
 export const JOB_NAMES = [
   'expire-deals',
@@ -38,6 +39,7 @@ export const JOB_NAMES = [
   'social-sync',
   'digests',
   'rates',
+  'support-autoclose',
 ] as const;
 export type JobName = (typeof JOB_NAMES)[number];
 
@@ -57,6 +59,7 @@ export class JobsService {
     private readonly email: EmailService,
     private readonly clock: Clock,
     private readonly rates: RatesService,
+    private readonly support: SupportService,
     @Inject(ENV) private readonly env: Env,
   ) {}
 
@@ -85,6 +88,11 @@ export class JobsService {
     if (this.scheduled) await this.safe('rates');
   }
 
+  @Cron('0 4 * * *', { timeZone: TIMEZONE })
+  async cronSupport() {
+    if (this.scheduled) await this.safe('support-autoclose');
+  }
+
   @Cron('0 10 * * *', { timeZone: TIMEZONE })
   async cronDigests() {
     if (this.scheduled) await this.safe('digests');
@@ -108,6 +116,8 @@ export class JobsService {
         return { queued: await this.social.enqueueAllSyncs() };
       case 'rates':
         return { updated: !!(await this.rates.refresh()) };
+      case 'support-autoclose':
+        return this.support.autoClose();
       case 'digests':
         return { influencers: await this.influencerDigest(), brands: await this.brandDigest() };
       default:

@@ -104,6 +104,30 @@ back to review. When applying, a blogger can attach up to 3 approved items; bran
 on the blogger's profile. Three optional questions (brands worked with, audience, brands wanted) appear to brands
 only when answered.
 
+## Support chat
+
+A chat button sits in the bottom-right corner of every page (not for admins) and `/support` shows
+the same chat full size.
+
+- **Signed-in users** pick a topic (Account, Payments, Briefs & offers, Other) and write; one open
+  conversation at a time. Replies arrive in the chat, as a notification and by email.
+- **Visitors who are not signed in** (including blocked users) give an email; an httpOnly
+  `bf_support` cookie keeps the conversation in that browser, and every admin reply is emailed with
+  a secret `/support?t=…` link that continues the chat on any device. Guests can attach images too.
+  Spam guards: hidden honeypot field, 3 new conversations per email and 20 per IP a day, 20
+  messages per conversation per 10 minutes, request throttling.
+- **Admins** work in **Admin → Support**: Unassigned / Mine / All open / Closed, assign to
+  themselves or another admin, reply (the first admin to reply becomes the assignee), close or
+  reopen. The side panel shows who is asking — for a guest, the account that owns the email, e.g.
+  a **blocked** one.
+- Statuses: Open (waiting for support) → Answered (waiting for the user) → Closed. A user reply
+  reopens Answered; Answered tickets with no reply for 7 days close automatically (daily job
+  `support-autoclose`).
+- **Live updates** use WebSockets (Socket.IO at `/api/v1/ws`). Messages are sent through the REST
+  API; the socket only says "ticket X changed" and clients reload it, so no content travels over
+  the socket. In production Caddy routes `/api/v1/ws/*` to the API; locally the browser connects to
+  the API port directly (`NEXT_PUBLIC_SOCKET_ORIGIN`).
+
 ## Re-registration warning
 
 Every link of a social account to a profile is kept in `SocialAccountLink` (also after the account or user is

@@ -62,6 +62,8 @@ export default defineConfig({
       env: {
         NEXT_DIST_DIR: '.next-e2e',
         API_INTERNAL_URL: `http://localhost:${API_PORT}`,
+        // No Caddy here: the support chat's WebSocket goes straight to the E2E API.
+        NEXT_PUBLIC_SOCKET_ORIGIN: `http://localhost:${API_PORT}`,
         NEXT_TELEMETRY_DISABLED: '1',
       },
       reuseExistingServer: !process.env.CI,

@@ -1,5 +1,13 @@
 # HTTPS certificates are issued and renewed automatically (Let's Encrypt).
 {$DOMAIN} {
 	encode zstd gzip
-	reverse_proxy web:3000
+
+	# Support chat live updates (Socket.IO WebSocket) go straight to the API: the website
+	# (Next.js) cannot pass WebSockets through. Everything else goes to the website.
+	handle /api/v1/ws/* {
+		reverse_proxy api:4000
+	}
+	handle {
+		reverse_proxy web:3000
+	}
 }

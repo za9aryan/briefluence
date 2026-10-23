@@ -622,6 +622,56 @@ const CATALOG: Record<NotificationType, { cta: L3; render: Record<NotificationLo
         }),
       },
     },
+    SUPPORT_NEW_TICKET: {
+      cta: { en: 'Open support inbox', ru: 'Открыть поддержку', hy: 'Բացել աջակցությունը' },
+      render: {
+        en: (p) => ({ title: 'New support request', body: `${s(p.name)}: "${s(p.preview)}"` }),
+        ru: (p) => ({
+          title: 'Новое обращение в поддержку',
+          body: `${s(p.name)}: «${s(p.preview)}»`,
+        }),
+        hy: (p) => ({ title: 'Նոր դիմում աջակցությանը', body: `${s(p.name)}՝ «${s(p.preview)}»` }),
+      },
+    },
+    SUPPORT_USER_MESSAGE: {
+      cta: { en: 'Open the ticket', ru: 'Открыть обращение', hy: 'Բացել դիմումը' },
+      render: {
+        en: (p) => ({
+          title: 'New message in a support ticket',
+          body: `${s(p.name)}: "${s(p.preview)}"`,
+        }),
+        ru: (p) => ({
+          title: 'Новое сообщение в обращении',
+          body: `${s(p.name)}: «${s(p.preview)}»`,
+        }),
+        hy: (p) => ({
+          title: 'Նոր հաղորդագրություն դիմումում',
+          body: `${s(p.name)}՝ «${s(p.preview)}»`,
+        }),
+      },
+    },
+    SUPPORT_ASSIGNED: {
+      cta: { en: 'Open the ticket', ru: 'Открыть обращение', hy: 'Բացել դիմումը' },
+      render: {
+        en: (p) => ({
+          title: 'A support ticket was assigned to you',
+          body: `${s(p.name)}: "${s(p.preview)}"`,
+        }),
+        ru: (p) => ({ title: 'Вам назначено обращение', body: `${s(p.name)}: «${s(p.preview)}»` }),
+        hy: (p) => ({
+          title: 'Ձեզ է հանձնարարվել դիմում',
+          body: `${s(p.name)}՝ «${s(p.preview)}»`,
+        }),
+      },
+    },
+    SUPPORT_REPLY: {
+      cta: { en: 'Open the chat', ru: 'Открыть чат', hy: 'Բացել չատը' },
+      render: {
+        en: (p) => ({ title: 'Support replied', body: `"${s(p.preview)}"` }),
+        ru: (p) => ({ title: 'Ответ поддержки', body: `«${s(p.preview)}»` }),
+        hy: (p) => ({ title: 'Աջակցությունը պատասխանել է', body: `«${s(p.preview)}»` }),
+      },
+    },
     PORTFOLIO_REJECTED: {
       cta: { en: 'Open portfolio', ru: 'Открыть портфолио', hy: 'Բացել պորտֆոլիոն' },
       render: {

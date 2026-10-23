@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import { join } from 'node:path';
 import type { Env } from './config/env';
+import { SocketAdapter } from './modules/support/socket-adapter';
 
 /** Shared HTTP setup for main.ts and e2e tests. */
 export function configureApp(app: INestApplication, env: Env) {
@@ -12,7 +13,10 @@ export function configureApp(app: INestApplication, env: Env) {
   // private-network hops so req.ip (rate limits, logs) is the visitor, not the proxy.
   (app.getHttpAdapter().getInstance() as express.Express).set('trust proxy', env.TRUST_PROXY);
   app.use(cookieParser());
-  app.enableCors({ origin: env.CORS_ORIGINS.split(',').map((o) => o.trim()), credentials: true });
+  const origins = env.CORS_ORIGINS.split(',').map((o) => o.trim());
+  app.enableCors({ origin: origins, credentials: true });
+  // Support chat live updates (Socket.IO at /api/v1/ws), same origins and cookies as the API.
+  app.useWebSocketAdapter(new SocketAdapter(app, origins));
   // Local file storage driver serves uploads from the API.
   app.use(
     '/api/v1/files',

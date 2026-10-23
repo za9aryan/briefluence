@@ -7,3 +7,4 @@ export * from './social';
 export * from './billing';
 export * from './offers';
 export * from './portfolio';
+export * from './support';

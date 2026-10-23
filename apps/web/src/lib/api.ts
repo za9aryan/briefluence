@@ -86,6 +86,12 @@ export const api = {
   put: <T>(path: string, body: unknown) => request<T>('PUT', path, body),
   patch: <T>(path: string, body: unknown) => request<T>('PATCH', path, body),
   del: <T>(path: string) => request<T>('DELETE', path),
+  /** Support chat images: open to guests too, so they use their own endpoint. */
+  uploadSupport: (file: File) => {
+    const form = new FormData();
+    form.append('file', file);
+    return request<{ url: string }>('POST', '/support/attachments', form);
+  },
   upload: (kind: 'avatar' | 'logo' | 'deal' | 'portfolio' | 'offer', file: File) => {
     const form = new FormData();
     form.append('file', file);

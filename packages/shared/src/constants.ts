@@ -76,6 +76,16 @@ export const PITCH_MAX_LENGTH = 500;
 export const PORTFOLIO_MAX_ITEMS = 12;
 export const APPLICATION_PORTFOLIO_MAX = 3;
 export const FAQ_ANSWER_MAX_LENGTH = 1000;
+/** Support chat limits. */
+export const SUPPORT_MESSAGE_MAX_LENGTH = 2000;
+/** Answered tickets with no user reply for this long are closed by the daily job. */
+export const SUPPORT_AUTO_CLOSE_DAYS = 7;
+/** Guests (not signed in): new tickets per email in 24 hours. */
+export const SUPPORT_GUEST_TICKETS_PER_DAY = 3;
+/** Per IP address it is higher: many people share one IP (mobile operators, offices). */
+export const SUPPORT_GUEST_TICKETS_PER_IP_PER_DAY = 20;
+/** Messages anyone can send to one ticket in 10 minutes. */
+export const SUPPORT_MESSAGES_PER_10_MIN = 20;
 /** Free Pro days every blogger gets when they choose a plan. */
 export const TRIAL_DAYS = 30;
 /** Basic's application limit counts applications in this rolling window. */

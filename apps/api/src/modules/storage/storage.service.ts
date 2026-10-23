@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 
-export type UploadKind = 'avatar' | 'logo' | 'deal' | 'portfolio' | 'offer';
+export type UploadKind = 'avatar' | 'logo' | 'deal' | 'portfolio' | 'offer' | 'support';
 
 const SIGNATURES: { mime: string; ext: string; test: (b: Buffer) => boolean }[] = [
   {

@@ -1,6 +1,9 @@
 import type {
   AccountReviewStatus,
   ApplicationStatus,
+  SupportAuthor,
+  SupportStatus,
+  SupportTopic,
   FaqKey,
   CollaborationType,
   ContactMethod,
@@ -15,6 +18,7 @@ import type {
   SubscriptionStatus,
   VerificationStatus,
   PlanCode,
+  Role,
   OfferStatus,
   OfferRequestStatus,
 } from '@briefluence/shared';
@@ -428,4 +432,70 @@ export interface MyOfferRequestDto {
   };
   blogger: { id: string; displayName: string; avatarUrl: string | null; coverUrl: string | null };
   contacts: { method: ContactMethod | null; value: string | null } | null;
+}
+
+export interface SupportMessageDto {
+  id: string;
+  author: SupportAuthor;
+  body: string;
+  imageUrl: string | null;
+  createdAt: string;
+}
+
+/** The requester's conversation (signed-in user or guest cookie). */
+export interface SupportViewDto {
+  ticket: {
+    id: string;
+    topic: SupportTopic;
+    status: SupportStatus;
+    createdAt: string;
+    guestEmail: string | null;
+    unread: boolean;
+  } | null;
+  messages: SupportMessageDto[];
+}
+
+export interface SupportInboxDto {
+  counts: { unassigned: number; mine: number; open: number };
+  items: {
+    id: string;
+    topic: SupportTopic;
+    status: SupportStatus;
+    lastMessageAt: string;
+    waitingSince: string | null;
+    unread: boolean;
+    person: {
+      kind: 'USER' | 'GUEST';
+      name: string | null;
+      email: string | null;
+      avatarUrl: string | null;
+      role: Role | null;
+      blocked: boolean;
+    };
+    assignee: { id: string; email: string } | null;
+    lastMessage: SupportMessageDto | null;
+  }[];
+}
+
+export interface SupportTicketDetailDto {
+  id: string;
+  topic: SupportTopic;
+  status: SupportStatus;
+  createdAt: string;
+  assignee: { id: string; email: string } | null;
+  guest: { email: string | null; name: string | null } | null;
+  account: {
+    id: string;
+    email: string;
+    role: Role;
+    blocked: boolean;
+    emailVerified: boolean;
+    createdAt: string;
+    name: string | null;
+    verification: VerificationStatus | null;
+    plan: PlanCode | null;
+    matchedByEmail: boolean;
+  } | null;
+  messages: SupportMessageDto[];
+  admins: { id: string; email: string }[];
 }

@@ -2,6 +2,7 @@
 import { ToastProvider } from '@briefluence/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState, type ReactNode } from 'react';
+import { SupportWidget } from '@/components/support/SupportWidget';
 import { ApiError } from '@/lib/api';
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -19,7 +20,10 @@ export function Providers({ children }: { children: ReactNode }) {
   );
   return (
     <QueryClientProvider client={client}>
-      <ToastProvider>{children}</ToastProvider>
+      <ToastProvider>
+        {children}
+        <SupportWidget />
+      </ToastProvider>
     </QueryClientProvider>
   );
 }

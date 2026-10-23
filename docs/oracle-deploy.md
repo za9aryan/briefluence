@@ -5,6 +5,7 @@ the website and Caddy (automatic HTTPS). The files are in [`deploy/oracle/`](../
 
 ```
 visitor ──https──▶ Caddy :443 ──▶ website (Next.js :3000) ──/api/v1──▶ API (:4000) ──▶ Postgres
+                          └── /api/v1/ws (support chat WebSocket) ──▶ API (:4000)
 ```
 
 Time: about an hour the first time. You need: a card for Oracle sign-up (Always Free is not
@@ -179,7 +180,8 @@ Manual backup: `./deploy/oracle/backup.sh`. Restore (asks for confirmation, back
 their keys in `.env`, set the matching mock switch to `false` (`SOCIAL_MOCK`, `OAUTH_LOGIN_MOCK`,
 `PAYMENT_PROVIDER=ameriabank`), and once all are real set `ALLOW_MOCKS_IN_PRODUCTION=false`. For
 real emails create a free Resend account, verify the domain, set `EMAIL_TRANSPORT=resend` and
-`RESEND_API_KEY`. Then `docker compose up -d` in `deploy/oracle`.
+`RESEND_API_KEY`. Real emails matter for the support chat too: visitors who are not signed in get
+support replies only by email. Then `docker compose up -d` in `deploy/oracle`.
 
 ## Troubleshooting
 
