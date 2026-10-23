@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { adminRequest, signupViaUi, uid } from './helpers';
+import { adminRequest, signupViaUi, uid, seen } from './helpers';
 
 test.use({
   storageState: {
@@ -40,7 +40,7 @@ test('free Pro days → Basic → upgrade to Pro → renew with the saved card',
     await page.goto('/influencer/billing');
     await expect(page.getByText('Choose your plan')).toBeVisible();
     await page.getByRole('button', { name: 'Start with Basic' }).click();
-    await expect(page.getByText('Your 30 free Pro days have started')).toBeVisible();
+    await expect(seen(page, 'Your 30 free Pro days have started')).toBeVisible();
     await expect(page.getByText(/Pro for free: 30 days left/)).toBeVisible();
     await expect(page.getByText('After that: Basic.')).toBeVisible();
 
@@ -56,7 +56,7 @@ test('free Pro days → Basic → upgrade to Pro → renew with the saved card',
     await page.waitForURL('**/billing/mock-checkout**');
     await page.getByRole('button', { name: 'Pay' }).click();
     await page.waitForURL('**/influencer/billing**');
-    await expect(page.getByText('Payment received. Pro is on.')).toBeVisible();
+    await expect(seen(page, 'Payment received. Pro is on.')).toBeVisible();
     await expect(page.getByText('Auto-renewal on')).toBeVisible();
     await expect(page.getByText(/Renews automatically on/)).toBeVisible();
 
@@ -72,7 +72,7 @@ test('free Pro days → Basic → upgrade to Pro → renew with the saved card',
     await page.getByRole('button', { name: /Switch to Pro yearly/ }).click();
     await expect(page.getByText(/you switch to Pro yearly/)).toBeVisible();
     await page.getByRole('button', { name: 'Keep Pro' }).click();
-    await expect(page.getByText('You stay on your current plan')).toBeVisible();
+    await expect(seen(page, 'You stay on your current plan')).toBeVisible();
     await expect(page.getByText(/you switch to Pro yearly/)).toHaveCount(0);
 
     // A month later the daily job charges the saved card.

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { signupViaUi, uid } from './helpers';
+import { signupViaUi, uid, seen } from './helpers';
 
 test.use({
   storageState: {
@@ -38,7 +38,7 @@ test('blogger adds a social account by hand and edits it', async ({ page }) => {
   await dialog.getByLabel('Engagement rate, %').fill('3.5');
   await dialog.getByRole('button', { name: 'Add account' }).click();
 
-  await expect(page.getByText('Account added')).toBeVisible();
+  await expect(seen(page, 'Account added')).toBeVisible();
   await expect(page.getByText(`@${handle}`)).toBeVisible();
   await expect(page.getByText('Added manually')).toBeVisible();
 
@@ -56,6 +56,6 @@ test('blogger adds a social account by hand and edits it', async ({ page }) => {
   await expect(dialog.getByLabel('Followers')).toHaveValue('15400');
   await dialog.getByLabel('Followers').fill('16000');
   await dialog.getByRole('button', { name: 'Save' }).click();
-  await expect(page.getByText('Account updated')).toBeVisible();
+  await expect(seen(page, 'Account updated')).toBeVisible();
   await expect(page.getByText('16K followers').first()).toBeVisible();
 });

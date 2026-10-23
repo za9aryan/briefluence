@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { PASSWORD, signupViaUi, uid, verifyEmailViaLink } from './helpers';
+import { PASSWORD, signupViaUi, uid, verifyEmailViaLink, seen } from './helpers';
 
 test.use({
   storageState: {
@@ -58,11 +58,11 @@ test('sign-up → verify → apply → accept → done', async ({ browser }) => 
   await blogger.getByRole('link', { name: 'See plans' }).click();
   await blogger.waitForURL('**/influencer/billing');
   await blogger.getByRole('button', { name: 'Start with Basic' }).click();
-  await expect(blogger.getByText('Your 30 free Pro days have started')).toBeVisible();
+  await expect(seen(blogger, 'Your 30 free Pro days have started')).toBeVisible();
   await verifyEmailViaLink(blogger, bloggerEmail);
   await blogger.goto('/influencer/verification');
   await blogger.getByRole('link', { name: 'Connect Instagram' }).click();
-  await expect(blogger.getByText('Instagram connected')).toBeVisible();
+  await expect(seen(blogger, 'Instagram connected')).toBeVisible();
   await blogger.getByRole('button', { name: 'Send for review' }).click();
   await expect(blogger.getByText('We are reviewing your profile').first()).toBeVisible();
 
@@ -81,7 +81,7 @@ test('sign-up → verify → apply → accept → done', async ({ browser }) => 
     .filter({ has: admin.getByRole('button', { name: 'Approve' }) })
     .last();
   await card.getByRole('button', { name: 'Approve' }).click();
-  await expect(admin.getByText('Approved. The blogger got an email.')).toBeVisible();
+  await expect(seen(admin, 'Approved. The blogger got an email.')).toBeVisible();
 
   // ── Brand: sign up, verify, profile, post a brief ──
   const brand = await (await newCtx()).newPage();
@@ -115,7 +115,7 @@ test('sign-up → verify → apply → accept → done', async ({ browser }) => 
     .filter({ has: admin.getByRole('button', { name: 'Approve and publish' }) })
     .last();
   await briefCard.getByRole('button', { name: 'Approve and publish' }).click();
-  await expect(admin.getByText('Brief is live. The brand got a notification.')).toBeVisible();
+  await expect(seen(admin, 'Brief is live. The brand got a notification.')).toBeVisible();
 
   // ── Blogger applies from the feed ──
   await blogger.goto('/influencer/deals');
@@ -125,7 +125,7 @@ test('sign-up → verify → apply → accept → done', async ({ browser }) => 
     .getByLabel('Your pitch')
     .fill('I post about food in Yerevan and would love to film this.');
   await blogger.getByRole('button', { name: 'Send application' }).click();
-  await expect(blogger.getByText('Application sent.')).toBeVisible();
+  await expect(seen(blogger, 'Application sent.')).toBeVisible();
 
   // ── Brand accepts; contacts are revealed ──
   await brand.reload();
@@ -139,7 +139,7 @@ test('sign-up → verify → apply → accept → done', async ({ browser }) => 
   // ── Blogger sees the brand contacts ──
   await blogger.goto('/influencer/applications');
   await blogger.getByRole('tab', { name: /Accepted/ }).click();
-  await expect(blogger.getByText('Have a great collab!')).toBeVisible();
+  await expect(seen(blogger, 'Have a great collab!')).toBeVisible();
   await expect(blogger.getByRole('link', { name: /Telegram: @e2e_cafe/ })).toHaveAttribute(
     'href',
     'https://t.me/e2e_cafe',
@@ -148,6 +148,6 @@ test('sign-up → verify → apply → accept → done', async ({ browser }) => 
   // ── Brand marks it done ──
   await brand.reload();
   await brand.getByRole('button', { name: 'Mark as done' }).click();
-  await expect(brand.getByText('Marked as done')).toBeVisible();
+  await expect(seen(brand, 'Marked as done')).toBeVisible();
   expect(PASSWORD).toBeTruthy();
 });

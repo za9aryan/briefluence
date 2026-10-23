@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { signupViaUi, uid, verifyEmailViaLink } from './helpers';
+import { signupViaUi, uid, verifyEmailViaLink, seen } from './helpers';
 
 const en = {
   cookies: [
@@ -32,7 +32,7 @@ test('live notifications: the admin approves a blogger, whose open page updates 
   await verifyEmailViaLink(blogger, email);
   await blogger.goto('/influencer/verification');
   await blogger.getByRole('link', { name: 'Connect Instagram' }).click();
-  await expect(blogger.getByText('Instagram connected')).toBeVisible();
+  await expect(seen(blogger, 'Instagram connected')).toBeVisible();
   await blogger.getByRole('button', { name: 'Send for review' }).click();
   await expect(blogger.getByRole('button', { name: 'Notifications', exact: true })).toBeVisible();
 

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { signupViaUi, uid, verifyEmailViaLink } from './helpers';
+import { signupViaUi, uid, verifyEmailViaLink, seen } from './helpers';
 
 const en = {
   cookies: [
@@ -45,7 +45,7 @@ test('portfolio + FAQ: blogger adds work → admin approves → brand sees it an
   await blogger.request.post('/api/v1/billing/plan', { data: { plan: 'BASIC' } });
   await blogger.goto('/influencer/verification');
   await blogger.getByRole('link', { name: 'Connect Instagram' }).click();
-  await expect(blogger.getByText('Instagram connected')).toBeVisible();
+  await expect(seen(blogger, 'Instagram connected')).toBeVisible();
   await blogger.getByRole('button', { name: 'Send for review' }).click();
   const admin = await newPage();
   await admin.request.post('/api/v1/auth/login', {

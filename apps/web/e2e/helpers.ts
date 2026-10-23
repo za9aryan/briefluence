@@ -8,7 +8,10 @@ export const uid = () => `${Date.now().toString(36)}${Math.floor(Math.random() *
 /** The API's "log" email transport saves every email as HTML in apps/api/.emails. */
 const EMAIL_DIR = resolve(__dirname, '../../api/.emails');
 
-export async function emailLink(to: string, path: 'verify-email' | 'reset-password'): Promise<string> {
+export async function emailLink(
+  to: string,
+  path: 'verify-email' | 'reset-password',
+): Promise<string> {
   const safe = to.replace(/[^a-z0-9@.]/gi, '_');
   let found: string | undefined;
   await expect
@@ -38,7 +41,11 @@ export async function signupViaUi(page: Page, role: 'BRAND' | 'INFLUENCER', emai
   await page.getByLabel('Email').fill(email);
   await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
   await page.getByRole('checkbox', { name: /I accept the/ }).check();
-  await page.getByRole('button', { name: role === 'BRAND' ? 'Create brand account' : 'Create blogger account' }).click();
+  await page
+    .getByRole('button', {
+      name: role === 'BRAND' ? 'Create brand account' : 'Create blogger account',
+    })
+    .click();
   await page.waitForURL(role === 'BRAND' ? '**/brand/onboarding' : '**/influencer/onboarding');
 }
 
@@ -49,11 +56,25 @@ export async function verifyEmailViaLink(page: Page, email: string) {
 }
 
 export async function adminRequest(request: APIRequestContext) {
-  const res = await request.post('/api/v1/auth/login', { data: { email: 'admin@briefluence.local', password: 'Admin12345' } });
+  const res = await request.post('/api/v1/auth/login', {
+    data: { email: 'admin@briefluence.local', password: 'Admin12345' },
+  });
   expect(res.ok()).toBeTruthy();
   return {
-    runJob: async (name: string) => expect((await request.post(`/api/v1/admin/jobs/${name}/run`)).ok()).toBeTruthy(),
-    advanceDays: async (days: number) => expect((await request.post('/api/v1/admin/dev/advance-time', { data: { days } })).ok()).toBeTruthy(),
-    resetTime: async () => expect((await request.post('/api/v1/admin/dev/reset-time')).ok()).toBeTruthy(),
+    runJob: async (name: string) =>
+      expect((await request.post(`/api/v1/admin/jobs/${name}/run`)).ok()).toBeTruthy(),
+    advanceDays: async (days: number) =>
+      expect(
+        (await request.post('/api/v1/admin/dev/advance-time', { data: { days } })).ok(),
+      ).toBeTruthy(),
+    resetTime: async () =>
+      expect((await request.post('/api/v1/admin/dev/reset-time')).ok()).toBeTruthy(),
   };
 }
+
+/**
+ * A text the user can see. Toasts (Vyrn) also copy their message into a hidden live region for
+ * screen readers, so a plain getByText finds two elements; this picks the visible one.
+ */
+export const seen = (page: Page, text: string | RegExp, opts?: { exact?: boolean }) =>
+  page.getByText(text, opts).filter({ visible: true }).first();

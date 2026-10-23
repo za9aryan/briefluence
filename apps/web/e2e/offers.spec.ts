@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { signupViaUi, uid, verifyEmailViaLink } from './helpers';
+import { signupViaUi, uid, verifyEmailViaLink, seen } from './helpers';
 
 const en = {
   cookies: [
@@ -39,7 +39,7 @@ test('blogger offer → admin approves → brand requests → blogger accepts �
   await blogger.request.post('/api/v1/billing/plan', { data: { plan: 'BASIC' } });
   await blogger.goto('/influencer/verification');
   await blogger.getByRole('link', { name: 'Connect Instagram' }).click();
-  await expect(blogger.getByText('Instagram connected')).toBeVisible();
+  await expect(seen(blogger, 'Instagram connected')).toBeVisible();
   await blogger.getByRole('button', { name: 'Send for review' }).click();
   const admin = await newPage();
   await admin.request.post('/api/v1/auth/login', {
@@ -84,7 +84,7 @@ test('blogger offer → admin approves → brand requests → blogger accepts �
     .last()
     .getByRole('button', { name: 'Approve and publish' })
     .click();
-  await expect(admin.getByText('Offer is live. The blogger got a notification.')).toBeVisible();
+  await expect(seen(admin, 'Offer is live. The blogger got a notification.')).toBeVisible();
 
   // ── Brand finds it and sends a request ──
   const brand = await newPage();
@@ -113,7 +113,7 @@ test('blogger offer → admin approves → brand requests → blogger accepts �
     .getByLabel('Message to the blogger')
     .fill('We would love a story about our new menu next week.');
   await brand.getByRole('dialog').getByRole('button', { name: 'Send request' }).click();
-  await expect(brand.getByText('Request sent. The blogger will answer here.')).toBeVisible();
+  await expect(seen(brand, 'Request sent. The blogger will answer here.')).toBeVisible();
   // …and so does the name in the side card of the offer page.
   await brand.getByRole('link', { name: 'Offer Blogger' }).click();
   await brand.waitForURL('**/brand/influencers/**');

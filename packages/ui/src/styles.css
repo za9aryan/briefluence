@@ -95,3 +95,34 @@
     }
   }
 }
+
+/*
+ * Vyrn toasts in brand colours (selectors from vyrn@5's stylesheet; ours load later and are more
+ * specific). Tokens switch with the theme, so light and dark both follow the brand book:
+ * success = success green, errors = primary text (no separate red), the rest neutral.
+ */
+.vyrn-toast-list.vyrn-toast-list.vyrn-toast-list {
+  --vyrn-bg: var(--bf-surface-raised);
+  --vyrn-fg: var(--bf-ink);
+  --vyrn-muted: var(--bf-ink-muted);
+  --vyrn-border: var(--bf-line);
+  --vyrn-shadow: var(--shadow-pop);
+  --vyrn-accent: var(--bf-ink-muted);
+  --vyrn-radius: var(--bf-radius-md);
+  --vyrn-font: 14px;
+  --vyrn-font-sm: 13px;
+  font-family: var(--bf-font-sans);
+}
+.vyrn-toast.vyrn-toast[data-type='success'] {
+  --vyrn-accent: var(--bf-success);
+}
+.vyrn-toast.vyrn-toast[data-type='error'] {
+  --vyrn-accent: var(--bf-primary-text);
+}
+.vyrn-toast.vyrn-toast[data-type='info'] {
+  --vyrn-accent: var(--bf-primary-text);
+}
+.vyrn-toast.vyrn-toast[data-type='warning'],
+.vyrn-toast.vyrn-toast[data-type='loading'] {
+  --vyrn-accent: var(--bf-ink-muted);
+}

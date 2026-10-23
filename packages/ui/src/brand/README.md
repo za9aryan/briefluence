@@ -27,3 +27,5 @@ The full brand book (BRAND.md) lives with the design team; this folder holds the
 12. Voice: warm, direct, informal "you" (ru «ты», hy «դու»), no hype, no emoji, no ALL CAPS except `label` badges.
 13. Photos on cards (`MediaCover`): text over an image sits on `scrim` (gradient or chip) in `on-scrim`.
     These two stay the same in both themes and are never used as surfaces.
+14. Toasts are Vyrn (`useToast()` / `toast` from the UI package): success = `success`, errors =
+    `primary-text` (no red), others neutral; colours come from the tokens, so dark mode follows.

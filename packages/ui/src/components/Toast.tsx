@@ -1,51 +1,60 @@
 'use client';
-import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
-import { cn } from '../lib/cn';
-import { Icon } from '../primitives/Icon';
+import { useCallback, type ReactNode } from 'react';
+import { Toaster, toast as vyrn } from 'vyrn';
 
-type ToastTone = 'success' | 'danger' | 'info';
-interface ToastItem {
-  id: number;
-  tone: ToastTone;
-  message: ReactNode;
-}
+/**
+ * Toasts are Vyrn (https://cdn.jsdelivr.net/npm/vyrn@5.0.0/README.md): accessible live regions,
+ * keyboard (Alt+T, Escape), swipe, reduced motion. Brand colours come from styles.css.
+ *
+ * `useToast()` keeps the app's original call shape — `toast(message, tone?)` — mapped onto
+ * Vyrn's states; `toast` (re-exported) gives the full Vyrn API: loading, promise, update…
+ */
+export type ToastTone = 'success' | 'danger' | 'info' | 'warning';
 
-const Ctx = createContext<((message: ReactNode, tone?: ToastTone) => void) | null>(null);
+export const toast = vyrn;
 
-export function ToastProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<ToastItem[]>([]);
-  const push = useCallback((message: ReactNode, tone: ToastTone = 'success') => {
-    const id = Date.now() + Math.random();
-    setItems((xs) => [...xs, { id, tone, message }]);
-    setTimeout(() => setItems((xs) => xs.filter((x) => x.id !== id)), 4500);
-  }, []);
+export function ToastProvider({
+  children,
+  closeLabel = 'Close',
+  regionLabel = 'Notifications',
+  aboveChat = true,
+}: {
+  children: ReactNode;
+  /** Leave room for the support chat button in the corner (off where there is none). */
+  aboveChat?: boolean;
+  /** Translated label of each toast's close button. */
+  closeLabel?: string;
+  /** Translated label of the toast region (Alt+T jumps there). */
+  regionLabel?: string;
+}) {
   return (
-    <Ctx.Provider value={push}>
+    <>
       {children}
-      <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-0 z-[100] flex flex-col items-center gap-2 p-4 sm:items-end">
-        {items.map((t) => (
-          <div
-            key={t.id}
-            className={cn(
-              'pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-sm border bg-surface-raised px-4 py-3 text-small shadow-pop',
-              t.tone === 'danger' ? 'border-primary-text/30' : 'border-line',
-            )}
-          >
-            <Icon
-              name={t.tone === 'success' ? 'check-circle' : t.tone === 'danger' ? 'alert' : 'info'}
-              tone={t.tone === 'success' ? 'success' : t.tone === 'danger' ? 'danger' : 'accent'}
-              size="md"
-            />
-            <div className="min-w-0 flex-1 text-ink">{t.message}</div>
-          </div>
-        ))}
-      </div>
-    </Ctx.Provider>
+      <Toaster
+        position="bottom-right"
+        // Above the support chat button (56 px + its 24 px margin) so they never overlap.
+        offset={aboveChat ? { bottom: 96, right: 24 } : { bottom: 24, right: 24 }}
+        mobileOffset={
+          aboveChat ? { bottom: 88, right: 16, left: 16 } : { bottom: 16, right: 16, left: 16 }
+        }
+        visibleToasts={3}
+        duration={4500}
+        // Brand colours only (styles.css); no extra per-type background tint.
+        color={false}
+        closeButtonAriaLabel={closeLabel}
+        containerAriaLabel={regionLabel}
+        toastOptions={{ types: { error: { duration: 7000 } } }}
+      />
+    </>
   );
 }
 
+/** `toast(message)` = success, `toast(message, 'danger')` = error, also 'info' / 'warning'. */
 export function useToast() {
-  const push = useContext(Ctx);
-  if (!push) throw new Error('useToast must be used inside <ToastProvider>');
-  return push;
+  return useCallback((message: ReactNode, tone: ToastTone = 'success') => {
+    if (tone === 'danger') return vyrn.error(message);
+    if (tone === 'info') return vyrn.info(message);
+    if (tone === 'warning') return vyrn.warning(message);
+    return vyrn.success(message);
+  }, []);
 }
