@@ -33,7 +33,9 @@ export class EmailService implements OnModuleInit {
         host: this.env.SMTP_HOST,
         port: this.env.SMTP_PORT,
         secure: this.env.SMTP_PORT === 465,
-        auth: this.env.SMTP_USER ? { user: this.env.SMTP_USER, pass: this.env.SMTP_PASSWORD } : undefined,
+        auth: this.env.SMTP_USER
+          ? { user: this.env.SMTP_USER, pass: this.env.SMTP_PASSWORD }
+          : undefined,
       });
     }
   }
@@ -57,8 +59,17 @@ export class EmailService implements OnModuleInit {
         // https://resend.com/docs/api-reference/emails/send-email
         const res = await fetch('https://api.resend.com/emails', {
           method: 'POST',
-          headers: { Authorization: `Bearer ${this.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ from: this.env.EMAIL_FROM, to: [job.to], subject: job.subject, html: job.html, text: job.text }),
+          headers: {
+            Authorization: `Bearer ${this.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: this.env.EMAIL_FROM,
+            to: [job.to],
+            subject: job.subject,
+            html: job.html,
+            text: job.text,
+          }),
         });
         if (!res.ok) throw new Error(`Resend responded ${res.status}`);
         return;

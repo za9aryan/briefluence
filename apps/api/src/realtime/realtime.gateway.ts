@@ -2,16 +2,18 @@ import { Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { WebSocketGateway, WebSocketServer, type OnGatewayConnection } from '@nestjs/websockets';
 import type { Server, Socket } from 'socket.io';
-import { COOKIE_ACCESS, type AccessTokenPayload } from '../../common/auth-user';
-import { CryptoService } from '../../common/crypto.service';
-import { PrismaService } from '../../common/prisma.service';
+import { COOKIE_ACCESS, type AccessTokenPayload } from '../common/auth-user';
+import { CryptoService } from '../common/crypto.service';
+import { PrismaService } from '../common/prisma.service';
 
 /** Guest support conversations are identified by this httpOnly cookie (the raw secret token). */
 export const SUPPORT_COOKIE = 'bf_support';
 /** Socket.IO endpoint; Caddy routes it straight to the API in production. */
-export const SUPPORT_WS_PATH = '/api/v1/ws';
-/** The only event: "this ticket changed" — clients then reload it over the REST API. */
+export const REALTIME_PATH = '/api/v1/ws';
+/** "This support ticket changed" — clients reload it over the REST API. */
 export const SUPPORT_EVENT = 'support:update';
+/** "Your notifications changed" (a new one, or read elsewhere) — clients reload them. */
+export const NOTIFICATIONS_EVENT = 'notifications:update';
 
 function readCookies(header: string | undefined): Record<string, string> {
   const out: Record<string, string> = {};
@@ -23,13 +25,14 @@ function readCookies(header: string | undefined): Record<string, string> {
 }
 
 /**
- * Live updates for the support chat. Sockets authenticate with the same cookies as the API:
- * the session cookie (user → room `user:<id>`, admins also join `admins`) and/or the guest
- * support cookie (room `ticket:<id>`). Pushes carry only ids, never message content.
+ * One live channel for the whole app (notifications, support chat). Sockets authenticate with
+ * the same cookies as the API: the session cookie (room `user:<id>`, admins also `admins`)
+ * and/or the guest support cookie (room `ticket:<id>`). Pushes carry ids and kinds only, never
+ * content: clients reload the data over the REST API, which checks permissions.
  */
-@WebSocketGateway({ path: SUPPORT_WS_PATH })
-export class SupportGateway implements OnGatewayConnection {
-  private readonly logger = new Logger(SupportGateway.name);
+@WebSocketGateway({ path: REALTIME_PATH })
+export class RealtimeGateway implements OnGatewayConnection {
+  private readonly logger = new Logger(RealtimeGateway.name);
   @WebSocketServer() server!: Server;
 
   constructor(
@@ -65,7 +68,16 @@ export class SupportGateway implements OnGatewayConnection {
     await client.join(rooms);
   }
 
-  /** Tell everyone who may see this ticket that it changed. */
+  /** Tell one user's open tabs and devices that something of theirs changed. */
+  toUser(userId: string, event: string, data: Record<string, unknown>) {
+    try {
+      this.server.to(`user:${userId}`).emit(event, data);
+    } catch (err) {
+      this.logger.warn(`Push failed: ${(err as Error).message}`);
+    }
+  }
+
+  /** Tell everyone who may see this support ticket that it changed. */
   ticketChanged(t: { id: string; userId: string | null }) {
     try {
       const target = this.server.to('admins').to(`ticket:${t.id}`);

@@ -5,12 +5,14 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { LIVE, useLive } from '@/lib/hooks/live';
 import { useNotificationText } from '@/lib/hooks/notification-text';
 import { useFormat } from '@/lib/hooks/format';
 import { NotificationIcon } from '@/components/domain/NotificationIcon';
 import type { NotificationDto, Paginated } from '@/lib/types';
 
-const POLL_MS = 30_000;
+/** Live pushes keep this fresh; the slow poll only covers a dropped connection. */
+const POLL_MS = 120_000;
 
 export function useUnreadCount() {
   return useQuery({
@@ -21,6 +23,20 @@ export function useUnreadCount() {
   });
 }
 
+/**
+ * Live notifications for the signed-in user (the bell is on every app page). A new
+ * notification also refreshes the data on the current page — e.g. a new applicant appears in
+ * the list — since something about it just changed.
+ */
+function useLiveNotifications() {
+  const qc = useQueryClient();
+  useLive<{ kind: 'new' | 'read' }>(LIVE.notifications, (e) => {
+    void qc.invalidateQueries({ queryKey: ['notifications'] });
+    if (e?.kind === 'new')
+      void qc.invalidateQueries({ predicate: (q) => q.queryKey[0] !== 'notifications' });
+  });
+}
+
 export function NotificationBell() {
   const t = useTranslations('notifications');
   const f = useFormat();
@@ -28,6 +44,7 @@ export function NotificationBell() {
   const qc = useQueryClient();
   const router = useRouter();
   const unread = useUnreadCount();
+  useLiveNotifications();
   const list = useQuery({
     queryKey: ['notifications', 'latest'],
     queryFn: () => api.get<Paginated<NotificationDto>>('/notifications', { page: 1, pageSize: 10 }),

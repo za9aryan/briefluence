@@ -22,7 +22,8 @@ export default function NotificationsPage() {
   const list = useQuery({
     queryKey: ['notifications', 'page', page],
     queryFn: () => api.get<Paginated<NotificationDto>>('/notifications', { page, pageSize: 20 }),
-    refetchInterval: 30_000,
+    // The bell's live channel refreshes this list; the poll only covers a dropped connection.
+    refetchInterval: 120_000,
   });
   const invalidate = () => qc.invalidateQueries({ queryKey: ['notifications'] });
   const readAll = useMutation({

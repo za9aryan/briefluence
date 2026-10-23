@@ -11,6 +11,7 @@ import { Prisma, type Notification } from '@prisma/client';
 import { notFound } from '../../common/app-error';
 import { PrismaService } from '../../common/prisma.service';
 import { ENV } from '../../config/config.module';
+import { NOTIFICATIONS_EVENT, RealtimeGateway } from '../../realtime/realtime.gateway';
 import type { Env } from '../../config/env';
 import { EMAIL_POLICY } from './catalog';
 import { EmailService } from './email.service';
@@ -30,6 +31,7 @@ export class NotificationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly email: EmailService,
+    private readonly realtime: RealtimeGateway,
     @Inject(ENV) private readonly env: Env,
   ) {}
 
@@ -37,8 +39,15 @@ export class NotificationsService {
    * Writes the in-app notification (type + params, plus the text rendered in the user's language
    * as a fallback) and, for transactional events, enqueues the email in that language.
    */
-  async notify(userId: string, type: NotificationType, payload: NotifyPayload = {}): Promise<Notification> {
-    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { email: true, locale: true } });
+  async notify(
+    userId: string,
+    type: NotificationType,
+    payload: NotifyPayload = {},
+  ): Promise<Notification> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, locale: true },
+    });
     const locale: NotificationLocale = isNotificationLocale(user?.locale) ? user.locale : 'en';
     const params = payload.params ?? {};
     const text = renderNotification(type, params, locale) ?? { title: type, body: '', cta: '' };
@@ -52,6 +61,8 @@ export class NotificationsService {
         link: payload.link ?? null,
       },
     });
+    // Live: the bell (and the page the user is on) refreshes right away on every open tab.
+    this.realtime.toUser(userId, NOTIFICATIONS_EVENT, { kind: 'new', id: row.id });
     if (EMAIL_POLICY[type] === 'instant' && user) {
       try {
         const email = await renderNotificationEmail(locale, {
@@ -70,7 +81,10 @@ export class NotificationsService {
   }
 
   async notifyAdmins(type: NotificationType, payload: NotifyPayload) {
-    const admins = await this.prisma.user.findMany({ where: { role: 'ADMIN', blockedAt: null }, select: { id: true } });
+    const admins = await this.prisma.user.findMany({
+      where: { role: 'ADMIN', blockedAt: null },
+      select: { id: true },
+    });
     await Promise.all(admins.map((a) => this.notify(a.id, type, payload)));
   }
 
@@ -97,12 +111,22 @@ export class NotificationsService {
       data: { readAt: new Date() },
     });
     if (count === 0) {
-      const exists = await this.prisma.notification.findFirst({ where: { id, userId }, select: { id: true } });
+      const exists = await this.prisma.notification.findFirst({
+        where: { id, userId },
+        select: { id: true },
+      });
       if (!exists) throw notFound('Notification');
+      return;
     }
+    // Other tabs and devices update their unread count too.
+    this.realtime.toUser(userId, NOTIFICATIONS_EVENT, { kind: 'read' });
   }
 
   async markAllRead(userId: string) {
-    await this.prisma.notification.updateMany({ where: { userId, readAt: null }, data: { readAt: new Date() } });
+    await this.prisma.notification.updateMany({
+      where: { userId, readAt: null },
+      data: { readAt: new Date() },
+    });
+    this.realtime.toUser(userId, NOTIFICATIONS_EVENT, { kind: 'read' });
   }
 }

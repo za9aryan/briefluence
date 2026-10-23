@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import { join } from 'node:path';
 import type { Env } from './config/env';
-import { SocketAdapter } from './modules/support/socket-adapter';
+import { SocketAdapter } from './realtime/socket-adapter';
 
 /** Shared HTTP setup for main.ts and e2e tests. */
 export function configureApp(app: INestApplication, env: Env) {
@@ -15,7 +15,8 @@ export function configureApp(app: INestApplication, env: Env) {
   app.use(cookieParser());
   const origins = env.CORS_ORIGINS.split(',').map((o) => o.trim());
   app.enableCors({ origin: origins, credentials: true });
-  // Support chat live updates (Socket.IO at /api/v1/ws), same origins and cookies as the API.
+  // Live updates (notifications, support chat) over Socket.IO at /api/v1/ws, same origins and
+  // cookies as the API.
   app.useWebSocketAdapter(new SocketAdapter(app, origins));
   // Local file storage driver serves uploads from the API.
   app.use(

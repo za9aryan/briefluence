@@ -26,10 +26,16 @@ import type { Env } from '../../config/env';
 import { AuthService } from './auth.service';
 import { clearSessionCookies, setSessionCookies } from './cookies';
 
-const AUTH_LIMIT = { default: { limit: 10, ttl: 60_000 } };
+/**
+ * Sign-up / login attempts per IP per minute. 10 in production; the isolated E2E servers raise it
+ * (AUTH_RATE_LIMIT) because the whole browser suite signs up many accounts from one address.
+ * Read at import time because decorators are evaluated then.
+ */
+const AUTH_LIMIT = { default: { limit: Number(process.env.AUTH_RATE_LIMIT) || 10, ttl: 60_000 } };
 /** Language the visitor browses in (set by the website; requests reach the API through the same origin). */
 const uiLocale = (req: Request) => (req.cookies as Record<string, string> | undefined)?.NEXT_LOCALE;
-const refreshCookie = (req: Request) => (req.cookies as Record<string, string> | undefined)?.[COOKIE_REFRESH];
+const refreshCookie = (req: Request) =>
+  (req.cookies as Record<string, string> | undefined)?.[COOKIE_REFRESH];
 
 @ApiTags('auth')
 @Controller('auth')
@@ -43,7 +49,11 @@ export class AuthController {
   @Throttle(AUTH_LIMIT)
   @Post('signup')
   @ApiZodBody(signupSchema)
-  async signup(@ZodBody(signupSchema) body: SignupInput, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async signup(
+    @ZodBody(signupSchema) body: SignupInput,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const session = await this.auth.signup(body, uiLocale(req));
     setSessionCookies(res, this.env, session);
     return this.auth.me(session.user.id);
@@ -54,7 +64,11 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   @ApiZodBody(loginSchema)
-  async login(@ZodBody(loginSchema) body: LoginInput, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async login(
+    @ZodBody(loginSchema) body: LoginInput,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const session = await this.auth.login(body, uiLocale(req));
     setSessionCookies(res, this.env, session);
     return this.auth.me(session.user.id);
@@ -147,7 +161,10 @@ export class AuthController {
   @Patch('settings')
   @HttpCode(204)
   @ApiZodBody(notificationSettingsSchema)
-  settings(@CurrentUser() user: AuthUser, @ZodBody(notificationSettingsSchema) body: NotificationSettingsInput) {
+  settings(
+    @CurrentUser() user: AuthUser,
+    @ZodBody(notificationSettingsSchema) body: NotificationSettingsInput,
+  ) {
     return this.auth.updateSettings(user.id, body);
   }
 }

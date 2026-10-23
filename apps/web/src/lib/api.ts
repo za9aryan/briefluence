@@ -20,10 +20,20 @@ export class ApiError extends Error {
 
 let refreshing: Promise<boolean> | null = null;
 
+/** Fired when the session cookies change, so the live channel re-authenticates (lib/hooks/live). */
+export const SESSION_EVENT = 'bf:session-changed';
+const sessionChanged = () => {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event(SESSION_EVENT));
+};
+const SESSION_PATHS = /^\/auth\/(login|signup|logout|verify-email|oauth)/;
+
 /** One shared refresh for all requests that hit 401 at the same time. */
 function refreshSession(): Promise<boolean> {
   refreshing ??= fetch(`${API_BASE}/auth/refresh`, { method: 'POST', credentials: 'include' })
-    .then((r) => r.ok)
+    .then((r) => {
+      if (r.ok) sessionChanged();
+      return r.ok;
+    })
     .catch(() => false)
     .finally(() => {
       setTimeout(() => (refreshing = null), 0);
@@ -66,6 +76,7 @@ async function request<T>(
   ) {
     if (await refreshSession()) return request<T>(method, path, body, query, true);
   }
+  if (res.ok && SESSION_PATHS.test(path)) sessionChanged();
   if (res.status === 204) return undefined as T;
   const data = (await res.json().catch(() => null)) as unknown;
   if (!res.ok) {

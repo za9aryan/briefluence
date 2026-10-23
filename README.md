@@ -123,10 +123,23 @@ the same chat full size.
 - Statuses: Open (waiting for support) → Answered (waiting for the user) → Closed. A user reply
   reopens Answered; Answered tickets with no reply for 7 days close automatically (daily job
   `support-autoclose`).
-- **Live updates** use WebSockets (Socket.IO at `/api/v1/ws`). Messages are sent through the REST
+- **Live updates** use the app-wide WebSocket channel (see "Live updates" below). Messages are sent through the REST
   API; the socket only says "ticket X changed" and clients reload it, so no content travels over
   the socket. In production Caddy routes `/api/v1/ws/*` to the API; locally the browser connects to
   the API port directly (`NEXT_PUBLIC_SOCKET_ORIGIN`).
+
+## Live updates
+
+One WebSocket channel (Socket.IO at `/api/v1/ws`, module `apps/api/src/realtime`) serves the whole
+app. It authenticates with the same cookies as the API and only carries ids and kinds:
+
+- `notifications:update` — to the user's own room: a new notification (the bell updates and the
+  current page reloads its data, e.g. a new applicant appears) or notifications read in another
+  tab (counts stay in sync).
+- `support:update` — support chat changes, to the ticket owner (user or guest cookie) and admins.
+
+Clients reload the data over the REST API, which checks permissions. The website reconnects after
+sign-in, sign-out and session refresh. In production Caddy routes `/api/v1/ws/*` to the API.
 
 ## Re-registration warning
 

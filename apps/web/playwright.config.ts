@@ -28,6 +28,8 @@ const apiEnv = {
   RATES_SOURCE: 'static',
   ADMIN_EMAIL: 'admin@briefluence.local',
   ADMIN_PASSWORD: 'Admin12345',
+  // The suite signs up many accounts from one IP within a minute; production keeps 10.
+  AUTH_RATE_LIMIT: '200',
 };
 
 export default defineConfig({

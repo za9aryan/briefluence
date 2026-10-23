@@ -12,7 +12,7 @@ import {
   type CSSProperties,
 } from 'react';
 import { useMe } from '@/lib/hooks/session';
-import { useSupportLive } from '@/lib/hooks/supportLive';
+import { LIVE, useLive } from '@/lib/hooks/live';
 import { SUPPORT_KEY, SupportChat, useSupportConversation } from './SupportChat';
 
 /**
@@ -47,7 +47,11 @@ function Widget({ signedIn }: { signedIn: boolean }) {
   const unread = !!conv.data?.ticket?.unread && phase === 'closed';
 
   // Live updates once there is someone to talk to: a session or a guest conversation.
-  useSupportLive(() => void qc.invalidateQueries({ queryKey: SUPPORT_KEY }), signedIn || hasTicket);
+  useLive(
+    LIVE.support,
+    () => void qc.invalidateQueries({ queryKey: SUPPORT_KEY }),
+    signedIn || hasTicket,
+  );
 
   /**
    * The panel squeezed onto the round button: same corner, same size. A 50% radius on the

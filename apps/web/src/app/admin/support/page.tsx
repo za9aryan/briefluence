@@ -29,7 +29,7 @@ import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { useFormat } from '@/lib/hooks/format';
 import { useMe } from '@/lib/hooks/session';
-import { useSupportLive } from '@/lib/hooks/supportLive';
+import { LIVE, useLive } from '@/lib/hooks/live';
 import type { SupportInboxDto, SupportTicketDetailDto } from '@/lib/types';
 
 const BOXES: SupportBox[] = ['unassigned', 'mine', 'open', 'closed'];
@@ -60,7 +60,7 @@ export default function AdminSupportPage() {
     queryKey: [...INBOX_KEY, 'inbox', box],
     queryFn: () => api.get<SupportInboxDto>('/admin/support', { box }),
   });
-  useSupportLive(() => void qc.invalidateQueries({ queryKey: INBOX_KEY }));
+  useLive(LIVE.support, () => void qc.invalidateQueries({ queryKey: INBOX_KEY }));
 
   const counts = inbox.data?.counts;
   return (

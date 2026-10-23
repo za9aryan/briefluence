@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { SUPPORT_KEY, SupportChat } from '@/components/support/SupportChat';
 import { api } from '@/lib/api';
-import { reconnectSupportLive, useSupportLive } from '@/lib/hooks/supportLive';
+import { LIVE, reconnectLive, useLive } from '@/lib/hooks/live';
 import type { SupportViewDto } from '@/lib/types';
 
 /**
@@ -30,7 +30,7 @@ export default function SupportPage() {
       .post<SupportViewDto>('/support/resume', { token })
       .then((view) => {
         qc.setQueryData(SUPPORT_KEY, view);
-        reconnectSupportLive();
+        reconnectLive();
       })
       .catch(() => setLinkInvalid(true))
       .finally(() => {
@@ -39,7 +39,7 @@ export default function SupportPage() {
       });
   }, [qc, router]);
 
-  useSupportLive(() => void qc.invalidateQueries({ queryKey: SUPPORT_KEY }), ready);
+  useLive(LIVE.support, () => void qc.invalidateQueries({ queryKey: SUPPORT_KEY }), ready);
 
   return (
     <Container size="md" py={{ base: 8, md: 12 }}>

@@ -29,7 +29,7 @@ import { EmailService } from '../notifications/email.service';
 import { renderNotificationEmail } from '../notifications/emails/templates';
 import { NotificationsService } from '../notifications/notifications.service';
 import { StorageService } from '../storage/storage.service';
-import { SupportGateway } from './support.gateway';
+import { RealtimeGateway } from '../../realtime/realtime.gateway';
 
 const DAY = 86_400_000;
 /** Short text for notifications; an image-only message shows as "[image]". */
@@ -62,7 +62,7 @@ export class SupportService {
     private readonly notifications: NotificationsService,
     private readonly email: EmailService,
     private readonly storage: StorageService,
-    private readonly gateway: SupportGateway,
+    private readonly gateway: RealtimeGateway,
     private readonly clock: Clock,
     @Inject(ENV) private readonly env: Env,
   ) {}

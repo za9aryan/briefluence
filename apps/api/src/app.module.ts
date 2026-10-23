@@ -25,6 +25,7 @@ import { SocialModule } from './modules/social/social.module';
 import { StorageModule } from './modules/storage/storage.module';
 import { SupportModule } from './modules/support/support.module';
 import { QueueModule } from './queue/queue.module';
+import { RealtimeModule } from './realtime/realtime.module';
 
 const env = loadEnv();
 
@@ -34,6 +35,7 @@ const env = loadEnv();
     PrismaModule,
     CommonModule,
     QueueModule,
+    RealtimeModule,
     ScheduleModule.forRoot(),
     JwtModule.register({ global: true, secret: env.JWT_ACCESS_SECRET }),
     ThrottlerModule.forRoot({

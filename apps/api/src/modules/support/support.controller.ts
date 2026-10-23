@@ -33,7 +33,7 @@ import { ApiZodBody, ZodBody } from '../../common/zod';
 import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { sniffImage, StorageService } from '../storage/storage.service';
-import { SUPPORT_COOKIE } from './support.gateway';
+import { SUPPORT_COOKIE } from '../../realtime/realtime.gateway';
 import { SupportService, type Requester } from './support.service';
 
 const GUEST_COOKIE_DAYS = 180;

@@ -15,7 +15,13 @@ async function build(subject: string, el: React.ReactElement): Promise<RenderedE
 }
 
 /** Generic single-event email: every row in the Notifications table uses this template. */
-export function NotificationEmail(p: { locale: NotificationLocale; title: string; body: string; ctaUrl?: string; ctaLabel?: string }) {
+export function NotificationEmail(p: {
+  locale: NotificationLocale;
+  title: string;
+  body: string;
+  ctaUrl?: string;
+  ctaLabel?: string;
+}) {
   return (
     <Layout preview={p.body} title={p.title} locale={p.locale}>
       {p.body.split('\n').map((line, i) => (
@@ -50,10 +56,13 @@ export function DigestEmail(p: {
   );
 }
 
-export const renderNotificationEmail = (locale: NotificationLocale, p: Omit<Parameters<typeof NotificationEmail>[0], 'locale'>) =>
-  build(p.title, <NotificationEmail locale={locale} {...p} />);
+export const renderNotificationEmail = (
+  locale: NotificationLocale,
+  p: Omit<Parameters<typeof NotificationEmail>[0], 'locale'>,
+) => build(p.title, <NotificationEmail locale={locale} {...p} />);
 
-export const renderDigestEmail = (p: Parameters<typeof DigestEmail>[0]) => build(p.title, <DigestEmail {...p} />);
+export const renderDigestEmail = (p: Parameters<typeof DigestEmail>[0]) =>
+  build(p.title, <DigestEmail {...p} />);
 
 type L3 = Record<NotificationLocale, string>;
 
@@ -78,13 +87,21 @@ const AUTH: Record<'verify' | 'reset', { subject: L3; body: L3; cta: L3 }> = {
   },
 };
 
-const authEmail = (kind: 'verify' | 'reset') => (url: string, locale: NotificationLocale = 'en') => {
-  const t = AUTH[kind];
-  return build(
-    t.subject[locale],
-    <NotificationEmail locale={locale} title={t.subject[locale]} body={t.body[locale]} ctaUrl={url} ctaLabel={t.cta[locale]} />,
-  );
-};
+const authEmail =
+  (kind: 'verify' | 'reset') =>
+  (url: string, locale: NotificationLocale = 'en') => {
+    const t = AUTH[kind];
+    return build(
+      t.subject[locale],
+      <NotificationEmail
+        locale={locale}
+        title={t.subject[locale]}
+        body={t.body[locale]}
+        ctaUrl={url}
+        ctaLabel={t.cta[locale]}
+      />,
+    );
+  };
 export const renderVerifyEmail = authEmail('verify');
 export const renderResetPasswordEmail = authEmail('reset');
 
@@ -106,7 +123,11 @@ export const DIGEST = {
     ru: (n: number) => `Новые отклики за вчера: ${n}`,
     hy: (n: number) => `Երեկվա նոր դիմորդներ՝ ${n}`,
   },
-  brandIntro: { en: 'Bloggers applied to your briefs:', ru: 'Блогеры откликнулись на твои брифы:', hy: 'Բլոգերները դիմել են քո բրիֆներին։' },
+  brandIntro: {
+    en: 'Bloggers applied to your briefs:',
+    ru: 'Блогеры откликнулись на твои брифы:',
+    hy: 'Բլոգերները դիմել են քո բրիֆներին։',
+  },
   brandCta: { en: 'Review applicants', ru: 'Смотреть отклики', hy: 'Դիտել դիմորդներին' },
   match: { en: 'Match', ru: 'Совпадение', hy: 'Համընկնում' },
   barter: { en: 'barter', ru: 'бартер', hy: 'բարտեր' },

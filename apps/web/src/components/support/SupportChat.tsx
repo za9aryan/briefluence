@@ -21,7 +21,7 @@ import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { useFormat } from '@/lib/hooks/format';
 import { useMe } from '@/lib/hooks/session';
-import { reconnectSupportLive } from '@/lib/hooks/supportLive';
+import { reconnectLive } from '@/lib/hooks/live';
 import type { SupportViewDto } from '@/lib/types';
 
 export const SUPPORT_KEY = ['support', 'current'];
@@ -118,7 +118,7 @@ export function SupportChat({ active, className }: { active: boolean; className?
           onStarted={() => {
             setStartNew(false);
             // A guest now has a support cookie: rejoin the live channel with it.
-            reconnectSupportLive();
+            reconnectLive();
           }}
         />
       ) : (
