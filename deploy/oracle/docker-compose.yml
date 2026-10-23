@@ -13,6 +13,10 @@ services:
       POSTGRES_DB: briefluence
     volumes:
       - pgdata:/var/lib/postgresql/data
+    # Only the server itself can reach this port (for an SSH tunnel from your Mac); the internet
+    # cannot (bound to 127.0.0.1, and Oracle's firewall only lets in 22/80/443).
+    ports:
+      - '127.0.0.1:5432:5432'
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U briefluence -d briefluence']
       interval: 5s

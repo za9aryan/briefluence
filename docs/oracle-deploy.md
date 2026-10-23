@@ -166,6 +166,18 @@ Database changes are applied automatically when the API starts.
 
 **Restart**: `docker compose restart api web`.
 
+**Look at the live database** from your Mac (read-only work, e.g. TablePlus or DBeaver) through an
+SSH tunnel; the database is never open to the internet. Get the password on the server with
+`grep POSTGRES_PASSWORD ~/briefluence/deploy/oracle/.env`, then on your Mac:
+
+```bash
+ssh -i ~/Downloads/ssh-key-*.key -N -L 5433:127.0.0.1:5432 ubuntu@YOUR_SERVER_IP
+```
+
+and connect the viewer to host `127.0.0.1`, port `5433`, database `briefluence`, user
+`briefluence`. Never run the local app (`pnpm dev`) against it: its daily jobs (renewals, emails)
+would run twice on real users.
+
 **Backups**: every night in `~/briefluence/backups` (database + uploaded images, 14 days). Copy
 them off the server now and then, from your Mac:
 
