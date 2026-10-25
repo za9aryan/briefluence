@@ -7,13 +7,34 @@ import { Providers } from './providers';
 import './globals.css';
 
 // Brand book: Syne 700–800 (Latin display), Manrope 400–800 (UI + Cyrillic), Noto Sans Armenian.
-const syne = Syne({ subsets: ['latin'], weight: ['700', '800'], variable: '--font-syne', display: 'swap' });
-const manrope = Manrope({ subsets: ['latin', 'cyrillic'], weight: ['400', '500', '700', '800'], variable: '--font-manrope', display: 'swap' });
-const armenian = Noto_Sans_Armenian({ subsets: ['armenian'], weight: ['400', '500', '700', '800'], variable: '--font-armenian', display: 'swap' });
+const syne = Syne({
+  subsets: ['latin'],
+  weight: ['700', '800'],
+  variable: '--font-syne',
+  display: 'swap',
+});
+const manrope = Manrope({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '500', '700', '800'],
+  variable: '--font-manrope',
+  display: 'swap',
+});
+const armenian = Noto_Sans_Armenian({
+  subsets: ['armenian'],
+  weight: ['400', '500', '700', '800'],
+  variable: '--font-armenian',
+  display: 'swap',
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('common');
-  return { title: { default: t('meta.title'), template: '%s · briefluence' }, description: t('meta.description') };
+  return {
+    title: { default: t('meta.title'), template: '%s · briefluence' },
+    description: t('meta.description'),
+    // Home Screen app on iPhone: its own window, our icon and name.
+    appleWebApp: { capable: true, title: 'briefluence', statusBarStyle: 'default' },
+    icons: { apple: '/icons/apple-touch-icon.png' },
+  };
 }
 
 export const viewport: Viewport = {
@@ -27,7 +48,11 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const locale = await getLocale();
   return (
-    <html lang={locale} data-theme="light" className={`${syne.variable} ${manrope.variable} ${armenian.variable}`}>
+    <html
+      lang={locale}
+      data-theme="light"
+      className={`${syne.variable} ${manrope.variable} ${armenian.variable}`}
+    >
       <body className="min-h-dvh">
         <NextIntlClientProvider>
           <Providers>{children}</Providers>

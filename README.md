@@ -141,6 +141,21 @@ app. It authenticates with the same cookies as the API and only carries ids and 
 Clients reload the data over the REST API, which checks permissions. The website reconnects after
 sign-in, sign-out and session refresh. In production Caddy routes `/api/v1/ws/*` to the API.
 
+## App (PWA) and push notifications
+
+- **Installable:** `app/manifest.ts` (standalone, brand icons in `public/icons`) and `public/sw.js`.
+  The service worker only shows push notifications and opens the linked page on tap; it caches
+  nothing, so the site is never stale. **Settings → App and notifications** shows install steps
+  for the visitor's device (iPhone: Share → Add to Home Screen; Android/desktop: one-tap Install
+  when the browser offers it).
+- **Push:** every in-app notification is also sent as Web Push (title and text in the user's
+  language, tap opens its link) to each device the user enabled, through the job queue. Devices
+  the push service reports gone (404/410) are removed. iPhone/iPad allow push only for the app
+  added to the Home Screen (iOS 16.4+) and only after a tap; the switch explains this.
+- **Keys:** VAPID keys in `.env` (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, optional
+  `VAPID_SUBJECT`). Without them push is off and the switch says so. Generate a pair with
+  `node -e "console.log(require('web-push').generateVAPIDKeys())"` in `apps/api`.
+
 ## Re-registration warning
 
 Every link of a social account to a profile is kept in `SocialAccountLink` (also after the account or user is

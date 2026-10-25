@@ -3,12 +3,15 @@ import { ToastProvider } from '@briefluence/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { SupportWidget } from '@/components/support/SupportWidget';
 import { ApiError } from '@/lib/api';
+import { registerServiceWorker } from '@/lib/pwa';
 
 export function Providers({ children }: { children: ReactNode }) {
   const tc = useTranslations('common');
+  // Installable app + push notifications (public/sw.js).
+  useEffect(() => registerServiceWorker(), []);
   const tn = useTranslations('notifications');
   // No support chat button in the admin area (or on /support), so toasts sit in the corner.
   const pathname = usePathname();

@@ -3,6 +3,7 @@ import { Card, CardHeader, Skeleton, Stack, Switch, useToast } from '@briefluenc
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { PageHeader } from '@/components/app/AppShell';
+import { AppInstallCard } from '@/components/app/AppInstallCard';
 import { ChangePasswordCard } from '@/components/forms/ChangePasswordCard';
 import { InfluencerProfileForm } from '@/components/influencer/ProfileForm';
 import { FaqCard, PortfolioCard } from '@/components/influencer/PortfolioSettings';
@@ -63,6 +64,7 @@ export default function InfluencerAccountPage() {
           description={t('digestHint')}
         />
       </Card>
+      <AppInstallCard />
       <ChangePasswordCard />
     </Stack>
   );

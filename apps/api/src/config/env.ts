@@ -118,6 +118,12 @@ export const envSchema = z
     AMERIA_BINDING_PAYMENT_TYPE: z.coerce.number().int().default(6),
 
     SENTRY_DSN: optional,
+
+    // Web Push (VAPID). Both keys set = push on; generate with web-push's generateVAPIDKeys().
+    VAPID_PUBLIC_KEY: optional,
+    VAPID_PRIVATE_KEY: optional,
+    /** Contact for push services: mailto: or https: URL. */
+    VAPID_SUBJECT: z.string().default('mailto:hello@briefluence.am'),
   })
   .superRefine((e, ctx) => {
     const need = (keys: (keyof typeof e)[], when: string) => {

@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { PageHeader } from '@/components/app/AppShell';
 import { BrandProfileForm } from '@/components/brand/BrandProfileForm';
+import { AppInstallCard } from '@/components/app/AppInstallCard';
 import { ChangePasswordCard } from '@/components/forms/ChangePasswordCard';
 import { api } from '@/lib/api';
 import { ME_KEY, useMe } from '@/lib/hooks/session';
@@ -15,7 +16,10 @@ export default function BrandAccountPage() {
   const toast = useToast();
   const qc = useQueryClient();
   const { data: me } = useMe();
-  const brand = useQuery({ queryKey: ['brand', 'me'], queryFn: () => api.get<BrandProfileDto>('/brands/me') });
+  const brand = useQuery({
+    queryKey: ['brand', 'me'],
+    queryFn: () => api.get<BrandProfileDto>('/brands/me'),
+  });
   const settings = useMutation({
     mutationFn: (digestEmails: boolean) => api.patch('/auth/settings', { digestEmails }),
     onSuccess: () => {
@@ -44,8 +48,15 @@ export default function BrandAccountPage() {
       </Card>
       <Card>
         <CardHeader title={t('notifications')} />
-        <Switch checked={me?.digestEmails ?? true} disabled={settings.isPending} onChange={(v) => settings.mutate(v)} label={t('digest')} description={t('digestHint')} />
+        <Switch
+          checked={me?.digestEmails ?? true}
+          disabled={settings.isPending}
+          onChange={(v) => settings.mutate(v)}
+          label={t('digest')}
+          description={t('digestHint')}
+        />
       </Card>
+      <AppInstallCard />
       <ChangePasswordCard />
     </Stack>
   );

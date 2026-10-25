@@ -138,25 +138,26 @@ enum PaymentStatus {
 }
 
 model User {
-  id              String              @id @default(cuid())
-  email           String              @unique
-  passwordHash    String? // null for accounts created with Google / Apple sign-in
-  role            Role
-  emailVerifiedAt DateTime?
-  createdAt       DateTime            @default(now())
-  blockedAt       DateTime? // spec+: admin moderation of users/brands
-  digestEmails    Boolean             @default(true) // spec+: notification settings page
-  currency        Currency            @default(AMD) // spec+: currency amounts are shown in
-  locale          String              @default("en") // spec+: language for emails / notifications (en | ru | hy)
-  influencer      InfluencerProfile?
-  brand           BrandProfile?
-  subscription    Subscription?
-  notifications   Notification[]
-  supportTickets  SupportTicket[]     @relation("SupportTicketUser")
-  supportAssigned SupportTicket[]     @relation("SupportTicketAssignee")
-  refreshTokens   RefreshToken[]
-  identities      AuthIdentity[]
-  accountLinks    SocialAccountLink[]
+  id                String              @id @default(cuid())
+  email             String              @unique
+  passwordHash      String? // null for accounts created with Google / Apple sign-in
+  role              Role
+  emailVerifiedAt   DateTime?
+  createdAt         DateTime            @default(now())
+  blockedAt         DateTime? // spec+: admin moderation of users/brands
+  digestEmails      Boolean             @default(true) // spec+: notification settings page
+  currency          Currency            @default(AMD) // spec+: currency amounts are shown in
+  locale            String              @default("en") // spec+: language for emails / notifications (en | ru | hy)
+  influencer        InfluencerProfile?
+  brand             BrandProfile?
+  subscription      Subscription?
+  notifications     Notification[]
+  supportTickets    SupportTicket[]     @relation("SupportTicketUser")
+  pushSubscriptions PushSubscription[]
+  supportAssigned   SupportTicket[]     @relation("SupportTicketAssignee")
+  refreshTokens     RefreshToken[]
+  identities        AuthIdentity[]
+  accountLinks      SocialAccountLink[]
 }
 
 // spec+: refresh token rotation with reuse detection needs server-side state.
@@ -658,4 +659,20 @@ model SupportMessage {
   createdAt DateTime      @default(now())
 
   @@index([ticketId, createdAt])
+}
+
+/// One device/browser that accepted Web Push for a user. Removed when the push service reports
+/// it gone (404/410) or the user turns push off on that device.
+model PushSubscription {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint   String    @unique
+  p256dh     String
+  auth       String
+  userAgent  String?
+  createdAt  DateTime  @default(now())
+  lastSentAt DateTime?
+
+  @@index([userId])
 }

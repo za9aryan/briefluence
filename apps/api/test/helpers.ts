@@ -39,6 +39,7 @@ export async function createTestApp(): Promise<TestCtx> {
 export async function resetDb(prisma: PrismaService) {
   const tables = [
     'AuthIdentity',
+    'PushSubscription',
     'SupportMessage',
     'SupportTicket',
     'OfferView',

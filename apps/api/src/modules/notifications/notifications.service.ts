@@ -15,6 +15,7 @@ import { NOTIFICATIONS_EVENT, RealtimeGateway } from '../../realtime/realtime.ga
 import type { Env } from '../../config/env';
 import { EMAIL_POLICY } from './catalog';
 import { EmailService } from './email.service';
+import { PushService } from './push.service';
 import { renderNotificationEmail } from './emails/templates';
 
 export interface NotifyPayload {
@@ -32,6 +33,7 @@ export class NotificationsService {
     private readonly prisma: PrismaService,
     private readonly email: EmailService,
     private readonly realtime: RealtimeGateway,
+    private readonly push: PushService,
     @Inject(ENV) private readonly env: Env,
   ) {}
 
@@ -63,6 +65,12 @@ export class NotificationsService {
     });
     // Live: the bell (and the page the user is on) refreshes right away on every open tab.
     this.realtime.toUser(userId, NOTIFICATIONS_EVENT, { kind: 'new', id: row.id });
+    // And to the user's devices as a push notification (queued; off without VAPID keys).
+    try {
+      await this.push.enqueue(row.id);
+    } catch (err) {
+      this.logger.error(`Failed to enqueue push: ${(err as Error).message}`);
+    }
     if (EMAIL_POLICY[type] === 'instant' && user) {
       try {
         const email = await renderNotificationEmail(locale, {
