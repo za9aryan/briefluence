@@ -10,9 +10,20 @@ import { SESSION_EVENT } from '../api';
 let socket: Socket | null = null;
 let listeners = 0;
 
+/** Where the socket goes. Dev builds point at localhost:4000, which a phone can't reach, so use
+ * the host the page was opened on (e.g. http://192.168.1.20:4000) instead. */
+function socketOrigin() {
+  const configured = process.env.NEXT_PUBLIC_SOCKET_ORIGIN;
+  if (!configured) return window.location.origin;
+  const url = new URL(configured);
+  if (url.hostname === 'localhost' && window.location.hostname !== 'localhost')
+    url.hostname = window.location.hostname;
+  return url.origin;
+}
+
 function connection(): Socket {
   if (!socket) {
-    socket = io(process.env.NEXT_PUBLIC_SOCKET_ORIGIN || window.location.origin, {
+    socket = io(socketOrigin(), {
       path: '/api/v1/ws',
       withCredentials: true,
       autoConnect: false,

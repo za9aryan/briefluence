@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
+import { networkInterfaces } from 'node:os';
 
 const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 // API origin for the /api/v1 rewrite. On Render the Blueprint passes the API's private host:port.
@@ -23,7 +24,16 @@ const nextConfig: NextConfig = {
   },
   // Dev only: let the dev server answer through HTTPS tunnels used for real OAuth testing
   // (see docs/social-oauth-setup.md).
-  allowedDevOrigins: ['*.trycloudflare.com', '*.ngrok-free.app', '*.ngrok.app'],
+  // Also this Mac's local network addresses, so the dev site works from a phone on the same Wi-Fi.
+  allowedDevOrigins: [
+    '*.trycloudflare.com',
+    '*.ngrok-free.app',
+    '*.ngrok.app',
+    ...Object.values(networkInterfaces())
+      .flat()
+      .filter((i) => i && i.family === 'IPv4' && !i.internal)
+      .map((i) => i!.address),
+  ],
   // The browser talks to the API through the web origin, so auth cookies are first-party
   // and OAuth / bank redirects land on the same site.
   async rewrites() {

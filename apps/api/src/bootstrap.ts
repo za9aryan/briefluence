@@ -13,7 +13,12 @@ export function configureApp(app: INestApplication, env: Env) {
   // private-network hops so req.ip (rate limits, logs) is the visitor, not the proxy.
   (app.getHttpAdapter().getInstance() as express.Express).set('trust proxy', env.TRUST_PROXY);
   app.use(cookieParser());
-  const origins = env.CORS_ORIGINS.split(',').map((o) => o.trim());
+  const listed = env.CORS_ORIGINS.split(',').map((o) => o.trim());
+  // Development only: also the dev site opened from a phone on the local network.
+  const localNetwork =
+    /^http:\/\/(localhost|127\.0\.0\.1|10(\.\d{1,3}){3}|192\.168(\.\d{1,3}){2}|172\.(1[6-9]|2\d|3[01])(\.\d{1,3}){2}):3000$/;
+  const origins: (string | RegExp)[] =
+    env.NODE_ENV === 'development' ? [...listed, localNetwork] : listed;
   app.enableCors({ origin: origins, credentials: true });
   // Live updates (notifications, support chat) over Socket.IO at /api/v1/ws, same origins and
   // cookies as the API.

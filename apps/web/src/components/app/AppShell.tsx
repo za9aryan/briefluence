@@ -11,6 +11,7 @@ import { api } from '@/lib/api';
 import { HOME_BY_ROLE, useMe, type Me } from '@/lib/hooks/session';
 import { NotificationBell } from './NotificationBell';
 import { UserMenu } from './UserMenu';
+import { AppReminder } from './AppReminder';
 
 interface NavItem {
   href: string;
@@ -144,6 +145,7 @@ function Banners({ me }: { me: Me }) {
           {tb('trialBanner', { count: sub.trialDaysLeft })}
         </Alert>
       )}
+      <AppReminder role={me.role} />
     </>
   );
 }

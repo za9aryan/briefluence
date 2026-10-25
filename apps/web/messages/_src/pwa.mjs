@@ -56,6 +56,22 @@ export default {
         'Chrome-ում կամ Edge-ում սեղմիր հասցեի տողի տեղադրման պատկերակը կամ ընտրացանկում ընտրիր «Տեղադրել briefluence»։ Mac-ի Safari-ում՝ Ֆայլ → Ավելացնել Dock-ին։',
       ],
     },
+    banner: {
+      install: [
+        'Add briefluence to your Home Screen to get notified about replies and new requests.',
+        'Добавь briefluence на экран «Домой», чтобы получать уведомления об ответах и новых запросах.',
+        'Ավելացրու briefluence-ը գլխավոր էկրանին՝ պատասխանների և նոր հարցումների մասին ծանուցումներ ստանալու համար։',
+      ],
+      push: [
+        'Turn on notifications so you don’t miss replies and new requests.',
+        'Включи уведомления, чтобы не пропустить ответы и новые запросы.',
+        'Միացրու ծանուցումները, որ բաց չթողնես պատասխաններն ու նոր հարցումները։',
+      ],
+      howTo: ['Show me how', 'Как это сделать', 'Ինչպես անել'],
+      installButton: ['Install', 'Установить', 'Տեղադրել'],
+      turnOn: ['Turn on', 'Включить', 'Միացնել'],
+      dismiss: ['Hide this reminder', 'Скрыть напоминание', 'Թաքցնել հիշեցումը'],
+    },
     push: {
       label: [
         'Push notifications on this device',

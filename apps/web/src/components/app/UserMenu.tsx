@@ -45,11 +45,20 @@ export function UserMenu({ me, showDashboard }: { me: Me; showDashboard?: boolea
           aria-label={t('account')}
           className="inline-flex min-h-11 items-center gap-2 rounded-pill pl-1 pr-2 hover:bg-primary-soft/60"
         >
-          <Avatar size="sm" name={displayName(me)} src={me.influencer?.avatarUrl ?? me.brand?.logoUrl} />
+          <Avatar
+            size="sm"
+            name={displayName(me)}
+            src={me.influencer?.avatarUrl ?? me.brand?.logoUrl}
+          />
           <span className="hidden text-label text-ink-muted sm:inline">
             {locale.toUpperCase()} · {currency}
           </span>
-          <Icon name={pending ? 'spinner' : 'chevron-down'} spin={pending} tone="muted" className="hidden sm:block" />
+          <Icon
+            name={pending ? 'spinner' : 'chevron-down'}
+            spin={pending}
+            tone="muted"
+            className="hidden sm:block"
+          />
         </button>
       )}
     >
@@ -70,7 +79,11 @@ export function UserMenu({ me, showDashboard }: { me: Me; showDashboard?: boolea
             </Link>
           )}
           {me.role !== 'ADMIN' && (
-            <Link href={me.role === 'BRAND' ? '/brand/account' : '/influencer/account'} onClick={close} className={item}>
+            <Link
+              href={me.role === 'BRAND' ? '/brand/account' : '/influencer/account'}
+              onClick={close}
+              className={item}
+            >
               <Icon name="settings" /> {t('settings')}
             </Link>
           )}
@@ -79,7 +92,11 @@ export function UserMenu({ me, showDashboard }: { me: Me; showDashboard?: boolea
           <div className="flex flex-col gap-2 border-t border-line px-4 py-2">
             <label className="flex flex-col gap-1">
               <span className="text-label text-ink-muted uppercase">{t('language')}</span>
-              <Select value={locale} disabled={pending} onChange={(e) => chooseLocale(e.target.value as Locale)}>
+              <Select
+                value={locale}
+                disabled={pending}
+                onChange={(e) => chooseLocale(e.target.value as Locale)}
+              >
                 {LOCALES.map((l) => (
                   <option key={l} value={l} lang={l}>
                     {LOCALE_NAMES[l]}
@@ -89,7 +106,11 @@ export function UserMenu({ me, showDashboard }: { me: Me; showDashboard?: boolea
             </label>
             <label className="flex flex-col gap-1">
               <span className="text-label text-ink-muted uppercase">{t('currency')}</span>
-              <Select value={currency} disabled={setCurrency.isPending} onChange={(e) => setCurrency.mutate(e.target.value as Currency)}>
+              <Select
+                value={currency}
+                disabled={setCurrency.isPending}
+                onChange={(e) => setCurrency.mutate(e.target.value as Currency)}
+              >
                 {CURRENCIES.map((c) => (
                   <option key={c} value={c}>
                     {CURRENCY_SYMBOL[c]} {c} · {tr(`currency.${c}`)}

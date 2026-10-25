@@ -45,8 +45,10 @@ export function AppInstallCard() {
     }
   };
 
+  // Phones and tablets only: that's where installing and push matter.
+  if (!install || install.platform === 'desktop') return null;
   return (
-    <Card>
+    <Card id="app" className="scroll-mt-24">
       <CardHeader title={t('title')} description={t('lead')} />
       <Stack gap={6}>
         <Stack gap={2}>

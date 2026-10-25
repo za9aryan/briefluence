@@ -65,3 +65,47 @@ for (const [name, ua, steps] of [
     await ctx.close();
   });
 }
+
+test('phones get a reminder banner; desktop gets neither the banner nor the card', async ({
+  browser,
+}) => {
+  const brandSetup = async (page: import('@playwright/test').Page) => {
+    await signupViaUi(page, 'BRAND', `pwa-${uid()}@e2e.test`);
+    await page.getByLabel('Brand name').fill('PWA Cafe');
+    await page.getByLabel('Contact person').fill('Karen');
+    await page.getByLabel('Contact method').selectOption('WHATSAPP');
+    await page.getByLabel('Phone number').fill('+374 91 222333');
+    await page.getByRole('button', { name: 'Save and post a brief' }).click();
+    await page.waitForURL('**/brand/deals/new');
+  };
+  const reminder = /Add briefluence to your Home Screen/;
+
+  // iPhone in Safari: banner → "Show me how" → the steps in settings; ✕ hides it.
+  const phone = await (
+    await browser.newContext({
+      storageState: en,
+      userAgent: IPHONE,
+      viewport: { width: 390, height: 844 },
+    })
+  ).newPage();
+  await brandSetup(phone);
+  await expect(phone.getByText(reminder)).toBeVisible();
+  if (process.env.E2E_SHOTS)
+    await phone.screenshot({ path: `${process.env.E2E_SHOTS}/pwa-banner.png` });
+  await phone.getByRole('link', { name: 'Show me how' }).click();
+  await phone.waitForURL('**/brand/account#app');
+  await expect(phone.getByText('Tap Share (the square with an arrow).')).toBeVisible();
+  await phone.getByRole('button', { name: 'Hide this reminder' }).click();
+  await expect(phone.getByText(reminder)).toBeHidden();
+  await phone.reload();
+  await expect(phone.getByText('App and notifications')).toBeVisible();
+  await expect(phone.getByText(reminder)).toBeHidden();
+
+  // Desktop: no banner, no card.
+  const desk = await (await browser.newContext({ storageState: en })).newPage();
+  await brandSetup(desk);
+  await desk.goto('/brand/account');
+  await expect(desk.getByText('Password', { exact: true }).first()).toBeVisible();
+  await expect(desk.getByText('App and notifications')).toHaveCount(0);
+  await expect(desk.getByText(reminder)).toHaveCount(0);
+});

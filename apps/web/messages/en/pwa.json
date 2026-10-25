@@ -17,6 +17,14 @@
     },
     "desktop": "In Chrome or Edge, click the install icon in the address bar or choose “Install briefluence” in the menu. In Safari on a Mac: File → Add to Dock."
   },
+  "banner": {
+    "install": "Add briefluence to your Home Screen to get notified about replies and new requests.",
+    "push": "Turn on notifications so you don’t miss replies and new requests.",
+    "howTo": "Show me how",
+    "installButton": "Install",
+    "turnOn": "Turn on",
+    "dismiss": "Hide this reminder"
+  },
   "push": {
     "label": "Push notifications on this device",
     "off": "Get notified about replies, accepted applications and new requests, even when briefluence is closed.",
