@@ -128,3 +128,28 @@ test('form fields use 16px text on touch screens (no zoom on tap)', async ({ bro
   expect(sizes.every((s) => parseFloat(s) >= 16)).toBe(true);
   await ctx.close();
 });
+
+/** Phones: the bell opens the notifications screen (no dropdown); back returns to the page. */
+test('bell opens the notifications screen on phones', async ({ browser }) => {
+  const ctx = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+    isMobile: true,
+  });
+  const page = await ctx.newPage();
+  await page
+    .context()
+    .addCookies([{ name: 'NEXT_LOCALE', value: 'en', url: 'http://localhost:3100' }]);
+  await signupViaUi(page, 'INFLUENCER', `bell-${uid()}@e2e.test`);
+  await page.getByLabel('Name').fill('Bell Blogger');
+  await page.getByRole('checkbox', { name: 'Food' }).click();
+  await page.getByRole('button', { name: 'Save and continue' }).click();
+  await page.waitForURL('**/influencer/verification');
+  const from = page.url();
+  await page.getByRole('link', { name: /^Notifications/ }).click();
+  await page.waitForURL('**/notifications');
+  await expect(page.getByRole('heading', { name: 'Notifications' })).toBeVisible();
+  await page.getByRole('button', { name: 'Back' }).click();
+  await page.waitForURL(from);
+  await ctx.close();
+});

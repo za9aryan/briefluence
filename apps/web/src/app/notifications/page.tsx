@@ -1,5 +1,15 @@
 'use client';
-import { Button, Card, EmptyState, Pagination, Skeleton, Stack, Text, cn } from '@briefluence/ui';
+import {
+  Button,
+  Card,
+  EmptyState,
+  Icon,
+  Pagination,
+  Skeleton,
+  Stack,
+  Text,
+  cn,
+} from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -37,6 +47,14 @@ export default function NotificationsPage() {
 
   return (
     <Stack gap={6}>
+      {/* Phones open this screen from the bell: back returns to where they were. */}
+      <button
+        type="button"
+        onClick={() => (window.history.length > 1 ? router.back() : router.push('/'))}
+        className="-mb-4 inline-flex min-h-11 items-center gap-1 self-start text-small font-bold text-primary-text md:hidden"
+      >
+        <Icon name="arrow-left" /> {tc('back')}
+      </button>
       <PageHeader
         title={t('title')}
         actions={
@@ -81,8 +99,11 @@ export default function NotificationsPage() {
                     <span className="block whitespace-pre-line text-small text-ink-muted">
                       {text(n).body}
                     </span>
+                    <span className="mt-1 block text-[11px] text-ink-muted sm:hidden">
+                      {f.relative(n.createdAt)}
+                    </span>
                   </span>
-                  <Text as="span" size="small" tone="muted" className="shrink-0">
+                  <Text as="span" size="small" tone="muted" className="hidden shrink-0 sm:block">
                     {f.relative(n.createdAt)}
                   </Text>
                 </button>

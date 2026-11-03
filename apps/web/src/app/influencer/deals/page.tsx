@@ -3,10 +3,12 @@ import type { CollaborationType, FeedQuery, PaymentType, Platform } from '@brief
 import { CURRENCY_SYMBOL, toMinor } from '@briefluence/shared';
 import {
   Button,
+  ChipGroup,
   EmptyState,
   ErrorState,
   Field,
   FilterDropdown,
+  FiltersButton,
   Grid,
   Icon,
   Inline,
@@ -14,6 +16,7 @@ import {
   Modal,
   Pagination,
   Select,
+  SheetSection,
   Skeleton,
   Stack,
   Text,
@@ -51,6 +54,171 @@ const EMPTY: Filters = {
 };
 type Saved = { name: string; query: Partial<Filters> };
 
+const countActive = (f: Filters) =>
+  f.platform.length +
+  f.niche.length +
+  f.paymentType.length +
+  f.collaboration.length +
+  (f.city ? 1 : 0) +
+  (f.budgetMin ? 1 : 0);
+
+/** The feed API query for a set of filters (budget typed in the viewer's currency). */
+function feedQuery(f: Filters, page: number, pageSize: number, currency: string) {
+  return {
+    page,
+    pageSize,
+    sort: f.sort,
+    platform: f.platform,
+    niche: f.niche,
+    city: f.city ? [f.city] : undefined,
+    paymentType: f.paymentType,
+    collaboration: f.collaboration,
+    // Entered in the viewer's currency (major units); the API converts it for each deal's currency.
+    budgetMin: f.budgetMin ? toMinor(Number(f.budgetMin)) : undefined,
+    budgetCurrency: f.budgetMin ? currency : undefined,
+  };
+}
+
+/**
+ * Phones: every filter in a bottom sheet. Choices are a draft until "Show N briefs", so the list
+ * behind does not jump while choosing; N is counted live for the draft.
+ */
+function FilterSheet({
+  open,
+  initial,
+  onClose,
+  onApply,
+}: {
+  open: boolean;
+  initial: Filters;
+  onClose: () => void;
+  onApply: (f: Filters) => void;
+}) {
+  const t = useTranslations('deals');
+  const tc = useTranslations('common');
+  const currency = useDisplayCurrency();
+  const o = useOptions();
+  const [draft, setDraft] = useState(initial);
+  const set = <K extends keyof Filters>(k: K, v: Filters[K]) => setDraft((d) => ({ ...d, [k]: v }));
+  const q = feedQuery(draft, 1, 1, currency);
+  const count = useQuery({
+    queryKey: ['feed', 'count', q],
+    queryFn: () => api.get<Paginated<FeedDealDto>>('/deals/feed', q),
+    placeholderData: keepPreviousData,
+    enabled: open,
+  });
+  const total = count.data?.total;
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={tc('filters')}
+      closeLabel={tc('close')}
+      footer={
+        <div className="flex w-full gap-2">
+          <Button variant="secondary" onClick={() => setDraft({ ...EMPTY, sort: draft.sort })}>
+            {tc('reset')}
+          </Button>
+          <Button
+            className="flex-1"
+            loading={count.isFetching && total == null}
+            onClick={() => onApply(draft)}
+          >
+            {total == null ? tc('filters') : t('showResults', { count: total })}
+          </Button>
+        </div>
+      }
+    >
+      <SheetSection title={t('filters.platform')}>
+        <ChipGroup
+          multiple
+          options={o.platforms}
+          value={draft.platform}
+          onChange={(v) => set('platform', v)}
+          aria-label={t('filters.platform')}
+        />
+      </SheetSection>
+      <SheetSection title={t('filters.payment')}>
+        <ChipGroup
+          multiple
+          options={o.paymentTypes}
+          value={draft.paymentType}
+          onChange={(v) => set('paymentType', v)}
+          aria-label={t('filters.payment')}
+        />
+      </SheetSection>
+      <SheetSection title={t('filters.collaboration')}>
+        <ChipGroup
+          multiple
+          options={o.collaboration}
+          value={draft.collaboration}
+          onChange={(v) => set('collaboration', v)}
+          aria-label={t('filters.collaboration')}
+        />
+      </SheetSection>
+      <SheetSection title={t('filters.niche')}>
+        <ChipGroup
+          multiple
+          options={o.niches}
+          value={draft.niche}
+          onChange={(v) => set('niche', v)}
+          aria-label={t('filters.niche')}
+        />
+      </SheetSection>
+      <SheetSection title={t('filters.city')}>
+        <Select
+          aria-label={t('filters.city')}
+          value={draft.city}
+          onChange={(e) => set('city', e.target.value)}
+        >
+          <option value="">{tc('any')}</option>
+          {o.citiesOf(['AM']).map((c) => (
+            <option key={c.value} value={c.value}>
+              {c.label}
+            </option>
+          ))}
+        </Select>
+      </SheetSection>
+      <SheetSection title={`${t('filters.budgetMin')} (${currency})`}>
+        <Input
+          aria-label={`${t('filters.budgetMin')} (${currency})`}
+          placeholder={t('filters.budgetHint')}
+          type="number"
+          inputMode="numeric"
+          min={0}
+          suffix={CURRENCY_SYMBOL[currency]}
+          value={draft.budgetMin}
+          onChange={(e) => set('budgetMin', e.target.value)}
+        />
+      </SheetSection>
+    </Modal>
+  );
+}
+
+function SortSelect({
+  value,
+  onChange,
+  className,
+}: {
+  value: Filters['sort'];
+  onChange: (v: Filters['sort']) => void;
+  className?: string;
+}) {
+  const t = useTranslations('deals');
+  return (
+    <Select
+      aria-label={t('sort.label')}
+      value={value}
+      onChange={(e) => onChange(e.target.value as Filters['sort'])}
+      className={`h-11 w-auto rounded-pill ${className ?? ''}`}
+    >
+      <option value="match">{t('sort.match')}</option>
+      <option value="deadline">{t('sort.deadline')}</option>
+      <option value="newest">{t('sort.newest')}</option>
+    </Select>
+  );
+}
+
 /** One horizontal row of filters above the results; wraps onto more lines on narrow screens. */
 function FilterBar({ value, onChange }: { value: Filters; onChange: (f: Filters) => void }) {
   const t = useTranslations('deals');
@@ -59,13 +227,7 @@ function FilterBar({ value, onChange }: { value: Filters; onChange: (f: Filters)
   const o = useOptions();
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) => onChange({ ...value, [k]: v });
   const pill = 'h-11 rounded-pill w-auto';
-  const active =
-    value.platform.length +
-    value.niche.length +
-    value.paymentType.length +
-    value.collaboration.length +
-    (value.city ? 1 : 0) +
-    (value.budgetMin ? 1 : 0);
+  const active = countActive(value);
   return (
     <div role="toolbar" aria-label={tc('filters')} className="flex flex-wrap items-center gap-2">
       <FilterDropdown
@@ -135,16 +297,7 @@ function FilterBar({ value, onChange }: { value: Filters; onChange: (f: Filters)
           {tc('clear')}
         </Button>
       )}
-      <Select
-        aria-label={t('sort.label')}
-        value={value.sort}
-        onChange={(e) => set('sort', e.target.value as Filters['sort'])}
-        className={`${pill} sm:ml-auto`}
-      >
-        <option value="match">{t('sort.match')}</option>
-        <option value="deadline">{t('sort.deadline')}</option>
-        <option value="newest">{t('sort.newest')}</option>
-      </Select>
+      <SortSelect value={value.sort} onChange={(v) => set('sort', v)} className="sm:ml-auto" />
     </div>
   );
 }
@@ -158,6 +311,13 @@ export default function DealFeedPage() {
   const [page, setPage] = useState(1);
   const [saveOpen, setSaveOpen] = useState(false);
   const [saveName, setSaveName] = useState('');
+  const [sheetOpen, setSheetOpen] = useState(false);
+  // A new key on each open restarts the sheet's draft from the filters in use.
+  const [sheetKey, setSheetKey] = useState(0);
+  const openSheet = () => {
+    setSheetKey((k) => k + 1);
+    setSheetOpen(true);
+  };
   const currency = useDisplayCurrency();
   const { data: me } = useMe();
   const unlocked = !!me?.subscription && me.influencer?.status === 'APPROVED';
@@ -167,19 +327,7 @@ export default function DealFeedPage() {
     setPage(1);
   };
 
-  const query = {
-    page,
-    pageSize: 12,
-    sort: filters.sort,
-    platform: filters.platform,
-    niche: filters.niche,
-    city: filters.city ? [filters.city] : undefined,
-    paymentType: filters.paymentType,
-    collaboration: filters.collaboration,
-    // Entered in the viewer's currency (major units); the API converts it for each deal's currency.
-    budgetMin: filters.budgetMin ? toMinor(Number(filters.budgetMin)) : undefined,
-    budgetCurrency: filters.budgetMin ? currency : undefined,
-  };
+  const query = feedQuery(filters, page, 12, currency);
   const feed = useQuery({
     queryKey: ['feed', query],
     queryFn: () => api.get<Paginated<FeedDealDto>>('/deals/feed', query),
@@ -196,19 +344,39 @@ export default function DealFeedPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['influencer', 'me'] }),
   });
 
-  const activeCount =
-    filters.platform.length +
-    filters.niche.length +
-    filters.paymentType.length +
-    filters.collaboration.length +
-    (filters.city ? 1 : 0) +
-    (filters.budgetMin ? 1 : 0);
+  const activeCount = countActive(filters);
 
   return (
     <Stack gap={6}>
       <PageHeader title={t('feedTitle')} />
 
-      {unlocked && <FilterBar value={filters} onChange={update} />}
+      {unlocked && (
+        <>
+          <div className="flex items-center gap-2 md:hidden">
+            <FiltersButton label={tc('filters')} count={activeCount} onClick={openSheet} />
+            <SortSelect
+              value={filters.sort}
+              onChange={(sort) => update({ ...filters, sort })}
+              className="ml-auto"
+            />
+          </div>
+          <div className="hidden md:block">
+            <FilterBar value={filters} onChange={update} />
+          </div>
+          {
+            <FilterSheet
+              key={sheetKey}
+              open={sheetOpen}
+              initial={filters}
+              onClose={() => setSheetOpen(false)}
+              onApply={(f) => {
+                update(f);
+                setSheetOpen(false);
+              }}
+            />
+          }
+        </>
+      )}
 
       {(saved.length > 0 || activeCount > 0) && (
         <Inline gap={2} wrap>

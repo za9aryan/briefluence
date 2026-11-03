@@ -79,6 +79,7 @@
   "search": "Search offers",
   "sortNewest": "Newest",
   "sortPrice": "Lowest price",
+  "showResults": "Show {count, plural, one {# offer} other {# offers}}",
   "emptyFeed": "No offers match these filters yet.",
   "emptyRequests": "You have not sent any requests yet.",
   "wantsToWorkWith": "Wants to work with: {value}",

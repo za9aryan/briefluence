@@ -3,15 +3,19 @@ import type { CollaborationType, ContentFormat, Platform } from '@briefluence/sh
 import {
   Button,
   Card,
+  ChipGroup,
   EmptyState,
   FilterDropdown,
+  FiltersButton,
   Grid,
   Icon,
   Inline,
   Input,
   MediaCover,
   Pagination,
+  Modal,
   Select,
+  SheetSection,
   Skeleton,
   Stack,
   Tabs,
@@ -50,6 +54,107 @@ const EMPTY: Filters = {
   sort: 'newest',
 };
 
+/** The offer feed API query for a set of filters. */
+const feedQuery = (f: Filters, page: number, pageSize: number) => ({
+  platform: f.platform.join(',') || undefined,
+  format: f.format.join(',') || undefined,
+  niche: f.niche.join(',') || undefined,
+  collaboration: f.collaboration.join(',') || undefined,
+  q: f.q || undefined,
+  sort: f.sort,
+  page,
+  pageSize,
+});
+
+const countActive = (f: Filters) =>
+  f.platform.length + f.format.length + f.niche.length + f.collaboration.length;
+
+/** Phones: the filters in a bottom sheet; a draft until "Show N offers" (counted live). */
+function OfferFilterSheet({
+  open,
+  initial,
+  onClose,
+  onApply,
+}: {
+  open: boolean;
+  initial: Filters;
+  onClose: () => void;
+  onApply: (f: Filters) => void;
+}) {
+  const t = useTranslations('offers');
+  const tc = useTranslations('common');
+  const td = useTranslations('deals');
+  const o = useOptions();
+  const [draft, setDraft] = useState(initial);
+  const set = <K extends keyof Filters>(k: K, v: Filters[K]) => setDraft((d) => ({ ...d, [k]: v }));
+  const q = feedQuery(draft, 1, 1);
+  const count = useQuery({
+    queryKey: ['offers', 'feed', 'count', q],
+    queryFn: () => api.get<Paginated<FeedOfferDto>>('/offers/feed', q),
+    placeholderData: keepPreviousData,
+    enabled: open,
+  });
+  const total = count.data?.total;
+  return (
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={tc('filters')}
+      closeLabel={tc('close')}
+      footer={
+        <div className="flex w-full gap-2">
+          <Button
+            variant="secondary"
+            onClick={() => setDraft({ ...EMPTY, q: draft.q, sort: draft.sort })}
+          >
+            {tc('reset')}
+          </Button>
+          <Button className="flex-1" onClick={() => onApply(draft)}>
+            {total == null ? tc('filters') : t('showResults', { count: total })}
+          </Button>
+        </div>
+      }
+    >
+      <SheetSection title={td('filters.platform')}>
+        <ChipGroup
+          multiple
+          options={o.platforms}
+          value={draft.platform}
+          onChange={(v) => set('platform', v)}
+          aria-label={td('filters.platform')}
+        />
+      </SheetSection>
+      <SheetSection title={t('fields.formats')}>
+        <ChipGroup
+          multiple
+          options={o.formats}
+          value={draft.format}
+          onChange={(v) => set('format', v)}
+          aria-label={t('fields.formats')}
+        />
+      </SheetSection>
+      <SheetSection title={td('filters.collaboration')}>
+        <ChipGroup
+          multiple
+          options={o.collaboration}
+          value={draft.collaboration}
+          onChange={(v) => set('collaboration', v)}
+          aria-label={td('filters.collaboration')}
+        />
+      </SheetSection>
+      <SheetSection title={td('filters.niche')}>
+        <ChipGroup
+          multiple
+          options={o.niches}
+          value={draft.niche}
+          onChange={(v) => set('niche', v)}
+          aria-label={td('filters.niche')}
+        />
+      </SheetSection>
+    </Modal>
+  );
+}
+
 function Browse() {
   const t = useTranslations('offers');
   const tc = useTranslations('common');
@@ -57,75 +162,92 @@ function Browse() {
   const o = useOptions();
   const [filters, setFilters] = useState<Filters>(EMPTY);
   const [page, setPage] = useState(1);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetKey, setSheetKey] = useState(0);
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) => {
     setFilters((f) => ({ ...f, [k]: v }));
     setPage(1);
   };
   const feed = useQuery({
     queryKey: ['offers', 'feed', filters, page],
-    queryFn: () =>
-      api.get<Paginated<FeedOfferDto>>('/offers/feed', {
-        platform: filters.platform.join(',') || undefined,
-        format: filters.format.join(',') || undefined,
-        niche: filters.niche.join(',') || undefined,
-        collaboration: filters.collaboration.join(',') || undefined,
-        q: filters.q || undefined,
-        sort: filters.sort,
-        page,
-        pageSize: 12,
-      }),
+    queryFn: () => api.get<Paginated<FeedOfferDto>>('/offers/feed', feedQuery(filters, page, 12)),
     placeholderData: keepPreviousData,
   });
 
   return (
     <Stack gap={6}>
       <div role="toolbar" aria-label={tc('filters')} className="flex flex-wrap items-center gap-2">
-        <Input
-          icon="search"
-          aria-label={t('search')}
-          placeholder={t('search')}
-          value={filters.q}
-          onChange={(e) => set('q', e.target.value)}
-          className="h-11 rounded-pill sm:w-64"
+        {/* Phones: search on its own row, then Filters + sort. */}
+        <div className="w-full md:w-64">
+          <Input
+            icon="search"
+            aria-label={t('search')}
+            placeholder={t('search')}
+            value={filters.q}
+            onChange={(e) => set('q', e.target.value)}
+            className="h-11 rounded-pill"
+          />
+        </div>
+        <FiltersButton
+          label={tc('filters')}
+          count={countActive(filters)}
+          onClick={() => {
+            setSheetKey((k) => k + 1);
+            setSheetOpen(true);
+          }}
+          className="md:hidden"
         />
-        <FilterDropdown
-          label={td('filters.platform')}
-          options={o.platforms}
-          value={filters.platform}
-          onChange={(v) => set('platform', v)}
-          clearLabel={tc('clear')}
-        />
-        <FilterDropdown
-          label={t('fields.formats')}
-          options={o.formats}
-          value={filters.format}
-          onChange={(v) => set('format', v)}
-          clearLabel={tc('clear')}
-        />
-        <FilterDropdown
-          label={td('filters.collaboration')}
-          options={o.collaboration}
-          value={filters.collaboration}
-          onChange={(v) => set('collaboration', v)}
-          clearLabel={tc('clear')}
-        />
-        <FilterDropdown
-          label={td('filters.niche')}
-          options={o.niches}
-          value={filters.niche}
-          onChange={(v) => set('niche', v)}
-          clearLabel={tc('clear')}
-        />
+        <div className="hidden flex-wrap items-center gap-2 md:contents">
+          <FilterDropdown
+            label={td('filters.platform')}
+            options={o.platforms}
+            value={filters.platform}
+            onChange={(v) => set('platform', v)}
+            clearLabel={tc('clear')}
+          />
+          <FilterDropdown
+            label={t('fields.formats')}
+            options={o.formats}
+            value={filters.format}
+            onChange={(v) => set('format', v)}
+            clearLabel={tc('clear')}
+          />
+          <FilterDropdown
+            label={td('filters.collaboration')}
+            options={o.collaboration}
+            value={filters.collaboration}
+            onChange={(v) => set('collaboration', v)}
+            clearLabel={tc('clear')}
+          />
+          <FilterDropdown
+            label={td('filters.niche')}
+            options={o.niches}
+            value={filters.niche}
+            onChange={(v) => set('niche', v)}
+            clearLabel={tc('clear')}
+          />
+        </div>
         <Select
           aria-label={t('sortNewest') + ' / ' + t('sortPrice')}
           value={filters.sort}
           onChange={(e) => set('sort', e.target.value as Filters['sort'])}
-          className="h-11 w-auto rounded-pill"
+          className="ml-auto h-11 w-auto rounded-pill md:ml-0"
         >
           <option value="newest">{t('sortNewest')}</option>
           <option value="price">{t('sortPrice')}</option>
         </Select>
       </div>
+      <OfferFilterSheet
+        key={sheetKey}
+        open={sheetOpen}
+        initial={filters}
+        onClose={() => setSheetOpen(false)}
+        onApply={(f) => {
+          setFilters(f);
+          setPage(1);
+          setSheetOpen(false);
+        }}
+      />
       {feed.isLoading ? (
         <Grid cols={{ base: 1, md: 2, xl: 3 }} gap={4}>
           {[0, 1, 2].map((i) => (

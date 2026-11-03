@@ -79,6 +79,7 @@
   "search": "Որոնել առաջարկներ",
   "sortNewest": "Նորերը",
   "sortPrice": "Ամենաէժանները",
+  "showResults": "Ցույց տալ {count, plural, one {# առաջարկ} other {# առաջարկ}}",
   "emptyFeed": "Այս ֆիլտրերով առաջարկներ դեռ չկան։",
   "emptyRequests": "Դու դեռ հարցումներ չես ուղարկել։",
   "wantsToWorkWith": "Ցանկանում է աշխատել՝ {value}",

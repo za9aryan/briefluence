@@ -59,92 +59,110 @@ export function NotificationBell() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['notifications'] }),
   });
   const count = unread.data?.count ?? 0;
+  const label = count ? t('bellUnread', { count }) : t('bell');
+  const bellClass =
+    'relative inline-flex size-11 items-center justify-center rounded-pill text-ink-muted hover:bg-primary-soft/60 hover:text-ink';
+  const bell = (
+    <>
+      <Icon name="bell" size="md" />
+      {count > 0 && (
+        <span className="pointer-events-none absolute bottom-1 left-[calc(50%+5px)] inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-pill bg-primary px-[5px] text-[10px] font-bold leading-none tabular-nums text-on-primary shadow-sm ring-2 ring-surface">
+          {count > 9 ? '9+' : count}
+        </span>
+      )}
+    </>
+  );
 
   return (
-    <Menu
-      align="end"
-      className="w-[min(22rem,calc(100vw-2rem))] p-0"
-      trigger={(p) => (
-        <button
-          type="button"
-          onClick={p.toggle}
-          aria-expanded={p['aria-expanded']}
-          aria-haspopup={p['aria-haspopup']}
-          aria-label={count ? t('bellUnread', { count }) : t('bell')}
-          className="relative inline-flex size-11 items-center justify-center rounded-pill text-ink-muted hover:bg-primary-soft/60 hover:text-ink"
-        >
-          <Icon name="bell" size="md" />
-          {count > 0 && (
-            <span className="pointer-events-none absolute bottom-1 left-[calc(50%+5px)] inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-pill bg-primary px-[5px] text-[10px] font-bold leading-none tabular-nums text-on-primary shadow-sm ring-2 ring-surface">
-              {count > 9 ? '9+' : count}
-            </span>
+    <>
+      {/* Phones: the full notifications screen instead of a cramped dropdown. */}
+      <Link href="/notifications" aria-label={label} className={cn(bellClass, 'md:hidden')}>
+        {bell}
+      </Link>
+      <div className="hidden md:block">
+        <Menu
+          align="end"
+          className="w-[min(22rem,calc(100vw-2rem))] p-0"
+          trigger={(p) => (
+            <button
+              type="button"
+              onClick={p.toggle}
+              aria-expanded={p['aria-expanded']}
+              aria-haspopup={p['aria-haspopup']}
+              aria-label={label}
+              className={bellClass}
+            >
+              {bell}
+            </button>
           )}
-        </button>
-      )}
-    >
-      {(close) => (
-        <div>
-          <div className="flex items-center justify-between border-b border-line px-4 py-2">
-            <Text size="small" weight="bold">
-              {t('title')}
-            </Text>
-            {count > 0 && (
-              <button
-                type="button"
-                onClick={() => markAll.mutate()}
-                className="min-h-11 text-small font-bold text-primary-text hover:underline"
-              >
-                {t('markAllRead')}
-              </button>
-            )}
-          </div>
-          <ul className="max-h-96 overflow-y-auto">
-            {list.data?.items.length ? (
-              list.data.items.map((n) => (
-                <li key={n.id}>
+        >
+          {(close) => (
+            <div>
+              <div className="flex items-center justify-between border-b border-line px-4 py-2">
+                <Text size="small" weight="bold">
+                  {t('title')}
+                </Text>
+                {count > 0 && (
                   <button
                     type="button"
-                    onClick={() => {
-                      if (!n.readAt) markOne.mutate(n.id);
-                      close();
-                      if (n.link) router.push(n.link);
-                    }}
-                    className={cn(
-                      'flex w-full gap-3 border-b border-line px-4 py-3 text-left hover:bg-surface',
-                      !n.readAt && 'bg-primary-soft/40',
-                    )}
+                    onClick={() => markAll.mutate()}
+                    className="min-h-11 text-small font-bold text-primary-text hover:underline"
                   >
-                    <span className="relative mt-0.5 shrink-0">
-                      <NotificationIcon type={n.type} size="sm" />
-                      {!n.readAt && (
-                        <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-pill bg-primary ring-2 ring-surface-raised" />
-                      )}
-                    </span>
-                    <span className="min-w-0">
-                      <span className="block text-small font-bold text-ink">{text(n).title}</span>
-                      <span className="line-clamp-2 block text-small text-ink-muted">
-                        {text(n).body}
-                      </span>
-                      <span className="mt-1 block text-[11px] text-ink-muted">
-                        {f.relative(n.createdAt)}
-                      </span>
-                    </span>
+                    {t('markAllRead')}
                   </button>
-                </li>
-              ))
-            ) : (
-              <li className="px-4 py-8 text-center text-small text-ink-muted">{t('empty')}</li>
-            )}
-          </ul>
-          <Link
-            href="/notifications"
-            onClick={close}
-            className="block px-4 py-3 text-center text-small font-bold text-primary-text hover:underline"
-          >
-            {t('seeAll')}
-          </Link>
-        </div>
-      )}
-    </Menu>
+                )}
+              </div>
+              <ul className="max-h-96 overflow-y-auto">
+                {list.data?.items.length ? (
+                  list.data.items.map((n) => (
+                    <li key={n.id}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!n.readAt) markOne.mutate(n.id);
+                          close();
+                          if (n.link) router.push(n.link);
+                        }}
+                        className={cn(
+                          'flex w-full gap-3 border-b border-line px-4 py-3 text-left hover:bg-surface',
+                          !n.readAt && 'bg-primary-soft/40',
+                        )}
+                      >
+                        <span className="relative mt-0.5 shrink-0">
+                          <NotificationIcon type={n.type} size="sm" />
+                          {!n.readAt && (
+                            <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-pill bg-primary ring-2 ring-surface-raised" />
+                          )}
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block text-small font-bold text-ink">
+                            {text(n).title}
+                          </span>
+                          <span className="line-clamp-2 block text-small text-ink-muted">
+                            {text(n).body}
+                          </span>
+                          <span className="mt-1 block text-[11px] text-ink-muted">
+                            {f.relative(n.createdAt)}
+                          </span>
+                        </span>
+                      </button>
+                    </li>
+                  ))
+                ) : (
+                  <li className="px-4 py-8 text-center text-small text-ink-muted">{t('empty')}</li>
+                )}
+              </ul>
+              <Link
+                href="/notifications"
+                onClick={close}
+                className="block px-4 py-3 text-center text-small font-bold text-primary-text hover:underline"
+              >
+                {t('seeAll')}
+              </Link>
+            </div>
+          )}
+        </Menu>
+      </div>
+    </>
   );
 }

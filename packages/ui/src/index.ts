@@ -55,6 +55,7 @@ export {
 export { FieldGrid } from './components/FieldGrid';
 export { ChipGroup, type ChipOption } from './components/ChipGroup';
 export { FilterDropdown, type FilterOption } from './components/FilterDropdown';
+export { FiltersButton, SheetSection } from './components/FilterSheet';
 export { RangeInput, Slider } from './components/RangeInput';
 export { Modal, type ModalProps } from './components/Modal';
 export { Menu, MenuItem } from './components/Menu';

@@ -163,6 +163,11 @@ export default {
     search: ['Search offers', 'Поиск предложений', 'Որոնել առաջարկներ'],
     sortNewest: ['Newest', 'Сначала новые', 'Նորերը'],
     sortPrice: ['Lowest price', 'Сначала дешевле', 'Ամենաէժանները'],
+    showResults: [
+      'Show {count, plural, one {# offer} other {# offers}}',
+      'Показать {count, plural, one {# предложение} few {# предложения} many {# предложений} other {# предложения}}',
+      'Ցույց տալ {count, plural, one {# առաջարկ} other {# առաջարկ}}',
+    ],
     emptyFeed: [
       'No offers match these filters yet.',
       'Пока нет предложений с такими фильтрами.',
