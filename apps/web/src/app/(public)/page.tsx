@@ -15,6 +15,7 @@ import {
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { FeatureItem, Section } from '@/components/common/Section';
+import { ExamplePrice } from '@/components/landing/ExamplePrice';
 import { ProcessFunnel } from '@/components/landing/ProcessFunnel';
 
 export default async function LandingPage() {
@@ -71,11 +72,15 @@ export default async function LandingPage() {
                     <Text size="small" tone="muted">
                       {t('preview.subtitle')}
                     </Text>
+                    {/* Money in the visitor's currency, plus the stay. */}
+                    <Text weight="bold" className="mt-1">
+                      <ExamplePrice amount={50} currency="USD" /> {t('preview.stay')}
+                    </Text>
                   </Stack>
                   <ScoreMeter value={92} label={t('preview.match')} />
                 </Inline>
                 <Inline gap={2} wrap className="mt-4">
-                  <Badge icon="instagram">Reels</Badge>
+                  <Badge icon="instagram">Reel</Badge>
                   <Badge tone="primary" icon="pin">
                     {t('preview.city')}
                   </Badge>

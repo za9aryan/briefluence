@@ -38,7 +38,7 @@
   },
   "budget": {
     "title": "Budget",
-    "subtitle": "Budgets influencers are interested in, AMD.",
+    "subtitle": "Budgets influencers are interested in ({currency}).",
     "note": "Only collaborations paid with money are counted."
   },
   "cities": {

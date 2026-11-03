@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
 import { defaultDealValues, toDealInput } from '@/components/brand/deal-form-values';
+import { useDisplayCurrency } from '@/lib/hooks/currency';
 import { DealWizard } from '@/components/brand/DealWizard';
 import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
@@ -20,7 +21,9 @@ export default function NewDealPage() {
   const toast = useToast();
   const [submitting, setSubmitting] = useState<'draft' | 'publish' | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [initial] = useState(defaultDealValues);
+  // Prices start in the currency chosen in Settings (the page renders once the account is loaded).
+  const currency = useDisplayCurrency();
+  const [initial] = useState(() => ({ ...defaultDealValues(), currency }));
 
   return (
     <Stack gap={6}>

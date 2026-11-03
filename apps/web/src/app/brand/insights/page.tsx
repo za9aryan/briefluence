@@ -256,7 +256,7 @@ export default function BrandInsightsPage() {
               return (
                 <ChartCard
                   title={t('budget.title')}
-                  subtitle={t('budget.subtitle')}
+                  subtitle={t('budget.subtitle', { currency: f.displayCurrency })}
                   valueLabel={t('signals')}
                   labels={labels}
                   format={n}

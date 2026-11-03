@@ -157,7 +157,12 @@ export default function MyOfferPage() {
                   <Text className="whitespace-pre-line">{r.message}</Text>
                   {r.proposedBudget != null && (
                     <Text size="small" weight="bold">
-                      {t('budget', { price: f.money(r.proposedBudget, o.currency) })}
+                      {/* In the viewer's currency, with the amount as sent when converted. */}
+                      {t('budget', {
+                        price: ((d) => (d.original ? `${d.main} (${d.original})` : d.main))(
+                          f.display(r.proposedBudget, o.currency),
+                        ),
+                      })}
                     </Text>
                   )}
                   {(r.brand.website || r.brand.instagramUrl) && (

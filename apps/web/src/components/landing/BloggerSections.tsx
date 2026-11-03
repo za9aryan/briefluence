@@ -15,6 +15,7 @@ import {
   type IconName,
 } from '@briefluence/ui';
 import { getTranslations } from 'next-intl/server';
+import { ExamplePrice } from './ExamplePrice';
 import { FeatureItem, Section } from '@/components/common/Section';
 
 /** /for-influencers: the two ways to earn, each with a static preview built from real UI parts. */
@@ -40,7 +41,7 @@ export async function EarnWays() {
               <Stack gap={1}>
                 <Heading level={3}>{t('brief.title')}</Heading>
                 <Text size="small" weight="bold">
-                  {t('brief.budget')}
+                  <ExamplePrice amount={30_000} to={50_000} currency="AMD" />
                 </Text>
               </Stack>
               <ScoreMeter value={88} label={t('brief.match')} />
@@ -81,7 +82,9 @@ export async function EarnWays() {
                     {t('offer.body')}
                   </Text>
                 </Stack>
-                <span className="shrink-0 text-h2 font-extrabold text-ink">{t('offer.price')}</span>
+                <span className="shrink-0 text-h2 font-extrabold text-ink">
+                  <ExamplePrice amount={20_000} currency="AMD" />
+                </span>
               </div>
             </Card>
             <Card p={4} className="ml-auto w-full sm:w-5/6">

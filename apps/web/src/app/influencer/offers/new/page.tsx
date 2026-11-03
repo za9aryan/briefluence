@@ -9,6 +9,7 @@ import { EMPTY_OFFER, OfferForm } from '@/components/offers/OfferParts';
 import { OfferLimitNotice } from '@/components/offers/useOfferActions';
 import { BriefsChecklist, useBloggerUnlocked } from '@/components/influencer/StartTrial';
 import { ApiError, api } from '@/lib/api';
+import { useDisplayCurrency } from '@/lib/hooks/currency';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import type { OfferDto } from '@/lib/types';
 
@@ -21,6 +22,8 @@ export default function NewOfferPage() {
   const [busy, setBusy] = useState<'draft' | 'publish' | null>(null);
   const [error, setError] = useState<React.ReactNode>(null);
 
+  // The price starts in the currency chosen in Settings.
+  const currency = useDisplayCurrency();
   const { me, unlocked } = useBloggerUnlocked();
   if (me && !unlocked) return <BriefsChecklist for="offers" />;
   return (
@@ -31,7 +34,7 @@ export default function NewOfferPage() {
         description={t('formLead')}
       />
       <OfferForm
-        initial={EMPTY_OFFER}
+        initial={{ ...EMPTY_OFFER, currency }}
         busy={busy}
         error={error}
         footerNote={t('publishHint')}

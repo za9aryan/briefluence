@@ -73,9 +73,9 @@ export default {
     budget: {
       title: ['Budget', 'Бюджет', 'Բյուջե'],
       subtitle: [
-        'Budgets influencers are interested in, AMD.',
-        'Бюджеты, которые интересны инфлюенсерам, в драмах.',
-        'Բյուջեներ, որոնք հետաքրքրում են ինֆլյուենսերներին, դրամով։',
+        'Budgets influencers are interested in ({currency}).',
+        'Бюджеты, которые интересны инфлюенсерам ({currency}).',
+        'Բյուջեներ, որոնք հետաքրքրում են ինֆլյուենսերներին ({currency})։',
       ],
       note: [
         'Only collaborations paid with money are counted.',

@@ -12,14 +12,15 @@
     }
   },
   "preview": {
-    "barter": "Barter",
-    "meta": "Yerevan · 2 days ago",
-    "title": "Dinner for two for a Reels",
-    "subtitle": "A cafe in the center is looking for 3 influencers, 5k+ followers",
-    "city": "Yerevan",
+    "barter": "Money + barter",
+    "meta": "Dilijan · 2 days ago",
+    "title": "A Reel about a weekend at our guest house",
+    "subtitle": "A guest house in the Dilijan forest invites 2 influencers with 5k+ followers",
+    "city": "Dilijan",
     "match": "Match",
     "apply": "Apply",
-    "accepted": "Your application is approved — the company expects the post by Friday"
+    "accepted": "You’re in! The guest house is holding a room for you this Friday",
+    "stay": "+ a weekend for two"
   },
   "how": {
     "eyebrow": "How it works",
@@ -187,7 +188,6 @@
         "type": "Paid",
         "meta": "Yerevan · today",
         "title": "Reels for a new coffee shop",
-        "budget": "30,000–50,000 AMD",
         "match": "Match",
         "why": "Why it fits you",
         "reasons": {
@@ -200,7 +200,6 @@
       "offer": {
         "title": "1 Reels about your product",
         "body": "Shot and edited by me, posted within a week.",
-        "price": "20,000 AMD",
         "request": "A coffee shop wants to work with you",
         "accept": "Accept",
         "decline": "Decline"
