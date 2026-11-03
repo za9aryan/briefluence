@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useEffect, useRef, type PointerEvent } from 'react';
 import { Logo } from '@/components/common/Logo';
-import { useLogout, type Me } from '@/lib/hooks/session';
+import { useConfirmLogout, type Me } from '@/lib/hooks/session';
 import { accountPaths, displayName } from './UserMenu';
 
 export interface DrawerItem {
@@ -40,7 +40,7 @@ export function MobileDrawer({
   const t = useTranslations('nav');
   const tc = useTranslations('common');
   const tr = useTranslations('enums');
-  const logout = useLogout();
+  const logout = useConfirmLogout();
   const panel = useRef<HTMLDivElement>(null);
   const drag = useRef<{ x: number; dx: number } | null>(null);
   const paths = me.role === 'ADMIN' ? null : accountPaths(me);
@@ -193,7 +193,7 @@ export function MobileDrawer({
             type="button"
             onClick={() => {
               onClose();
-              logout.mutate();
+              void logout();
             }}
             className="flex min-h-11 items-center gap-3 rounded-pill px-3 text-small font-bold text-primary-text hover:bg-surface"
           >

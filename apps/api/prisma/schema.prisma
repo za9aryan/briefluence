@@ -146,6 +146,9 @@ model User {
   emailVerifiedAt   DateTime?
   createdAt         DateTime            @default(now())
   blockedAt         DateTime? // spec+: admin moderation of users/brands
+  /// spec+: the owner deleted the account. Personal data is wiped and blockedAt is set too, so every
+  /// "not blocked" filter hides it; the row stays so the other side's history still makes sense.
+  deletedAt         DateTime?
   digestEmails      Boolean             @default(true) // spec+: notification settings page
   currency          Currency            @default(AMD) // spec+: currency amounts are shown in
   locale            String              @default("en") // spec+: language for emails / notifications (en | ru | hy)

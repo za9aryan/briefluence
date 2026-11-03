@@ -1,5 +1,5 @@
 'use client';
-import { ToastProvider } from '@briefluence/ui';
+import { ConfirmProvider, ToastProvider } from '@briefluence/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
@@ -31,8 +31,10 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={client}>
       <ToastProvider closeLabel={tc('close')} regionLabel={tn('title')} aboveChat={chatButton}>
-        {children}
-        <SupportWidget />
+        <ConfirmProvider cancelLabel={tc('cancel')} closeLabel={tc('close')}>
+          {children}
+          <SupportWidget />
+        </ConfirmProvider>
       </ToastProvider>
     </QueryClientProvider>
   );

@@ -307,6 +307,7 @@ export class AdminService {
         role: true,
         emailVerifiedAt: true,
         blockedAt: true,
+        deletedAt: true,
         createdAt: true,
         influencer: {
           select: {
@@ -369,6 +370,7 @@ export class AdminService {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw notFound('User');
     if (user.role === 'ADMIN') throw new AppError('FORBIDDEN', 'Admins cannot be blocked here');
+    if (user.deletedAt) throw new AppError('CONFLICT', 'This account was deleted by its owner');
     await this.prisma.user.update({
       where: { id },
       data: { blockedAt: blocked ? this.clock.now() : null },

@@ -44,6 +44,8 @@ interface UserRow {
   role: Role;
   emailVerifiedAt: string | null;
   blockedAt: string | null;
+  /** The owner deleted the account (it is also blocked, and stays so). */
+  deletedAt: string | null;
   createdAt: string;
   influencer: { id: string; displayName: string; status: VerificationStatus } | null;
   brand: { id: string; companyName: string } | null;
@@ -176,7 +178,11 @@ export default function AdminUsersPage() {
                 <TD>{tr(u.role)}</TD>
                 <TD>
                   <Inline gap={1} wrap>
-                    {u.blockedAt && <Badge tone="danger">{t('isBlocked')}</Badge>}
+                    {u.deletedAt ? (
+                      <Badge icon="trash">{t('isDeleted')}</Badge>
+                    ) : (
+                      u.blockedAt && <Badge tone="danger">{t('isBlocked')}</Badge>
+                    )}
                     <ReuseBadge accountIds={u.reuseWarnings} />
                     {!u.emailVerifiedAt && <Badge>{t('emailPending')}</Badge>}
                     {u.influencer && <VerificationBadge status={u.influencer.status} />}
@@ -185,7 +191,7 @@ export default function AdminUsersPage() {
                 </TD>
                 <TD>{f.date(u.createdAt)}</TD>
                 <TD>
-                  {u.role !== 'ADMIN' && (
+                  {u.role !== 'ADMIN' && !u.deletedAt && (
                     <Inline gap={1} justify="end" wrap={false}>
                       <Button
                         size="sm"

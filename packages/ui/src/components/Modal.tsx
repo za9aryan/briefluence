@@ -143,7 +143,7 @@ export function Modal({
               </button>
             </div>
           </div>
-          <div className="overflow-y-auto px-5 py-4 sm:px-6">{children}</div>
+          {children != null && <div className="overflow-y-auto px-5 py-4 sm:px-6">{children}</div>}
           {footer && (
             <div className="flex flex-col-reverse gap-2 border-t border-line px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 sm:flex-row sm:justify-end sm:px-6 sm:pb-4">
               {footer}

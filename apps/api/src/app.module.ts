@@ -9,6 +9,7 @@ import { HttpExceptionFilter } from './common/http-exception.filter';
 import { PrismaModule } from './common/prisma.service';
 import { ConfigModule } from './config/config.module';
 import { loadEnv } from './config/env';
+import { AccountModule } from './modules/account/account.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { ApplicationsModule } from './modules/applications/applications.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -54,6 +55,7 @@ const env = loadEnv();
     OffersModule,
     ApplicationsModule,
     BillingModule,
+    AccountModule,
     AdminModule,
     SupportModule,
     JobsModule,

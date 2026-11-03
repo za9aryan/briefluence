@@ -1,4 +1,9 @@
 {
+  "confirmClose": {
+    "title": "Close this brief?",
+    "text": "Influencers won’t see it or be able to apply. You can reopen it later.",
+    "confirm": "Close brief"
+  },
   "newTitle": "New brief",
   "newLead": "Only platform and country are required — post fast, refine later.",
   "editTitle": "Edit brief",

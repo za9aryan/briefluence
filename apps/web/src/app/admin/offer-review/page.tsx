@@ -1,6 +1,5 @@
 'use client';
 import {
-  Avatar,
   Button,
   Card,
   EmptyState,
@@ -10,7 +9,6 @@ import {
   Skeleton,
   Stack,
   Tabs,
-  Text,
   Textarea,
   useToast,
 } from '@briefluence/ui';
@@ -18,14 +16,11 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
-import { CollaborationBadge } from '@/components/domain/badges';
-import { OfferMeta, OfferPrice, OfferStatusBadge } from '@/components/offers/OfferParts';
+import { AdminOfferContent, type AdminOffer } from '@/components/admin/ContentViews';
 import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
-import { useFormat } from '@/lib/hooks/format';
-import type { OfferBloggerDto, OfferDto } from '@/lib/types';
 
-type Row = OfferDto & { blogger: OfferBloggerDto & { email: string } };
+type Row = AdminOffer;
 type Queue = 'IN_REVIEW' | 'REJECTED';
 
 /** Moderation of blogger offers before brands see them. */
@@ -33,7 +28,6 @@ export default function AdminOfferReviewPage() {
   const t = useTranslations('offers');
   const ts = useTranslations('offers.status');
   const tc = useTranslations('common');
-  const f = useFormat();
   const toast = useToast();
   const errorMessage = useErrorMessage();
   const qc = useQueryClient();
@@ -74,35 +68,7 @@ export default function AdminOfferReviewPage() {
           {list.data.map((o) => (
             <Card key={o.id}>
               <Stack gap={4}>
-                <Inline justify="between" align="start" gap={2}>
-                  <Inline gap={2} align="center">
-                    <Avatar name={o.blogger.displayName} src={o.blogger.avatarUrl} size="sm" />
-                    <Stack gap={0}>
-                      <Text weight="bold">{o.title}</Text>
-                      <Text size="small" tone="muted">
-                        {o.blogger.displayName} · {o.blogger.email}
-                        {o.submittedAt ? ` · ${f.dateTime(o.submittedAt)}` : ''}
-                      </Text>
-                    </Stack>
-                  </Inline>
-                  <Inline gap={1}>
-                    <CollaborationBadge type={o.collaborationType} />
-                    <OfferStatusBadge status={o.status} />
-                  </Inline>
-                </Inline>
-                <OfferMeta offer={o} />
-                <OfferPrice offer={o} size="body" />
-                <Text size="small" className="whitespace-pre-line wrap-anywhere">
-                  {o.description}
-                </Text>
-                {o.idealBrands && (
-                  <Text size="small">{t('wantsToWorkWith', { value: o.idealBrands })}</Text>
-                )}
-                {o.reviewNote && (
-                  <Text size="small" tone="muted">
-                    {t('review.rejected', { reason: o.reviewNote })}
-                  </Text>
-                )}
+                <AdminOfferContent offer={o} />
                 {o.status === 'IN_REVIEW' && (
                   <Inline gap={2} justify="end" wrap>
                     <Button variant="ghost" onClick={() => setRejecting(o)}>

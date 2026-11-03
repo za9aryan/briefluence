@@ -52,5 +52,8 @@
   "reset": "Сбросить",
   "searchCountry": "Найди страну",
   "searchCity": "Найди город",
-  "nothingFound": "Ничего не найдено"
+  "nothingFound": "Ничего не найдено",
+  "logoutTitle": "Выйти из аккаунта?",
+  "logoutText": "На этом устройстве нужно будет войти снова.",
+  "logoutConfirm": "Выйти"
 }

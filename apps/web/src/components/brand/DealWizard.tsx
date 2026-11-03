@@ -21,6 +21,7 @@ import {
   FieldGrid,
   Heading,
   Input,
+  AmountInput,
   OptionalField,
   RangeInput,
   Select,
@@ -716,35 +717,38 @@ export function DealWizard({
                     filled={v.barterValue != null}
                     onClear={() => form.setValue('barterValue', null)}
                   >
-                    <FieldGrid cols={{ base: 1, sm: money ? 1 : 2 }} gap={4}>
-                      <Field label={t('fields.barterValue')}>
-                        {({ id }) => (
+                    <Field label={t('fields.barterValue')} className="sm:max-w-sm">
+                      {({ id }) => {
+                        const amount = form.register('barterValue', {
+                          setValueAs: (x) => (x === '' || x == null ? null : Number(x)),
+                        });
+                        // With money, the budget's currency applies (picked above): show it.
+                        return money ? (
                           <Input
                             id={id}
                             type="number"
                             inputMode="numeric"
                             min={0}
                             suffix={curSymbol}
-                            {...form.register('barterValue', {
-                              setValueAs: (x) => (x === '' || x == null ? null : Number(x)),
-                            })}
+                            {...amount}
                           />
-                        )}
-                      </Field>
-                      {!money && (
-                        <Field label={t('fields.currency')}>
-                          {({ id }) => (
-                            <Select id={id} {...form.register('currency')}>
-                              {CURRENCIES.map((c) => (
-                                <option key={c} value={c}>
-                                  {c} · {te(`currency.${c}`)}
-                                </option>
-                              ))}
-                            </Select>
-                          )}
-                        </Field>
-                      )}
-                    </FieldGrid>
+                        ) : (
+                          <AmountInput
+                            id={id}
+                            type="number"
+                            inputMode="numeric"
+                            min={0}
+                            currencyLabel={t('fields.currency')}
+                            currencies={CURRENCIES.map((c) => ({
+                              value: c,
+                              label: `${CURRENCY_SYMBOL[c]} ${c}`,
+                            }))}
+                            currency={form.register('currency')}
+                            {...amount}
+                          />
+                        );
+                      }}
+                    </Field>
                   </OptionalField>
                 </Section>
               )}

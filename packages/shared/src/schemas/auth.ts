@@ -52,3 +52,9 @@ export const notificationSettingsSchema = z
   .partial()
   .refine((v) => Object.keys(v).length > 0, { message: 'invalid' });
 export type NotificationSettingsInput = z.infer<typeof notificationSettingsSchema>;
+
+/** Delete my account. Accounts with a password confirm with it; Google/Apple-only accounts send ''. */
+export const deleteAccountSchema = z.object({
+  password: z.string().max(128).default(''),
+});
+export type DeleteAccountInput = z.infer<typeof deleteAccountSchema>;

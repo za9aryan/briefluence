@@ -5,6 +5,7 @@ import {
   EmptyState,
   Inline,
   Input,
+  Modal,
   Select,
   Skeleton,
   Stack,
@@ -14,20 +15,21 @@ import {
   THead,
   TR,
   Table,
+  useConfirm,
   useToast,
 } from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
+import { AdminDealContent, type AdminDeal } from '@/components/admin/ContentViews';
 import { DealStatusBadge } from '@/components/domain/badges';
 import { Compensation } from '@/components/domain/Compensation';
 import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { useFormat } from '@/lib/hooks/format';
-import type { DealDto } from '@/lib/types';
 
-type Row = DealDto & { brand: { id: string; companyName: string }; applicantCount: number };
+type Row = AdminDeal & { applicantCount: number };
 
 export default function AdminDealsPage() {
   const t = useTranslations('admin.deals');
@@ -39,6 +41,15 @@ export default function AdminDealsPage() {
   const qc = useQueryClient();
   const [status, setStatus] = useState<'' | DealStatus>('');
   const [q, setQ] = useState('');
+  const [viewing, setViewing] = useState<Row | null>(null);
+  const confirm = useConfirm();
+  const tf = useTranslations('dealForm.confirmClose');
+  const askClose = (id: string) =>
+    void confirm({ title: tf('title'), description: tf('text'), confirmLabel: tf('confirm') }).then(
+      (ok) => ok && close.mutate(id),
+    );
+  const closable = (d: Row) =>
+    ['DRAFT', 'IN_REVIEW', 'REJECTED', 'ACTIVE', 'PAUSED'].includes(d.status);
   const list = useQuery({
     queryKey: ['admin', 'deals', status, q],
     queryFn: () =>
@@ -47,6 +58,7 @@ export default function AdminDealsPage() {
   const close = useMutation({
     mutationFn: (id: string) => api.post(`/admin/deals/${id}/close`),
     onSuccess: () => {
+      setViewing(null);
       void qc.invalidateQueries({ queryKey: ['admin', 'deals'] });
       toast(t('closed'));
     },
@@ -98,7 +110,15 @@ export default function AdminDealsPage() {
           <TBody>
             {list.data.map((d) => (
               <TR key={d.id}>
-                <TD className="max-w-xs font-bold">{d.title}</TD>
+                <TD className="max-w-xs">
+                  <button
+                    type="button"
+                    onClick={() => setViewing(d)}
+                    className="text-left font-bold text-ink underline-offset-2 hover:underline"
+                  >
+                    {d.title}
+                  </button>
+                </TD>
                 <TD>{d.brand.companyName}</TD>
                 <TD>
                   <DealStatusBadge status={d.status} />
@@ -109,22 +129,43 @@ export default function AdminDealsPage() {
                 <TD className="tabular-nums">{d.applicantCount}</TD>
                 <TD>{f.date(d.applicationDeadline)}</TD>
                 <TD>
-                  {['DRAFT', 'IN_REVIEW', 'REJECTED', 'ACTIVE', 'PAUSED'].includes(d.status) && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      loading={close.isPending && close.variables === d.id}
-                      onClick={() => close.mutate(d.id)}
-                    >
-                      {t('close')}
+                  <Inline gap={1} justify="end" wrap={false}>
+                    <Button size="sm" variant="secondary" onClick={() => setViewing(d)}>
+                      {t('view')}
                     </Button>
-                  )}
+                    {closable(d) && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        loading={close.isPending && close.variables === d.id}
+                        onClick={() => askClose(d.id)}
+                      >
+                        {t('close')}
+                      </Button>
+                    )}
+                  </Inline>
                 </TD>
               </TR>
             ))}
           </TBody>
         </Table>
       )}
+      <Modal
+        open={!!viewing}
+        onClose={() => setViewing(null)}
+        size="lg"
+        closeLabel={tc('close')}
+        title={t('viewTitle')}
+        footer={
+          viewing && closable(viewing) ? (
+            <Button variant="ghost" loading={close.isPending} onClick={() => askClose(viewing.id)}>
+              {t('close')}
+            </Button>
+          ) : undefined
+        }
+      >
+        {viewing && <AdminDealContent deal={viewing} />}
+      </Modal>
     </Stack>
   );
 }

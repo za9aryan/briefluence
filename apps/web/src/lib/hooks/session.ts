@@ -6,7 +6,9 @@ import type {
   VerificationStatus,
   PlanCode,
 } from '@briefluence/shared';
+import { useConfirm } from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { api, ApiError } from '../api';
 import { unlinkPushFromAccount } from '../pwa';
@@ -88,4 +90,21 @@ export function useLogout() {
       router.refresh();
     },
   });
+}
+
+/** Log out after an "are you sure?" dialog; returns the call for menus and sheets. */
+export function useConfirmLogout() {
+  const logout = useLogout();
+  const confirm = useConfirm();
+  const t = useTranslations('common');
+  return async () => {
+    if (
+      await confirm({
+        title: t('logoutTitle'),
+        description: t('logoutText'),
+        confirmLabel: t('logoutConfirm'),
+      })
+    )
+      logout.mutate();
+  };
 }

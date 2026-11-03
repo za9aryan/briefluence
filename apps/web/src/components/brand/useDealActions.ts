@@ -1,5 +1,5 @@
 'use client';
-import { useToast } from '@briefluence/ui';
+import { useConfirm, useToast } from '@briefluence/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -13,7 +13,8 @@ export function useDealActions() {
   const errorMessage = useErrorMessage();
   const qc = useQueryClient();
   const router = useRouter();
-  return useMutation({
+  const confirm = useConfirm();
+  const m = useMutation({
     mutationFn: ({
       id,
       action,
@@ -31,4 +32,17 @@ export function useDealActions() {
     },
     onError: (e) => toast(errorMessage(e), 'danger'),
   });
+  type Vars = Parameters<typeof m.mutate>[0];
+  return {
+    ...m,
+    /** Closing a brief asks first; the other actions run straight away. */
+    mutate: (v: Vars) => {
+      if (v.action !== 'close') return m.mutate(v);
+      void confirm({
+        title: t('confirmClose.title'),
+        description: t('confirmClose.text'),
+        confirmLabel: t('confirmClose.confirm'),
+      }).then((ok) => ok && m.mutate(v));
+    },
+  };
 }

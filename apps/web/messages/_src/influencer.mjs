@@ -979,6 +979,31 @@ export default {
       'Ընկերության պրոֆիլը՝ այն, ինչ կտեսնեն ինֆլյուենսերները։',
     ],
     settingsTitle: ['Settings', 'Настройки', 'Կարգավորումներ'],
+    deleteTitle: ['Delete account', 'Удалить аккаунт', 'Ջնջել հաշիվը'],
+    deleteText: [
+      'Your profile, photos, connected accounts and notifications are removed, and you are signed out everywhere. Your briefs and offers close and open applications are withdrawn. A Pro subscription stops right away, with no refund for the days left. This can’t be undone.',
+      'Профиль, фото, подключённые аккаунты и уведомления удалятся, а ты выйдешь со всех устройств. Твои брифы и офферы закроются, открытые отклики будут отозваны. Подписка Pro остановится сразу, без возврата за оставшиеся дни. Это нельзя отменить.',
+      'Պրոֆիլը, նկարները, միացված հաշիվներն ու ծանուցումները կջնջվեն, և դու դուրս կգաս բոլոր սարքերից։ Քո բրիֆներն ու առաջարկները կփակվեն, բաց հայտերը հետ կկանչվեն։ Pro բաժանորդագրությունը կդադարի անմիջապես՝ առանց մնացած օրերի վերադարձի։ Սա հնարավոր չէ հետարկել։',
+    ],
+    deleteButton: ['Delete account', 'Удалить аккаунт', 'Ջնջել հաշիվը'],
+    deleteConfirmTitle: ['Delete your account?', 'Удалить аккаунт?', 'Ջնջե՞լ հաշիվը'],
+    deleteConfirmText: [
+      'Everything above happens at once and can’t be undone.',
+      'Всё, что описано выше, произойдёт сразу, и это нельзя отменить.',
+      'Վերը նշված ամեն ինչ տեղի կունենա անմիջապես, և այն հնարավոր չէ հետարկել։',
+    ],
+    deletePassword: ['Your password', 'Твой пароль', 'Քո գաղտնաբառը'],
+    deleteTypeEmail: [
+      'Type your email to confirm: {email}',
+      'Введи свой email для подтверждения: {email}',
+      'Մուտքագրիր քո email-ը՝ հաստատելու համար․ {email}',
+    ],
+    deleteConfirm: ['Delete for good', 'Удалить навсегда', 'Ջնջել ընդմիշտ'],
+    deletedToast: [
+      'Your account is deleted. Take care.',
+      'Аккаунт удалён. Всего доброго.',
+      'Հաշիվը ջնջված է։ Ամենայն բարիք։',
+    ],
     settingsLead: [
       'Language, currency, notifications, the app and your password.',
       'Язык, валюта, уведомления, приложение и пароль.',

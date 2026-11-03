@@ -6,10 +6,11 @@ import { PageHeader } from '@/components/app/AppShell';
 import { AppInstallCard } from '@/components/app/AppInstallCard';
 import { PreferenceFields } from '@/components/app/Preferences';
 import { ChangePasswordCard } from '@/components/forms/ChangePasswordCard';
+import { DeleteAccountCard } from './DeleteAccountCard';
 import { api } from '@/lib/api';
 import { ME_KEY, useMe } from '@/lib/hooks/session';
 
-/** Settings for bloggers and brands: language, currency, emails, the app + push, password. */
+/** Settings for bloggers and brands: language, currency, emails, the app + push, password, deleting the account. */
 export function SettingsView() {
   const t = useTranslations('account');
   const tc = useTranslations('common');
@@ -47,6 +48,7 @@ export function SettingsView() {
       </Card>
       <AppInstallCard />
       <ChangePasswordCard />
+      <DeleteAccountCard />
     </Stack>
   );
 }

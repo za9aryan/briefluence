@@ -95,6 +95,15 @@ export default {
     },
   },
   dealForm: {
+    confirmClose: {
+      title: ['Close this brief?', 'Закрыть этот бриф?', 'Փակե՞լ այս բրիֆը'],
+      text: [
+        'Influencers won’t see it or be able to apply. You can reopen it later.',
+        'Инфлюенсеры перестанут его видеть и не смогут откликнуться. Позже его можно открыть снова.',
+        'Ինֆլյուենսերներն այլևս չեն տեսնի այն և չեն կարողանա հայտ ուղարկել։ Հետո կարող ես նորից բացել այն։',
+      ],
+      confirm: ['Close brief', 'Закрыть бриф', 'Փակել բրիֆը'],
+    },
     newTitle: ['New brief', 'Новый бриф', 'Նոր բրիֆ'],
     newLead: [
       'Only platform and country are required — post fast, refine later.',
@@ -767,6 +776,26 @@ export default {
       deadline: ['Deadline', 'Дедлайн', 'Վերջնաժամկետ'],
       close: ['Close', 'Закрыть', 'Փակել'],
       closed: ['Brief closed', 'Бриф закрыт', 'Բրիֆը փակված է'],
+      view: ['View', 'Открыть', 'Դիտել'],
+      viewTitle: ['Brief', 'Бриф', 'Բրիֆ'],
+    },
+    offers: {
+      title: ['Offers', 'Офферы', 'Առաջարկներ'],
+      lead: [
+        'Every influencer offer, whatever its status. Open one to read it in full.',
+        'Все офферы инфлюенсеров в любом статусе. Открой, чтобы прочитать целиком.',
+        'Ինֆլյուենսերների բոլոր առաջարկները՝ ցանկացած կարգավիճակով։ Բացիր՝ ամբողջությամբ կարդալու համար։',
+      ],
+      search: ['Title or influencer', 'Название или инфлюенсер', 'Վերնագիր կամ ինֆլյուենսեր'],
+      status: ['Status', 'Статус', 'Կարգավիճակ'],
+      empty: ['No offers found', 'Офферы не найдены', 'Առաջարկներ չեն գտնվել'],
+      offer: ['Offer', 'Оффер', 'Առաջարկ'],
+      influencer: ['Influencer', 'Инфлюенсер', 'Ինֆլյուենսեր'],
+      price: ['Price', 'Цена', 'Գին'],
+      requests: ['Requests', 'Запросы', 'Հարցումներ'],
+      created: ['Created', 'Создан', 'Ստեղծվել է'],
+      view: ['View', 'Открыть', 'Դիտել'],
+      viewTitle: ['Offer', 'Оффер', 'Առաջարկ'],
     },
     users: {
       title: ['Users', 'Пользователи', 'Օգտատերեր'],
@@ -785,6 +814,7 @@ export default {
       ],
       unblocked: ['User unblocked', 'Пользователь разблокирован', 'Օգտատերն ապաարգելափակված է'],
       isBlocked: ['Blocked', 'Заблокирован', 'Արգելափակված'],
+      isDeleted: ['Deleted by owner', 'Удалён владельцем', 'Ջնջված է սեփականատիրոջ կողմից'],
       emailPending: ['Email not confirmed', 'Email не подтверждён', 'Էլ. փոստը հաստատված չէ'],
       allRoles: ['All roles', 'Все роли', 'Բոլոր դերերը'],
       allStates: ['All states', 'Любое состояние', 'Բոլոր վիճակները'],

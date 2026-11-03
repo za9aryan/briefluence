@@ -1,6 +1,15 @@
 // Blogger offers ("1 Story for 10,000 AMD"): what bloggers sell, what brands request. Every leaf is [en, ru, hy].
 export default {
   offers: {
+    confirmClose: {
+      title: ['Close this offer?', 'Закрыть этот оффер?', 'Փակե՞լ այս առաջարկը'],
+      text: [
+        'Companies won’t see it or be able to send requests.',
+        'Компании перестанут его видеть и не смогут отправлять запросы.',
+        'Ընկերություններն այլևս չեն տեսնի այն և չեն կարողանա հարցումներ ուղարկել։',
+      ],
+      confirm: ['Close offer', 'Закрыть оффер', 'Փակել առաջարկը'],
+    },
     // Blogger side
     mineTitle: ['My offers', 'Мои предложения', 'Իմ առաջարկները'],
     mineLead: [

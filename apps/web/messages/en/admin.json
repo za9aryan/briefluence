@@ -180,7 +180,23 @@
     "applicants": "Applicants",
     "deadline": "Deadline",
     "close": "Close",
-    "closed": "Brief closed"
+    "closed": "Brief closed",
+    "view": "View",
+    "viewTitle": "Brief"
+  },
+  "offers": {
+    "title": "Offers",
+    "lead": "Every influencer offer, whatever its status. Open one to read it in full.",
+    "search": "Title or influencer",
+    "status": "Status",
+    "empty": "No offers found",
+    "offer": "Offer",
+    "influencer": "Influencer",
+    "price": "Price",
+    "requests": "Requests",
+    "created": "Created",
+    "view": "View",
+    "viewTitle": "Offer"
   },
   "users": {
     "title": "Users",
@@ -195,6 +211,7 @@
     "blocked": "User blocked and signed out",
     "unblocked": "User unblocked",
     "isBlocked": "Blocked",
+    "isDeleted": "Deleted by owner",
     "emailPending": "Email not confirmed",
     "allRoles": "All roles",
     "allStates": "All states",

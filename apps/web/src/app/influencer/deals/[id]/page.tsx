@@ -26,12 +26,12 @@ import { PageHeader } from '@/components/app/AppShell';
 import { BrandAboutCard } from '@/components/domain/BrandIdentity';
 import { ApplicationStatusBadge, CollaborationBadge } from '@/components/domain/badges';
 import { Compensation } from '@/components/domain/Compensation';
+import { useDealRequirements } from '@/components/domain/dealRequirements';
 import { ApplyModal } from '@/components/influencer/ApplyModal';
 import { BriefsChecklist } from '@/components/influencer/StartTrial';
 import { api, ApiError } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { useFormat } from '@/lib/hooks/format';
-import { useOptions } from '@/lib/hooks/options';
 import { useMe } from '@/lib/hooks/session';
 import type { DealDetailDto } from '@/lib/types';
 
@@ -39,9 +39,8 @@ export default function DealDetailPage() {
   const { id } = useParams<{ id: string }>();
   const t = useTranslations('deals');
   const tc = useTranslations('common');
-  const te = useTranslations('enums');
   const f = useFormat();
-  const o = useOptions();
+  const dealRequirements = useDealRequirements();
   const toast = useToast();
   const errorMessage = useErrorMessage();
   const qc = useQueryClient();
@@ -83,53 +82,7 @@ export default function DealDetailPage() {
   const canApply =
     open && (!app || app.status === 'WITHDRAWN') && (d.eligibleAccounts?.length ?? 0) > 0;
   const hasAccess = me?.subscription?.hasAccess ?? false;
-  const range = (min: number | null, max: number | null, fmt: (n: number) => string = String) =>
-    min == null && max == null
-      ? tc('any')
-      : min != null && max != null
-        ? `${fmt(min)}–${fmt(max)}`
-        : min != null
-          ? `${fmt(min)}+`
-          : `≤ ${fmt(max!)}`;
-
-  const requirements = [
-    { label: t('req.platforms'), value: d.platforms.map((p) => te(`platform.${p}`)).join(', ') },
-    {
-      label: t('req.formats'),
-      value: d.contentFormats.map((x) => te(`contentFormat.${x}`)).join(', '),
-    },
-    {
-      label: t('req.location'),
-      value: [d.countries.map(o.country).join(', '), d.cities.join(', ')]
-        .filter(Boolean)
-        .join(' · '),
-    },
-    { label: t('req.followers'), value: range(d.minFollowers, d.maxFollowers, f.compact) },
-    ...(d.minEngagementRate
-      ? [{ label: t('req.engagement'), value: `≥ ${f.percent(d.minEngagementRate)}` }]
-      : []),
-    ...(d.niches.length
-      ? [{ label: t('req.niches'), value: d.niches.map(o.niche).join(', ') }]
-      : []),
-    ...(d.languages.length
-      ? [{ label: t('req.languages'), value: d.languages.map(o.language).join(', ') }]
-      : []),
-    ...(d.influencerGender !== 'ANY'
-      ? [{ label: t('req.bloggerGender'), value: te(`genderFilter.${d.influencerGender}`) }]
-      : []),
-    ...(d.influencerAgeMin != null || d.influencerAgeMax != null
-      ? [{ label: t('req.bloggerAge'), value: range(d.influencerAgeMin, d.influencerAgeMax) }]
-      : []),
-    ...(d.audienceGender !== 'ANY'
-      ? [{ label: t('req.audienceGender'), value: te(`audienceGender.${d.audienceGender}`) }]
-      : []),
-    ...(d.audienceAgeMin != null || d.audienceAgeMax != null
-      ? [{ label: t('req.audienceAge'), value: range(d.audienceAgeMin, d.audienceAgeMax) }]
-      : []),
-    ...(d.audienceCountry
-      ? [{ label: t('req.audienceCountry'), value: o.country(d.audienceCountry) }]
-      : []),
-  ];
+  const requirements = dealRequirements(d);
 
   const applyButton = canApply ? (
     <Button

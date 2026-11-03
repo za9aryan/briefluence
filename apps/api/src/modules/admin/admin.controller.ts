@@ -18,6 +18,8 @@ import {
   type PlanCode,
   type PlanUpdateInput,
   DEAL_STATUSES,
+  OFFER_STATUSES,
+  type OfferStatus,
   ROLES,
   VERIFICATION_STATUSES,
   verificationDecisionSchema,
@@ -68,10 +70,16 @@ export class AdminController {
   }
 
   /** Blogger plans: prices, currency, Basic's application limit, on/off. */
-  /** Offer review queue (blogger offers are checked before brands see them). */
+  /**
+   * Offers: the review queue by default (offers are checked before companies see them);
+   * `status=ALL` lists every offer, any other status filters by it; `q` searches title / name.
+   */
   @Get('offers')
-  offers(@Query('status') status?: string) {
-    return this.offersService.reviewQueue(status === 'REJECTED' ? 'REJECTED' : 'IN_REVIEW');
+  offers(@Query('status') status?: string, @Query('q') q?: string) {
+    return this.offersService.reviewQueue(
+      status === 'ALL' ? undefined : (pick<OfferStatus>(OFFER_STATUSES, status) ?? 'IN_REVIEW'),
+      q?.slice(0, 100),
+    );
   }
 
   @Post('offers/:id/approve')

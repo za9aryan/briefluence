@@ -493,20 +493,38 @@ export class OffersService {
 
   // ─── Admin review ────────────────────────────────────────
 
-  async reviewQueue(status: 'IN_REVIEW' | 'REJECTED') {
+  /** Admin: the review queue, or every offer (`status` omitted) with an optional title/name search. */
+  async reviewQueue(status?: OfferStatus, q?: string) {
     const rows = await this.prisma.offer.findMany({
-      where: { status },
-      orderBy: status === 'IN_REVIEW' ? { submittedAt: 'asc' } : { reviewedAt: 'desc' },
+      where: {
+        ...(status ? { status } : {}),
+        ...(q
+          ? {
+              OR: [
+                { title: { contains: q, mode: 'insensitive' } },
+                { influencer: { displayName: { contains: q, mode: 'insensitive' } } },
+              ],
+            }
+          : {}),
+      },
+      orderBy:
+        status === 'IN_REVIEW'
+          ? { submittedAt: 'asc' }
+          : status === 'REJECTED'
+            ? { reviewedAt: 'desc' }
+            : { createdAt: 'desc' },
       take: 200,
       include: {
         influencer: {
           ...BLOGGER_CARD,
           select: { ...BLOGGER_CARD.select, user: { select: { email: true } } },
         },
+        _count: { select: { requests: true } },
       },
     });
-    return rows.map(({ influencer, ...o }) => ({
+    return rows.map(({ influencer, _count, ...o }) => ({
       ...o,
+      requestCount: _count.requests,
       blogger: { ...bloggerCard(influencer), email: influencer.user.email },
     }));
   }

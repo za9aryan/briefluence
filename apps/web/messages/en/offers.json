@@ -1,4 +1,9 @@
 {
+  "confirmClose": {
+    "title": "Close this offer?",
+    "text": "Companies won’t see it or be able to send requests.",
+    "confirm": "Close offer"
+  },
   "mineTitle": "My offers",
   "mineLead": "Tell companies what you do and for how much. Companies send requests; you choose who to work with.",
   "newOffer": "New offer",

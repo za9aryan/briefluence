@@ -115,6 +115,12 @@ export class PaddleBillingService {
     await this.apply(sub, p, this.clock.now());
   }
 
+  /** Account deletion: stop the Paddle subscription right away so nothing renews. */
+  async cancelNow(sub: Subscription) {
+    const p = await this.paddle.cancel(this.requireLinked(sub), 'immediately');
+    await this.apply(sub, p, this.clock.now());
+  }
+
   async resume(sub: Subscription) {
     await this.apply(
       sub,

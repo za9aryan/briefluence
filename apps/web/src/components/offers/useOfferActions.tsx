@@ -1,5 +1,5 @@
 'use client';
-import { Alert, buttonStyles, useToast } from '@briefluence/ui';
+import { Alert, buttonStyles, useConfirm, useToast } from '@briefluence/ui';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -16,6 +16,7 @@ export function useOfferActions() {
   const toast = useToast();
   const errorMessage = useErrorMessage();
   const qc = useQueryClient();
+  const confirm = useConfirm();
   const [limit, setLimit] = useState<number | null | false>(false);
   const mutation = useMutation({
     mutationFn: ({ id, action }: { id: string; action: OfferAction }) =>
@@ -40,7 +41,20 @@ export function useOfferActions() {
       toast(errorMessage(e), 'danger');
     },
   });
-  return { ...mutation, limit, clearLimit: () => setLimit(false) };
+  return {
+    ...mutation,
+    /** Closing an offer asks first; the other actions run straight away. */
+    mutate: (v: { id: string; action: OfferAction }) => {
+      if (v.action !== 'close') return mutation.mutate(v);
+      void confirm({
+        title: t('confirmClose.title'),
+        description: t('confirmClose.text'),
+        confirmLabel: t('confirmClose.confirm'),
+      }).then((ok) => ok && mutation.mutate(v));
+    },
+    limit,
+    clearLimit: () => setLimit(false),
+  };
 }
 
 /** Shown when the plan's live-offer limit is reached. */

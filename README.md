@@ -166,6 +166,16 @@ deleted). If an account shows up on a different user than before, admins get a n
 **Possible re-registration** warning (Accounts → Re-registration tab, Verifications, Users) with the full history;
 the blogger keeps working until the admin chooses **Allow**, **Reject account** or **Block user**.
 
+## Deleting an account
+
+Companies and influencers delete their own account in **Settings → Delete account** (`POST /api/v1/account/delete`,
+confirmed with the password; Google/Apple-only accounts type their email). The account is anonymized, not removed:
+a running Paddle subscription is cancelled immediately, then personal data, sign-in methods, sessions, social
+accounts (with tokens), portfolio, notifications and push subscriptions are deleted, briefs and offers close, open
+applications and offer requests are withdrawn, and the user gets `deletedAt` + `blockedAt` (so every "not blocked"
+filter hides it). The email becomes free to register again. Admins see **Deleted by owner** in Users and cannot
+unblock it. Uploaded images are not removed from storage yet.
+
 ## Admin access
 
 There is no public admin sign-up. The admin account comes from `ADMIN_EMAIL` / `ADMIN_PASSWORD` in `.env`:
@@ -177,7 +187,7 @@ pnpm admin:create     # creates the admin, or resets its password; touches no ot
 Then log in at `/login` with those credentials; admins land on **Overview** (sign-ups, briefs, applications,
 the shortlist → accept funnel, bloggers on free trial vs paid, over 30 days / 90 days / 12 months), then
 **Verifications** (approve / reject bloggers),
-with **Brief review**, **Briefs**, **Users** (block, confirm email, send reset link, sign out everywhere) and
+with **Brief review**, **Briefs** and **Offers** (every brief / offer in any status, opened in full with **View**), **Users** (block, confirm email, send reset link, sign out everywhere) and
 **Payments** in the sidebar.
 
 Every brief is checked before bloggers see it: Publish puts it **In review**; the admin approves it (it goes live)

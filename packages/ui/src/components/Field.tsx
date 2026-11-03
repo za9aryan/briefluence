@@ -6,6 +6,7 @@ import {
   useId,
   type InputHTMLAttributes,
   type ReactNode,
+  type Ref,
   type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
 } from 'react';
@@ -146,6 +147,65 @@ export const Textarea = forwardRef<
       className={cn(control, 'px-3 py-2 leading-relaxed', className)}
       {...rest}
     />
+  );
+});
+
+/**
+ * An amount with its currency picked inside the same field ("12 000 | ֏ AMD ▾"), so changing the
+ * currency visibly changes the amount's unit. `currency` goes to the <select> (value, onChange,
+ * name, ref from react-hook-form's register); `currencies` are its options.
+ */
+export const AmountInput = forwardRef<
+  HTMLInputElement,
+  Omit<InputProps, 'suffix' | 'icon'> & {
+    currency: SelectHTMLAttributes<HTMLSelectElement> & { ref?: Ref<HTMLSelectElement> };
+    currencies: { value: string; label: string }[];
+    currencyLabel: string;
+  }
+>(function AmountInput({ currency, currencies, currencyLabel, invalid, className, ...rest }, ref) {
+  return (
+    <div
+      className={cn(
+        'flex h-11 w-full items-stretch overflow-hidden rounded-sm border bg-surface-raised transition-colors',
+        'focus-within:border-primary focus-within:ring-3 focus-within:ring-primary/15',
+        invalid ? 'border-primary-text' : 'border-line',
+        className,
+      )}
+    >
+      <input
+        ref={ref}
+        aria-invalid={invalid || undefined}
+        className="min-w-0 flex-1 bg-transparent px-3 text-small text-ink outline-none placeholder:text-ink-muted pointer-coarse:text-body"
+        {...rest}
+        onWheel={
+          rest.type === 'number'
+            ? (e) => {
+                e.currentTarget.blur();
+                rest.onWheel?.(e);
+              }
+            : rest.onWheel
+        }
+      />
+      <div className="relative shrink-0 border-l border-line bg-surface">
+        <select
+          aria-label={currencyLabel}
+          className="h-full appearance-none bg-transparent pl-3 pr-8 text-small font-bold text-ink outline-none pointer-coarse:text-body"
+          {...currency}
+        >
+          {currencies.map((c) => (
+            <option key={c.value} value={c.value}>
+              {c.label}
+            </option>
+          ))}
+        </select>
+        <Icon
+          name="chevron-down"
+          size="sm"
+          tone="muted"
+          className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2"
+        />
+      </div>
+    </div>
   );
 });
 

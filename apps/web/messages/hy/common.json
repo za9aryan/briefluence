@@ -52,5 +52,8 @@
   "reset": "Զրոյացնել",
   "searchCountry": "Որոնիր երկիրը",
   "searchCity": "Որոնիր քաղաքը",
-  "nothingFound": "Ոչինչ չի գտնվել"
+  "nothingFound": "Ոչինչ չի գտնվել",
+  "logoutTitle": "Դուրս գա՞լ հաշվից",
+  "logoutText": "Այս սարքում պետք կլինի նորից մուտք գործել։",
+  "logoutConfirm": "Դուրս գալ"
 }

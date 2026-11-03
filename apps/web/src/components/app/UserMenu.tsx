@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { PreferenceFields } from '@/components/app/Preferences';
 import { useDisplayCurrency } from '@/lib/hooks/currency';
-import { landingPath, useLogout, type Me } from '@/lib/hooks/session';
+import { landingPath, useConfirmLogout, type Me } from '@/lib/hooks/session';
 
 export function displayName(me: Me) {
   return me.influencer?.displayName ?? me.brand?.companyName ?? me.email;
@@ -58,7 +58,7 @@ export function UserMenu({ me, showDashboard }: { me: Me; showDashboard?: boolea
   const t = useTranslations('nav');
   const tc = useTranslations('common');
   const locale = useLocale();
-  const logout = useLogout();
+  const logout = useConfirmLogout();
   const currency = useDisplayCurrency();
   const links = useLinks(me, showDashboard);
   const [sheet, setSheet] = useState(false);
@@ -104,7 +104,7 @@ export function UserMenu({ me, showDashboard }: { me: Me; showDashboard?: boolea
           type="button"
           onClick={() => {
             setSheet(false);
-            logout.mutate();
+            void logout();
           }}
           className="-mx-5 flex min-h-12 w-[calc(100%+2.5rem)] items-center gap-2 border-t border-line px-5 pt-2 text-body font-bold text-primary-text"
         >
@@ -149,7 +149,7 @@ export function UserMenu({ me, showDashboard }: { me: Me; showDashboard?: boolea
                   className="min-h-11 px-4 text-small"
                   onClick={() => {
                     close();
-                    logout.mutate();
+                    void logout();
                   }}
                 >
                   <Icon name="logout" /> {t('logout')}

@@ -12,6 +12,8 @@ import {
   Card,
   EmptyState,
   CoverChip,
+  FiltersButton,
+  Modal,
   Inline,
   MediaCover,
   Skeleton,
@@ -55,7 +57,9 @@ export default function MyApplicationsPage() {
   const toast = useToast();
   const errorMessage = useErrorMessage();
   const qc = useQueryClient();
+  const tc = useTranslations('common');
   const [tab, setTab] = useState<keyof typeof GROUPS>('active');
+  const [sheet, setSheet] = useState(false);
   const apps = useQuery({
     queryKey: ['applications', 'mine'],
     queryFn: () => api.get<MyApplicationDto[]>('/applications/mine'),
@@ -71,20 +75,67 @@ export default function MyApplicationsPage() {
 
   const all = apps.data ?? [];
   const list = all.filter((a) => GROUPS[tab].includes(a.status));
+  const groups = Object.keys(GROUPS) as (keyof typeof GROUPS)[];
+  const counts = Object.fromEntries(
+    groups.map((g) => [g, all.filter((a) => GROUPS[g].includes(a.status)).length]),
+  ) as Record<keyof typeof GROUPS, number>;
 
   return (
     <Stack gap={6}>
       <PageHeader title={t('title')} description={t('lead')} />
+      {/* Phones: one Filters pill opening a sheet; wider screens keep the tabs. */}
+      <div className="flex items-center gap-3 md:hidden">
+        <FiltersButton
+          label={tc('filters')}
+          count={tab === 'active' ? 0 : 1}
+          onClick={() => setSheet(true)}
+        />
+        <Text size="small" tone="muted" className="truncate">
+          {t(`tabs.${tab}`)} · {counts[tab]}
+        </Text>
+      </div>
       <Tabs
         aria-label={t('title')}
         value={tab}
         onChange={setTab}
-        items={(Object.keys(GROUPS) as (keyof typeof GROUPS)[]).map((g) => ({
-          value: g,
-          label: t(`tabs.${g}`),
-          count: all.filter((a) => GROUPS[g].includes(a.status)).length,
-        }))}
+        className="max-md:hidden"
+        items={groups.map((g) => ({ value: g, label: t(`tabs.${g}`), count: counts[g] }))}
       />
+      <Modal
+        open={sheet}
+        onClose={() => setSheet(false)}
+        title={tc('filters')}
+        closeLabel={tc('close')}
+      >
+        <div role="radiogroup" aria-label={t('title')} className="-mx-2 flex flex-col">
+          {groups.map((g) => (
+            <button
+              key={g}
+              type="button"
+              role="radio"
+              aria-checked={tab === g}
+              onClick={() => {
+                setTab(g);
+                setSheet(false);
+              }}
+              className="flex min-h-12 items-center gap-3 rounded-sm px-2 text-left text-body text-ink hover:bg-surface"
+            >
+              <span
+                aria-hidden
+                className={
+                  tab === g
+                    ? 'inline-flex size-5 items-center justify-center rounded-pill bg-primary text-on-primary'
+                    : 'inline-flex size-5 rounded-pill border border-line'
+                }
+              >
+                {tab === g && <Icon name="check" size="xs" />}
+              </span>
+              <span className="flex-1 font-bold">{t(`tabs.${g}`)}</span>
+              <span className="tabular-nums text-ink-muted">{counts[g]}</span>
+            </button>
+          ))}
+        </div>
+      </Modal>
       {apps.isLoading ? (
         <Skeleton className="h-48 rounded-card" />
       ) : list.length === 0 ? (
