@@ -167,6 +167,38 @@ export default {
     search: ['Search offers', 'Поиск предложений', 'Որոնել առաջարկներ'],
     sortNewest: ['Newest', 'Сначала новые', 'Նորերը'],
     sortPrice: ['Lowest price', 'Сначала дешевле', 'Ամենաէժանները'],
+    optional: {
+      add: ['Add', 'Добавить', 'Ավելացնել'],
+      remove: ['Remove', 'Убрать', 'Հեռացնել'],
+      image: {
+        title: ['Cover image', 'Обложка', 'Շապիկ'],
+        desc: [
+          'Your best shot for this offer. Without one we show your profile photo.',
+          'Лучший кадр для этого предложения. Без него покажем фото профиля.',
+          'Լավագույն կադրը այս առաջարկի համար։ Առանց դրա կցուցադրենք պրոֆիլի նկարը։',
+        ],
+      },
+      niches: {
+        title: ['Niches', 'Ниши', 'Նիշեր'],
+        desc: [
+          'Helps companies in these topics find your offer.',
+          'Поможет компаниям из этих тем найти твоё предложение.',
+          'Կօգնի այս թեմաների ընկերություններին գտնել քո առաջարկը։',
+        ],
+      },
+      idealBrands: {
+        title: [
+          'Companies you want to work with',
+          'С какими компаниями хочешь работать',
+          'Ինչ ընկերությունների հետ ես ուզում աշխատել',
+        ],
+        desc: [
+          'Name the kind of companies you would love to hear from.',
+          'Напиши, от каких компаний ждёшь запросов.',
+          'Գրիր, թե ինչ ընկերություններից ես սպասում հարցումների։',
+        ],
+      },
+    },
     showResults: [
       'Show {count, plural, one {# offer} other {# offers}}',
       'Показать {count, plural, one {# предложение} few {# предложения} many {# предложений} other {# предложения}}',

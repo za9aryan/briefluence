@@ -79,6 +79,22 @@
   "search": "Search offers",
   "sortNewest": "Newest",
   "sortPrice": "Lowest price",
+  "optional": {
+    "add": "Add",
+    "remove": "Remove",
+    "image": {
+      "title": "Cover image",
+      "desc": "Your best shot for this offer. Without one we show your profile photo."
+    },
+    "niches": {
+      "title": "Niches",
+      "desc": "Helps companies in these topics find your offer."
+    },
+    "idealBrands": {
+      "title": "Companies you want to work with",
+      "desc": "Name the kind of companies you would love to hear from."
+    }
+  },
   "showResults": "Show {count, plural, one {# offer} other {# offers}}",
   "emptyFeed": "No offers match these filters yet.",
   "emptyRequests": "You have not sent any requests yet.",

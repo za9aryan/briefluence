@@ -21,6 +21,7 @@ import {
   FieldGrid,
   Heading,
   Input,
+  OptionalField,
   RangeInput,
   Select,
   Slider,
@@ -170,6 +171,13 @@ export function DealWizard({
       () => setStep(0),
     )();
 
+  // Optional parts: folded rows with what they do; opened when wanted (or already set).
+  const opt = (key: string) => ({
+    title: t(`optional.${key}.title`),
+    description: t(`optional.${key}.desc`),
+    addLabel: t('optional.add'),
+    removeLabel: t('optional.remove'),
+  });
   const genderOptions = (kind: 'genderFilter' | 'audienceGender') =>
     (['ANY', 'FEMALE', 'MALE'] as GenderFilter[]).map((g) => ({
       value: g,
@@ -244,20 +252,26 @@ export function DealWizard({
                     />
                   )}
                 </Field>
-                <Controller
-                  control={form.control}
-                  name="imageUrl"
-                  render={({ field }) => (
-                    <ImageUpload
-                      wide
-                      kind="deal"
-                      label={t('fields.cover')}
-                      name=""
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
+                <OptionalField
+                  {...opt('cover')}
+                  filled={!!v.imageUrl}
+                  onClear={() => form.setValue('imageUrl', null)}
+                >
+                  <Controller
+                    control={form.control}
+                    name="imageUrl"
+                    render={({ field }) => (
+                      <ImageUpload
+                        wide
+                        kind="deal"
+                        label={t('fields.cover')}
+                        name=""
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                </OptionalField>
               </Section>
               <Controller
                 control={form.control}
@@ -305,16 +319,19 @@ export function DealWizard({
                 control={form.control}
                 name="niches"
                 render={({ field }) => (
-                  <Field label={t('fields.niches')} aside={tc('optional')}>
-                    {() => (
-                      <ChipGroup
-                        multiple
-                        options={o.niches}
-                        value={(field.value ?? []) as string[]}
-                        onChange={field.onChange}
-                      />
-                    )}
-                  </Field>
+                  <OptionalField
+                    {...opt('niches')}
+                    filled={(field.value ?? []).length > 0}
+                    onClear={() => field.onChange([])}
+                  >
+                    <ChipGroup
+                      multiple
+                      aria-label={t('fields.niches')}
+                      options={o.niches}
+                      value={(field.value ?? []) as string[]}
+                      onChange={field.onChange}
+                    />
+                  </OptionalField>
                 )}
               />
               <Controller
@@ -458,117 +475,152 @@ export function DealWizard({
                     </Field>
                   </FieldGrid>
                 )}
-                <Field label={t('fields.minEngagement')} hint={t('fields.minEngagementHint')}>
-                  {() => (
-                    <Slider
-                      label={t('fields.minEngagement')}
-                      min={0}
-                      max={10}
-                      step={0.5}
-                      value={v.minEngagementRate ?? 0}
-                      onChange={(x) => form.setValue('minEngagementRate', x === 0 ? null : x)}
-                      format={(x) => (x === 0 ? tc('any') : `${x}%`)}
-                    />
-                  )}
-                </Field>
+                <OptionalField
+                  {...opt('engagement')}
+                  filled={v.minEngagementRate != null}
+                  onClear={() => form.setValue('minEngagementRate', null)}
+                >
+                  <Slider
+                    label={t('fields.minEngagement')}
+                    min={0}
+                    max={10}
+                    step={0.5}
+                    value={v.minEngagementRate ?? 0}
+                    onChange={(x) => form.setValue('minEngagementRate', x === 0 ? null : x)}
+                    format={(x) => (x === 0 ? tc('any') : `${x}%`)}
+                  />
+                </OptionalField>
               </Section>
 
-              <Section title={t('targeting.blogger')}>
-                <Controller
-                  control={form.control}
-                  name="influencerGender"
-                  render={({ field }) => (
-                    <Field label={t('fields.bloggerGender')}>
-                      {() => (
-                        <ChipGroup
-                          options={genderOptions('genderFilter')}
-                          value={field.value ?? 'ANY'}
-                          onChange={field.onChange}
-                        />
-                      )}
-                    </Field>
-                  )}
-                />
-                <Field label={t('fields.bloggerAge')} error={fe(errors.influencerAgeMax)}>
-                  {() => (
-                    <RangeInput
-                      min={INFLUENCER_AGE_RANGE.min}
-                      max={INFLUENCER_AGE_RANGE.max}
-                      value={[v.influencerAgeMin ?? null, v.influencerAgeMax ?? null]}
-                      onChange={([a, b]) => {
-                        form.setValue('influencerAgeMin', a);
-                        form.setValue('influencerAgeMax', b);
-                      }}
-                      labels={{ min: t('fields.ageFrom'), max: t('fields.ageTo') }}
-                    />
-                  )}
-                </Field>
-              </Section>
-
-              <Section title={t('targeting.audience')} hint={t('targeting.audienceHint')}>
-                <Controller
-                  control={form.control}
-                  name="audienceGender"
-                  render={({ field }) => (
-                    <Field label={t('fields.audienceGender')}>
-                      {() => (
-                        <ChipGroup
-                          options={genderOptions('audienceGender')}
-                          value={field.value ?? 'ANY'}
-                          onChange={field.onChange}
-                        />
-                      )}
-                    </Field>
-                  )}
-                />
-                <Field label={t('fields.audienceAge')} error={fe(errors.audienceAgeMax)}>
-                  {() => (
-                    <RangeInput
-                      min={13}
-                      max={65}
-                      value={[v.audienceAgeMin ?? null, v.audienceAgeMax ?? null]}
-                      onChange={([a, b]) => {
-                        form.setValue('audienceAgeMin', a);
-                        form.setValue('audienceAgeMax', b);
-                      }}
-                      labels={{ min: t('fields.ageFrom'), max: t('fields.ageTo') }}
-                    />
-                  )}
-                </Field>
-                <FieldGrid cols={{ base: 1, md: 2 }} gap={4}>
+              <OptionalField
+                {...opt('influencer')}
+                filled={
+                  (v.influencerGender ?? 'ANY') !== 'ANY' ||
+                  v.influencerAgeMin != null ||
+                  v.influencerAgeMax != null
+                }
+                onClear={() => {
+                  form.setValue('influencerGender', 'ANY');
+                  form.setValue('influencerAgeMin', null);
+                  form.setValue('influencerAgeMax', null);
+                }}
+              >
+                <Stack gap={4}>
                   <Controller
                     control={form.control}
-                    name="audienceCountry"
+                    name="influencerGender"
                     render={({ field }) => (
-                      <Field label={t('fields.audienceCountry')} aside={tc('optional')}>
-                        {({ id }) => (
-                          <CountrySelect
-                            id={id}
-                            value={field.value ?? null}
-                            onChange={(c) => field.onChange(c)}
+                      <Field label={t('fields.bloggerGender')}>
+                        {() => (
+                          <ChipGroup
+                            options={genderOptions('genderFilter')}
+                            value={field.value ?? 'ANY'}
+                            onChange={field.onChange}
                           />
                         )}
                       </Field>
                     )}
                   />
-                </FieldGrid>
-                <Controller
-                  control={form.control}
-                  name="languages"
-                  render={({ field }) => (
-                    <Field label={t('fields.languages')} aside={tc('optional')}>
-                      {() => (
-                        <ChipGroup
-                          multiple
-                          options={o.languages}
-                          value={(field.value ?? []) as string[]}
-                          onChange={field.onChange}
-                        />
+                  <Field label={t('fields.bloggerAge')} error={fe(errors.influencerAgeMax)}>
+                    {() => (
+                      <RangeInput
+                        min={INFLUENCER_AGE_RANGE.min}
+                        max={INFLUENCER_AGE_RANGE.max}
+                        value={[v.influencerAgeMin ?? null, v.influencerAgeMax ?? null]}
+                        onChange={([a, b]) => {
+                          form.setValue('influencerAgeMin', a);
+                          form.setValue('influencerAgeMax', b);
+                        }}
+                        labels={{ min: t('fields.ageFrom'), max: t('fields.ageTo') }}
+                      />
+                    )}
+                  </Field>
+                </Stack>
+              </OptionalField>
+
+              <OptionalField
+                {...opt('audience')}
+                filled={
+                  (v.audienceGender ?? 'ANY') !== 'ANY' ||
+                  v.audienceAgeMin != null ||
+                  v.audienceAgeMax != null ||
+                  !!v.audienceCountry
+                }
+                onClear={() => {
+                  form.setValue('audienceGender', 'ANY');
+                  form.setValue('audienceAgeMin', null);
+                  form.setValue('audienceAgeMax', null);
+                  form.setValue('audienceCountry', null);
+                }}
+              >
+                <Stack gap={4}>
+                  <Controller
+                    control={form.control}
+                    name="audienceGender"
+                    render={({ field }) => (
+                      <Field label={t('fields.audienceGender')}>
+                        {() => (
+                          <ChipGroup
+                            options={genderOptions('audienceGender')}
+                            value={field.value ?? 'ANY'}
+                            onChange={field.onChange}
+                          />
+                        )}
+                      </Field>
+                    )}
+                  />
+                  <Field label={t('fields.audienceAge')} error={fe(errors.audienceAgeMax)}>
+                    {() => (
+                      <RangeInput
+                        min={13}
+                        max={65}
+                        value={[v.audienceAgeMin ?? null, v.audienceAgeMax ?? null]}
+                        onChange={([a, b]) => {
+                          form.setValue('audienceAgeMin', a);
+                          form.setValue('audienceAgeMax', b);
+                        }}
+                        labels={{ min: t('fields.ageFrom'), max: t('fields.ageTo') }}
+                      />
+                    )}
+                  </Field>
+                  <FieldGrid cols={{ base: 1, md: 2 }} gap={4}>
+                    <Controller
+                      control={form.control}
+                      name="audienceCountry"
+                      render={({ field }) => (
+                        <Field label={t('fields.audienceCountry')}>
+                          {({ id }) => (
+                            <CountrySelect
+                              id={id}
+                              value={field.value ?? null}
+                              onChange={(c) => field.onChange(c)}
+                            />
+                          )}
+                        </Field>
                       )}
-                    </Field>
-                  )}
-                />
-              </Section>
+                    />
+                  </FieldGrid>
+                </Stack>
+              </OptionalField>
+              <Controller
+                control={form.control}
+                name="languages"
+                render={({ field }) => (
+                  <OptionalField
+                    {...opt('languages')}
+                    filled={(field.value ?? []).length > 0}
+                    onClear={() => field.onChange([])}
+                  >
+                    <ChipGroup
+                      multiple
+                      aria-label={t('fields.languages')}
+                      options={o.languages}
+                      value={(field.value ?? []) as string[]}
+                      onChange={field.onChange}
+                    />
+                  </OptionalField>
+                )}
+              />
             </Stack>
           )}
 
@@ -659,39 +711,45 @@ export function DealWizard({
                     )}
                   </Field>
                   {/* Barter only: the value needs its own currency (with money, the budget's applies). */}
-                  <FieldGrid cols={{ base: 1, sm: money ? 1 : 2 }} gap={4}>
-                    <Field label={t('fields.barterValue')} aside={tc('optional')}>
-                      {({ id }) => (
-                        <Input
-                          id={id}
-                          type="number"
-                          inputMode="numeric"
-                          min={0}
-                          suffix={curSymbol}
-                          {...form.register('barterValue', {
-                            setValueAs: (x) => (x === '' || x == null ? null : Number(x)),
-                          })}
-                        />
-                      )}
-                    </Field>
-                    {!money && (
-                      <Field label={t('fields.currency')}>
+                  <OptionalField
+                    {...opt('barterValue')}
+                    filled={v.barterValue != null}
+                    onClear={() => form.setValue('barterValue', null)}
+                  >
+                    <FieldGrid cols={{ base: 1, sm: money ? 1 : 2 }} gap={4}>
+                      <Field label={t('fields.barterValue')}>
                         {({ id }) => (
-                          <Select id={id} {...form.register('currency')}>
-                            {CURRENCIES.map((c) => (
-                              <option key={c} value={c}>
-                                {c} · {te(`currency.${c}`)}
-                              </option>
-                            ))}
-                          </Select>
+                          <Input
+                            id={id}
+                            type="number"
+                            inputMode="numeric"
+                            min={0}
+                            suffix={curSymbol}
+                            {...form.register('barterValue', {
+                              setValueAs: (x) => (x === '' || x == null ? null : Number(x)),
+                            })}
+                          />
                         )}
                       </Field>
-                    )}
-                  </FieldGrid>
+                      {!money && (
+                        <Field label={t('fields.currency')}>
+                          {({ id }) => (
+                            <Select id={id} {...form.register('currency')}>
+                              {CURRENCIES.map((c) => (
+                                <option key={c} value={c}>
+                                  {c} · {te(`currency.${c}`)}
+                                </option>
+                              ))}
+                            </Select>
+                          )}
+                        </Field>
+                      )}
+                    </FieldGrid>
+                  </OptionalField>
                 </Section>
               )}
               <Section title={t('compensation.timing')}>
-                <FieldGrid cols={{ base: 1, sm: 3 }} gap={4}>
+                <FieldGrid cols={{ base: 1, sm: 2 }} gap={4}>
                   <Field
                     label={t('fields.slots')}
                     hint={t('fields.slotsHint')}
@@ -724,21 +782,24 @@ export function DealWizard({
                       />
                     )}
                   </Field>
-                  <Field
-                    label={t('fields.publishBy')}
-                    error={fe(errors.publishBy)}
-                    aside={tc('optional')}
-                  >
+                </FieldGrid>
+                <OptionalField
+                  {...opt('publishBy')}
+                  filled={!!v.publishBy}
+                  onClear={() => form.setValue('publishBy', '')}
+                >
+                  <Field label={t('fields.publishBy')} error={fe(errors.publishBy)}>
                     {({ id, invalid }) => (
                       <Input
                         id={id}
                         type="date"
                         invalid={invalid}
+                        className="sm:max-w-xs"
                         {...form.register('publishBy')}
                       />
                     )}
                   </Field>
-                </FieldGrid>
+                </OptionalField>
               </Section>
             </Stack>
           )}

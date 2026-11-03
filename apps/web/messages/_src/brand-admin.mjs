@@ -275,6 +275,78 @@ export default {
     pause: ['Pause', 'Пауза', 'Դադար'],
     close: ['Close brief', 'Закрыть бриф', 'Փակել բրիֆը'],
     reopen: ['Reopen', 'Открыть снова', 'Կրկին բացել'],
+    optional: {
+      add: ['Add', 'Добавить', 'Ավելացնել'],
+      remove: ['Remove', 'Убрать', 'Հեռացնել'],
+      cover: {
+        title: ['Cover image', 'Обложка', 'Շապիկ'],
+        desc: [
+          'A photo makes your brief stand out in the feed.',
+          'С фото бриф заметнее в ленте.',
+          'Լուսանկարով բրիֆն ավելի նկատելի է լենտում։',
+        ],
+      },
+      niches: {
+        title: ['Niches', 'Ниши', 'Նիշեր'],
+        desc: [
+          'Show the brief first to influencers in these topics.',
+          'Бриф увидят инфлюенсеры с этими темами.',
+          'Բրիֆը կտեսնեն այս թեմաներով ինֆլյուենսերները։',
+        ],
+      },
+      engagement: {
+        title: ['Minimum engagement', 'Минимальная вовлечённость', 'Նվազագույն ներգրավվածություն'],
+        desc: [
+          'Skip accounts whose followers rarely like or comment.',
+          'Без аккаунтов, где подписчики почти не ставят лайки и не комментируют.',
+          'Առանց հաշիվների, որտեղ հետևորդները գրեթե չեն հավանում և չեն մեկնաբանում։',
+        ],
+      },
+      influencer: {
+        title: [
+          'Influencer gender and age',
+          'Пол и возраст инфлюенсера',
+          'Ինֆլյուենսերի սեռը և տարիքը',
+        ],
+        desc: [
+          'Only influencers of this gender or age range can apply.',
+          'Откликнуться смогут только инфлюенсеры этого пола или возраста.',
+          'Կդիմեն միայն այս սեռի կամ տարիքի ինֆլյուենսերները։',
+        ],
+      },
+      audience: {
+        title: ['Their audience', 'Их аудитория', 'Նրանց լսարանը'],
+        desc: [
+          'Prefer influencers whose followers match: gender, age, country. Used for the match score.',
+          'Предпочтение инфлюенсерам с подходящими подписчиками: пол, возраст, страна. Влияет на совпадение.',
+          'Նախապատվություն այն ինֆլյուենսերներին, որոնց հետևորդները համապատասխանում են՝ սեռ, տարիք, երկիր։ Ազդում է համընկնման վրա։',
+        ],
+      },
+      languages: {
+        title: ['Languages', 'Языки', 'Լեզուներ'],
+        desc: [
+          'Influencers who post in these languages.',
+          'Инфлюенсеры, которые публикуют на этих языках.',
+          'Ինֆլյուենսերներ, որոնք հրապարակում են այս լեզուներով։',
+        ],
+      },
+      barterValue: {
+        title: ['Value of the barter', 'Стоимость бартера', 'Բարտերի արժեքը'],
+        desc: [
+          'Helps influencers see what the barter is worth.',
+          'Помогает инфлюенсерам понять, сколько стоит бартер.',
+          'Օգնում է ինֆլյուենսերներին հասկանալ բարտերի արժեքը։',
+        ],
+      },
+      publishBy: {
+        title: ['Post by a date', 'Опубликовать до даты', 'Հրապարակել մինչև ամսաթիվ'],
+        desc: [
+          'The date the post must be live by.',
+          'Дата, к которой пост должен выйти.',
+          'Ամսաթիվը, մինչև որը գրառումը պետք է հրապարակվի։',
+        ],
+      },
+    },
     notEditable: [
       'This brief can’t be edited right now.',
       'Этот бриф сейчас нельзя изменить.',

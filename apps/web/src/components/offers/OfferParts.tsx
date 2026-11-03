@@ -22,6 +22,7 @@ import {
   Icon,
   Inline,
   Input,
+  OptionalField,
   MediaCover,
   Select,
   Stack,
@@ -211,7 +212,13 @@ export function OfferForm({
   footerNote?: ReactNode;
 }) {
   const t = useTranslations('offers');
-  const tc = useTranslations('common');
+  // Optional parts: folded rows with what they do; opened when wanted (or already set).
+  const opt = (key: string) => ({
+    title: t(`optional.${key}.title`),
+    description: t(`optional.${key}.desc`),
+    addLabel: t('optional.add'),
+    removeLabel: t('optional.remove'),
+  });
   const o = useOptions();
   const fe = useFieldError();
   const [v, setV] = useState<OfferFormValues>(initial);
@@ -285,19 +292,20 @@ export function OfferForm({
               />
             )}
           </Field>
-          <Stack gap={1}>
+          <OptionalField
+            {...opt('image')}
+            filled={!!v.imageUrl}
+            onClear={() => set('imageUrl', null)}
+          >
             <ImageUpload
               kind="offer"
               wide
               name={v.title}
-              label={`${t('fields.image')} · ${tc('optional')}`}
+              label={t('fields.image')}
               value={v.imageUrl}
               onChange={(url) => set('imageUrl', url)}
             />
-            <Text size="small" tone="muted">
-              {t('fields.imageHint')}
-            </Text>
-          </Stack>
+          </OptionalField>
           <FieldGrid cols={{ base: 1, sm: 2 }}>
             <Field label={t('fields.price')} error={err('priceMinor')}>
               {({ id, invalid }) => (
@@ -366,32 +374,36 @@ export function OfferForm({
               />
             )}
           </Field>
-          <Field label={t('fields.niches')} aside={tc('optional')}>
-            {() => (
-              <ChipGroup
-                multiple
-                options={o.niches}
-                value={v.niches as string[]}
-                onChange={(x: string[]) => set('niches', x as OfferFormValues['niches'])}
-              />
-            )}
-          </Field>
-          <Field
-            label={t('fields.idealBrands')}
-            hint={t('fields.idealBrandsHint')}
-            aside={tc('optional')}
-            error={err('idealBrands')}
+          <OptionalField
+            {...opt('niches')}
+            filled={v.niches.length > 0}
+            onClear={() => set('niches', [] as OfferFormValues['niches'])}
           >
-            {({ id, describedBy }) => (
-              <Input
-                id={id}
-                aria-describedby={describedBy}
-                maxLength={200}
-                value={v.idealBrands ?? ''}
-                onChange={(e) => set('idealBrands', e.target.value || null)}
-              />
-            )}
-          </Field>
+            <ChipGroup
+              multiple
+              aria-label={t('fields.niches')}
+              options={o.niches}
+              value={v.niches as string[]}
+              onChange={(x: string[]) => set('niches', x as OfferFormValues['niches'])}
+            />
+          </OptionalField>
+          <OptionalField
+            {...opt('idealBrands')}
+            filled={!!v.idealBrands}
+            onClear={() => set('idealBrands', null)}
+          >
+            <Field label={t('fields.idealBrands')} error={err('idealBrands')}>
+              {({ id, describedBy }) => (
+                <Input
+                  id={id}
+                  aria-describedby={describedBy}
+                  maxLength={200}
+                  value={v.idealBrands ?? ''}
+                  onChange={(e) => set('idealBrands', e.target.value || null)}
+                />
+              )}
+            </Field>
+          </OptionalField>
           <Stack gap={2}>
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <Button
