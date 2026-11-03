@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
       .map((i) => i!.address),
   ],
   // The browser talks to the API through the web origin, so auth cookies are first-party
-  // and OAuth / bank redirects land on the same site.
+  // and OAuth / payment redirects land on the same site.
   async rewrites() {
     return [{ source: '/api/v1/:path*', destination: `${apiOrigin}/api/v1/:path*` }];
   },

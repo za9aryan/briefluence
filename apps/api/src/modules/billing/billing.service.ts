@@ -173,7 +173,7 @@ export class BillingService implements OnModuleInit {
     return this.getForUser(userId);
   }
 
-  /** Allocates a unique integer order id (Ameria requires numeric OrderIDs). */
+  /** Records a pending payment; its order id is the short running payment number. */
   private async createPayment(
     subscriptionId: string,
     kind: 'checkout' | 'renewal',
@@ -194,7 +194,7 @@ export class BillingService implements OnModuleInit {
     });
     return this.prisma.payment.update({
       where: { id: p.id },
-      data: { providerOrderId: String(this.env.AMERIA_ORDER_ID_OFFSET + p.orderNumber) },
+      data: { providerOrderId: String(p.orderNumber) },
     });
   }
 

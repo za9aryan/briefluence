@@ -11,7 +11,7 @@ import type {
 export type MockCard = 'success' | 'decline' | 'renewal_decline';
 
 /**
- * Local stand-in for the bank. Checkout redirects to the web app's fake payment page
+ * Local stand-in for a real payment page. Checkout redirects to the web app's fake payment page
  * (/billing/mock-checkout), which reports the chosen outcome back via POST /billing/mock/complete.
  * The chosen card is encoded in the binding id so renewals behave consistently across restarts.
  */
@@ -36,7 +36,7 @@ export class MockPaymentProvider implements PaymentProvider {
   constructor(private readonly env: Env) {}
 
   async createCheckout(input: CheckoutInput): Promise<CheckoutResult> {
-    // The checkout details travel inside the id, so the fake bank page survives API restarts.
+    // The checkout details travel inside the id, so the fake payment page survives API restarts.
     const payload = Buffer.from(
       JSON.stringify({ c: input.cardHolderId, b: input.backUrl }),
     ).toString('base64url');
@@ -53,7 +53,7 @@ export class MockPaymentProvider implements PaymentProvider {
     return { providerPaymentId, redirectUrl: `${this.env.WEB_URL}/billing/mock-checkout?${q}` };
   }
 
-  /** Called by the fake bank page. Returns the back URL to continue to. */
+  /** Called by the fake payment page. Returns the back URL to continue to. */
   complete(providerPaymentId: string, card: MockCard): string | null {
     const c = this.checkouts.get(providerPaymentId) ?? decode(providerPaymentId);
     if (!c) return null;

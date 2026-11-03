@@ -1,5 +1,5 @@
 {
-  "updated": "Last updated: 16 October 2026 · Draft",
+  "updated": "Last updated: 3 November 2026 · Draft",
   "contact": "Questions? Write to support@briefluence.am.",
   "terms": {
     "title": "Terms of service",
@@ -23,7 +23,7 @@
       },
       "e": {
         "title": "5. Payments and cancellation",
-        "body": "Payments are processed by Ameriabank. Your card is charged automatically each month. You can cancel any time in Billing; access continues until the end of the paid month. Payments already made are not refunded except where the law requires."
+        "body": "Our order process is conducted by our online reseller Paddle.com. Paddle.com is the merchant of record for all our orders and handles payments, renewals and billing questions; Paddle’s Buyer Terms also apply to your purchase. Your card is charged automatically at the start of each paid period (a month or a year). You can cancel any time in Billing; Pro continues until the end of the paid period. Payments already made are not refunded except where the law requires."
       },
       "f": {
         "title": "6. Content and conduct",
@@ -61,7 +61,7 @@
       },
       "e": {
         "title": "5. Payments",
-        "body": "Card payments are handled by Ameriabank. We never receive or store your full card number; we keep only a masked number and a payment token for renewals."
+        "body": "Card payments are handled by Paddle.com, our reseller and merchant of record, under its own privacy notice. We never receive or store your full card number; we keep only its last four digits and Paddle’s subscription reference for renewals."
       },
       "f": {
         "title": "6. Retention and deletion",

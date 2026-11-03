@@ -77,8 +77,7 @@ or shown to brands. Changing a manual account's platform or username, or fixing 
 - **Pro** (monthly) and **Pro yearly**: unlimited applications.
 
 Every blogger picks a plan and first gets **30 days of Pro for free** (1 hour in the Paddle demo). Choosing Pro
-opens the payment page right away; with the bank, the paid period starts when the free days end; with Paddle it
-starts at payment and Paddle runs the renewals. Without payment (or after a cancelled / failed renewal) the blogger
+opens Paddle's checkout right away; the paid period starts at payment and Paddle runs the renewals. Without payment (or after a cancelled / failed renewal) the blogger
 moves to Basic — nobody loses access. Prices, currency, Basic's limit and which Pro plans are offered are edited in
 **Admin → Plans**. Prices are never shown on public pages.
 
@@ -208,8 +207,5 @@ One free ARM server runs Postgres, the API, the website and HTTPS: see [docs/ora
   `{WEB_URL}/api/v1/social/{instagram|tiktok|youtube}/callback`. Submit each for app review; set `SOCIAL_MOCK=false`.
 - Paddle: live account approved (domain, public pricing, refund policy, Terms naming Paddle as merchant of record),
   live keys and prices in `.env`, `PADDLE_ENV=production` ([docs/paddle.md](docs/paddle.md)).
-- (Alternative) Ameriabank vPOS: request API credentials and **binding payments** (director applies in internet banking); confirm
-  whether USD is allowed (otherwise `SUBSCRIPTION_CURRENCY=AMD`, `SUBSCRIPTION_PRICE_MINOR=390000`), the test OrderID
-  range (`AMERIA_ORDER_ID_OFFSET`) and the binding `PaymentType`.
 - Have a lawyer review the draft Terms and Privacy pages (all three languages).
 - Deploy: web on Vercel (`API_INTERNAL_URL` → API), API + worker + Postgres + Redis on a VPS/Railway; `COOKIE_SECURE=true`.

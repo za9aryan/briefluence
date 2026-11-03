@@ -13,7 +13,7 @@ export type CheckoutResponse = { redirectUrl: string } | { paddle: PaddleCheckou
 const SUB_KEY = ['billing', 'subscription'];
 
 /**
- * Runs what `POST /billing/checkout` returned: the bank page (redirect) or the Paddle overlay.
+ * Runs what `POST /billing/checkout` returned: the fake payment page (redirect) or the Paddle overlay.
  * After a Paddle payment the plan is switched by the webhook a few seconds later, so we poll the
  * subscription until the card is linked (or give up after ~30 s and just refresh).
  */

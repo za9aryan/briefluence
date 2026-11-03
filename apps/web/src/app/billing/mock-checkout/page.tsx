@@ -10,7 +10,7 @@ import { useFormat } from '@/lib/hooks/format';
 
 type Card = 'success' | 'decline' | 'renewal_decline';
 
-/** Development stand-in for the Ameriabank payment page (PAYMENT_PROVIDER=mock only). */
+/** Development stand-in for a real payment page (PAYMENT_PROVIDER=mock only). */
 function MockCheckout() {
   const t = useTranslations('billing.mock');
   const params = useSearchParams();
@@ -26,7 +26,10 @@ function MockCheckout() {
   const pay = async () => {
     setBusy(true);
     try {
-      const { redirectUrl } = await api.post<{ redirectUrl: string }>('/billing/mock/complete', { paymentID, card });
+      const { redirectUrl } = await api.post<{ redirectUrl: string }>('/billing/mock/complete', {
+        paymentID,
+        card,
+      });
       window.location.href = redirectUrl;
     } catch (e) {
       setError(errorMessage(e));
@@ -63,7 +66,10 @@ function MockCheckout() {
                   role="radio"
                   aria-checked={card === c.value}
                   onClick={() => setCard(c.value)}
-                  className={cn('flex min-h-11 flex-col rounded-card border-2 px-4 py-2 text-left', card === c.value ? 'border-primary bg-primary-soft' : 'border-line')}
+                  className={cn(
+                    'flex min-h-11 flex-col rounded-card border-2 px-4 py-2 text-left',
+                    card === c.value ? 'border-primary bg-primary-soft' : 'border-line',
+                  )}
                 >
                   <span className="font-bold tabular-nums text-ink">{c.mask}</span>
                   <span className="text-small text-ink-muted">{t(`cards.${c.value}`)}</span>

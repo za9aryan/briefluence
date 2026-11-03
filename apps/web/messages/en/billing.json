@@ -27,8 +27,8 @@
     "choosePro": "Choose Pro",
     "chooseYearly": "Choose Pro yearly",
     "payNote": "You pay now; your paid period starts after the free days.",
-    "started": "Your 30 free Pro days have started",
-    "payNowNote": "You pay now and your paid period starts today."
+    "payNowNote": "You pay now and your paid period starts today.",
+    "started": "Your 30 free Pro days have started"
   },
   "checklist": {
     "title": "Two steps to see briefs",
@@ -50,7 +50,7 @@
   },
   "trialBanner": "{count, plural, =0 {Your free Pro days end today.} one {# free Pro day left.} other {# free Pro days left.}}",
   "paidToast": "Payment received. Pro is on.",
-  "pendingToast": "The bank is still processing the payment.",
+  "pendingToast": "The payment is still being processed.",
   "failedToast": "The payment did not go through.",
   "title": "Plan & billing",
   "lead": "Your plan, card and payments.",
@@ -82,10 +82,12 @@
   "cancelledToast": "Subscription cancelled. Pro stays until the end of the paid period.",
   "resumedToast": "Auto-renewal is on again",
   "cardRemovedToast": "Card removed. Pro will not renew.",
-  "cardsNote": "Visa, Mastercard and ArCa. Payments are processed by Ameriabank; we never see your card number.",
+  "cardsNote": "Payments are processed by Paddle, our reseller and merchant of record; we never see your card number.",
   "card": "Card",
   "nextCharge": "Next charge on {date}",
   "removeCard": "Remove card",
+  "updateCard": "Change card",
+  "cardUpdatedToast": "Card updated",
   "noCard": "No saved card. You add one when you choose Pro.",
   "history": "Payment history",
   "date": "Date",
@@ -102,8 +104,12 @@
   "cancelBody": "You keep Pro until {date}. Then you move to the free Basic plan.",
   "removeCardTitle": "Remove your card?",
   "removeCardBody": "Without a card Pro will not renew; you move to Basic when the current period ends.",
+  "demo": {
+    "title": "Test mode",
+    "body": "Free Pro lasts 1 hour, and Pro renews every day. Pay with the test card {card}, any future date and any CVC. No real money is charged."
+  },
   "mock": {
-    "notice": "Test payment page. In production the Ameriabank page opens here. No real money is charged.",
+    "notice": "Test payment page. On the live site Paddle’s checkout opens instead. No real money is charged.",
     "title": "Pay with a test card",
     "amount": "Amount",
     "pay": "Pay",
@@ -112,12 +118,5 @@
       "renewal_decline": "Pays now, renewals decline",
       "decline": "Declined"
     }
-  },
-  "demo": {
-    "title": "Test mode",
-    "body": "Free Pro lasts 1 hour, and Pro renews every day. Pay with the test card {card}, any future date and any CVC. No real money is charged."
-  },
-  "cardsNotePaddle": "Payments are processed by Paddle, our reseller and merchant of record; we never see your card number.",
-  "updateCard": "Change card",
-  "cardUpdatedToast": "Card updated"
+  }
 }

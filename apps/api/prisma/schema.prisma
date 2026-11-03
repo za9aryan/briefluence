@@ -378,7 +378,7 @@ model Subscription {
   trialEndsAt          DateTime
   currentPeriodEnd     DateTime?
   cancelAtPeriodEnd    Boolean            @default(false)
-  bindingId            String? // Ameriabank card binding (CardHolderID) for recurring charges
+  bindingId            String? // saved card / Paddle subscription id used for renewals
   /// Paddle Billing: the subscription Paddle runs (renewals, retries, cancel) and its customer.
   paddleSubscriptionId String?            @unique
   paddleCustomerId     String?
@@ -397,12 +397,12 @@ model Payment {
   id                String        @id @default(cuid())
   subscriptionId    String
   subscription      Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
-  orderNumber       Int           @unique @default(autoincrement()) // spec+: Ameria OrderID must be an integer
+  orderNumber       Int           @unique @default(autoincrement()) // short running number shown as the order id
   kind              String        @default("checkout") // spec+: "checkout" | "renewal"
   planCode          PlanCode? // spec+: which plan this payment was for
   amount            Int // minor units
   currency          Currency
-  provider          String // "ameriabank" | "mock"
+  provider          String // "paddle" | "mock"
   providerOrderId   String        @unique
   providerPaymentId String?
   status            PaymentStatus @default(PENDING)

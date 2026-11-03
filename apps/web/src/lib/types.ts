@@ -320,7 +320,7 @@ export interface SubscriptionDto {
     nextPlan: PlanDto | null;
   } | null;
   plans: PlanDto[];
-  provider: 'mock' | 'ameriabank' | 'paddle';
+  provider: 'mock' | 'paddle';
   /** Paddle.js settings when Paddle takes the payments. */
   paddle: PaddleClientConfig | null;
 }

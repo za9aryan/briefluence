@@ -51,7 +51,7 @@ test('free Pro days → Basic → upgrade to Pro → renew with the saved card',
     await expect(page.getByText('0 of 10 applications used in the last 30 days.')).toBeVisible();
     await expect(page.getByText('Upgrade to Pro')).toBeVisible();
 
-    // Upgrade to Pro through the (mock) bank page.
+    // Upgrade to Pro through the (mock) payment page.
     await page.getByRole('button', { name: 'Choose Pro', exact: true }).click();
     await page.waitForURL('**/billing/mock-checkout**');
     await page.getByRole('button', { name: 'Pay' }).click();

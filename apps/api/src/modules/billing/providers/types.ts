@@ -6,7 +6,7 @@ export interface CheckoutInput {
   currency: Currency;
   description: string;
   backUrl: string;
-  /** Our identifier for the card binding (Ameria "CardHolderID"); reused for recurring charges. */
+  /** Our identifier for the saved card; reused for recurring charges. */
   cardHolderId: string;
 }
 
@@ -19,7 +19,7 @@ export interface CheckoutResult {
 export interface PaymentOutcome {
   status: 'SUCCEEDED' | 'FAILED' | 'PENDING';
   providerPaymentId?: string;
-  /** Identifier used for future binding charges (we use our CardHolderID). */
+  /** Identifier used for future charges of the saved card. */
   bindingId?: string;
   cardMask?: string;
   failureReason?: string;
@@ -32,7 +32,7 @@ export interface ChargeInput extends Omit<CheckoutInput, 'cardHolderId'> {
 
 /** The spec's provider contract: createCheckout, confirm, chargeBinding, refund (+ removeBinding). */
 export interface PaymentProvider {
-  readonly name: 'ameriabank' | 'mock' | 'paddle';
+  readonly name: 'mock' | 'paddle';
   createCheckout(input: CheckoutInput): Promise<CheckoutResult>;
   /** Server-to-server confirmation; never trust redirect query params. */
   confirm(providerPaymentId: string): Promise<PaymentOutcome>;

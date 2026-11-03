@@ -2,9 +2,9 @@
 export default {
   legal: {
     updated: [
-      'Last updated: 16 October 2026 · Draft',
-      'Обновлено: 16 октября 2026 · Черновик',
-      'Թարմացվել է՝ 2026 թ. հոկտեմբերի 16 · Սևագիր',
+      'Last updated: 3 November 2026 · Draft',
+      'Обновлено: 3 ноября 2026 · Черновик',
+      'Թարմացվել է՝ 2026 թ. նոյեմբերի 3 · Սևագիր',
     ],
     contact: [
       'Questions? Write to support@briefluence.am.',
@@ -58,9 +58,9 @@ export default {
         e: {
           title: ['5. Payments and cancellation', '5. Оплата и отмена', '5. Վճարումը և չեղարկումը'],
           body: [
-            'Payments are processed by Ameriabank. Your card is charged automatically each month. You can cancel any time in Billing; access continues until the end of the paid month. Payments already made are not refunded except where the law requires.',
-            'Платежи обрабатывает Америабанк. Карта списывается автоматически каждый месяц. Отменить можно в любой момент в разделе «Оплата»; доступ сохраняется до конца оплаченного месяца. Уже сделанные платежи не возвращаются, кроме случаев, предусмотренных законом.',
-            'Վճարումները մշակում է Ամերիաբանկը։ Քարտից գումարը գանձվում է ավտոմատ կերպով ամեն ամիս։ Կարող ես չեղարկել ցանկացած պահի «Վճարում» բաժնում․ մուտքը պահպանվում է մինչև վճարված ամսվա ավարտը։ Կատարված վճարումները չեն վերադարձվում, բացառությամբ օրենքով նախատեսված դեպքերի։',
+            'Our order process is conducted by our online reseller Paddle.com. Paddle.com is the merchant of record for all our orders and handles payments, renewals and billing questions; Paddle’s Buyer Terms also apply to your purchase. Your card is charged automatically at the start of each paid period (a month or a year). You can cancel any time in Billing; Pro continues until the end of the paid period. Payments already made are not refunded except where the law requires.',
+            'Заказы оформляет наш онлайн-реселлер Paddle.com. Paddle.com — официальный продавец (merchant of record) по всем нашим заказам: он принимает платежи, проводит продления и отвечает на вопросы об оплате; к покупке также применяются Условия для покупателей Paddle. Карта списывается автоматически в начале каждого оплаченного периода (месяц или год). Отменить можно в любой момент в разделе «Оплата»; Pro сохраняется до конца оплаченного периода. Уже сделанные платежи не возвращаются, кроме случаев, предусмотренных законом.',
+            'Պատվերները ձևակերպում է մեր առցանց վերավաճառողը՝ Paddle.com-ը։ Paddle.com-ը մեր բոլոր պատվերների պաշտոնական վաճառողն է (merchant of record)․ այն ընդունում է վճարումները, կատարում երկարաձգումները և պատասխանում վճարման հարցերին, իսկ գնման վրա տարածվում են նաև Paddle-ի Գնորդի պայմանները։ Քարտից գումարը գանձվում է ավտոմատ կերպով յուրաքանչյուր վճարված ժամկետի սկզբում (ամիս կամ տարի)։ Կարող ես չեղարկել ցանկացած պահի «Վճարում» բաժնում․ Pro-ն պահպանվում է մինչև վճարված ժամկետի ավարտը։ Կատարված վճարումները չեն վերադարձվում, բացառությամբ օրենքով նախատեսված դեպքերի։',
           ],
         },
         f: {
@@ -140,9 +140,9 @@ export default {
         e: {
           title: ['5. Payments', '5. Платежи', '5. Վճարումները'],
           body: [
-            'Card payments are handled by Ameriabank. We never receive or store your full card number; we keep only a masked number and a payment token for renewals.',
-            'Платежи по картам обрабатывает Америабанк. Мы никогда не получаем и не храним полный номер карты — только маскированный номер и платёжный токен для продлений.',
-            'Քարտային վճարումները մշակում է Ամերիաբանկը։ Մենք երբեք չենք ստանում և չենք պահում քարտի ամբողջական համարը․ պահում ենք միայն քողարկված համարը և վճարային թոքենը երկարաձգումների համար։',
+            'Card payments are handled by Paddle.com, our reseller and merchant of record, under its own privacy notice. We never receive or store your full card number; we keep only its last four digits and Paddle’s subscription reference for renewals.',
+            'Платежи по картам обрабатывает Paddle.com — наш реселлер и официальный продавец — по своей политике конфиденциальности. Мы никогда не получаем и не храним полный номер карты — только последние четыре цифры и идентификатор подписки Paddle для продлений.',
+            'Քարտային վճարումները մշակում է Paddle.com-ը՝ մեր վերավաճառողը և պաշտոնական վաճառողը, իր գաղտնիության քաղաքականությանը համապատասխան։ Մենք երբեք չենք ստանում և չենք պահում քարտի ամբողջական համարը․ պահում ենք միայն վերջին չորս թվանշանը և Paddle-ի բաժանորդագրության նույնացուցիչը երկարաձգումների համար։',
           ],
         },
         f: {

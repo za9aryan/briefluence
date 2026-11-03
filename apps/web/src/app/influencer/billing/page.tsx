@@ -289,7 +289,7 @@ export default function BillingPage() {
                     </Text>
                   )}
                 <Text size="small" tone="muted">
-                  {paddle ? t('cardsNotePaddle') : t('cardsNote')}
+                  {t('cardsNote')}
                 </Text>
               </Stack>
             </Card>

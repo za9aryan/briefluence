@@ -680,6 +680,11 @@ export default {
         'Оплата сейчас, а платный период начнётся после бесплатных дней.',
         'Վճարում ես հիմա, իսկ վճարովի ժամկետը կսկսվի անվճար օրերից հետո։',
       ],
+      payNowNote: [
+        'You pay now and your paid period starts today.',
+        'Ты платишь сейчас, и оплаченный период начинается сегодня.',
+        'Վճարում ես հիմա, և վճարված ժամկետը սկսվում է այսօր։',
+      ],
       started: [
         'Your 30 free Pro days have started',
         '30 бесплатных дней Pro начались',
@@ -751,9 +756,9 @@ export default {
       'Վճարումն ստացվել է։ Pro-ն միացված է։',
     ],
     pendingToast: [
-      'The bank is still processing the payment.',
-      'Банк ещё обрабатывает платёж.',
-      'Բանկը դեռ մշակում է վճարումը։',
+      'The payment is still being processed.',
+      'Платёж ещё обрабатывается.',
+      'Վճարումը դեռ մշակվում է։',
     ],
     failedToast: ['The payment did not go through.', 'Платёж не прошёл.', 'Վճարումը չանցավ։'],
     title: ['Plan & billing', 'Тариф и оплата', 'Փաթեթ և վճարում'],
@@ -863,13 +868,15 @@ export default {
       'Քարտը հեռացված է։ Pro-ն չի երկարաձգվի։',
     ],
     cardsNote: [
-      'Visa, Mastercard and ArCa. Payments are processed by Ameriabank; we never see your card number.',
-      'Visa, Mastercard и ArCa. Платежи обрабатывает Америабанк, номер карты мы не видим.',
-      'Visa, Mastercard և ArCa։ Վճարումները մշակում է Ամերիաբանկը, մենք չենք տեսնում քարտի համարը։',
+      'Payments are processed by Paddle, our reseller and merchant of record; we never see your card number.',
+      'Платежи обрабатывает Paddle — наш реселлер и официальный продавец; номер твоей карты мы не видим.',
+      'Վճարումները մշակում է Paddle-ը՝ մեր վերավաճառողը և պաշտոնական վաճառողը, մենք երբեք չենք տեսնում քո քարտի համարը։',
     ],
     card: ['Card', 'Карта', 'Քարտ'],
     nextCharge: ['Next charge on {date}', 'Следующее списание {date}', 'Հաջորդ գանձումը՝ {date}'],
     removeCard: ['Remove card', 'Удалить карту', 'Հեռացնել քարտը'],
+    updateCard: ['Change card', 'Сменить карту', 'Փոխել քարտը'],
+    cardUpdatedToast: ['Card updated', 'Карта обновлена', 'Քարտը թարմացվեց'],
     noCard: [
       'No saved card. You add one when you choose Pro.',
       'Карта не сохранена. Ты добавишь её, когда выберешь Pro.',
@@ -896,13 +903,21 @@ export default {
     removeCardBody: [
       'Without a card Pro will not renew; you move to Basic when the current period ends.',
       'Без карты Pro не продлится; после текущего периода ты перейдёшь на Basic.',
-      'Առանց քարտի Pro-ն չի երկարաձգվի․ ընթացիկ ժամկետից հետո կանցնես Basic-ին։',
+      'Պահված քարտ չկա։ Կավելացնես այն, երբ ընտրես Pro։',
     ],
+    demo: {
+      title: ['Test mode', 'Тестовый режим', 'Թեստային ռեժիմ'],
+      body: [
+        'Free Pro lasts 1 hour, and Pro renews every day. Pay with the test card {card}, any future date and any CVC. No real money is charged.',
+        'Бесплатный Pro длится 1 час, а Pro продлевается каждый день. Плати тестовой картой {card}, любая будущая дата и любой CVC. Настоящие деньги не списываются.',
+        'Անվճար Pro-ն տևում է 1 ժամ, իսկ Pro-ն երկարաձգվում է ամեն օր։ Վճարիր {card} թեստային քարտով, ցանկացած ապագա ամսաթիվ և ցանկացած CVC։ Իրական գումար չի գանձվում։',
+      ],
+    },
     mock: {
       notice: [
-        'Test payment page. In production the Ameriabank page opens here. No real money is charged.',
-        'Тестовая страница оплаты. В рабочей версии здесь откроется страница Америабанка. Реальные деньги не списываются.',
-        'Թեստային վճարման էջ։ Աշխատանքային տարբերակում այստեղ կբացվի Ամերիաբանկի էջը։ Իրական գումար չի գանձվում։',
+        'Test payment page. On the live site Paddle’s checkout opens instead. No real money is charged.',
+        'Тестовая страница оплаты. На рабочем сайте вместо неё откроется оплата Paddle. Реальные деньги не списываются.',
+        'Թեստային վճարման էջ։ Աշխատանքային կայքում դրա փոխարեն կբացվի Paddle-ի վճարումը։ Իրական գումար չի գանձվում։',
       ],
       title: ['Pay with a test card', 'Оплата тестовой картой', 'Վճարում թեստային քարտով'],
       amount: ['Amount', 'Сумма', 'Գումար'],

@@ -104,7 +104,8 @@ export const envSchema = z
     APPLE_KEY_ID: optional,
     APPLE_PRIVATE_KEY: optional, // contents of the .p8 key (newlines as \\n are fine)
 
-    PAYMENT_PROVIDER: z.enum(['mock', 'ameriabank', 'paddle']).default('mock'),
+    /** `mock` = the fake payment page (local dev and tests); `paddle` = real checkout. */
+    PAYMENT_PROVIDER: z.enum(['mock', 'paddle']).default('mock'),
     /**
      * Paddle Billing (https://developer.paddle.com). Sandbox and live are separate accounts with
      * their own keys and prices; PADDLE_ENV picks the set. Sandbox = demo mode: 1 hour of free Pro,
@@ -125,15 +126,6 @@ export const envSchema = z
     PADDLE_LIVE_PRICE_YEARLY: optional,
     /** Staging / early launch: allow simulated social login and payments with NODE_ENV=production. */
     ALLOW_MOCKS_IN_PRODUCTION: bool,
-    AMERIA_TEST_MODE: z
-      .enum(['true', 'false', '1', '0', ''])
-      .default('true')
-      .transform((v) => v === 'true' || v === '1'),
-    AMERIA_CLIENT_ID: optional,
-    AMERIA_USERNAME: optional,
-    AMERIA_PASSWORD: optional,
-    AMERIA_ORDER_ID_OFFSET: z.coerce.number().int().min(0).default(0),
-    AMERIA_BINDING_PAYMENT_TYPE: z.coerce.number().int().default(6),
 
     SENTRY_DSN: optional,
 
@@ -178,12 +170,6 @@ export const envSchema = z
           path: ['PADDLE_SANDBOX_PRICE_DEMO'],
           message: 'Set the demo or monthly price',
         });
-    }
-    if (e.PAYMENT_PROVIDER === 'ameriabank') {
-      need(
-        ['AMERIA_CLIENT_ID', 'AMERIA_USERNAME', 'AMERIA_PASSWORD'],
-        'PAYMENT_PROVIDER=ameriabank',
-      );
     }
     const real = (p: Platform) => !e.SOCIAL_MOCK.includes(p);
     if (real('INSTAGRAM'))

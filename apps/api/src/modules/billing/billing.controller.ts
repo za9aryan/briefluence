@@ -112,7 +112,7 @@ export class BillingController {
     return this.billing.choosePlan(user.id, body.plan);
   }
 
-  /** Pays for a Pro plan (monthly or yearly) on the bank page. */
+  /** Pays for a Pro plan (monthly or yearly): Paddle checkout settings, or the fake page's URL. */
   @Roles('INFLUENCER')
   @Post('checkout')
   @HttpCode(200)
@@ -121,7 +121,7 @@ export class BillingController {
     return this.billing.checkout(user.id, body.plan);
   }
 
-  /** Bank redirect target. Public because the access cookie may expire while the user is on the bank page. */
+  /** Redirect target of the fake payment page. Public because the access cookie may expire meanwhile. */
   @Public()
   @Get('return')
   async return(@Query('paymentID') paymentId: string | undefined, @Res() res: Response) {
@@ -171,7 +171,7 @@ export class BillingController {
     return this.billing.payments(user.id);
   }
 
-  /** Fake bank page callback; only exists with PAYMENT_PROVIDER=mock. */
+  /** Fake payment page callback; only exists with PAYMENT_PROVIDER=mock. */
   @Roles('INFLUENCER')
   @Post('mock/complete')
   @HttpCode(200)

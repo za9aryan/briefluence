@@ -4,7 +4,7 @@
 
 1. Work one phase at a time, in order. At the end of each phase run lint, typecheck and tests; fix everything before moving on.
 2. Before choosing between two approaches that change the architecture, list the options with pros and cons and wait for the owner's choice.
-3. Never invent third-party API fields, scopes or endpoints. Read the current official docs for Meta, TikTok, Google and Ameriabank first and link them in code comments.
+3. Never invent third-party API fields, scopes or endpoints. Read the current official docs for Meta, TikTok, Google and Paddle first and link them in code comments.
 4. Secrets only in env variables; social tokens encrypted at rest; never log tokens, passwords or card data.
 5. Validate every input with shared Zod schemas on both web and API; return typed errors.
 6. Every endpoint checks the role and ownership (a brand can only touch its own deals and applicants).

@@ -52,7 +52,7 @@ envVarGroups:
       # Exchange rates
       - key: RATES_SOURCE
         value: cba
-      # Social login + payments. Until the Meta/TikTok/Google apps and Ameriabank are approved,
+      # Social login + payments. Until the Meta/TikTok/Google apps and Paddle are approved,
       # keep the simulated versions on; set ALLOW_MOCKS_IN_PRODUCTION=false once real keys are in.
       - key: ALLOW_MOCKS_IN_PRODUCTION
         value: "true"
@@ -82,13 +82,20 @@ envVarGroups:
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
-      - key: AMERIA_TEST_MODE
-        value: "true"
-      - key: AMERIA_CLIENT_ID
+      # Paddle (docs/paddle.md): PAYMENT_PROVIDER=paddle + PADDLE_ENV=sandbox|production + its keys
+      - key: PADDLE_ENV
+        value: sandbox
+      - key: PADDLE_SANDBOX_API_KEY
         sync: false
-      - key: AMERIA_USERNAME
+      - key: PADDLE_SANDBOX_CLIENT_TOKEN
         sync: false
-      - key: AMERIA_PASSWORD
+      - key: PADDLE_SANDBOX_WEBHOOK_SECRET
+        sync: false
+      - key: PADDLE_SANDBOX_PRICE_DEMO
+        sync: false
+      - key: PADDLE_SANDBOX_PRICE_MONTHLY
+        sync: false
+      - key: PADDLE_SANDBOX_PRICE_YEARLY
         sync: false
 
 services:
