@@ -35,7 +35,7 @@ test('continue with Google from the login page creates an account, then logs bac
   await page.goto('/login');
   await viaGoogle();
   await page.waitForURL('**/signup/complete**');
-  await page.getByRole('radio', { name: /Brand/ }).click();
+  await page.getByRole('radio', { name: /Company/ }).click();
   await page.getByRole('checkbox', { name: /I accept the/ }).check();
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.waitForURL('**/brand/**');

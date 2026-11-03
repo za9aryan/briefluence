@@ -13,19 +13,26 @@ export class BrandsService {
 
   async requireMine(userId: string) {
     const brand = await this.getMine(userId);
-    if (!brand) throw new AppError('PROFILE_INCOMPLETE', 'Create your brand profile first');
+    if (!brand) throw new AppError('PROFILE_INCOMPLETE', 'Create your company profile first');
     return brand;
   }
 
   upsertMine(userId: string, data: BrandProfileData) {
-    return this.prisma.brandProfile.upsert({ where: { userId }, create: { userId, ...data }, update: data });
+    return this.prisma.brandProfile.upsert({
+      where: { userId },
+      create: { userId, ...data },
+      update: data,
+    });
   }
 
   /** Public brand card for influencers; contact person is revealed per application, not here. */
   async getPublic(id: string) {
     const b = await this.prisma.brandProfile.findUnique({
       where: { id },
-      include: { user: { select: { blockedAt: true } }, _count: { select: { deals: { where: { status: { not: 'DRAFT' } } } } } },
+      include: {
+        user: { select: { blockedAt: true } },
+        _count: { select: { deals: { where: { status: { not: 'DRAFT' } } } } },
+      },
     });
     if (!b || b.user.blockedAt) throw notFound('Brand');
     return {
@@ -46,8 +53,12 @@ export class BrandsService {
     const since = new Date(Date.now() - 7 * 86_400_000);
     const [byStatus, newApplicants, pendingReview, recent] = await Promise.all([
       this.prisma.deal.groupBy({ by: ['status'], where: { brandId: brand.id }, _count: true }),
-      this.prisma.application.count({ where: { deal: { brandId: brand.id }, createdAt: { gte: since } } }),
-      this.prisma.application.count({ where: { deal: { brandId: brand.id }, status: { in: ['APPLIED', 'VIEWED'] } } }),
+      this.prisma.application.count({
+        where: { deal: { brandId: brand.id }, createdAt: { gte: since } },
+      }),
+      this.prisma.application.count({
+        where: { deal: { brandId: brand.id }, status: { in: ['APPLIED', 'VIEWED'] } },
+      }),
       this.prisma.application.findMany({
         where: { deal: { brandId: brand.id } },
         orderBy: { createdAt: 'desc' },

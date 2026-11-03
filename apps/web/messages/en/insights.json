@@ -1,6 +1,6 @@
 {
-  "title": "What bloggers are looking for",
-  "lead": "What verified bloggers are interested in right now. Shape your next brief around it.",
+  "title": "What influencers are looking for",
+  "lead": "What verified influencers are interested in right now. Shape your next brief around it.",
   "period": "Period",
   "lastDays": "Last {count} days",
   "total": "Total",
@@ -11,43 +11,43 @@
   "empty": "No activity in this period yet.",
   "kpi": {
     "searches": "Interest",
-    "bloggers": "Active bloggers",
+    "bloggers": "Active influencers",
     "ofVerified": "of {count} verified",
     "topFormat": "Top format",
     "topNiche": "Top niche"
   },
   "perDay": {
     "title": "Interest per day",
-    "subtitle": "How active bloggers are."
+    "subtitle": "How active influencers are."
   },
   "platforms": {
     "title": "Platforms",
-    "subtitle": "Platforms bloggers are interested in."
+    "subtitle": "Platforms influencers are interested in."
   },
   "payment": {
     "title": "Money or barter",
-    "subtitle": "Compensation bloggers are interested in."
+    "subtitle": "Compensation influencers are interested in."
   },
   "collaboration": {
     "title": "Short-term or long-term",
-    "subtitle": "Collaboration bloggers are interested in."
+    "subtitle": "Collaboration influencers are interested in."
   },
   "niches": {
     "title": "Niches",
-    "subtitle": "Topics bloggers are interested in."
+    "subtitle": "Topics influencers are interested in."
   },
   "budget": {
     "title": "Budget",
-    "subtitle": "Budgets bloggers are interested in, AMD.",
+    "subtitle": "Budgets influencers are interested in, AMD.",
     "note": "Only collaborations paid with money are counted."
   },
   "cities": {
     "title": "Cities",
-    "subtitle": "Where bloggers want to collaborate."
+    "subtitle": "Where influencers want to collaborate."
   },
   "formats": {
     "title": "Content formats",
-    "subtitle": "Formats bloggers are interested in."
+    "subtitle": "Formats influencers are interested in."
   },
-  "privacy": "Anonymous totals across all verified bloggers; one action can count in several categories."
+  "privacy": "Anonymous totals across all verified influencers; one action can count in several categories."
 }

@@ -74,21 +74,21 @@ test('sign-up → verify → apply → accept → done', async ({ browser }) => 
   await admin.getByRole('button', { name: 'Log in' }).click();
   // Admins land on the overview dashboard.
   await admin.waitForURL('**/admin/overview');
-  await expect(admin.getByText('Bloggers by plan')).toBeVisible();
+  await expect(admin.getByText('Influencers by plan')).toBeVisible();
   await admin.goto('/admin/verifications');
   const card = admin
     .locator('div', { hasText: bloggerEmail })
     .filter({ has: admin.getByRole('button', { name: 'Approve' }) })
     .last();
   await card.getByRole('button', { name: 'Approve' }).click();
-  await expect(seen(admin, 'Approved. The blogger got an email.')).toBeVisible();
+  await expect(seen(admin, 'Approved. The influencer got an email.')).toBeVisible();
 
   // ── Brand: sign up, verify, profile, post a brief ──
   const brand = await (await newCtx()).newPage();
   await signupViaUi(brand, 'BRAND', brandEmail);
   await verifyEmailViaLink(brand, brandEmail);
   await brand.goto('/brand/onboarding');
-  await brand.getByLabel('Brand name').fill(`E2E Cafe ${id}`);
+  await brand.getByLabel('Company name').fill(`E2E Cafe ${id}`);
   await brand.getByLabel('Contact person').fill('Karen');
   await brand.getByLabel('Contact method').selectOption('TELEGRAM');
   await brand.getByLabel('Username or phone').fill('@e2e_cafe');
@@ -102,7 +102,7 @@ test('sign-up → verify → apply → accept → done', async ({ browser }) => 
   await brand.getByRole('button', { name: 'Next', exact: true }).click();
   await expect(brand.getByText('Matching now')).toBeVisible();
   await brand.getByRole('button', { name: 'Next', exact: true }).click();
-  await brand.getByLabel('What the blogger gets').fill('Dinner for two');
+  await brand.getByLabel('What the influencer gets').fill('Dinner for two');
   await brand.getByRole('button', { name: 'Next', exact: true }).click();
   await brand.getByRole('button', { name: 'Publish', exact: true }).click();
   await brand.waitForURL('**/applicants**');
@@ -115,7 +115,7 @@ test('sign-up → verify → apply → accept → done', async ({ browser }) => 
     .filter({ has: admin.getByRole('button', { name: 'Approve and publish' }) })
     .last();
   await briefCard.getByRole('button', { name: 'Approve and publish' }).click();
-  await expect(seen(admin, 'Brief is live. The brand got a notification.')).toBeVisible();
+  await expect(seen(admin, 'Brief is live. The company got a notification.')).toBeVisible();
 
   // ── Blogger applies from the feed ──
   await blogger.goto('/influencer/deals');

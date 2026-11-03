@@ -48,7 +48,7 @@ for (const [name, ua, steps] of [
     });
     const page = await ctx.newPage();
     await signupViaUi(page, 'BRAND', `pwa-${uid()}@e2e.test`);
-    await page.getByLabel('Brand name').fill('PWA Cafe');
+    await page.getByLabel('Company name').fill('PWA Cafe');
     await page.getByLabel('Contact person').fill('Karen');
     await page.getByLabel('Contact method').selectOption('WHATSAPP');
     await page.getByLabel('Phone number').fill('+374 91 222333');
@@ -71,7 +71,7 @@ test('phones get a reminder banner; desktop gets neither the banner nor the card
 }) => {
   const brandSetup = async (page: import('@playwright/test').Page) => {
     await signupViaUi(page, 'BRAND', `pwa-${uid()}@e2e.test`);
-    await page.getByLabel('Brand name').fill('PWA Cafe');
+    await page.getByLabel('Company name').fill('PWA Cafe');
     await page.getByLabel('Contact person').fill('Karen');
     await page.getByLabel('Contact method').selectOption('WHATSAPP');
     await page.getByLabel('Phone number').fill('+374 91 222333');

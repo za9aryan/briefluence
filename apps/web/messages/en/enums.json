@@ -1,7 +1,7 @@
 {
   "role": {
-    "INFLUENCER": "Blogger",
-    "BRAND": "Brand",
+    "INFLUENCER": "Influencer",
+    "BRAND": "Company",
     "ADMIN": "Admin"
   },
   "platform": {
@@ -71,7 +71,7 @@
     "REVIEW": "Review or unboxing",
     "GIVEAWAY": "Giveaway",
     "EVENT": "Event visit",
-    "UGC": "Content for the brand (UGC)"
+    "UGC": "Content for the company (UGC)"
   },
   "dealStatus": {
     "DRAFT": "Draft",

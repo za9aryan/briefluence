@@ -14,17 +14,17 @@ export default {
     terms: {
       title: ['Terms of service', 'Условия использования', 'Օգտագործման պայմաններ'],
       intro: [
-        'These terms govern your use of briefluence, a marketplace that connects brands that publish promo briefs with bloggers who apply to them. By creating an account you agree to them.',
-        'Эти условия регулируют использование briefluence — маркетплейса, где бренды публикуют промо-брифы, а блогеры на них откликаются. Создавая аккаунт, ты соглашаешься с ними.',
-        'Այս պայմանները կարգավորում են briefluence-ի օգտագործումը․ այն հարթակ է, որտեղ բրենդները հրապարակում են պրոմո բրիֆներ, իսկ բլոգերները դիմում են դրանց։ Հաշիվ ստեղծելով՝ համաձայնում ես դրանց։',
+        'These terms govern your use of briefluence, a marketplace that connects companies that publish promo briefs with influencers who apply to them. By creating an account you agree to them.',
+        'Эти условия регулируют использование briefluence — маркетплейса, где компании публикуют промо-брифы, а инфлюенсеры на них откликаются. Создавая аккаунт, ты соглашаешься с ними.',
+        'Այս պայմանները կարգավորում են briefluence-ի օգտագործումը․ այն հարթակ է, որտեղ ընկերությունները հրապարակում են պրոմո բրիֆներ, իսկ ինֆլյուենսերները դիմում են դրանց։ Հաշիվ ստեղծելով՝ համաձայնում ես դրանց։',
       ],
       sections: {
         a: {
           title: ['1. The service', '1. Сервис', '1. Ծառայությունը'],
           body: [
-            'We provide the platform; collaborations are agreed directly between the brand and the blogger. We are not a party to those agreements and do not guarantee results, payment or publication.',
-            'Мы предоставляем платформу; о сотрудничестве бренд и блогер договариваются напрямую. Мы не являемся стороной этих договорённостей и не гарантируем результат, оплату или публикацию.',
-            'Մենք տրամադրում ենք հարթակը, իսկ համագործակցության շուրջ բրենդը և բլոգերը պայմանավորվում են ուղղակիորեն։ Մենք այդ պայմանավորվածությունների կողմ չենք և չենք երաշխավորում արդյունք, վճարում կամ հրապարակում։',
+            'We provide the platform; collaborations are agreed directly between the company and the influencer. We are not a party to those agreements and do not guarantee results, payment or publication.',
+            'Мы предоставляем платформу; о сотрудничестве компания и инфлюенсер договариваются напрямую. Мы не являемся стороной этих договорённостей и не гарантируем результат, оплату или публикацию.',
+            'Մենք տրամադրում ենք հարթակը, իսկ համագործակցության շուրջ ընկերությունը և ինֆլյուենսերը պայմանավորվում են ուղղակիորեն։ Մենք այդ պայմանավորվածությունների կողմ չենք և չենք երաշխավորում արդյունք, վճարում կամ հրապարակում։',
           ],
         },
         b: {
@@ -36,18 +36,18 @@ export default {
           ],
         },
         c: {
-          title: ['3. Brands', '3. Бренды', '3. Բրենդները'],
+          title: ['3. Companies', '3. Компании', '3. Ընկերությունները'],
           body: [
-            'Posting briefs is free. Briefs must describe a real, lawful product or service and the actual compensation. Contacts of a blogger may be used only for the accepted collaboration.',
-            'Размещение брифов бесплатно. Бриф должен описывать реальный и законный продукт или услугу и реальное вознаграждение. Контакты блогера можно использовать только для принятого сотрудничества.',
-            'Բրիֆների տեղադրումն անվճար է։ Բրիֆը պետք է նկարագրի իրական և օրինական ապրանք կամ ծառայություն և իրական վարձատրություն։ Բլոգերի կոնտակտները կարելի է օգտագործել միայն ընդունված համագործակցության համար։',
+            'Posting briefs is free. Briefs must describe a real, lawful product or service and the actual compensation. Contacts of an influencer may be used only for the accepted collaboration.',
+            'Размещение брифов бесплатно. Бриф должен описывать реальный и законный продукт или услугу и реальное вознаграждение. Контакты инфлюенсера можно использовать только для принятого сотрудничества.',
+            'Բրիֆների տեղադրումն անվճար է։ Բրիֆը պետք է նկարագրի իրական և օրինական ապրանք կամ ծառայություն և իրական վարձատրություն։ Ինֆլյուենսերի կոնտակտները կարելի է օգտագործել միայն ընդունված համագործակցության համար։',
           ],
         },
         d: {
           title: [
-            '4. Bloggers and subscription',
-            '4. Блогеры и подписка',
-            '4. Բլոգերները և բաժանորդագրությունը',
+            '4. Influencers and subscription',
+            '4. Инфлюенсеры и подписка',
+            '4. Ինֆլյուենսերները և բաժանորդագրությունը',
           ],
           body: [
             'Applying requires a verified profile and an active plan. Plans and their prices are shown in your account before you choose one; a paid plan renews at the shown price until you cancel.',
@@ -104,9 +104,9 @@ export default {
         a: {
           title: ['1. What we collect', '1. Что мы собираем', '1. Ինչ ենք հավաքում'],
           body: [
-            'Account data (email, password hash), profile data you enter (name, city, gender, birth year, niches, languages, contacts) and, for brands, company details.',
-            'Данные аккаунта (email, хэш пароля), данные профиля, которые ты вводишь (имя, город, пол, год рождения, ниши, языки, контакты), а для брендов — данные компании.',
-            'Հաշվի տվյալներ (էլ. փոստ, գաղտնաբառի հեշ), քո մուտքագրած պրոֆիլի տվյալներ (անուն, քաղաք, սեռ, ծննդյան տարի, նիշաներ, լեզուներ, կոնտակտներ), իսկ բրենդների համար՝ ընկերության տվյալներ։',
+            'Account data (email, password hash), profile data you enter (name, city, gender, birth year, niches, languages, contacts) and, for companies, company details.',
+            'Данные аккаунта (email, хэш пароля), данные профиля, которые ты вводишь (имя, город, пол, год рождения, ниши, языки, контакты), а для компаний — данные компании.',
+            'Հաշվի տվյալներ (էլ. փոստ, գաղտնաբառի հեշ), քո մուտքագրած պրոֆիլի տվյալներ (անուն, քաղաք, սեռ, ծննդյան տարի, նիշաներ, լեզուներ, կոնտակտներ), իսկ ընկերությունների համար՝ ընկերության տվյալներ։',
           ],
         },
         b: {
@@ -124,17 +124,17 @@ export default {
         c: {
           title: ['3. How we use it', '3. Как мы их используем', '3. Ինչպես ենք օգտագործում'],
           body: [
-            'To verify bloggers, match them with briefs, show statistics to brands, send notifications and process subscriptions. We do not sell personal data.',
-            'Чтобы проверять блогеров, подбирать им брифы, показывать статистику брендам, отправлять уведомления и обрабатывать подписки. Мы не продаём персональные данные.',
-            'Բլոգերներին ստուգելու, նրանց համար բրիֆներ ընտրելու, բրենդներին վիճակագրություն ցույց տալու, ծանուցումներ ուղարկելու և բաժանորդագրությունները մշակելու համար։ Մենք անձնական տվյալներ չենք վաճառում։',
+            'To verify influencers, match them with briefs, show statistics to companies, send notifications and process subscriptions. We do not sell personal data.',
+            'Чтобы проверять инфлюенсеров, подбирать им брифы, показывать статистику компаниям, отправлять уведомления и обрабатывать подписки. Мы не продаём персональные данные.',
+            'Ինֆլյուենսերներին ստուգելու, նրանց համար բրիֆներ ընտրելու, ընկերություններին վիճակագրություն ցույց տալու, ծանուցումներ ուղարկելու և բաժանորդագրությունները մշակելու համար։ Մենք անձնական տվյալներ չենք վաճառում։',
           ],
         },
         d: {
           title: ['4. Who sees what', '4. Кто что видит', '4. Ով ինչ է տեսնում'],
           body: [
-            'Brands see a verified blogger’s public profile and statistics. Contact details are shared only between a brand and a blogger after the brand accepts the application.',
-            'Бренды видят публичный профиль и статистику проверенного блогера. Контакты открываются только бренду и блогеру после того, как бренд примет заявку.',
-            'Բրենդները տեսնում են ստուգված բլոգերի հանրային պրոֆիլը և վիճակագրությունը։ Կոնտակտները բացվում են միայն բրենդի և բլոգերի համար՝ բրենդի կողմից հայտն ընդունելուց հետո։',
+            'Companies see a verified influencer’s public profile and statistics. Contact details are shared only between a company and an influencer after the company accepts the application.',
+            'Компании видят публичный профиль и статистику проверенного инфлюенсера. Контакты открываются только компании и инфлюенсеру после того, как компания примет заявку.',
+            'Ընկերությունները տեսնում են ստուգված ինֆլյուենսերի հանրային պրոֆիլը և վիճակագրությունը։ Կոնտակտները բացվում են միայն ընկերության և ինֆլյուենսերի համար՝ ընկերության կողմից հայտն ընդունելուց հետո։',
           ],
         },
         e: {

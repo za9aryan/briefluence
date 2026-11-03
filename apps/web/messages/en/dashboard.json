@@ -1,7 +1,7 @@
 {
   "hello": "Hi, {name}",
   "influencerLead": "Here is what is happening with your collabs.",
-  "brandLead": "Your briefs and the bloggers who replied.",
+  "brandLead": "Your briefs and the influencers who replied.",
   "match": "Match",
   "verify": {
     "DRAFT": {
@@ -40,6 +40,6 @@
     "recent": "Latest applicants",
     "noApplicants": "No applicants yet.",
     "firstTitle": "Post your first brief",
-    "firstBody": "Describe the task, choose who you want, and see how many verified bloggers match."
+    "firstBody": "Describe the task, choose who you want, and see how many verified influencers match."
   }
 }

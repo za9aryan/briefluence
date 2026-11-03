@@ -1,14 +1,14 @@
 {
   "match": "Match",
-  "wanted": "{count, plural, one {# blogger wanted} other {# bloggers wanted}}",
+  "wanted": "{count, plural, one {# influencer wanted} other {# influencers wanted}}",
   "deadline": "Until {date}",
   "applicants": "{count, plural, =0 {no applicants yet} one {# applicant} other {# applicants}}",
   "confidential": {
-    "name": "Confidential brand",
-    "note": "The brand keeps its name private for business reasons. You'll see who it is once they accept you."
+    "name": "Confidential company",
+    "note": "The company keeps its name private for business reasons. You'll see who it is once they accept you."
   },
   "views": "{count, plural, one {# view} other {# views}}",
-  "viewsHint": "How many bloggers opened this brief",
+  "viewsHint": "How many influencers opened this brief",
   "feedTitle": "Briefs for you",
   "filters": {
     "platform": "Platform",
@@ -17,7 +17,7 @@
     "city": "City",
     "collaboration": "Collaboration",
     "budgetMin": "Minimum budget",
-    "budgetHint": "In AMD, per blogger."
+    "budgetHint": "In AMD, per influencer."
   },
   "sort": {
     "label": "Sort",
@@ -41,8 +41,8 @@
     "pitchHint": "Why you and what you will post. Short and concrete works best.",
     "pitchPlaceholder": "Hi! I post about coffee spots in Yerevan; I can do a Reels with…",
     "price": "Your price",
-    "priceHint": "Leave empty to accept the brand budget.",
-    "contactsNote": "Your contacts stay hidden until the brand accepts you."
+    "priceHint": "Leave empty to accept the company budget.",
+    "contactsNote": "Your contacts stay hidden until the company accepts you."
   },
   "withdrawn": "Application withdrawn",
   "backToFeed": "All briefs",
@@ -54,8 +54,8 @@
     "engagement": "Engagement",
     "niches": "Niches",
     "languages": "Languages",
-    "bloggerGender": "Blogger gender",
-    "bloggerAge": "Blogger age",
+    "bloggerGender": "Influencer gender",
+    "bloggerAge": "Influencer age",
     "audienceGender": "Audience",
     "audienceAge": "Audience age",
     "audienceCountry": "Audience country"
@@ -76,7 +76,7 @@
   "closed": "This brief no longer takes applications.",
   "noEligibleAccount": "None of your connected accounts fits this brief.",
   "website": "Website",
-  "appliedToast": "Application sent. The brand will see it right away.",
+  "appliedToast": "Application sent. The company will see it right away.",
   "paywall": {
     "title": "Basic limit reached",
     "headline": "Unlimited applications with Pro",

@@ -28,8 +28,8 @@
       "unlimited": "Unlimited applications",
       "cancel": "Cancel any time",
       "yearly": "One payment for 12 months",
-      "offers": "{count, plural, one {# live offer for brands} other {# live offers for brands}}",
-      "offersUnlimited": "Unlimited offers for brands"
+      "offers": "{count, plural, one {# live offer for companies} other {# live offers for companies}}",
+      "offersUnlimited": "Unlimited offers for companies"
     },
     "chooseBasic": "Start with Basic",
     "choosePro": "Choose Pro",
@@ -43,7 +43,7 @@
     "title": "Two steps to see briefs",
     "lead": "Briefs open as soon as both are done.",
     "offersTitle": "Two steps to post offers",
-    "offersLead": "You can post offers for brands as soon as both are done.",
+    "offersLead": "You can post offers for companies as soon as both are done.",
     "planTitle": "Choose your plan",
     "planBody": "Start with free Basic or go Pro.",
     "planDone": "Done.",

@@ -10,7 +10,7 @@
   },
   "basics": {
     "title": "What is the task?",
-    "hint": "Bloggers decide in seconds — be concrete."
+    "hint": "Influencers decide in seconds — be concrete."
   },
   "fields": {
     "title": "Title",
@@ -23,10 +23,10 @@
     "niches": "Niches",
     "collaboration": "Collaboration",
     "collaborationHint": "One promo, or an ongoing partnership.",
-    "confidential": "Hide our brand from bloggers",
-    "confidentialHint": "Bloggers see the brief without your name, logo or links. We show them only to bloggers you accept.",
-    "confidentialShort": "Brand visibility",
-    "confidentialOn": "Hidden until you accept a blogger",
+    "confidential": "Hide our company from influencers",
+    "confidentialHint": "Influencers see the brief without your name, logo or links. We show them only to influencers you accept.",
+    "confidentialShort": "Company visibility",
+    "confidentialOn": "Hidden until you accept an influencer",
     "confidentialOff": "Visible",
     "countries": "Country",
     "cities": "City",
@@ -35,8 +35,8 @@
     "maxFollowers": "To",
     "minEngagement": "Minimum engagement",
     "minEngagementHint": "Lower engagement still sees the brief but gets a lower match.",
-    "bloggerGender": "Blogger gender",
-    "bloggerAge": "Blogger age",
+    "bloggerGender": "Influencer gender",
+    "bloggerAge": "Influencer age",
     "audienceGender": "Audience is mostly",
     "audienceAge": "Audience age",
     "audienceCountry": "Audience mainly from",
@@ -47,10 +47,10 @@
     "budgetMin": "Budget from",
     "budgetMax": "Budget to",
     "currency": "Currency",
-    "barterDescription": "What the blogger gets",
+    "barterDescription": "What the influencer gets",
     "barterHint": "For example: dinner for two, a skincare set.",
     "barterValue": "Approximate value",
-    "slots": "Bloggers needed",
+    "slots": "Influencers needed",
     "slotsHint": "The brief closes when this many are accepted.",
     "deadline": "Applications until",
     "publishBy": "Post by"
@@ -58,28 +58,28 @@
   "targeting": {
     "where": "Where",
     "size": "Audience size",
-    "sizeHint": "Followers on the platform the blogger applies with.",
-    "blogger": "The blogger",
+    "sizeHint": "Followers on the platform the influencer applies with.",
+    "blogger": "The influencer",
     "audience": "Their audience",
-    "audienceHint": "Used for the match score, not to hide bloggers."
+    "audienceHint": "Used for the match score, not to hide influencers."
   },
   "compensation": {
     "money": "Budget",
-    "perBlogger": "Per blogger.",
+    "perBlogger": "Per influencer.",
     "barter": "Barter",
     "timing": "Places and dates"
   },
   "reachLabel": "Matching now",
-  "reachValue": "{count, plural, one {# verified blogger} other {# verified bloggers}}",
+  "reachValue": "{count, plural, one {# verified influencer} other {# verified influencers}}",
   "reachZero": "Try fewer filters or a wider audience size.",
-  "reachHint": "Counts verified bloggers who pass the location, platform, followers, gender and age filters.",
+  "reachHint": "Counts verified influencers who pass the location, platform, followers, gender and age filters.",
   "saveDraft": "Save draft",
   "publish": "Publish",
   "sendForReview": "Send for review",
   "sendAgain": "Send again",
-  "reviewHint": "We check every brief before bloggers see it, usually within a day.",
+  "reviewHint": "We check every brief before influencers see it, usually within a day.",
   "review": {
-    "inReview": "In review. We check every brief before bloggers see it, usually within a day. You can still edit it.",
+    "inReview": "In review. We check every brief before influencers see it, usually within a day. You can still edit it.",
     "rejected": "Needs changes: {reason}",
     "fix": "Edit and send again"
   },
@@ -92,7 +92,7 @@
   "listTitle": "Briefs",
   "listLead": "Everything you posted, with applicants.",
   "emptyTitle": "No briefs here",
-  "emptyBody": "Post a brief and bloggers who fit will see it today.",
+  "emptyBody": "Post a brief and influencers who fit will see it today.",
   "until": "until {date}",
   "applicantsCount": "{count, plural, one {# applicant} other {# applicants}}",
   "newCount": "{count} new",

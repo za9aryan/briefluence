@@ -90,7 +90,7 @@ test('portfolio + FAQ: blogger adds work → admin approves → brand sees it an
   await signupViaUi(brand, 'BRAND', brandEmail);
   await verifyEmailViaLink(brand, brandEmail);
   await brand.goto('/brand/onboarding');
-  await brand.getByLabel('Brand name').fill(`Portfolio Cafe ${id}`);
+  await brand.getByLabel('Company name').fill(`Portfolio Cafe ${id}`);
   await brand.getByLabel('Contact person').fill('Karen');
   await brand.getByLabel('Contact method').selectOption('WHATSAPP');
   await brand.getByLabel('Phone number').fill('+374 91 222333');
@@ -143,7 +143,7 @@ test('portfolio + FAQ: blogger adds work → admin approves → brand sees it an
   await brand.getByText('Who is your audience?').click();
   await expect(brand.getByText('Women 20–30 in Yerevan who love food')).toBeVisible();
   // Unanswered questions stay hidden.
-  await expect(brand.getByText('What brands have you worked with?')).toHaveCount(0);
+  await expect(brand.getByText('What companies have you worked with?')).toHaveCount(0);
   await expect(brand.getByRole('link', { name: 'instagram.com' })).toBeVisible();
   if (shots) await brand.screenshot({ path: `${shots}/brand.png`, fullPage: true });
 

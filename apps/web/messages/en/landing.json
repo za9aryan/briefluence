@@ -1,12 +1,12 @@
 {
   "hero": {
     "badge": "Now in Armenia",
-    "title": "Brands post briefs. Bloggers reply.",
-    "lead": "Brands publish promo briefs for free. Active bloggers with 5k–100k followers see the ones that fit them and apply — for money or barter.",
+    "title": "Companies post briefs. Influencers reply.",
+    "lead": "Companies publish promo briefs for free. Active influencers with 5k–100k followers see the ones that fit them and apply — for money or barter.",
     "ctaBrand": "Post a brief for free",
-    "ctaInfluencer": "I'm a blogger",
+    "ctaInfluencer": "I'm an influencer",
     "points": {
-      "free": "Free for brands",
+      "free": "Free for companies",
       "verified": "Stats from official APIs",
       "local": "Made for Armenia"
     }
@@ -15,11 +15,11 @@
     "barter": "Barter",
     "meta": "Yerevan · 2 days ago",
     "title": "Dinner for two for a Reels",
-    "subtitle": "A cafe in the center is looking for 3 bloggers, 5k+ followers",
+    "subtitle": "A cafe in the center is looking for 3 influencers, 5k+ followers",
     "city": "Yerevan",
     "match": "Match",
     "apply": "Apply",
-    "accepted": "Your application is approved — the brand expects the post by Friday"
+    "accepted": "Your application is approved — the company expects the post by Friday"
   },
   "how": {
     "eyebrow": "How it works",
@@ -27,43 +27,43 @@
     "lead": "No agencies, no screenshots of follower counts.",
     "steps": {
       "post": {
-        "title": "A brand posts a brief",
-        "body": "Country, city, audience size, age, gender, money or barter — as precise as the brand needs."
+        "title": "A company posts a brief",
+        "body": "Country, city, audience size, age, gender, money or barter — as precise as the company needs."
       },
       "match": {
         "title": "You see what fits you",
         "body": "Your feed shows only briefs you qualify for, each with a 0–100 match score. Apply with a short pitch."
       },
       "accept": {
-        "title": "The brand says yes",
+        "title": "The company says yes",
         "body": "Once you're accepted, you both see each other's contacts. Not before."
       },
       "publish": {
         "title": "You agree directly",
-        "body": "Talk to the brand directly, agree on content, dates and payment, and the brand marks the collab as done."
+        "body": "Talk to the company directly, agree on content, dates and payment, and the company marks the collab as done."
       }
     }
   },
   "audiences": {
     "brands": {
-      "badge": "For brands",
-      "title": "Find bloggers whose audience is your customer",
+      "badge": "For companies",
+      "title": "Find influencers whose audience is your customer",
       "points": {
         "a": "Post as many briefs as you like — free.",
         "b": "See real followers, engagement and audience before you say yes.",
-        "c": "A live counter shows how many verified bloggers match your brief."
+        "c": "A live counter shows how many verified influencers match your brief."
       },
-      "more": "How it works for brands"
+      "more": "How it works for companies"
     },
     "influencers": {
-      "badge": "For bloggers",
+      "badge": "For influencers",
       "title": "Collabs that fit you, not spam in your DMs",
       "points": {
         "a": "A feed of briefs you actually qualify for, best matches first.",
         "b": "Money, barter or both — you choose. Models who work for barter are welcome.",
-        "c": "Talk to brands directly once they accept you."
+        "c": "Talk to companies directly once they accept you."
       },
-      "more": "How it works for bloggers"
+      "more": "How it works for influencers"
     }
   },
   "trust": {
@@ -71,11 +71,11 @@
     "title": "Every number here is real",
     "oauth": {
       "title": "Official APIs only",
-      "body": "Bloggers connect Instagram, TikTok and YouTube through the official login. Followers and engagement come straight from the platform."
+      "body": "Influencers connect Instagram, TikTok and YouTube through the official login. Followers and engagement come straight from the platform."
     },
     "review": {
       "title": "Checked by people",
-      "body": "We review every blogger profile before it can apply. Brands see a Verified badge and links to the real accounts."
+      "body": "We review every influencer profile before it can apply. Companies see a Verified badge and links to the real accounts."
     },
     "match": {
       "title": "A fair match score",
@@ -84,19 +84,19 @@
   },
   "cta": {
     "title": "Your next collab starts with a brief",
-    "lead": "Create a free brand account and post your first brief in five minutes."
+    "lead": "Create a free company account and post your first brief in five minutes."
   },
   "brands": {
     "title": "Influencer marketing without guesswork",
-    "lead": "Post a brief, see how many verified bloggers match it, and choose by real numbers.",
+    "lead": "Post a brief, see how many verified influencers match it, and choose by real numbers.",
     "features": {
       "targeting": {
         "title": "Precise targeting",
-        "body": "Country, city, platform, followers, engagement, blogger and audience gender and age, content language."
+        "body": "Country, city, platform, followers, engagement, influencer and audience gender and age, content language."
       },
       "reach": {
         "title": "Reach before you post",
-        "body": "The brief form shows a live count of verified bloggers who match your filters."
+        "body": "The brief form shows a live count of verified influencers who match your filters."
       },
       "applicants": {
         "title": "Compare applicants",
@@ -104,19 +104,19 @@
       },
       "contacts": {
         "title": "Talk directly",
-        "body": "Accept a blogger and you both get each other's contacts. No middlemen, no commission."
+        "body": "Accept an influencer and you both get each other's contacts. No middlemen, no commission."
       }
     },
-    "cta": "Create a brand account",
+    "cta": "Create a company account",
     "stats": {
-      "title": "Why brands work with bloggers",
+      "title": "Why companies work with influencers",
       "lead": "Numbers from industry research on influencer marketing.",
       "note": "Results vary by product, audience and campaign. These are external studies, not briefluence results.",
       "items": {
         "roi": {
           "value": "$5.78",
-          "label": "average return brands report for every $1 spent on influencer marketing",
-          "source": "Influencer Marketing Hub, brand survey"
+          "label": "average return companies report for every $1 spent on influencer marketing",
+          "source": "Influencer Marketing Hub, company survey"
         },
         "buy": {
           "value": "86%",
@@ -141,25 +141,25 @@
       },
       "verified": {
         "title": "Verified badge",
-        "body": "Your stats come from official APIs, so brands trust them — and you."
+        "body": "Your stats come from official APIs, so companies trust them — and you."
       },
       "track": {
         "title": "Track every application",
         "body": "Applied, viewed, shortlisted, accepted — you always know where you stand."
       },
       "direct": {
-        "title": "Talk to brands directly",
-        "body": "Once a brand accepts you, you get its contacts and agree on the details yourselves."
+        "title": "Talk to companies directly",
+        "body": "Once a company accepts you, you get its contacts and agree on the details yourselves."
       }
     },
-    "cta": "Create a blogger account",
+    "cta": "Create an influencer account",
     "funnel": {
       "eyebrow": "Less busywork",
-      "title": "Brands come to you",
-      "lead": "Working with brands on your own means hunting for them, sending your media kit and waiting for replies, again and again. Here brands post what they need, and briefs that fit you show up in your feed.",
+      "title": "Companies come to you",
+      "lead": "Working with companies on your own means hunting for them, sending your media kit and waiting for replies, again and again. Here companies post what they need, and briefs that fit you show up in your feed.",
       "chores": {
-        "find": "Find brands",
-        "dm": "DM brands",
+        "find": "Find companies",
+        "dm": "DM companies",
         "kit": "Send media kit",
         "wait": "Wait for replies",
         "prove": "Prove your numbers",
@@ -168,20 +168,20 @@
       "points": {
         "feed": "Briefs you qualify for land in your feed, with a match score.",
         "budget": "Every brief shows the budget or the barter up front.",
-        "offers": "Post your services and let brands send you requests."
+        "offers": "Post your services and let companies send you requests."
       },
-      "cta": "Create a blogger account"
+      "cta": "Create an influencer account"
     },
     "earn": {
       "title": "Two ways to earn",
-      "lead": "Apply to briefs from brands, or put up your own services and let brands come to you.",
+      "lead": "Apply to briefs from companies, or put up your own services and let companies come to you.",
       "briefs": {
         "title": "Apply to briefs",
         "body": "Pick a brief that fits, write a short pitch and follow its status."
       },
       "offers": {
         "title": "Post your services",
-        "body": "Say what you do and for how much. Brands send requests, and you accept the ones you like."
+        "body": "Say what you do and for how much. Companies send requests, and you accept the ones you like."
       },
       "brief": {
         "type": "Paid",
@@ -210,11 +210,11 @@
       "title": "No catch",
       "commission": {
         "title": "No commission",
-        "body": "Whatever you agree with a brand is yours. We don’t take a cut."
+        "body": "Whatever you agree with a company is yours. We don’t take a cut."
       },
       "private": {
         "title": "Your contacts stay private",
-        "body": "A brand sees how to reach you only after it accepts you."
+        "body": "A company sees how to reach you only after it accepts you."
       },
       "choice": {
         "title": "You decide",
@@ -222,27 +222,27 @@
       }
     },
     "faq": {
-      "title": "Questions bloggers ask",
+      "title": "Questions influencers ask",
       "items": {
         "followers": {
           "q": "How many followers do I need?",
-          "a": "There’s no fixed minimum. Each brand sets its own in the brief, and your feed shows only the briefs you qualify for."
+          "a": "There’s no fixed minimum. Each company sets its own in the brief, and your feed shows only the briefs you qualify for."
         },
         "pay": {
           "q": "Who pays me, and how?",
-          "a": "The brand pays you directly, in money or barter, as the brief says. Payments don’t go through briefluence, and we take no commission."
+          "a": "The company pays you directly, in money or barter, as the brief says. Payments don’t go through briefluence, and we take no commission."
         },
         "plans": {
           "q": "What’s the difference between Basic and Pro?",
-          "a": "Every new blogger gets 30 days of Pro for free. After that Basic stays free, with a limit on applications and live service cards. Pro has no limits."
+          "a": "Every new influencer gets 30 days of Pro for free. After that Basic stays free, with a limit on applications and live service cards. Pro has no limits."
         },
         "review": {
           "q": "Why do you check my profile and accounts?",
-          "a": "So brands can trust what they see. We look at every profile and every added account before it counts. Accounts must be public. This keeps fake accounts out."
+          "a": "So companies can trust what they see. We look at every profile and every added account before it counts. Accounts must be public. This keeps fake accounts out."
         },
         "noReply": {
-          "q": "What if a brand doesn’t reply?",
-          "a": "You see when a brand opens your application. If nothing happens, you can withdraw it any time before it’s accepted and focus on other briefs."
+          "q": "What if a company doesn’t reply?",
+          "a": "You see when a company opens your application. If nothing happens, you can withdraw it any time before it’s accepted and focus on other briefs."
         }
       }
     }
@@ -250,9 +250,9 @@
   "funnel": {
     "eyebrow": "Less busywork",
     "title": "Six chores become one brief",
-    "lead": "Finding bloggers on your own means searching, messaging, checking numbers and haggling, one blogger at a time. Here you post one brief and bloggers who fit come to you.",
+    "lead": "Finding influencers on your own means searching, messaging, checking numbers and haggling, one influencer at a time. Here you post one brief and influencers who fit come to you.",
     "chores": {
-      "search": "Find bloggers",
+      "search": "Find influencers",
       "followers": "Check followers",
       "dm": "DM and wait",
       "screens": "Ask for screenshots",
@@ -260,8 +260,8 @@
       "contacts": "Chase contacts"
     },
     "points": {
-      "verified": "Every blogger is verified before they can apply.",
-      "match": "Only bloggers who match your filters see your brief.",
+      "verified": "Every influencer is verified before they can apply.",
+      "match": "Only influencers who match your filters see your brief.",
       "contacts": "Accept the one you like and you both get each other’s contacts."
     },
     "cta": "Post a brief for free"

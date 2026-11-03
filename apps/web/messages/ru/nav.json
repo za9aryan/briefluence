@@ -1,8 +1,8 @@
 {
   "main": "Основная навигация",
   "menu": "Меню",
-  "forBrands": "Брендам",
-  "forInfluencers": "Блогерам",
+  "forBrands": "Компаниям",
+  "forInfluencers": "Инфлюенсерам",
   "login": "Войти",
   "signup": "Регистрация",
   "logout": "Выйти",
@@ -20,7 +20,7 @@
   "settings": "Настройки",
   "profile": "Профиль",
   "newDeal": "Новый бриф",
-  "brandProfile": "Профиль бренда",
+  "brandProfile": "Профиль компании",
   "notifications": "Уведомления",
   "admin": {
     "overview": "Обзор",
@@ -39,5 +39,5 @@
   "language": "Язык",
   "currency": "Валюта",
   "myOffers": "Мои предложения",
-  "bloggerOffers": "Предложения блогеров"
+  "bloggerOffers": "Предложения инфлюенсеров"
 }

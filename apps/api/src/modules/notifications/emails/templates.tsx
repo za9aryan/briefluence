@@ -113,9 +113,9 @@ export const DIGEST = {
     hy: (n: number) => `Նոր բրիֆներ քեզ համար՝ ${n}`,
   },
   bloggerIntro: {
-    en: 'Brands posted new briefs that fit your profile:',
-    ru: 'Бренды опубликовали новые брифы, которые тебе подходят:',
-    hy: 'Բրենդները հրապարակել են նոր բրիֆներ, որոնք համապատասխանում են քեզ։',
+    en: 'Companies posted new briefs that fit your profile:',
+    ru: 'Компании опубликовали новые брифы, которые тебе подходят:',
+    hy: 'Ընկերությունները հրապարակել են նոր բրիֆներ, որոնք համապատասխանում են քեզ։',
   },
   bloggerCta: { en: 'Open brief feed', ru: 'Открыть ленту брифов', hy: 'Բացել բրիֆների լենտը' },
   brandTitle: {
@@ -124,9 +124,9 @@ export const DIGEST = {
     hy: (n: number) => `Երեկվա նոր դիմորդներ՝ ${n}`,
   },
   brandIntro: {
-    en: 'Bloggers applied to your briefs:',
-    ru: 'Блогеры откликнулись на твои брифы:',
-    hy: 'Բլոգերները դիմել են քո բրիֆներին։',
+    en: 'Influencers applied to your briefs:',
+    ru: 'Инфлюенсеры откликнулись на твои брифы:',
+    hy: 'Ինֆլյուենսերները դիմել են քո բրիֆներին։',
   },
   brandCta: { en: 'Review applicants', ru: 'Смотреть отклики', hy: 'Դիտել դիմորդներին' },
   match: { en: 'Match', ru: 'Совпадение', hy: 'Համընկնում' },

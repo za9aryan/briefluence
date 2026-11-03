@@ -1,8 +1,8 @@
 {
   "main": "Հիմնական նավիգացիա",
   "menu": "Մենյու",
-  "forBrands": "Բրենդներին",
-  "forInfluencers": "Բլոգերներին",
+  "forBrands": "Ընկերություններին",
+  "forInfluencers": "Ինֆլյուենսերներին",
   "login": "Մուտք",
   "signup": "Գրանցում",
   "logout": "Ելք",
@@ -20,7 +20,7 @@
   "settings": "Կարգավորումներ",
   "profile": "Պրոֆիլ",
   "newDeal": "Նոր բրիֆ",
-  "brandProfile": "Բրենդի պրոֆիլ",
+  "brandProfile": "Ընկերության պրոֆիլ",
   "notifications": "Ծանուցումներ",
   "admin": {
     "overview": "Ամփոփում",
@@ -39,5 +39,5 @@
   "language": "Լեզու",
   "currency": "Արժույթ",
   "myOffers": "Իմ առաջարկները",
-  "bloggerOffers": "Բլոգերների առաջարկներ"
+  "bloggerOffers": "Ինֆլյուենսերների առաջարկներ"
 }

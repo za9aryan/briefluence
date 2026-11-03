@@ -179,7 +179,7 @@ test('account sheet leads to Account and Settings on phones', async ({ browser }
   await page.goto('/influencer/account');
   await page.getByRole('link', { name: 'See how it looks' }).click();
   await page.waitForURL('**/influencer/account/preview');
-  await expect(page.getByRole('heading', { name: 'How brands see you' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'How companies see you' })).toBeVisible();
   await expect(seenText(page, 'it appears to them once it’s verified')).toBeVisible();
   await ctx.close();
 });

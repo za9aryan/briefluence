@@ -84,7 +84,7 @@ test('blogger offer → admin approves → brand requests → blogger accepts �
     .last()
     .getByRole('button', { name: 'Approve and publish' })
     .click();
-  await expect(seen(admin, 'Offer is live. The blogger got a notification.')).toBeVisible();
+  await expect(seen(admin, 'Offer is live. The influencer got a notification.')).toBeVisible();
 
   // ── Brand finds it and sends a request ──
   const brand = await newPage();
@@ -92,7 +92,7 @@ test('blogger offer → admin approves → brand requests → blogger accepts �
   await signupViaUi(brand, 'BRAND', brandEmail);
   await verifyEmailViaLink(brand, brandEmail);
   await brand.goto('/brand/onboarding');
-  await brand.getByLabel('Brand name').fill(`Offer Cafe ${id}`);
+  await brand.getByLabel('Company name').fill(`Offer Cafe ${id}`);
   await brand.getByLabel('Contact person').fill('Karen');
   await brand.getByLabel('Contact method').selectOption('WHATSAPP');
   await brand.getByLabel('Phone number').fill('+374 91 222333');
@@ -110,10 +110,10 @@ test('blogger offer → admin approves → brand requests → blogger accepts �
   await expect(brand.getByText('1 view')).toBeVisible();
   await brand.getByRole('button', { name: 'Send request' }).click();
   await brand
-    .getByLabel('Message to the blogger')
+    .getByLabel('Message to the influencer')
     .fill('We would love a story about our new menu next week.');
   await brand.getByRole('dialog').getByRole('button', { name: 'Send request' }).click();
-  await expect(seen(brand, 'Request sent. The blogger will answer here.')).toBeVisible();
+  await expect(seen(brand, 'Request sent. The influencer will answer here.')).toBeVisible();
   // …and so does the name in the side card of the offer page.
   await brand.getByRole('link', { name: 'Offer Blogger' }).click();
   await brand.waitForURL('**/brand/influencers/**');

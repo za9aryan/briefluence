@@ -212,7 +212,7 @@ export class ApplicationsService {
   async withdraw(userId: string, id: string) {
     const app = await this.ownApplication(userId, id);
     if (!canWithdraw(app.status))
-      throw new AppError('INVALID_TRANSITION', 'You can only withdraw before the brand accepts');
+      throw new AppError('INVALID_TRANSITION', 'You can only withdraw before the company accepts');
     return this.prisma.application.update({ where: { id }, data: { status: 'WITHDRAWN' } });
   }
 

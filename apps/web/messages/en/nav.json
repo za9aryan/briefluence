@@ -1,8 +1,8 @@
 {
   "main": "Main navigation",
   "menu": "Menu",
-  "forBrands": "For brands",
-  "forInfluencers": "For bloggers",
+  "forBrands": "For companies",
+  "forInfluencers": "For influencers",
   "login": "Log in",
   "signup": "Sign up",
   "logout": "Log out",
@@ -20,7 +20,7 @@
   "settings": "Settings",
   "profile": "Profile",
   "newDeal": "New brief",
-  "brandProfile": "Brand profile",
+  "brandProfile": "Company profile",
   "notifications": "Notifications",
   "admin": {
     "overview": "Overview",
@@ -39,5 +39,5 @@
   "language": "Language",
   "currency": "Currency",
   "myOffers": "My offers",
-  "bloggerOffers": "Blogger offers"
+  "bloggerOffers": "Influencer offers"
 }

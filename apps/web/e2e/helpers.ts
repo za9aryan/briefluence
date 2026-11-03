@@ -43,7 +43,7 @@ export async function signupViaUi(page: Page, role: 'BRAND' | 'INFLUENCER', emai
   await page.getByRole('checkbox', { name: /I accept the/ }).check();
   await page
     .getByRole('button', {
-      name: role === 'BRAND' ? 'Create brand account' : 'Create blogger account',
+      name: role === 'BRAND' ? 'Create company account' : 'Create influencer account',
     })
     .click();
   await page.waitForURL(role === 'BRAND' ? '**/brand/onboarding' : '**/influencer/onboarding');
