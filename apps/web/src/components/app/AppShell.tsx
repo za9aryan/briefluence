@@ -5,13 +5,14 @@ import { useMutation } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Logo } from '@/components/common/Logo';
 import { api } from '@/lib/api';
 import { HOME_BY_ROLE, useMe, type Me } from '@/lib/hooks/session';
 import { NotificationBell } from './NotificationBell';
 import { UserMenu } from './UserMenu';
 import { AppReminder } from './AppReminder';
+import { MobileDrawer } from './MobileDrawer';
 import { usePushFollowsAccount } from '@/lib/pwa';
 
 interface NavItem {
@@ -163,6 +164,8 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
   const pathname = usePathname();
   const items = useNav(role);
   const [drawer, setDrawer] = useState(false);
+  // The page shrinks toward the middle of what is on screen, not the middle of the whole page.
+  const [origin, setOrigin] = useState('100% 50%');
 
   const needsOnboarding =
     !!me &&
@@ -178,6 +181,7 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
   }, [isLoading, me, role, router, pathname, needsOnboarding]);
 
   useEffect(() => setDrawer(false), [pathname]);
+  const closeDrawer = useCallback(() => setDrawer(false), []);
 
   if (isLoading || !me || me.role !== role || needsOnboarding)
     return <Spinner label={tc('loading')} className="min-h-dvh" />;
@@ -194,7 +198,14 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
         </nav>
       </aside>
 
-      <div className="flex min-w-0 flex-col">
+      <div
+        className={cn(
+          'flex min-w-0 flex-col transition-transform duration-[420ms] ease-[cubic-bezier(0.32,0.72,0,1)] motion-reduce:transition-none',
+          // Only while open: a transform makes a containing block for fixed children.
+          drawer && 'scale-[0.94] lg:scale-100',
+        )}
+        style={drawer ? { transformOrigin: origin } : undefined}
+      >
         <header className="sticky top-0 z-30 border-b border-line bg-surface/90 backdrop-blur">
           <Container size="full" className="flex h-16 items-center justify-between gap-2">
             <div className="flex items-center gap-1 lg:hidden">
@@ -203,7 +214,10 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
                 size="icon"
                 aria-label={t('menu')}
                 aria-expanded={drawer}
-                onClick={() => setDrawer(true)}
+                onClick={() => {
+                  setOrigin(`100% ${window.scrollY + window.innerHeight / 2}px`);
+                  setDrawer(true);
+                }}
               >
                 <Icon name="menu" size="md" />
               </Button>
@@ -225,36 +239,13 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
         </main>
       </div>
 
-      {/* Mobile drawer */}
-      {drawer && (
-        <div
-          className="fixed inset-0 z-50 lg:hidden"
-          role="dialog"
-          aria-modal="true"
-          aria-label={t('menu')}
-        >
-          <button
-            type="button"
-            aria-label={tc('close')}
-            className="absolute inset-0 bg-ink/50"
-            onClick={() => setDrawer(false)}
-          />
-          <nav className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col gap-6 bg-surface-raised p-4 shadow-pop">
-            <div className="flex items-center justify-between">
-              <Logo href={HOME_BY_ROLE[role]} />
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label={tc('close')}
-                onClick={() => setDrawer(false)}
-              >
-                <Icon name="close" size="md" />
-              </Button>
-            </div>
-            <NavLinks items={items} onNavigate={() => setDrawer(false)} />
-          </nav>
-        </div>
-      )}
+      <MobileDrawer
+        open={drawer}
+        onClose={closeDrawer}
+        me={me}
+        home={HOME_BY_ROLE[role]}
+        items={items.map((n) => ({ ...n, active: isActive(pathname, n.href, items) }))}
+      />
     </div>
   );
 }

@@ -19,9 +19,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { PageHeader } from '@/components/app/AppShell';
-import { ApplicationStatusBadge } from '@/components/domain/badges';
-import { useBrandName } from '@/components/domain/BrandIdentity';
 import { DealCard } from '@/components/domain/DealCard';
+import { ApplicationMiniCard } from '@/components/influencer/ApplicationMiniCard';
 import { BriefsChecklist } from '@/components/influencer/StartTrial';
 import { api } from '@/lib/api';
 import { useFormat } from '@/lib/hooks/format';
@@ -45,7 +44,6 @@ export default function InfluencerDashboardPage() {
   const tn = useTranslations('nav');
   const tp = useTranslations('billing.plans');
   const f = useFormat();
-  const brandName = useBrandName();
   const { data: me } = useMe();
   const stats = useQuery({
     queryKey: ['influencer', 'dashboard'],
@@ -141,21 +139,10 @@ export default function InfluencerDashboardPage() {
           }
         />
         {apps.data?.length ? (
-          <ul className="divide-y divide-line">
+          <ul className="flex flex-col gap-3">
             {apps.data.slice(0, 5).map((a) => (
-              <li
-                key={a.id}
-                className="flex flex-col gap-1 py-2 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div className="min-w-0">
-                  <Text weight="bold" truncate>
-                    {a.deal.title}
-                  </Text>
-                  <Text size="small" tone="muted">
-                    {brandName(a.deal.brand)} · {f.relative(a.updatedAt)}
-                  </Text>
-                </div>
-                <ApplicationStatusBadge status={a.status} />
+              <li key={a.id}>
+                <ApplicationMiniCard app={a} />
               </li>
             ))}
           </ul>
