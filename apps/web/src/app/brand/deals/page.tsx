@@ -1,5 +1,5 @@
 'use client';
-import { isDealEditable, type DealStatus } from '@briefluence/shared';
+import { canEditDeal, canReopenDeal, type DealStatus } from '@briefluence/shared';
 import { DealReviewNotice, PUBLISH_LABEL } from '@/components/brand/DealReviewNotice';
 import {
   Badge,
@@ -188,7 +188,7 @@ export default function BrandDealsPage() {
                     >
                       {(close) => (
                         <>
-                          {isDealEditable(d.status) && (
+                          {canEditDeal(d.status) && (
                             <Link
                               href={`/brand/deals/${d.id}/edit`}
                               onClick={close}
@@ -217,6 +217,17 @@ export default function BrandDealsPage() {
                               }}
                             >
                               <Icon name="pause" /> {t('pause')}
+                            </MenuItem>
+                          )}
+                          {canReopenDeal(d.status) && (
+                            <MenuItem
+                              className="min-h-11 px-4 text-small"
+                              onClick={() => {
+                                close();
+                                act.mutate({ id: d.id, action: 'reopen' });
+                              }}
+                            >
+                              <Icon name="refresh" /> {t('reopen')}
                             </MenuItem>
                           )}
                           {['DRAFT', 'IN_REVIEW', 'REJECTED', 'ACTIVE', 'PAUSED'].includes(

@@ -1,5 +1,5 @@
 'use client';
-import { isDealEditable } from '@briefluence/shared';
+import { canEditDeal, canReopenDeal } from '@briefluence/shared';
 import { Alert, Button, Skeleton, Stack, useToast } from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
@@ -27,13 +27,21 @@ export default function EditDealPage() {
     queryKey: ['deal', id],
     queryFn: () => api.get<DealDetailDto>(`/deals/${id}`),
   });
-  const pause = useMutation({
-    mutationFn: () => api.post(`/deals/${id}/pause`),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['deal', id] }),
+  const reopen = useMutation({
+    mutationFn: () => api.post(`/deals/${id}/reopen`),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['deals'] });
+      return qc.invalidateQueries({ queryKey: ['deal', id] });
+    },
+    onError: (e) => toast(errorMessage(e), 'danger'),
   });
 
   if (deal.isLoading || !deal.data) return <Skeleton className="h-[70vh] rounded-card" />;
-  const editable = isDealEditable(deal.data.status);
+  const status = deal.data.status;
+  const editable = canEditDeal(status);
+  const live = status === 'ACTIVE';
+  // Reopened (or long-paused) brief with a past deadline: say what to do first.
+  const needsDate = status === 'PAUSED' && new Date(deal.data.applicationDeadline) <= new Date();
 
   return (
     <Stack gap={6}>
@@ -43,27 +51,25 @@ export default function EditDealPage() {
         description={deal.data.title}
       />
       <DealReviewNotice deal={deal.data} withFixLink={false} />
+      {live && <Alert tone="info">{t('live.banner')}</Alert>}
+      {needsDate && <Alert tone="warning">{t('reopenFlow.needsDate')}</Alert>}
       {!editable ? (
         <Alert
           tone="warning"
           action={
-            deal.data.status === 'ACTIVE' ? (
-              <Button
-                size="sm"
-                variant="secondary"
-                loading={pause.isPending}
-                onClick={() => pause.mutate()}
-              >
-                {t('pauseToEdit')}
+            canReopenDeal(status) ? (
+              <Button size="sm" loading={reopen.isPending} onClick={() => reopen.mutate()}>
+                {t('reopen')}
               </Button>
             ) : undefined
           }
         >
-          {deal.data.status === 'ACTIVE' ? t('activeNotEditable') : t('notEditable')}
+          {canReopenDeal(status) ? t('reopenFlow.lead') : t('notEditable')}
         </Alert>
       ) : (
         <DealWizard
-          key={deal.data.status}
+          key={status}
+          live={live}
           initial={dealToFormValues(deal.data)}
           submitting={submitting}
           serverError={error}
@@ -71,14 +77,17 @@ export default function EditDealPage() {
             setSubmitting(publish ? 'publish' : 'draft');
             setError(null);
             try {
-              await api.patch(`/deals/${id}`, toDealInput(values));
-              if (publish) {
+              const saved = await api.patch<DealDto>(`/deals/${id}`, toDealInput(values));
+              if (live) {
+                // The server decides: still live, or back to review for changed content.
+                toast(saved.status === 'IN_REVIEW' ? t('toast.sentForReview') : t('live.saved'));
+              } else if (publish) {
                 const sent = await api.post<DealDto>(`/deals/${id}/publish`);
                 toast(sent.status === 'IN_REVIEW' ? t('toast.sentForReview') : t('toast.publish'));
               }
               await qc.invalidateQueries({ queryKey: ['deals'] });
               await qc.invalidateQueries({ queryKey: ['deal', id] });
-              router.push(publish ? `/brand/deals/${id}/applicants` : '/brand/deals');
+              router.push(publish || live ? `/brand/deals/${id}/applicants` : '/brand/deals');
             } catch (e) {
               setError(errorMessage(e));
               setSubmitting(null);

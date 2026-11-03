@@ -9,6 +9,7 @@ import type {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { api, ApiError } from '../api';
+import { unlinkPushFromAccount } from '../pwa';
 
 export interface Me {
   id: string;
@@ -76,7 +77,11 @@ export function useLogout() {
   const qc = useQueryClient();
   const router = useRouter();
   return useMutation({
-    mutationFn: () => api.post('/auth/logout'),
+    mutationFn: async () => {
+      // While still signed in, so the server knows whose device this was.
+      await unlinkPushFromAccount();
+      return api.post('/auth/logout');
+    },
     onSettled: () => {
       qc.clear();
       router.replace('/login');

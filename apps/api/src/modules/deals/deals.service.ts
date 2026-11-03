@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   canDealTransition,
+  canReopenDeal,
   convertMinor,
   CURRENCIES,
   TIMEZONE,
@@ -63,10 +64,49 @@ export class DealsService {
 
   async update(userId: string, dealId: string, data: DealData) {
     const deal = await this.ownedDeal(userId, dealId);
+    if (deal.status === 'ACTIVE') return this.updateLive(deal, data);
     if (!isDealEditable(deal.status)) {
-      throw new AppError('DEAL_NOT_EDITABLE', 'Pause the deal before editing it');
+      throw new AppError('DEAL_NOT_EDITABLE', 'Reopen the brief before editing it');
     }
     return this.prisma.deal.update({ where: { id: deal.id }, data });
+  }
+
+  /**
+   * Editing a live brief in place. Deadline, slots and targeting apply right away and it stays
+   * live. If reviewed content changed (title, description, image, formats, payment), it goes back
+   * to review: hidden from new influencers until approved; existing applications stay.
+   */
+  private async updateLive(deal: Deal, data: DealData) {
+    const now = this.clock.now();
+    if (new Date(data.applicationDeadline) <= now)
+      throw new AppError('VALIDATION_FAILED', 'Application deadline must be in the future');
+    const saved = await this.prisma.deal.update({ where: { id: deal.id }, data });
+    if (publishTarget(saved) === 'ACTIVE') return saved;
+    const inReview = await this.prisma.deal.update({
+      where: { id: deal.id },
+      data: { status: 'IN_REVIEW', submittedAt: now },
+    });
+    await this.notifyReviewPending(saved);
+    return inReview;
+  }
+
+  private async notifyReviewPending(deal: Pick<Deal, 'brandId' | 'title'>) {
+    const brand = await this.prisma.brandProfile.findUniqueOrThrow({
+      where: { id: deal.brandId },
+      select: { companyName: true },
+    });
+    await this.notifications.notifyAdmins('DEAL_REVIEW_PENDING', {
+      params: { brand: brand.companyName, deal: deal.title },
+      link: '/admin/brief-review',
+    });
+  }
+
+  /** A closed or expired brief comes back paused, so the company can set a new deadline. */
+  async reopen(userId: string, dealId: string) {
+    const deal = await this.ownedDeal(userId, dealId);
+    if (!canReopenDeal(deal.status))
+      throw new AppError('INVALID_TRANSITION', 'Only closed or expired briefs can be reopened');
+    return this.prisma.deal.update({ where: { id: deal.id }, data: { status: 'PAUSED' } });
   }
 
   /**
@@ -78,14 +118,7 @@ export class DealsService {
     const to = publishTarget(deal);
     if (to === 'ACTIVE') return this.transition(userId, dealId, 'ACTIVE');
     const updated = await this.transition(userId, dealId, 'IN_REVIEW');
-    const brand = await this.prisma.brandProfile.findUniqueOrThrow({
-      where: { id: deal.brandId },
-      select: { companyName: true },
-    });
-    await this.notifications.notifyAdmins('DEAL_REVIEW_PENDING', {
-      params: { brand: brand.companyName, deal: deal.title },
-      link: '/admin/brief-review',
-    });
+    await this.notifyReviewPending(deal);
     return updated;
   }
 

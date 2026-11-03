@@ -6,5 +6,16 @@
 /* Brand fonts are self-hosted by next/font (see app/layout.tsx); point the brand tokens at them. */
 :root {
   --bf-font-display: var(--font-syne), var(--font-manrope), system-ui, sans-serif;
-  --bf-font-sans: var(--font-manrope), var(--font-armenian), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --bf-font-sans:
+    var(--font-manrope), var(--font-armenian), system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/*
+ * Phones: the support chat button (56px, 16px from the bottom) floats over the page. Leave room
+ * under the last content so it never covers buttons or text.
+ */
+@media (max-width: 639px) {
+  body {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
 }

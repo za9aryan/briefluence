@@ -274,17 +274,52 @@ export default {
     resume: ['Resume', 'Возобновить', 'Վերսկսել'],
     pause: ['Pause', 'Пауза', 'Դադար'],
     close: ['Close brief', 'Закрыть бриф', 'Փակել բրիֆը'],
-    pauseToEdit: ['Pause and edit', 'Пауза и редактирование', 'Դադարեցնել և խմբագրել'],
-    activeNotEditable: [
-      'Pause the brief to edit it, so applicants do not see terms change under them.',
-      'Поставь бриф на паузу, чтобы изменить его, — так условия не поменяются у тех, кто уже откликнулся.',
-      'Դադարեցրու բրիֆը՝ խմբագրելու համար, որ պայմանները չփոխվեն արդեն դիմածների համար։',
-    ],
+    reopen: ['Reopen', 'Открыть снова', 'Կրկին բացել'],
     notEditable: [
-      'Closed and expired briefs cannot be edited.',
-      'Закрытые и истёкшие брифы нельзя изменить.',
-      'Փակված և ժամկետանց բրիֆները հնարավոր չէ խմբագրել։',
+      'This brief can’t be edited right now.',
+      'Этот бриф сейчас нельзя изменить.',
+      'Այս բրիֆը հիմա հնարավոր չէ խմբագրել։',
     ],
+    live: {
+      banner: [
+        'This brief is live. Changing the deadline, the number of influencers or who it’s for keeps it live. Changing the title, description, image, formats or payment sends it for a quick review first.',
+        'Бриф опубликован. Если меняешь срок, число инфлюенсеров или целевую аудиторию, он остаётся в ленте. Если меняешь название, описание, изображение, форматы или оплату, сначала он уйдёт на быструю проверку.',
+        'Բրիֆը հրապարակված է։ Ժամկետը, ինֆլյուենսերների քանակը կամ թիրախը փոխելիս այն մնում է լենտում։ Անունը, նկարագրությունը, նկարը, ձևաչափերը կամ վճարումը փոխելիս այն նախ կանցնի արագ ստուգում։',
+      ],
+      save: ['Save changes', 'Сохранить изменения', 'Պահպանել փոփոխությունները'],
+      saveForReview: [
+        'Save and send for review',
+        'Сохранить и отправить на проверку',
+        'Պահպանել և ուղարկել ստուգման',
+      ],
+      note: [
+        'The brief stays live with your changes.',
+        'Бриф останется в ленте с твоими изменениями.',
+        'Բրիֆը կմնա լենտում՝ քո փոփոխություններով։',
+      ],
+      reviewNote: [
+        'You changed what we check, so the brief is hidden from new influencers until it’s approved, usually within a day. Applications you already have stay.',
+        'Ты изменил то, что мы проверяем, поэтому новые инфлюенсеры не увидят бриф, пока его не одобрят, — обычно в течение дня. Полученные отклики сохранятся.',
+        'Դու փոխել ես այն, ինչ մենք ստուգում ենք, ուստի նոր ինֆլյուենսերները չեն տեսնի բրիֆը, մինչև այն հաստատվի՝ սովորաբար մեկ օրվա ընթացքում։ Ստացված դիմումները կպահպանվեն։',
+      ],
+      saved: [
+        'Changes saved. The brief is live.',
+        'Изменения сохранены. Бриф в ленте.',
+        'Փոփոխությունները պահպանված են։ Բրիֆը լենտում է։',
+      ],
+    },
+    reopenFlow: {
+      lead: [
+        'This brief is closed. Reopen it to change the deadline or anything else and publish it again. Applications you already have stay.',
+        'Бриф закрыт. Открой его снова, чтобы изменить срок или что-то ещё и опубликовать заново. Полученные отклики сохранятся.',
+        'Բրիֆը փակված է։ Կրկին բացիր այն՝ ժամկետը կամ այլ բան փոխելու և նորից հրապարակելու համար։ Ստացված դիմումները կպահպանվեն։',
+      ],
+      needsDate: [
+        'Set a new application deadline, then publish. If you only change dates, the number of influencers or targeting, it goes live right away.',
+        'Укажи новый срок приёма откликов и опубликуй. Если меняешь только даты, число инфлюенсеров или аудиторию, бриф сразу появится в ленте.',
+        'Նշիր դիմումների նոր վերջնաժամկետ և հրապարակիր։ Եթե փոխում ես միայն ամսաթվերը, ինֆլյուենսերների քանակը կամ թիրախը, բրիֆն անմիջապես կհայտնվի լենտում։',
+      ],
+    },
     listTitle: ['Briefs', 'Брифы', 'Բրիֆներ'],
     listLead: [
       'Everything you posted, with applicants.',
@@ -326,6 +361,11 @@ export default {
       ],
       pause: ['Brief paused', 'Бриф на паузе', 'Բրիֆը դադարեցված է'],
       close: ['Brief closed', 'Бриф закрыт', 'Բրիֆը փակված է'],
+      reopen: [
+        'Brief reopened. Set a new deadline and publish.',
+        'Бриф снова открыт. Укажи новый срок и опубликуй.',
+        'Բրիֆը կրկին բացված է։ Նշիր նոր ժամկետ և հրապարակիր։',
+      ],
     },
   },
   admin: {

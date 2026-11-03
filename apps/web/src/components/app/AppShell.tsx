@@ -12,6 +12,7 @@ import { HOME_BY_ROLE, useMe, type Me } from '@/lib/hooks/session';
 import { NotificationBell } from './NotificationBell';
 import { UserMenu } from './UserMenu';
 import { AppReminder } from './AppReminder';
+import { usePushFollowsAccount } from '@/lib/pwa';
 
 interface NavItem {
   href: string;
@@ -157,6 +158,7 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
   const t = useTranslations('nav');
   const tc = useTranslations('common');
   const { data: me, isLoading } = useMe();
+  usePushFollowsAccount(me?.id);
   const router = useRouter();
   const pathname = usePathname();
   const items = useNav(role);

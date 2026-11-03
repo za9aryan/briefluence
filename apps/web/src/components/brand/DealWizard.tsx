@@ -6,6 +6,7 @@ import {
   CURRENCY_SYMBOL,
   INFLUENCER_AGE_RANGE,
   dealInputSchema,
+  dealReviewKey,
   type AudienceSizePreset,
   type GenderFilter,
   type PaymentType,
@@ -105,11 +106,14 @@ export function DealWizard({
   submitting,
   serverError,
   onSubmit,
+  live,
 }: {
   initial: DealFormValues;
   submitting: 'draft' | 'publish' | null;
   serverError: string | null;
   onSubmit: (values: DealFormValues, publish: boolean) => void;
+  /** Editing a live brief: one "Save changes" (no draft); says when changes need a review. */
+  live?: boolean;
 }) {
   const t = useTranslations('dealForm');
   const tc = useTranslations('common');
@@ -121,6 +125,28 @@ export function DealWizard({
   const form = useForm<DealFormValues>({ resolver, defaultValues: initial, mode: 'onTouched' });
   const { errors } = form.formState;
   const v = form.watch();
+  // Live brief: changing what an admin checked (title, text, image, formats, payment) needs a
+  // new review; deadline, slots and targeting do not.
+  const reviewKey = (x: DealFormValues) => {
+    try {
+      const d = toDealInput(x);
+      return dealReviewKey({
+        title: d.title ?? '',
+        description: d.description ?? '',
+        imageUrl: d.imageUrl ?? null,
+        contentFormats: d.contentFormats ?? [],
+        paymentType: d.paymentType ?? '',
+        budgetMin: d.budgetMin ?? null,
+        budgetMax: d.budgetMax ?? null,
+        currency: d.currency ?? '',
+        barterDescription: d.barterDescription ?? null,
+        barterValue: d.barterValue ?? null,
+      });
+    } catch {
+      return null; // half-filled form; the server decides on save anyway
+    }
+  };
+  const needsReview = !!live && reviewKey(v) !== reviewKey(initial);
   const [preset, setPreset] = useState<AudienceSizePreset | 'custom' | null>(
     presetOf(initial.minFollowers, initial.maxFollowers),
   );
@@ -781,14 +807,16 @@ export function DealWizard({
             {tc('back')}
           </Button>
           <div className="flex flex-col-reverse gap-2 sm:flex-row">
-            <Button
-              variant="secondary"
-              loading={submitting === 'draft'}
-              disabled={!!submitting}
-              onClick={() => submit(false)}
-            >
-              {t('saveDraft')}
-            </Button>
+            {!live && (
+              <Button
+                variant="secondary"
+                loading={submitting === 'draft'}
+                disabled={!!submitting}
+                onClick={() => submit(false)}
+              >
+                {t('saveDraft')}
+              </Button>
+            )}
             {step < 3 ? (
               <Button iconRight="arrow-right" onClick={next}>
                 {tc('next')}
@@ -799,14 +827,14 @@ export function DealWizard({
                 disabled={!!submitting}
                 onClick={() => submit(true)}
               >
-                {t('publish')}
+                {live ? (needsReview ? t('live.saveForReview') : t('live.save')) : t('publish')}
               </Button>
             )}
           </div>
         </div>
         {step === 3 && (
           <Text size="small" tone="muted" className="sm:text-right">
-            {t('reviewHint')}
+            {live ? (needsReview ? t('live.reviewNote') : t('live.note')) : t('reviewHint')}
           </Text>
         )}
       </Stack>

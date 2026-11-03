@@ -129,14 +129,14 @@ export class JobsService {
     const now = this.clock.now();
     const due = await this.prisma.deal.findMany({
       where: {
-        status: { in: ['ACTIVE', 'PAUSED', 'IN_REVIEW', 'REJECTED'] },
+        status: { in: ['ACTIVE', 'IN_REVIEW', 'REJECTED'] },
         applicationDeadline: { lte: now },
       },
       include: { brand: { select: { userId: true } } },
     });
     for (const d of due.filter((x) => shouldExpire(x, now))) {
       const { count } = await this.prisma.deal.updateMany({
-        where: { id: d.id, status: { in: ['ACTIVE', 'PAUSED', 'IN_REVIEW', 'REJECTED'] } },
+        where: { id: d.id, status: { in: ['ACTIVE', 'IN_REVIEW', 'REJECTED'] } },
         data: { status: 'EXPIRED' },
       });
       if (count) {

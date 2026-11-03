@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { canBrandTransition, canWithdraw, contactsRevealed } from './applications';
 import {
   canDealTransition,
+  canEditDeal,
+  canReopenDeal,
   dealReviewKey,
   exceedsSlots,
   isDealEditable,
@@ -37,6 +39,7 @@ describe('deal lifecycle', () => {
   it('expires active deals after the deadline', () => {
     expect(shouldExpire({ status: 'ACTIVE', applicationDeadline: now }, now)).toBe(true);
     expect(shouldExpire({ status: 'DRAFT', applicationDeadline: now }, now)).toBe(false);
+    expect(shouldExpire({ status: 'PAUSED', applicationDeadline: now }, now)).toBe(false);
   });
   it('tracks slots', () => {
     expect(exceedsSlots(2, 1)).toBe(false);
@@ -51,8 +54,22 @@ describe('deal lifecycle', () => {
     expect(canDealTransition('REJECTED', 'IN_REVIEW')).toBe(true);
     expect(canDealTransition('PAUSED', 'ACTIVE')).toBe(true);
     expect(canDealTransition('CLOSED', 'ACTIVE')).toBe(false);
+    // Reopening: closed / expired come back paused (new deadline), never straight to live.
+    expect(canDealTransition('CLOSED', 'PAUSED')).toBe(true);
+    expect(canDealTransition('EXPIRED', 'PAUSED')).toBe(true);
+    expect(canDealTransition('EXPIRED', 'ACTIVE')).toBe(false);
     expect(isDealEditable('REJECTED')).toBe(true);
     expect(isDealEditable('ACTIVE')).toBe(false);
+  });
+
+  it('live briefs are editable in place; closed / expired ones can be reopened', () => {
+    expect(canEditDeal('ACTIVE')).toBe(true);
+    expect(canEditDeal('PAUSED')).toBe(true);
+    expect(canEditDeal('CLOSED')).toBe(false);
+    expect(isDealEditable('ACTIVE')).toBe(false);
+    expect(canReopenDeal('CLOSED')).toBe(true);
+    expect(canReopenDeal('EXPIRED')).toBe(true);
+    expect(canReopenDeal('ACTIVE')).toBe(false);
   });
 
   describe('review on publish', () => {

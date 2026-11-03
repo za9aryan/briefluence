@@ -267,12 +267,13 @@ describe('marketplace core loop (e2e)', () => {
     await other.agent.get(`${API}/deals/${brand.dealId}/applications`).expect(403);
     await inf.agent.post(`${API}/deals`).send(dealInput()).expect(403);
 
-    // Active deals must be paused before editing.
+    // Someone else can't edit it; the owner can edit a live brief in place (targeting stays live).
+    await other.agent.patch(`${API}/deals/${brand.dealId}`).send(dealInput()).expect(403);
     const edit = await brand.agent
       .patch(`${API}/deals/${brand.dealId}`)
       .send(dealInput())
-      .expect(409);
-    expect(edit.body.error.code).toBe('DEAL_NOT_EDITABLE');
+      .expect(200);
+    expect(edit.body.status).toBe('ACTIVE');
     await brand.agent.post(`${API}/deals/${brand.dealId}/pause`).expect(200);
     await brand.agent
       .patch(`${API}/deals/${brand.dealId}`)

@@ -245,7 +245,7 @@ export default function DealDetailPage() {
 
       {/* Sticky apply bar on phones */}
       {applyButton && (
-        <div className="sticky bottom-0 -mx-4 border-t border-line bg-surface-raised p-4 lg:hidden">
+        <div className="sticky bottom-0 -mx-4 border-t border-line bg-surface-raised p-4 pr-24 lg:hidden sm:pr-4">
           {applyButton}
         </div>
       )}

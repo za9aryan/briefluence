@@ -86,9 +86,20 @@
   "resume": "Resume",
   "pause": "Pause",
   "close": "Close brief",
-  "pauseToEdit": "Pause and edit",
-  "activeNotEditable": "Pause the brief to edit it, so applicants do not see terms change under them.",
-  "notEditable": "Closed and expired briefs cannot be edited.",
+  "reopen": "Reopen",
+  "notEditable": "This brief can’t be edited right now.",
+  "live": {
+    "banner": "This brief is live. Changing the deadline, the number of influencers or who it’s for keeps it live. Changing the title, description, image, formats or payment sends it for a quick review first.",
+    "save": "Save changes",
+    "saveForReview": "Save and send for review",
+    "note": "The brief stays live with your changes.",
+    "reviewNote": "You changed what we check, so the brief is hidden from new influencers until it’s approved, usually within a day. Applications you already have stay.",
+    "saved": "Changes saved. The brief is live."
+  },
+  "reopenFlow": {
+    "lead": "This brief is closed. Reopen it to change the deadline or anything else and publish it again. Applications you already have stay.",
+    "needsDate": "Set a new application deadline, then publish. If you only change dates, the number of influencers or targeting, it goes live right away."
+  },
   "listTitle": "Briefs",
   "listLead": "Everything you posted, with applicants.",
   "emptyTitle": "No briefs here",
@@ -105,6 +116,7 @@
     "publish": "Brief is live",
     "sentForReview": "Sent for review. We will let you know when it is live.",
     "pause": "Brief paused",
-    "close": "Brief closed"
+    "close": "Brief closed",
+    "reopen": "Brief reopened. Set a new deadline and publish."
   }
 }

@@ -3,7 +3,8 @@ import type { DealStatus } from '../enums';
 /**
  * Briefs are moderated: publishing sends a brief to IN_REVIEW; an admin approves it (ACTIVE) or
  * sends it back (REJECTED, editable). A paused brief whose key content is unchanged since the last
- * approval goes straight back to ACTIVE (see publishTarget).
+ * approval goes straight back to ACTIVE (see publishTarget). A closed or expired brief can be
+ * reopened: it becomes PAUSED, so the company can set a new deadline and publish it again.
  */
 const DEAL_TRANSITIONS: Record<DealStatus, DealStatus[]> = {
   DRAFT: ['IN_REVIEW', 'CLOSED'],
@@ -11,19 +12,33 @@ const DEAL_TRANSITIONS: Record<DealStatus, DealStatus[]> = {
   REJECTED: ['IN_REVIEW', 'CLOSED', 'EXPIRED'],
   ACTIVE: ['PAUSED', 'CLOSED', 'EXPIRED'],
   PAUSED: ['ACTIVE', 'IN_REVIEW', 'CLOSED', 'EXPIRED'],
-  CLOSED: [],
-  EXPIRED: [],
+  CLOSED: ['PAUSED'],
+  EXPIRED: ['PAUSED'],
 };
 
 export function canDealTransition(from: DealStatus, to: DealStatus): boolean {
   return DEAL_TRANSITIONS[from].includes(to);
 }
 
-/** Live deals cannot be edited (that would change applicants' terms); pause first. */
+/** Briefs edited in the full editor with "Save draft" / "Publish" (not live). */
 export function isDealEditable(status: DealStatus): boolean {
   return (
     status === 'DRAFT' || status === 'PAUSED' || status === 'IN_REVIEW' || status === 'REJECTED'
   );
+}
+
+/**
+ * The company can change this brief now. A live (ACTIVE) brief is edited in place: changes an
+ * admin does not check stay live; changes to reviewed content send it back to review
+ * (the same check as publishTarget).
+ */
+export function canEditDeal(status: DealStatus): boolean {
+  return isDealEditable(status) || status === 'ACTIVE';
+}
+
+/** A closed or expired brief can come back (as PAUSED) to get a new deadline. */
+export function canReopenDeal(status: DealStatus): boolean {
+  return status === 'CLOSED' || status === 'EXPIRED';
 }
 
 /** Statuses bloggers never see (unless they already applied). */
@@ -72,11 +87,9 @@ export function shouldExpire(
   deal: { status: DealStatus; applicationDeadline: Date },
   now: Date,
 ): boolean {
+  // A paused brief is hidden already; it is not expired, so a reopened one can get a new date.
   return (
-    (deal.status === 'ACTIVE' ||
-      deal.status === 'PAUSED' ||
-      deal.status === 'IN_REVIEW' ||
-      deal.status === 'REJECTED') &&
+    (deal.status === 'ACTIVE' || deal.status === 'IN_REVIEW' || deal.status === 'REJECTED') &&
     deal.applicationDeadline.getTime() <= now.getTime()
   );
 }

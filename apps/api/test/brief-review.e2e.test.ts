@@ -119,4 +119,68 @@ describe('brief review (e2e)', () => {
     );
     expect(await feedTotal(inf.agent)).toBe(0);
   });
+
+  it('live brief: date/slots/targeting edits stay live; content edits go back to review', async () => {
+    const { admin, inf, brand, dealId } = await setup();
+    await brand.agent.post(`${API}/deals/${dealId}/publish`).expect(200);
+    await admin.agent.post(`${API}/admin/deals/${dealId}/approve`).expect(204);
+    expect(await feedTotal(inf.agent)).toBe(1);
+
+    const later = new Date(Date.now() + 20 * 86_400_000).toISOString();
+    const kept = await brand.agent
+      .patch(`${API}/deals/${dealId}`)
+      .send(dealInput({ applicationDeadline: later, slots: 3 }))
+      .expect(200);
+    expect(kept.body).toMatchObject({ status: 'ACTIVE', slots: 3 });
+    expect(await feedTotal(inf.agent)).toBe(1);
+
+    // A deadline in the past is refused while live.
+    await brand.agent
+      .patch(`${API}/deals/${dealId}`)
+      .send(dealInput({ applicationDeadline: new Date(Date.now() - 86_400_000).toISOString() }))
+      .expect(400);
+
+    const changed = await brand.agent
+      .patch(`${API}/deals/${dealId}`)
+      .send(dealInput({ applicationDeadline: later, slots: 3, title: 'Skincare reels, new line' }))
+      .expect(200);
+    expect(changed.body.status).toBe('IN_REVIEW');
+    expect(await feedTotal(inf.agent)).toBe(0);
+    const notes = await admin.agent.get(`${API}/notifications`).expect(200);
+    expect(notes.body.items[0].type).toBe('DEAL_REVIEW_PENDING');
+  });
+
+  it('closed or expired brief can be reopened, given a new deadline and published again', async () => {
+    const { admin, inf, brand, dealId } = await setup();
+    await brand.agent.post(`${API}/deals/${dealId}/publish`).expect(200);
+    await admin.agent.post(`${API}/admin/deals/${dealId}/approve`).expect(204);
+    await brand.agent.post(`${API}/deals/${dealId}/close`).expect(200);
+    await brand.agent.post(`${API}/deals/${dealId}/publish`).expect(409);
+
+    const reopened = await brand.agent.post(`${API}/deals/${dealId}/reopen`).expect(200);
+    expect(reopened.body.status).toBe('PAUSED');
+    await brand.agent.post(`${API}/deals/${dealId}/reopen`).expect(409);
+    // Unchanged content was approved before: publishing goes live without a new review.
+    const live = await brand.agent.post(`${API}/deals/${dealId}/publish`).expect(200);
+    expect(live.body.status).toBe('ACTIVE');
+    expect(await feedTotal(inf.agent)).toBe(1);
+
+    // Expired (deadline passed): reopen, set a new deadline, publish.
+    await ctx.prisma.deal.update({
+      where: { id: dealId },
+      data: { status: 'EXPIRED', applicationDeadline: new Date(Date.now() - 86_400_000) },
+    });
+    await brand.agent.post(`${API}/deals/${dealId}/reopen`).expect(200);
+    await brand.agent.post(`${API}/deals/${dealId}/publish`).expect(400);
+    await brand.agent
+      .patch(`${API}/deals/${dealId}`)
+      .send(dealInput({ applicationDeadline: new Date(Date.now() + 5 * 86_400_000).toISOString() }))
+      .expect(200);
+    expect((await brand.agent.post(`${API}/deals/${dealId}/publish`).expect(200)).body.status).toBe(
+      'ACTIVE',
+    );
+    // Someone else's brief can't be reopened.
+    const other = await signup(ctx, 'BRAND');
+    await other.agent.post(`${API}/deals/${dealId}/reopen`).expect(403);
+  });
 });

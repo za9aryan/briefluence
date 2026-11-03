@@ -91,6 +91,13 @@ export class DealsController {
   }
 
   @Roles('BRAND')
+  @Post(':id/reopen')
+  @HttpCode(200)
+  reopen(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.deals.reopen(user.id, id);
+  }
+
+  @Roles('BRAND')
   @Post(':id/close')
   @HttpCode(200)
   close(@CurrentUser() user: AuthUser, @Param('id') id: string) {

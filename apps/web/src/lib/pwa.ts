@@ -81,6 +81,34 @@ export function useInstall() {
   return { state, prompt };
 }
 
+async function currentSubscription() {
+  if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return null;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return null;
+  const reg = await navigator.serviceWorker.getRegistration().catch(() => undefined);
+  return (await reg?.pushManager.getSubscription().catch(() => null)) ?? null;
+}
+
+/**
+ * Push follows whoever is signed in on this device. Push is saved per account, so after signing
+ * in to another account (or after the server forgot this device) the phone would stay silent
+ * until push was turned on again. If this device already allows notifications, link it now.
+ */
+export function usePushFollowsAccount(userId: string | undefined) {
+  useEffect(() => {
+    if (!userId) return;
+    void currentSubscription().then((sub) =>
+      sub ? api.post('/push/subscriptions', sub.toJSON()).catch(() => undefined) : undefined,
+    );
+  }, [userId]);
+}
+
+/** Before logging out: stop sending this account's pushes to this device. */
+export async function unlinkPushFromAccount() {
+  const sub = await currentSubscription();
+  if (sub)
+    await api.post('/push/subscriptions/remove', { endpoint: sub.endpoint }).catch(() => undefined);
+}
+
 export type PushState =
   | 'loading'
   | 'unavailable' // push not set up on the server

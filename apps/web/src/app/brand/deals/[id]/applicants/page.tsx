@@ -1,5 +1,5 @@
 'use client';
-import { isDealEditable, type ApplicationStatus } from '@briefluence/shared';
+import { canEditDeal, canReopenDeal, type ApplicationStatus } from '@briefluence/shared';
 import { DealReviewNotice, PUBLISH_LABEL } from '@/components/brand/DealReviewNotice';
 import {
   Alert,
@@ -88,7 +88,7 @@ export default function ApplicantsPage() {
           d && (
             <Inline gap={2} wrap>
               <DealStatusBadge status={d.status} />
-              {isDealEditable(d.status) && (
+              {canEditDeal(d.status) && (
                 <Link
                   href={`/brand/deals/${id}/edit`}
                   className={buttonStyles({ variant: 'secondary', size: 'sm' })}
@@ -108,6 +108,15 @@ export default function ApplicantsPage() {
               {['DRAFT', 'PAUSED', 'REJECTED'].includes(d.status) && (
                 <Button size="sm" onClick={() => act.mutate({ id, action: 'publish' })}>
                   {tf(PUBLISH_LABEL[d.status] ?? 'resume')}
+                </Button>
+              )}
+              {canReopenDeal(d.status) && (
+                <Button
+                  size="sm"
+                  loading={act.isPending && act.variables?.action === 'reopen'}
+                  onClick={() => act.mutate({ id, action: 'reopen' })}
+                >
+                  {tf('reopen')}
                 </Button>
               )}
               {['ACTIVE', 'PAUSED', 'IN_REVIEW', 'REJECTED'].includes(d.status) && (
