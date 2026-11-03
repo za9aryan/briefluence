@@ -5,6 +5,7 @@ import { PrismaService } from '../../common/prisma.service';
 import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { QueueService } from '../../queue/queue.service';
+import { RealtimeGateway } from '../../realtime/realtime.gateway';
 
 export const PUSH_JOB = 'push.send';
 /** How long a push service keeps an undelivered message (device offline), in seconds. */
@@ -46,6 +47,7 @@ export class PushService implements OnModuleInit {
     private readonly prisma: PrismaService,
     private readonly queue: QueueService,
     @Inject(ENV) private readonly env: Env,
+    private readonly realtime: RealtimeGateway,
   ) {}
 
   get enabled() {
@@ -97,7 +99,10 @@ export class PushService implements OnModuleInit {
       tag: n.id,
     };
     const json = JSON.stringify(payload);
+    // A device with the app on screen already shows it live (toast, bell): no push there.
+    const onScreen = this.realtime.visibleEndpoints(n.userId);
     for (const s of n.user.pushSubscriptions) {
+      if (onScreen.has(s.endpoint)) continue;
       try {
         await this.sender({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, json);
         await this.prisma.pushSubscription.update({

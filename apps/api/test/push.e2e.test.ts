@@ -1,4 +1,7 @@
+import type { AddressInfo } from 'node:net';
+import { io, type Socket } from 'socket.io-client';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { PRESENCE_TTL_MS, RealtimeGateway } from '../src/realtime/realtime.gateway';
 import { NotificationsService } from '../src/modules/notifications/notifications.service';
 import { PushService } from '../src/modules/notifications/push.service';
 import { API, createTestApp, resetDb, signup, type TestCtx } from './helpers';
@@ -14,8 +17,12 @@ describe('web push (e2e)', () => {
   const sent: { endpoint: string; payload: Record<string, string> }[] = [];
   let gone = new Set<string>();
 
+  let port = 0;
+  const sockets: Socket[] = [];
   beforeAll(async () => {
     ctx = await createTestApp();
+    await ctx.app.listen(0);
+    port = (ctx.app.getHttpServer().address() as AddressInfo).port;
     push = ctx.app.get(PushService);
     push.forceEnabled = true;
     push.sender = async (sub, payload) => {
@@ -24,6 +31,7 @@ describe('web push (e2e)', () => {
     };
   });
   afterAll(async () => {
+    for (const x of sockets) x.close();
     await ctx.app.close();
   });
   beforeEach(async () => {
@@ -100,5 +108,58 @@ describe('web push (e2e)', () => {
     await ctx.prisma.notification.update({ where: { id: n.id }, data: { readAt: new Date() } });
     await ctx.queue.drain();
     expect(sent).toHaveLength(0);
+  });
+
+  it('no push to a device that has the app on screen; it comes back when hidden or stale', async () => {
+    const user = await signup(ctx, 'INFLUENCER');
+    await user.agent.post(`${API}/push/subscriptions`).send(device(1)).expect(204);
+    await user.agent.post(`${API}/push/subscriptions`).send(device(2)).expect(204);
+    const login = await ctx
+      .http()
+      .post(`${API}/auth/login`)
+      .send({ email: user.email, password: 'secret123' })
+      .expect(200);
+    const cookie = (login.headers['set-cookie'] as unknown as string[])
+      .map((c) => c.split(';')[0])
+      .join('; ');
+    const phone = io(`http://localhost:${port}`, {
+      path: '/api/v1/ws',
+      transports: ['websocket'],
+      extraHeaders: { cookie },
+    });
+    sockets.push(phone);
+    await new Promise<void>((resolve, reject) => {
+      phone.on('connect', () => resolve());
+      phone.on('connect_error', reject);
+    });
+    const say = async (visible: boolean, endpoint = device(1).endpoint) => {
+      phone.emit('presence', { visible, endpoint });
+      await new Promise((r) => setTimeout(r, 100));
+    };
+    const notify = async () => {
+      sent.length = 0;
+      await ctx.app.get(NotificationsService).notify(user.id, 'PORTFOLIO_APPROVED', {
+        params: { title: 'Story' },
+        link: '/influencer/account#portfolio',
+      });
+      await ctx.queue.drain();
+      return sent.map((x) => x.endpoint).sort();
+    };
+
+    // Phone (device 1) has the app open: only the other device gets the push.
+    await say(true);
+    expect(await notify()).toEqual([device(2).endpoint]);
+    // Back to the home screen: pushes again.
+    await say(false);
+    expect(await notify()).toEqual([device(1).endpoint, device(2).endpoint]);
+    // On screen, then frozen by the OS without a word: pushes resume after the TTL.
+    await say(true);
+    const gw = ctx.app.get(RealtimeGateway);
+    expect(gw.visibleEndpoints(user.id).has(device(1).endpoint)).toBe(true);
+    expect(gw.visibleEndpoints(user.id, Date.now() + PRESENCE_TTL_MS + 1).size).toBe(0);
+    // Closing the app (socket gone) also ends it.
+    phone.close();
+    await new Promise((r) => setTimeout(r, 150));
+    expect(gw.visibleEndpoints(user.id).size).toBe(0);
   });
 });

@@ -1,6 +1,14 @@
 import { Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { WebSocketGateway, WebSocketServer, type OnGatewayConnection } from '@nestjs/websockets';
+import {
+  ConnectedSocket,
+  MessageBody,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+  type OnGatewayConnection,
+  type OnGatewayDisconnect,
+} from '@nestjs/websockets';
 import type { Server, Socket } from 'socket.io';
 import { COOKIE_ACCESS, type AccessTokenPayload } from '../common/auth-user';
 import { CryptoService } from '../common/crypto.service';
@@ -14,6 +22,20 @@ export const REALTIME_PATH = '/api/v1/ws';
 export const SUPPORT_EVENT = 'support:update';
 /** "Your notifications changed" (a new one, or read elsewhere) — clients reload them. */
 export const NOTIFICATIONS_EVENT = 'notifications:update';
+/** Client → server: "this device is on screen (or not)", with its push endpoint if it has one. */
+export const PRESENCE_EVENT = 'presence';
+/**
+ * A device counts as on screen only if it said so within this time. The app repeats it every 20 s
+ * while visible, so a phone whose app was frozen in the background (iOS keeps the socket open
+ * without telling anyone) gets pushes again within half a minute.
+ */
+export const PRESENCE_TTL_MS = 30_000;
+
+interface Presence {
+  userId: string;
+  endpoint: string;
+  at: number;
+}
 
 function readCookies(header: string | undefined): Record<string, string> {
   const out: Record<string, string> = {};
@@ -31,9 +53,14 @@ function readCookies(header: string | undefined): Record<string, string> {
  * content: clients reload the data over the REST API, which checks permissions.
  */
 @WebSocketGateway({ path: REALTIME_PATH })
-export class RealtimeGateway implements OnGatewayConnection {
+export class RealtimeGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(RealtimeGateway.name);
   @WebSocketServer() server!: Server;
+  /**
+   * Devices with the app on screen, by socket. In memory: one process serves sockets and sends
+   * pushes (PROCESS_ROLE=all). A separate worker would see none and simply push as before.
+   */
+  private readonly onScreen = new Map<string, Presence>();
 
   constructor(
     private readonly jwt: JwtService,
@@ -48,6 +75,7 @@ export class RealtimeGateway implements OnGatewayConnection {
       try {
         const p = await this.jwt.verifyAsync<AccessTokenPayload>(access);
         rooms.push(`user:${p.sub}`);
+        client.data.userId = p.sub;
         if (p.role === 'ADMIN') rooms.push('admins');
       } catch {
         // Expired session: the client reconnects after its next token refresh.
@@ -66,6 +94,30 @@ export class RealtimeGateway implements OnGatewayConnection {
       return;
     }
     await client.join(rooms);
+  }
+
+  handleDisconnect(client: Socket) {
+    this.onScreen.delete(client.id);
+  }
+
+  /** The app reports whether it is visible; only signed-in sockets with a push endpoint count. */
+  @SubscribeMessage(PRESENCE_EVENT)
+  presence(@ConnectedSocket() client: Socket, @MessageBody() body: unknown) {
+    const userId = client.data.userId as string | undefined;
+    const b = (body ?? {}) as { visible?: unknown; endpoint?: unknown };
+    const endpoint =
+      typeof b.endpoint === 'string' && b.endpoint.length <= 2048 ? b.endpoint : null;
+    if (userId && endpoint && b.visible === true)
+      this.onScreen.set(client.id, { userId, endpoint, at: Date.now() });
+    else this.onScreen.delete(client.id);
+  }
+
+  /** Push endpoints of this user's devices that have the app on screen right now. */
+  visibleEndpoints(userId: string, now = Date.now()): Set<string> {
+    const out = new Set<string>();
+    for (const p of this.onScreen.values())
+      if (p.userId === userId && now - p.at < PRESENCE_TTL_MS) out.add(p.endpoint);
+    return out;
   }
 
   /** Tell one user's open tabs and devices that something of theirs changed. */

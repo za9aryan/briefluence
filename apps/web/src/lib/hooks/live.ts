@@ -30,8 +30,37 @@ function connection(): Socket {
     });
     // Signed in, out or refreshed: join the rooms that belong to the new cookies.
     window.addEventListener(SESSION_EVENT, () => reconnectLive());
+    socket.on('connect', () => void reportPresence());
+    document.addEventListener('visibilitychange', () => void reportPresence());
+    // Repeat while on screen: the server stops trusting a report after 30 s, so a phone frozen
+    // in the background (socket still open) gets pushes again.
+    window.setInterval(() => {
+      if (document.visibilityState === 'visible') void reportPresence();
+    }, PRESENCE_EVERY_MS);
   }
   return socket;
+}
+
+const PRESENCE_EVERY_MS = 20_000;
+
+/** This device's push endpoint, if it has push turned on. */
+async function pushEndpoint(): Promise<string | null> {
+  if (!('serviceWorker' in navigator) || !('Notification' in window)) return null;
+  if (Notification.permission !== 'granted') return null;
+  const reg = await navigator.serviceWorker.getRegistration().catch(() => undefined);
+  const sub = await reg?.pushManager.getSubscription().catch(() => null);
+  return sub?.endpoint ?? null;
+}
+
+/**
+ * Tell the server whether the app is on screen here, so it skips the push to this device (the
+ * bell and toasts already show the notification live). Also call after turning push on.
+ */
+export async function reportPresence() {
+  if (!socket?.connected) return;
+  const endpoint = await pushEndpoint();
+  if (!endpoint) return;
+  socket.emit('presence', { visible: document.visibilityState === 'visible', endpoint });
 }
 
 export const LIVE = {

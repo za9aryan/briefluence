@@ -1,6 +1,7 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
 import { api } from './api';
+import { reportPresence } from './hooks/live';
 
 /**
  * PWA helpers: service worker registration, the install prompt (Chrome/Edge/Android) and Web
@@ -174,6 +175,7 @@ export function usePush() {
           applicationServerKey: keyBytes(publicKey),
         }));
       await api.post('/push/subscriptions', sub.toJSON());
+      void reportPresence();
       setState('on');
       return 'on';
     } finally {
