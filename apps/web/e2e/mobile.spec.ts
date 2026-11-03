@@ -153,3 +153,36 @@ test('bell opens the notifications screen on phones', async ({ browser }) => {
   await page.waitForURL(from);
   await ctx.close();
 });
+
+/** Phones: the avatar opens the account sheet; Account and Settings are separate pages. */
+test('account sheet leads to Account and Settings on phones', async ({ browser }) => {
+  const ctx = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+    isMobile: true,
+  });
+  const page = await ctx.newPage();
+  await page
+    .context()
+    .addCookies([{ name: 'NEXT_LOCALE', value: 'en', url: 'http://localhost:3100' }]);
+  await signupViaUi(page, 'INFLUENCER', `sheet-${uid()}@e2e.test`);
+  await page.getByLabel('Name').fill('Sheet Blogger');
+  await page.getByRole('checkbox', { name: 'Food' }).click();
+  await page.getByRole('button', { name: 'Save and continue' }).click();
+  await page.waitForURL('**/influencer/verification');
+  await page.getByRole('button', { name: 'Account' }).click();
+  const sheet = page.getByRole('dialog', { name: 'Sheet Blogger' });
+  await expect(sheet.getByLabel('Language')).toBeVisible();
+  await sheet.getByRole('link', { name: 'Settings' }).click();
+  await page.waitForURL('**/influencer/settings');
+  await expect(page.getByRole('heading', { name: 'Settings', level: 1 })).toBeVisible();
+  await page.goto('/influencer/account');
+  await page.getByRole('link', { name: 'See how it looks' }).click();
+  await page.waitForURL('**/influencer/account/preview');
+  await expect(page.getByRole('heading', { name: 'How brands see you' })).toBeVisible();
+  await expect(seenText(page, 'it appears to them once it’s verified')).toBeVisible();
+  await ctx.close();
+});
+
+const seenText = (page: import('@playwright/test').Page, text: string) =>
+  page.getByText(text, { exact: false }).first();

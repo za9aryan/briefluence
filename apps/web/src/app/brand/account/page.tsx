@@ -1,35 +1,39 @@
 'use client';
-import { Card, CardHeader, Skeleton, Stack, Switch, useToast } from '@briefluence/ui';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button, Card, CardHeader, Modal, Skeleton, Stack, Text, useToast } from '@briefluence/ui';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
 import { BrandProfileForm } from '@/components/brand/BrandProfileForm';
-import { AppInstallCard } from '@/components/app/AppInstallCard';
-import { ChangePasswordCard } from '@/components/forms/ChangePasswordCard';
+import { BrandAboutCard } from '@/components/domain/BrandIdentity';
 import { api } from '@/lib/api';
-import { ME_KEY, useMe } from '@/lib/hooks/session';
+import { ME_KEY } from '@/lib/hooks/session';
 import type { BrandProfileDto } from '@/lib/types';
 
+/** The brand's public side: its profile, and a preview of the card bloggers see on briefs. */
 export default function BrandAccountPage() {
   const t = useTranslations('account');
   const tc = useTranslations('common');
   const toast = useToast();
   const qc = useQueryClient();
-  const { data: me } = useMe();
+  const [preview, setPreview] = useState(false);
   const brand = useQuery({
     queryKey: ['brand', 'me'],
     queryFn: () => api.get<BrandProfileDto>('/brands/me'),
   });
-  const settings = useMutation({
-    mutationFn: (digestEmails: boolean) => api.patch('/auth/settings', { digestEmails }),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ME_KEY });
-      toast(tc('saved'));
-    },
-  });
   return (
     <Stack gap={6}>
-      <PageHeader title={t('title')} description={t('brandLead')} />
+      <PageHeader
+        title={t('title')}
+        description={t('brandLead')}
+        actions={
+          brand.data && (
+            <Button variant="secondary" size="sm" icon="eye" onClick={() => setPreview(true)}>
+              {t('preview')}
+            </Button>
+          )
+        }
+      />
       <Card>
         <CardHeader title={t('profile')} />
         {brand.isLoading ? (
@@ -46,18 +50,23 @@ export default function BrandAccountPage() {
           />
         )}
       </Card>
-      <Card>
-        <CardHeader title={t('notifications')} />
-        <Switch
-          checked={me?.digestEmails ?? true}
-          disabled={settings.isPending}
-          onChange={(v) => settings.mutate(v)}
-          label={t('digest')}
-          description={t('digestHint')}
-        />
-      </Card>
-      <AppInstallCard />
-      <ChangePasswordCard />
+      <Modal
+        open={preview}
+        onClose={() => setPreview(false)}
+        title={t('previewBrandTitle')}
+        size="sm"
+        closeLabel={tc('close')}
+      >
+        {brand.data && (
+          <Stack gap={4}>
+            <Text size="small" tone="muted">
+              {t('previewBrandNote')}
+            </Text>
+            {/* Exactly the card on a brief: the saved profile, not unsaved edits. */}
+            <BrandAboutCard brand={brand.data} />
+          </Stack>
+        )}
+      </Modal>
     </Stack>
   );
 }

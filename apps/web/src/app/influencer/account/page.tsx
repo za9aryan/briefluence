@@ -1,37 +1,40 @@
 'use client';
-import { Card, CardHeader, Skeleton, Stack, Switch, useToast } from '@briefluence/ui';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Card, CardHeader, Icon, Skeleton, Stack, buttonStyles, useToast } from '@briefluence/ui';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import { PageHeader } from '@/components/app/AppShell';
-import { AppInstallCard } from '@/components/app/AppInstallCard';
-import { ChangePasswordCard } from '@/components/forms/ChangePasswordCard';
 import { InfluencerProfileForm } from '@/components/influencer/ProfileForm';
 import { FaqCard, PortfolioCard } from '@/components/influencer/PortfolioSettings';
 import { api } from '@/lib/api';
-import { ME_KEY, useMe } from '@/lib/hooks/session';
+import { ME_KEY } from '@/lib/hooks/session';
 import type { InfluencerProfileDto } from '@/lib/types';
 
+/** The blogger's public side: profile, portfolio, FAQ, and a preview of how brands see it. */
 export default function InfluencerAccountPage() {
   const t = useTranslations('account');
   const tc = useTranslations('common');
   const toast = useToast();
   const qc = useQueryClient();
-  const { data: me } = useMe();
   const profile = useQuery({
     queryKey: ['influencer', 'me'],
     queryFn: () => api.get<InfluencerProfileDto>('/influencers/me'),
   });
-  const settings = useMutation({
-    mutationFn: (digestEmails: boolean) => api.patch('/auth/settings', { digestEmails }),
-    onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ME_KEY });
-      toast(tc('saved'));
-    },
-  });
 
   return (
     <Stack gap={6}>
-      <PageHeader title={t('title')} description={t('influencerLead')} />
+      <PageHeader
+        title={t('title')}
+        description={t('influencerLead')}
+        actions={
+          <Link
+            href="/influencer/account/preview"
+            className={buttonStyles({ variant: 'secondary', size: 'sm' })}
+          >
+            <Icon name="eye" /> {t('preview')}
+          </Link>
+        }
+      />
       <Card>
         <CardHeader title={t('profile')} />
         {profile.isLoading ? (
@@ -43,6 +46,7 @@ export default function InfluencerAccountPage() {
             onSaved={(p) => {
               qc.setQueryData(['influencer', 'me'], p);
               void qc.invalidateQueries({ queryKey: ME_KEY });
+              void qc.invalidateQueries({ queryKey: ['influencer', 'preview'] });
               toast(tc('saved'));
             }}
           />
@@ -54,18 +58,6 @@ export default function InfluencerAccountPage() {
           <FaqCard profile={profile.data} />
         </>
       )}
-      <Card>
-        <CardHeader title={t('notifications')} />
-        <Switch
-          checked={me?.digestEmails ?? true}
-          disabled={settings.isPending}
-          onChange={(v) => settings.mutate(v)}
-          label={t('digest')}
-          description={t('digestHint')}
-        />
-      </Card>
-      <AppInstallCard />
-      <ChangePasswordCard />
     </Stack>
   );
 }

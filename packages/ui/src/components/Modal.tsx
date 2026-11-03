@@ -1,6 +1,7 @@
 'use client';
 import {
   useEffect,
+  useId,
   useRef,
   useState,
   type PointerEvent,
@@ -84,6 +85,9 @@ export function Modal({
   // Content stays mounted while the panel slides out, then unmounts (so forms reset as before).
   const [mounted, setMounted] = useState(open);
   const dragHandlers = useDragToClose(ref, onClose);
+  // Screen readers announce the dialog by its title (and description).
+  const titleId = useId();
+  const descId = useId();
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
@@ -100,6 +104,8 @@ export function Modal({
   return (
     <dialog
       ref={ref}
+      aria-labelledby={titleId}
+      aria-describedby={description ? descId : undefined}
       onClose={onClose}
       onClick={(e) => {
         if (e.target === ref.current) onClose();
@@ -118,11 +124,11 @@ export function Modal({
             </div>
             <div className="flex items-start justify-between gap-4 border-b border-line px-5 pb-4 pt-2 sm:px-6 sm:pt-4">
               <div>
-                <Heading level={2} size="h2">
+                <Heading level={2} size="h2" id={titleId}>
                   {title}
                 </Heading>
                 {description && (
-                  <Text tone="muted" className="mt-1">
+                  <Text tone="muted" className="mt-1" id={descId}>
                     {description}
                   </Text>
                 )}

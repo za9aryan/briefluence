@@ -29,7 +29,8 @@ function useNav(role: Role): NavItem[] {
       { href: '/influencer/offers', label: t('myOffers'), icon: 'sparkles' },
       { href: '/influencer/verification', label: t('verification'), icon: 'verified' },
       { href: '/influencer/billing', label: t('billing'), icon: 'card' },
-      { href: '/influencer/account', label: t('settings'), icon: 'settings' },
+      { href: '/influencer/account', label: t('account'), icon: 'user' },
+      { href: '/influencer/settings', label: t('settings'), icon: 'settings' },
     ];
   }
   if (role === 'BRAND') {
@@ -40,6 +41,7 @@ function useNav(role: Role): NavItem[] {
       { href: '/brand/offers', label: t('bloggerOffers'), icon: 'sparkles' },
       { href: '/brand/insights', label: t('insights'), icon: 'chart' },
       { href: '/brand/account', label: t('brandProfile'), icon: 'building' },
+      { href: '/brand/settings', label: t('settings'), icon: 'settings' },
     ];
   }
   return [

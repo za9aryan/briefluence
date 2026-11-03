@@ -1,6 +1,10 @@
 import { Body, Controller, Get, HttpCode, Param, Post, Put } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { feedQuerySchema, influencerProfileSchema, type InfluencerProfileData } from '@briefluence/shared';
+import {
+  feedQuerySchema,
+  influencerProfileSchema,
+  type InfluencerProfileData,
+} from '@briefluence/shared';
 import { AppError } from '../../common/app-error';
 import type { AuthUser } from '../../common/auth-user';
 import { CurrentUser, Roles } from '../../common/decorators';
@@ -21,7 +25,10 @@ export class InfluencersController {
   @Roles('INFLUENCER')
   @Put('me')
   @ApiZodBody(influencerProfileSchema)
-  update(@CurrentUser() user: AuthUser, @ZodBody(influencerProfileSchema) body: InfluencerProfileData) {
+  update(
+    @CurrentUser() user: AuthUser,
+    @ZodBody(influencerProfileSchema) body: InfluencerProfileData,
+  ) {
     return this.influencers.upsertMine(user.id, body);
   }
 
@@ -44,14 +51,24 @@ export class InfluencersController {
   @HttpCode(204)
   async saveFilters(@CurrentUser() user: AuthUser, @Body() body: unknown) {
     const list = (body as { filters?: unknown })?.filters;
-    if (!Array.isArray(list) || list.length > 10) throw new AppError('VALIDATION_FAILED', 'Up to 10 saved filters');
+    if (!Array.isArray(list) || list.length > 10)
+      throw new AppError('VALIDATION_FAILED', 'Up to 10 saved filters');
     const clean = list.map((f) => {
-      const name = String((f as { name?: unknown })?.name ?? '').slice(0, 40).trim();
+      const name = String((f as { name?: unknown })?.name ?? '')
+        .slice(0, 40)
+        .trim();
       const query = feedQuerySchema.partial().safeParse((f as { query?: unknown })?.query ?? {});
       if (!name || !query.success) throw new AppError('VALIDATION_FAILED', 'Invalid saved filter');
       return { name, query: (f as { query: unknown }).query };
     });
     await this.influencers.saveFilters(user.id, clean);
+  }
+
+  /** The blogger's own profile exactly as brands see it (preview). */
+  @Roles('INFLUENCER')
+  @Get('me/public')
+  preview(@CurrentUser() user: AuthUser) {
+    return this.influencers.previewForBrands(user.id);
   }
 
   @Roles('BRAND', 'ADMIN')

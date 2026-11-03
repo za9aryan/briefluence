@@ -1,7 +1,6 @@
 'use client';
 import {
   Alert,
-  Badge,
   Button,
   Card,
   CardHeader,
@@ -24,12 +23,7 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
-import {
-  BrandAvatar,
-  ConfidentialNote,
-  isHiddenBrand,
-  useBrandName,
-} from '@/components/domain/BrandIdentity';
+import { BrandAboutCard } from '@/components/domain/BrandIdentity';
 import { ApplicationStatusBadge, CollaborationBadge } from '@/components/domain/badges';
 import { Compensation } from '@/components/domain/Compensation';
 import { ApplyModal } from '@/components/influencer/ApplyModal';
@@ -47,7 +41,6 @@ export default function DealDetailPage() {
   const tc = useTranslations('common');
   const te = useTranslations('enums');
   const f = useFormat();
-  const brandName = useBrandName();
   const o = useOptions();
   const toast = useToast();
   const errorMessage = useErrorMessage();
@@ -246,41 +239,7 @@ export default function DealDetailPage() {
             </Stack>
           </Card>
 
-          <Card>
-            <Inline gap={2}>
-              <BrandAvatar brand={d.brand} />
-              <Stack gap={0}>
-                <Text weight="bold">{brandName(d.brand)}</Text>
-                {d.brand.city && (
-                  <Text size="small" tone="muted">
-                    {d.brand.city}
-                  </Text>
-                )}
-              </Stack>
-            </Inline>
-            {isHiddenBrand(d.brand) && <ConfidentialNote className="mt-4" />}
-            {d.brand.description && (
-              <Text size="small" tone="muted" className="mt-4" clamp={3}>
-                {d.brand.description}
-              </Text>
-            )}
-            <Inline gap={2} wrap className="mt-4">
-              {d.brand.instagramUrl && (
-                <a href={d.brand.instagramUrl} target="_blank" rel="noopener noreferrer">
-                  <Badge variant="small" icon="instagram">
-                    Instagram
-                  </Badge>
-                </a>
-              )}
-              {d.brand.website && (
-                <a href={d.brand.website} target="_blank" rel="noopener noreferrer">
-                  <Badge variant="small" icon="globe">
-                    {t('website')}
-                  </Badge>
-                </a>
-              )}
-            </Inline>
-          </Card>
+          <BrandAboutCard brand={d.brand} />
         </Stack>
       </div>
 

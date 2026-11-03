@@ -54,7 +54,7 @@ for (const [name, ua, steps] of [
     await page.getByLabel('Phone number').fill('+374 91 222333');
     await page.getByRole('button', { name: 'Save and post a brief' }).click();
     await page.waitForURL('**/brand/deals/new');
-    await page.goto('/brand/account');
+    await page.goto('/brand/settings');
     await expect(page.getByText('App and notifications')).toBeVisible();
     for (const s of steps) await expect(page.getByText(s)).toBeVisible();
     // No VAPID keys on the E2E server: the switch explains instead of failing.
@@ -93,7 +93,7 @@ test('phones get a reminder banner; desktop gets neither the banner nor the card
   if (process.env.E2E_SHOTS)
     await phone.screenshot({ path: `${process.env.E2E_SHOTS}/pwa-banner.png` });
   await phone.getByRole('link', { name: 'Show me how' }).click();
-  await phone.waitForURL('**/brand/account#app');
+  await phone.waitForURL('**/brand/settings#app');
   await expect(phone.getByText('Tap Share (the square with an arrow).')).toBeVisible();
   await phone.getByRole('button', { name: 'Hide this reminder' }).click();
   await expect(phone.getByText(reminder)).toBeHidden();
@@ -104,7 +104,7 @@ test('phones get a reminder banner; desktop gets neither the banner nor the card
   // Desktop: no banner, no card.
   const desk = await (await browser.newContext({ storageState: en })).newPage();
   await brandSetup(desk);
-  await desk.goto('/brand/account');
+  await desk.goto('/brand/settings');
   await expect(desk.getByText('Password', { exact: true }).first()).toBeVisible();
   await expect(desk.getByText('App and notifications')).toHaveCount(0);
   await expect(desk.getByText(reminder)).toHaveCount(0);

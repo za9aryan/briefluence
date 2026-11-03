@@ -32,7 +32,7 @@ export function AppReminder({ role }: { role: Role }) {
   }, []);
 
   if (hidden || !install || install.platform === 'desktop' || role === 'ADMIN') return null;
-  const settings = `/${role === 'BRAND' ? 'brand' : 'influencer'}/account#app`;
+  const settings = `/${role === 'BRAND' ? 'brand' : 'influencer'}/settings#app`;
   const kind =
     install.platform === 'ios' && !install.installed
       ? 'install-ios'

@@ -136,6 +136,32 @@ export class InfluencersService {
         data: { profileViews: { increment: 1 } },
       });
     }
+    return this.publicView(p, { admin: viewer.role === 'ADMIN', showContacts });
+  }
+
+  /**
+   * "See how brands see me": the blogger's own profile in exactly the brand view (contacts hidden
+   * as before acceptance, only approved accounts and work). No view is counted. `status` tells the
+   * page whether brands can see it yet (only verified profiles are shown to brands).
+   */
+  async previewForBrands(userId: string) {
+    const p = await this.prisma.influencerProfile.findUnique({
+      where: { userId },
+      include: {
+        socialAccounts: { orderBy: { followers: 'desc' } },
+        portfolio: { orderBy: { createdAt: 'desc' } },
+      },
+    });
+    if (!p) throw notFound('Influencer');
+    return { ...this.publicView(p, { admin: false, showContacts: false }), status: p.status };
+  }
+
+  private publicView(
+    p: Prisma.InfluencerProfileGetPayload<{
+      include: { socialAccounts: true; portfolio: true };
+    }>,
+    { admin, showContacts }: { admin: boolean; showContacts: boolean },
+  ) {
     return {
       id: p.id,
       displayName: p.displayName,
@@ -151,14 +177,12 @@ export class InfluencersService {
       approvedAt: p.approvedAt,
       // Brands see only accounts an admin approved.
       socialAccounts: p.socialAccounts
-        .filter((a) => viewer.role === 'ADMIN' || isAccountUsable(a))
+        .filter((a) => admin || isAccountUsable(a))
         .map(publicAccount),
       contacts: showContacts ? { method: p.contactMethod, value: p.contactValue } : null,
       // Only answered questions and approved work; brands see nothing for empty sections.
       faq: answeredFaq(p),
-      portfolio: p.portfolio
-        .filter((i) => viewer.role === 'ADMIN' || isPortfolioVisible(i))
-        .map(publicPortfolioItem),
+      portfolio: p.portfolio.filter((i) => admin || isPortfolioVisible(i)).map(publicPortfolioItem),
     };
   }
 }

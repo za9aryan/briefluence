@@ -235,4 +235,29 @@ describe('blogger portfolio & FAQ (e2e)', () => {
     const feed = (await brand.agent.get(`${API}/offers/feed`).expect(200)).body;
     expect(feed.items[0].blogger).not.toHaveProperty('portfolio');
   });
+
+  it('"see how it looks": the blogger gets the brand view of their profile, without contacts', async () => {
+    const draft = await signup(ctx, 'INFLUENCER');
+    await draft.agent.put(`${API}/influencers/me`).send(influencerProfile).expect(200);
+    const hidden = await draft.agent.get(`${API}/influencers/me/public`).expect(200);
+    expect(hidden.body).toMatchObject({ status: 'DRAFT', verified: false, contacts: null });
+
+    const inf = await approvedInfluencer();
+    const before = await ctx.prisma.influencerProfile.findUniqueOrThrow({
+      where: { id: inf.profileId },
+    });
+    const mine = await inf.agent.get(`${API}/influencers/me/public`).expect(200);
+    const brand = await signup(ctx, 'BRAND');
+    const seen = await brand.agent.get(`${API}/influencers/${inf.profileId}`).expect(200);
+    const { status, ...view } = mine.body;
+    expect(status).toBe('APPROVED');
+    expect(view).toEqual(seen.body);
+    expect(view.contacts).toBeNull();
+    // The preview itself counts no profile view (only the brand's visit does).
+    const after = await ctx.prisma.influencerProfile.findUniqueOrThrow({
+      where: { id: inf.profileId },
+    });
+    expect(after.profileViews).toBe(before.profileViews + 1);
+    await brand.agent.get(`${API}/influencers/me/public`).expect(403);
+  });
 });

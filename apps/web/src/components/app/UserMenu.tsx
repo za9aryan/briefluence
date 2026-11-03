@@ -1,138 +1,164 @@
 'use client';
-import { CURRENCIES, CURRENCY_SYMBOL, type Currency } from '@briefluence/shared';
-import { Avatar, Icon, Menu, MenuItem, Select, Text } from '@briefluence/ui';
+import { Avatar, Icon, Menu, MenuItem, Modal, Text, cn, type IconName } from '@briefluence/ui';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
-import { LOCALE_COOKIE, LOCALE_NAMES, LOCALES, type Locale } from '@/i18n/config';
-import { api } from '@/lib/api';
-import { useDisplayCurrency, useSetCurrency } from '@/lib/hooks/currency';
+import { useState } from 'react';
+import { PreferenceFields } from '@/components/app/Preferences';
+import { useDisplayCurrency } from '@/lib/hooks/currency';
 import { landingPath, useLogout, type Me } from '@/lib/hooks/session';
 
 export function displayName(me: Me) {
   return me.influencer?.displayName ?? me.brand?.companyName ?? me.email;
 }
 
-/** Account dropdown for signed-in users: profile, language, currency, sign out. */
+/** Where a role's Account (public profile) and Settings pages live. */
+export function accountPaths(me: Me) {
+  const base = me.role === 'BRAND' ? '/brand' : '/influencer';
+  return { account: `${base}/account`, settings: `${base}/settings` };
+}
+
+function useLinks(me: Me, showDashboard?: boolean) {
+  const t = useTranslations('nav');
+  const links: { href: string; label: string; icon: IconName }[] = [];
+  if (showDashboard)
+    links.push({ href: landingPath(me), label: t('dashboard'), icon: 'dashboard' });
+  if (me.role !== 'ADMIN') {
+    const p = accountPaths(me);
+    links.push({ href: p.account, label: t('account'), icon: 'user' });
+    links.push({ href: p.settings, label: t('settings'), icon: 'settings' });
+  }
+  return links;
+}
+
+/** Second line under the name. Admins have no profile name, so the email is already the title. */
+function useSubtitle(me: Me) {
+  const tr = useTranslations('enums');
+  return me.role === 'ADMIN' ? tr('role.ADMIN') : `${me.email} · ${tr(`role.${me.role}`)}`;
+}
+
+function Identity({ me }: { me: Me }) {
+  const subtitle = useSubtitle(me);
+  return (
+    <div className="min-w-0">
+      <Text size="small" weight="bold" truncate>
+        {displayName(me)}
+      </Text>
+      <Text size="small" tone="muted" truncate>
+        {subtitle}
+      </Text>
+    </div>
+  );
+}
+
+/**
+ * Account menu for signed-in users: Account, Settings, language, currency, sign out. A dropdown
+ * from `md` up; on phones the avatar opens the same items in a bottom sheet.
+ */
 export function UserMenu({ me, showDashboard }: { me: Me; showDashboard?: boolean }) {
   const t = useTranslations('nav');
-  const tr = useTranslations('enums');
-  const locale = useLocale() as Locale;
-  const router = useRouter();
-  const [pending, start] = useTransition();
+  const tc = useTranslations('common');
+  const locale = useLocale();
   const logout = useLogout();
   const currency = useDisplayCurrency();
-  const setCurrency = useSetCurrency();
-
-  const chooseLocale = (l: Locale) => {
-    document.cookie = `${LOCALE_COOKIE}=${l}; path=/; max-age=31536000; samesite=lax`;
-    // Emails and notifications follow the account language.
-    void api.patch('/auth/settings', { locale: l }).catch(() => undefined);
-    start(() => router.refresh());
-  };
+  const links = useLinks(me, showDashboard);
+  const [sheet, setSheet] = useState(false);
+  const subtitle = useSubtitle(me);
+  const avatar = (
+    <Avatar size="sm" name={displayName(me)} src={me.influencer?.avatarUrl ?? me.brand?.logoUrl} />
+  );
   const item = 'flex min-h-11 w-full items-center gap-2 px-4 text-small text-ink hover:bg-surface';
 
   return (
-    <Menu
-      className="w-72"
-      trigger={(p) => (
+    <>
+      <button
+        type="button"
+        onClick={() => setSheet(true)}
+        aria-haspopup="dialog"
+        aria-label={t('account')}
+        className="inline-flex min-h-11 items-center rounded-pill pl-1 pr-2 hover:bg-primary-soft/60 md:hidden"
+      >
+        {avatar}
+      </button>
+      <Modal
+        open={sheet}
+        onClose={() => setSheet(false)}
+        title={<span className="wrap-anywhere">{displayName(me)}</span>}
+        description={<span className="wrap-anywhere">{subtitle}</span>}
+        closeLabel={tc('close')}
+      >
+        <nav aria-label={t('account')} className="-mx-5 border-b border-line pb-2">
+          {links.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setSheet(false)}
+              className={cn(item, 'min-h-12 px-5 text-body')}
+            >
+              <Icon name={l.icon} size="md" tone="muted" /> {l.label}
+              <Icon name="chevron-right" tone="muted" className="ml-auto" />
+            </Link>
+          ))}
+        </nav>
+        <PreferenceFields className="py-4" />
         <button
           type="button"
-          onClick={p.toggle}
-          aria-expanded={p['aria-expanded']}
-          aria-haspopup={p['aria-haspopup']}
-          aria-label={t('account')}
-          className="inline-flex min-h-11 items-center gap-2 rounded-pill pl-1 pr-2 hover:bg-primary-soft/60"
+          onClick={() => {
+            setSheet(false);
+            logout.mutate();
+          }}
+          className="-mx-5 flex min-h-12 w-[calc(100%+2.5rem)] items-center gap-2 border-t border-line px-5 pt-2 text-body font-bold text-primary-text"
         >
-          <Avatar
-            size="sm"
-            name={displayName(me)}
-            src={me.influencer?.avatarUrl ?? me.brand?.logoUrl}
-          />
-          <span className="hidden text-label text-ink-muted sm:inline">
-            {locale.toUpperCase()} · {currency}
-          </span>
-          <Icon
-            name={pending ? 'spinner' : 'chevron-down'}
-            spin={pending}
-            tone="muted"
-            className="hidden sm:block"
-          />
+          <Icon name="logout" size="md" /> {t('logout')}
         </button>
-      )}
-    >
-      {(close) => (
-        <>
-          <div className="border-b border-line px-4 py-2">
-            <Text size="small" weight="bold" truncate>
-              {displayName(me)}
-            </Text>
-            <Text size="small" tone="muted" truncate>
-              {/* Admins have no profile name, so the email is already the title. */}
-              {me.role === 'ADMIN' ? tr('role.ADMIN') : `${me.email} · ${tr(`role.${me.role}`)}`}
-            </Text>
-          </div>
-          {showDashboard && (
-            <Link href={landingPath(me)} onClick={close} className={item}>
-              <Icon name="dashboard" /> {t('dashboard')}
-            </Link>
-          )}
-          {me.role !== 'ADMIN' && (
-            <Link
-              href={me.role === 'BRAND' ? '/brand/account' : '/influencer/account'}
-              onClick={close}
-              className={item}
-            >
-              <Icon name="settings" /> {t('settings')}
-            </Link>
-          )}
+      </Modal>
 
-          {/* Preferences: two selects instead of long lists; changes apply immediately. */}
-          <div className="flex flex-col gap-2 border-t border-line px-4 py-2">
-            <label className="flex flex-col gap-1">
-              <span className="text-label text-ink-muted uppercase">{t('language')}</span>
-              <Select
-                value={locale}
-                disabled={pending}
-                onChange={(e) => chooseLocale(e.target.value as Locale)}
-              >
-                {LOCALES.map((l) => (
-                  <option key={l} value={l} lang={l}>
-                    {LOCALE_NAMES[l]}
-                  </option>
-                ))}
-              </Select>
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-label text-ink-muted uppercase">{t('currency')}</span>
-              <Select
-                value={currency}
-                disabled={setCurrency.isPending}
-                onChange={(e) => setCurrency.mutate(e.target.value as Currency)}
-              >
-                {CURRENCIES.map((c) => (
-                  <option key={c} value={c}>
-                    {CURRENCY_SYMBOL[c]} {c} · {tr(`currency.${c}`)}
-                  </option>
-                ))}
-              </Select>
-            </label>
-          </div>
-
-          <div className="border-t border-line">
-            <MenuItem
-              className="min-h-11 px-4 text-small"
-              onClick={() => {
-                close();
-                logout.mutate();
-              }}
+      <div className="hidden md:block">
+        <Menu
+          className="w-72"
+          trigger={(p) => (
+            <button
+              type="button"
+              onClick={p.toggle}
+              aria-expanded={p['aria-expanded']}
+              aria-haspopup={p['aria-haspopup']}
+              aria-label={t('account')}
+              className="inline-flex min-h-11 items-center gap-2 rounded-pill pl-1 pr-2 hover:bg-primary-soft/60"
             >
-              <Icon name="logout" /> {t('logout')}
-            </MenuItem>
-          </div>
-        </>
-      )}
-    </Menu>
+              {avatar}
+              <span className="text-label text-ink-muted">
+                {locale.toUpperCase()} · {currency}
+              </span>
+              <Icon name="chevron-down" tone="muted" />
+            </button>
+          )}
+        >
+          {(close) => (
+            <>
+              <div className="border-b border-line px-4 py-2">
+                <Identity me={me} />
+              </div>
+              {links.map((l) => (
+                <Link key={l.href} href={l.href} onClick={close} className={item}>
+                  <Icon name={l.icon} /> {l.label}
+                </Link>
+              ))}
+              {/* Preferences: two selects instead of long lists; changes apply immediately. */}
+              <PreferenceFields className="border-t border-line px-4 py-2" />
+              <div className="border-t border-line">
+                <MenuItem
+                  className="min-h-11 px-4 text-small"
+                  onClick={() => {
+                    close();
+                    logout.mutate();
+                  }}
+                >
+                  <Icon name="logout" /> {t('logout')}
+                </MenuItem>
+              </div>
+            </>
+          )}
+        </Menu>
+      </div>
+    </>
   );
 }
