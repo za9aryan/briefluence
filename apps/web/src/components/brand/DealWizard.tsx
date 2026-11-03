@@ -38,6 +38,7 @@ import { useFieldError } from '@/components/forms/form';
 import { useFormat } from '@/lib/hooks/format';
 import { useOptions } from '@/lib/hooks/options';
 import { presetOf, toDealInput, type DealFormValues } from './deal-form-values';
+import { CitiesSelect, CountriesSelect, CountrySelect } from '@/components/forms/LocationFields';
 import { ReachCounter } from './ReachCounter';
 
 /** Validates the wizard state with the shared Zod schema (after unit conversion). */
@@ -365,35 +366,33 @@ export function DealWizard({
                       error={fe(errors.countries as never)}
                       required
                     >
-                      {({ invalid }) => (
-                        <ChipGroup
-                          multiple
-                          options={o.countries}
+                      {({ id, invalid, describedBy }) => (
+                        <CountriesSelect
+                          id={id}
+                          invalid={invalid}
+                          describedBy={describedBy}
                           value={field.value ?? []}
                           onChange={(c) => {
+                            // Removing every country also clears its cities.
                             field.onChange(c);
-                            const allowed = new Set(o.citiesOf(c).map((x) => x.value));
-                            form.setValue(
-                              'cities',
-                              (form.getValues('cities') ?? []).filter((x) => allowed.has(x)),
-                            );
+                            if (!c.length) form.setValue('cities', []);
                           }}
-                          invalid={invalid}
                         />
                       )}
                     </Field>
                   )}
                 />
-                {o.citiesOf(v.countries ?? []).length > 0 && (
+                {(v.countries ?? []).length > 0 && (
                   <Controller
                     control={form.control}
                     name="cities"
                     render={({ field }) => (
                       <Field label={t('fields.cities')} hint={t('fields.citiesHint')}>
-                        {() => (
-                          <ChipGroup
-                            multiple
-                            options={o.citiesOf(v.countries ?? [])}
+                        {({ id, describedBy }) => (
+                          <CitiesSelect
+                            id={id}
+                            describedBy={describedBy}
+                            countries={v.countries ?? []}
                             value={field.value ?? []}
                             onChange={field.onChange}
                           />
@@ -537,23 +536,21 @@ export function DealWizard({
                   )}
                 </Field>
                 <FieldGrid cols={{ base: 1, md: 2 }} gap={4}>
-                  <Field label={t('fields.audienceCountry')}>
-                    {({ id }) => (
-                      <Select
-                        id={id}
-                        {...form.register('audienceCountry', {
-                          setValueAs: (x) => (x === '' ? null : x),
-                        })}
-                      >
-                        <option value="">{tc('any')}</option>
-                        {o.countries.map((c) => (
-                          <option key={c.value} value={c.value}>
-                            {c.label}
-                          </option>
-                        ))}
-                      </Select>
+                  <Controller
+                    control={form.control}
+                    name="audienceCountry"
+                    render={({ field }) => (
+                      <Field label={t('fields.audienceCountry')} aside={tc('optional')}>
+                        {({ id }) => (
+                          <CountrySelect
+                            id={id}
+                            value={field.value ?? null}
+                            onChange={(c) => field.onChange(c)}
+                          />
+                        )}
+                      </Field>
                     )}
-                  </Field>
+                  />
                 </FieldGrid>
                 <Controller
                   control={form.control}
@@ -661,20 +658,36 @@ export function DealWizard({
                       />
                     )}
                   </Field>
-                  <Field label={t('fields.barterValue')} aside={tc('optional')}>
-                    {({ id }) => (
-                      <Input
-                        id={id}
-                        type="number"
-                        inputMode="numeric"
-                        min={0}
-                        suffix={curSymbol}
-                        {...form.register('barterValue', {
-                          setValueAs: (x) => (x === '' || x == null ? null : Number(x)),
-                        })}
-                      />
+                  {/* Barter only: the value needs its own currency (with money, the budget's applies). */}
+                  <FieldGrid cols={{ base: 1, sm: money ? 1 : 2 }} gap={4}>
+                    <Field label={t('fields.barterValue')} aside={tc('optional')}>
+                      {({ id }) => (
+                        <Input
+                          id={id}
+                          type="number"
+                          inputMode="numeric"
+                          min={0}
+                          suffix={curSymbol}
+                          {...form.register('barterValue', {
+                            setValueAs: (x) => (x === '' || x == null ? null : Number(x)),
+                          })}
+                        />
+                      )}
+                    </Field>
+                    {!money && (
+                      <Field label={t('fields.currency')}>
+                        {({ id }) => (
+                          <Select id={id} {...form.register('currency')}>
+                            {CURRENCIES.map((c) => (
+                              <option key={c} value={c}>
+                                {c} · {te(`currency.${c}`)}
+                              </option>
+                            ))}
+                          </Select>
+                        )}
+                      </Field>
                     )}
-                  </Field>
+                  </FieldGrid>
                 </Section>
               )}
               <Section title={t('compensation.timing')}>

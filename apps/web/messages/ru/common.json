@@ -49,5 +49,8 @@
   "notFoundTitle": "Страница не найдена",
   "notFoundBody": "Такой страницы нет или её перенесли.",
   "goHome": "На главную",
-  "reset": "Сбросить"
+  "reset": "Сбросить",
+  "searchCountry": "Найди страну",
+  "searchCity": "Найди город",
+  "nothingFound": "Ничего не найдено"
 }

@@ -49,5 +49,8 @@
   "notFoundTitle": "Էջը չի գտնվել",
   "notFoundBody": "Այդպիսի էջ չկա կամ այն տեղափոխվել է։",
   "goHome": "Գլխավոր էջ",
-  "reset": "Զրոյացնել"
+  "reset": "Զրոյացնել",
+  "searchCountry": "Որոնիր երկիրը",
+  "searchCity": "Որոնիր քաղաքը",
+  "nothingFound": "Ոչինչ չի գտնվել"
 }

@@ -49,5 +49,8 @@
   "notFoundTitle": "Page not found",
   "notFoundBody": "The page you are looking for does not exist or was moved.",
   "goHome": "Go to home page",
-  "reset": "Reset"
+  "reset": "Reset",
+  "searchCountry": "Search for a country",
+  "searchCity": "Search for a city",
+  "nothingFound": "Nothing found"
 }

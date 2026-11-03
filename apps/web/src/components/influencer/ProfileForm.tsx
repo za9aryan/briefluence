@@ -1,12 +1,24 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DEFAULT_COUNTRY, influencerProfileSchema, type InfluencerProfileInput } from '@briefluence/shared';
+import {
+  DEFAULT_COUNTRY,
+  influencerProfileSchema,
+  type InfluencerProfileInput,
+} from '@briefluence/shared';
 import { Button, ChipGroup, Field, FieldGrid, Heading, Stack, Text } from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { FormError, SelectField, TextAreaField, TextField, useFieldError, useServerErrors } from '@/components/forms/form';
+import {
+  FormError,
+  SelectField,
+  TextAreaField,
+  TextField,
+  useFieldError,
+  useServerErrors,
+} from '@/components/forms/form';
 import { ImageUpload } from '@/components/forms/ImageUpload';
+import { CitySelect, CountrySelect } from '@/components/forms/LocationFields';
 import { ContactMethodFields } from '@/components/brand/ContactMethodFields';
 import { api } from '@/lib/api';
 import { useOptions } from '@/lib/hooks/options';
@@ -41,13 +53,16 @@ export function InfluencerProfileForm({
       languages: (initial?.languages ?? ['hy']) as InfluencerProfileInput['languages'],
       niches: (initial?.niches ?? []) as InfluencerProfileInput['niches'],
       contactMethod: initial?.contactMethod ?? null,
-      contactValue: initial?.contactValue ? (initial.contactValue.startsWith('+') ? initial.contactValue : `@${initial.contactValue}`) : '',
+      contactValue: initial?.contactValue
+        ? initial.contactValue.startsWith('+')
+          ? initial.contactValue
+          : `@${initial.contactValue}`
+        : '',
     },
   });
   const serverError = useServerErrors(form.setError);
   const { errors } = form.formState;
   const country = form.watch('country');
-  const cities = o.citiesOf([country]);
 
   const onSubmit = form.handleSubmit(async (values) => {
     setError(null);
@@ -69,10 +84,25 @@ export function InfluencerProfileForm({
           <Controller
             control={form.control}
             name="avatarUrl"
-            render={({ field }) => <ImageUpload kind="avatar" label={t('photo')} name={form.watch('displayName') ?? ''} value={field.value} onChange={field.onChange} />}
+            render={({ field }) => (
+              <ImageUpload
+                kind="avatar"
+                label={t('photo')}
+                name={form.watch('displayName') ?? ''}
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
           />
           <FieldGrid cols={{ base: 1, md: 2 }} gap={4}>
-            <TextField name="displayName" label={t('displayName')} hint={t('displayNameHint')} required register={form.register} error={errors.displayName} />
+            <TextField
+              name="displayName"
+              label={t('displayName')}
+              hint={t('displayNameHint')}
+              required
+              register={form.register}
+              error={errors.displayName}
+            />
             <SelectField
               name="gender"
               label={t('gender')}
@@ -82,8 +112,45 @@ export function InfluencerProfileForm({
               options={o.genders}
               hint={t('genderHint')}
             />
-            <SelectField name="country" label={t('country')} required register={form.register} error={errors.country} options={o.countries} />
-            <SelectField name="city" label={t('city')} register={form.register} error={errors.city} placeholder={tc('notSet')} options={cities} />
+            <Controller
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <Field label={t('country')} required error={fe(errors.country)}>
+                  {({ id, invalid, describedBy }) => (
+                    <CountrySelect
+                      id={id}
+                      invalid={invalid}
+                      describedBy={describedBy}
+                      value={field.value ?? null}
+                      onChange={(c) => {
+                        field.onChange(c ?? '');
+                        // A city belongs to one country: picking another country clears it.
+                        if (c !== field.value) form.setValue('city', null);
+                      }}
+                    />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              control={form.control}
+              name="city"
+              render={({ field }) => (
+                <Field label={t('city')} error={fe(errors.city)}>
+                  {({ id, invalid, describedBy }) => (
+                    <CitySelect
+                      id={id}
+                      invalid={invalid}
+                      describedBy={describedBy}
+                      country={country}
+                      value={field.value ?? null}
+                      onChange={(v) => field.onChange(v)}
+                    />
+                  )}
+                </Field>
+              )}
+            />
             <TextField
               name="birthYear"
               type="number"
@@ -97,7 +164,15 @@ export function InfluencerProfileForm({
               error={errors.birthYear}
             />
           </FieldGrid>
-          <TextAreaField name="bio" label={t('bio')} aside={tc('optional')} rows={3} maxLength={1000} register={form.register} error={errors.bio} />
+          <TextAreaField
+            name="bio"
+            label={t('bio')}
+            aside={tc('optional')}
+            rows={3}
+            maxLength={1000}
+            register={form.register}
+            error={errors.bio}
+          />
         </Stack>
 
         <Stack gap={4}>
@@ -108,9 +183,21 @@ export function InfluencerProfileForm({
             control={form.control}
             name="niches"
             render={({ field }) => (
-              <Field label={t('niches')} hint={t('nichesHint')} error={fe(errors.niches as never)} required>
+              <Field
+                label={t('niches')}
+                hint={t('nichesHint')}
+                error={fe(errors.niches as never)}
+                required
+              >
                 {({ describedBy, invalid }) => (
-                  <ChipGroup multiple options={o.niches} value={(field.value ?? []) as string[]} onChange={field.onChange} aria-describedby={describedBy} invalid={invalid} />
+                  <ChipGroup
+                    multiple
+                    options={o.niches}
+                    value={(field.value ?? []) as string[]}
+                    onChange={field.onChange}
+                    aria-describedby={describedBy}
+                    invalid={invalid}
+                  />
                 )}
               </Field>
             )}
@@ -120,7 +207,14 @@ export function InfluencerProfileForm({
             name="languages"
             render={({ field }) => (
               <Field label={t('languages')} hint={t('languagesHint')}>
-                {() => <ChipGroup multiple options={o.languages} value={(field.value ?? []) as string[]} onChange={field.onChange} />}
+                {() => (
+                  <ChipGroup
+                    multiple
+                    options={o.languages}
+                    value={(field.value ?? []) as string[]}
+                    onChange={field.onChange}
+                  />
+                )}
               </Field>
             )}
           />
@@ -139,7 +233,12 @@ export function InfluencerProfileForm({
         </Stack>
 
         <div className="flex justify-end">
-          <Button type="submit" size="lg" loading={form.formState.isSubmitting} className="w-full sm:w-auto">
+          <Button
+            type="submit"
+            size="lg"
+            loading={form.formState.isSubmitting}
+            className="w-full sm:w-auto"
+          >
             {submitLabel}
           </Button>
         </div>

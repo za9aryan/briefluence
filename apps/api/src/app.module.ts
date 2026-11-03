@@ -19,6 +19,7 @@ import { DealsModule } from './modules/deals/deals.module';
 import { OffersModule } from './modules/offers/offers.module';
 import { HealthController } from './modules/health/health.controller';
 import { InfluencersModule } from './modules/influencers/influencers.module';
+import { GeoModule } from './modules/geo/geo.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { SocialModule } from './modules/social/social.module';
@@ -56,6 +57,7 @@ const env = loadEnv();
     AdminModule,
     SupportModule,
     JobsModule,
+    GeoModule,
   ],
   controllers: [HealthController],
   providers: [
