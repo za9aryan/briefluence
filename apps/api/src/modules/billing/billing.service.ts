@@ -19,6 +19,7 @@ import {
   nextChargeAt,
   PLAN_WINDOW_DAYS,
   startPlan,
+  TRIAL_DAYS,
   TRIAL_REMINDER_DAYS_BEFORE,
   trialDaysLeft,
   type PlanCode,
@@ -55,6 +56,7 @@ const publicPlan = (p: Plan) => ({
 
 const DESCRIPTION: Record<PlanCode, string> = {
   BASIC: 'Briefluence Basic',
+  PRO_DAILY: 'Briefluence Pro, daily (test)',
   PRO_MONTHLY: 'Briefluence Pro, monthly',
   PRO_YEARLY: 'Briefluence Pro, yearly',
 };
@@ -103,13 +105,16 @@ export class BillingService implements OnModuleInit {
       provider: this.provider.name,
       /** Paddle.js settings (public client token) when Paddle is the provider. */
       paddle: this.paddle.clientConfig(),
+      /** How long the free Pro period lasts (30 days; 1 hour in the Paddle test mode). */
+      freeProHours: (this.freeProMs() ?? TRIAL_DAYS * 24 * 60 * 60 * 1000) / (60 * 60 * 1000),
     };
     if (!sub) return { subscription: null, ...base };
     const state = toState(sub);
     const tier = effectiveTier(state, now);
     const basic = plans.find((p) => p.code === 'BASIC');
     const used = tier === 'BASIC' ? await this.applicationsUsed(userId, state, now) : 0;
-    const current = (await this.prisma.plan.findUnique({ where: { code: sub.planCode } })) ?? basic;
+    const current =
+      (await this.plans.all()).find((p) => p.code === sub.planCode && p.code !== 'BASIC') ?? basic;
     return {
       subscription: {
         status: sub.status,
@@ -161,6 +166,9 @@ export class BillingService implements OnModuleInit {
       select: { id: true },
     });
     if (!profile) throw new AppError('PROFILE_INCOMPLETE', 'Complete your profile first');
+    // With Paddle, Pro starts only when Paddle confirms the payment (webhook), never here.
+    if (this.paddle.enabled && isPaidPlan(planCode))
+      throw new AppError('CONFLICT', 'Pay for Pro in the checkout');
     const plan = await this.plans.get(planCode);
     if (!plan.isActive) throw new AppError('VALIDATION_FAILED', 'This plan is not available');
     const existing = await this.prisma.subscription.findUnique({ where: { userId } });
@@ -206,20 +214,25 @@ export class BillingService implements OnModuleInit {
     userId: string,
     planCode: PlanCode,
   ): Promise<{ redirectUrl: string } | Awaited<ReturnType<PaddleBillingService['checkout']>>> {
-    const sub = await this.requireSub(userId);
     if (!isPaidPlan(planCode)) throw new AppError('VALIDATION_FAILED', 'Basic is free');
     const plan = await this.plans.get(planCode);
     if (!plan.isActive) throw new AppError('VALIDATION_FAILED', 'This plan is not available');
     const now = this.clock.now();
-    const state = toState(sub);
-    if (!canCheckout(state, now)) throw new AppError('CONFLICT', 'Your Pro plan is already active');
     if (this.paddle.enabled) {
+      // No plan yet is fine: the subscription is created when Paddle confirms the payment.
+      const existing = await this.prisma.subscription.findUnique({ where: { userId } });
+      if (existing && !canCheckout(toState(existing), now))
+        throw new AppError('CONFLICT', 'Your Pro plan is already active');
       const user = await this.prisma.user.findUniqueOrThrow({
         where: { id: userId },
-        select: { email: true },
+        select: { email: true, influencer: { select: { id: true } } },
       });
-      return this.paddle.checkout(sub, planCode, user.email);
+      if (!user.influencer) throw new AppError('PROFILE_INCOMPLETE', 'Complete your profile first');
+      return this.paddle.checkout(existing, planCode, user.email, userId);
     }
+    const sub = await this.requireSub(userId);
+    const state = toState(sub);
+    if (!canCheckout(state, now)) throw new AppError('CONFLICT', 'Your Pro plan is already active');
     // Renewing without a card (any Pro plan): the new period starts when the paid one ends.
     const cardHolderId = `bf-${sub.id}-${Date.now().toString(36)}`;
     const payment = await this.createPayment(sub.id, 'checkout', plan, { cardHolderId });

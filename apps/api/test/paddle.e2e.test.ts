@@ -35,6 +35,34 @@ function signed(event: Record<string, unknown>, secret = SECRET) {
   return { body, header: `ts=${ts};h1=${h1}` };
 }
 
+/** What Paddle returns for each price (GET /prices/{id}). */
+const PRICES: Record<string, unknown> = {
+  [PRICE.demo]: {
+    id: PRICE.demo,
+    name: 'Pro demo',
+    description: 'Demo 1 day',
+    status: 'active',
+    billing_cycle: { interval: 'day', frequency: 1 },
+    unit_price: { amount: '100', currency_code: 'USD' },
+  },
+  [PRICE.monthly]: {
+    id: PRICE.monthly,
+    name: 'Pro monthly',
+    description: 'Monthly Plan',
+    status: 'active',
+    billing_cycle: { interval: 'month', frequency: 1 },
+    unit_price: { amount: '1499', currency_code: 'USD' },
+  },
+  [PRICE.yearly]: {
+    id: PRICE.yearly,
+    name: 'Pro yearly',
+    description: 'Yearly Plan',
+    status: 'active',
+    billing_cycle: { interval: 'year', frequency: 1 },
+    unit_price: { amount: '9999', currency_code: 'USD' },
+  },
+};
+
 const subscription = (over: Record<string, unknown> = {}) => ({
   id: 'sub_01test000000000000000000000',
   status: 'active',
@@ -65,7 +93,9 @@ describe('Paddle billing (e2e)', () => {
       if (!url.startsWith('https://sandbox-api.paddle.com')) return realFetch(input, init);
       const method = init?.method ?? 'GET';
       calls.push({ method, url, body: init?.body ? JSON.parse(String(init.body)) : undefined });
-      return new Response(JSON.stringify({ data: reply(method, url) }), { status: 200 });
+      const price = method === 'GET' && url.match(/\/prices\/(pri_\w+)$/)?.[1];
+      const data = price ? PRICES[price] : reply(method, url);
+      return new Response(JSON.stringify({ data }), { status: 200 });
     });
   });
   afterAll(async () => {
@@ -84,7 +114,7 @@ describe('Paddle billing (e2e)', () => {
   async function blogger() {
     const b = await signup(ctx, 'INFLUENCER');
     await b.agent.put(`${API}/influencers/me`).send(influencerProfile).expect(200);
-    await b.agent.post(`${API}/billing/plan`).send({ plan: 'PRO_MONTHLY' }).expect(200);
+    await b.agent.post(`${API}/billing/plan`).send({ plan: 'BASIC' }).expect(200);
     const sub = await ctx.prisma.subscription.findUniqueOrThrow({ where: { userId: b.id } });
     return { ...b, subId: sub.id };
   }
@@ -98,13 +128,87 @@ describe('Paddle billing (e2e)', () => {
       .send(body);
   };
 
-  it('demo mode: 1 hour of free Pro; checkout returns the Paddle.js settings with the demo price', async () => {
+  it('plans come from Paddle: prices, the daily test plan, Pro picked only through checkout', async () => {
+    const b = await signup(ctx, 'INFLUENCER');
+    await b.agent.put(`${API}/influencers/me`).send(influencerProfile).expect(200);
+    const state = (await b.agent.get(`${API}/billing/subscription`).expect(200)).body;
+    expect(state.freeProHours).toBe(1);
+    expect(
+      state.plans.map((p: { code: string; priceMinor: number }) => [p.code, p.priceMinor]),
+    ).toEqual([
+      ['BASIC', 0],
+      ['PRO_DAILY', 100],
+      ['PRO_MONTHLY', 1499],
+      ['PRO_YEARLY', 9999],
+    ]);
+    // Picking Pro starts nothing; checkout works without a plan and still creates nothing.
+    await b.agent.post(`${API}/billing/plan`).send({ plan: 'PRO_MONTHLY' }).expect(409);
+    const res = await b.agent
+      .post(`${API}/billing/checkout`)
+      .send({ plan: 'PRO_DAILY' })
+      .expect(200);
+    expect(res.body.paddle).toEqual({
+      priceId: PRICE.demo,
+      customerEmail: b.email,
+      customData: { bf_user_id: b.id },
+    });
+    expect(await ctx.prisma.subscription.count({ where: { userId: b.id } })).toBe(0);
+
+    // Paddle confirms the payment: the subscription is created and Pro is on.
+    await post({
+      event_id: 'evt_first',
+      event_type: 'transaction.completed',
+      occurred_at: new Date().toISOString(),
+      data: {
+        id: 'txn_01first',
+        status: 'completed',
+        origin: 'web',
+        subscription_id: 'sub_01first',
+        customer_id: 'ctm_01first',
+        custom_data: { bf_user_id: b.id },
+        currency_code: 'USD',
+        billing_period: { starts_at: new Date().toISOString(), ends_at: '2099-01-01T00:00:00Z' },
+        items: [{ price: { id: PRICE.demo } }],
+        details: { totals: { grand_total: '100' } },
+        payments: [],
+      },
+    }).expect(200);
+    const view = (await b.agent.get(`${API}/billing/subscription`).expect(200)).body.subscription;
+    expect(view).toMatchObject({ tier: 'PRO', planCode: 'PRO_DAILY', status: 'ACTIVE' });
+    expect(view.plan).toMatchObject({ code: 'PRO_DAILY', priceMinor: 100 });
+  });
+
+  it('admins edit Basic only; Pro plans show Paddle data', async () => {
+    const admin = await createAdmin(ctx);
+    const plans = (await admin.agent.get(`${API}/admin/plans`).expect(200)).body;
+    expect(plans.find((p: { code: string }) => p.code === 'PRO_YEARLY')).toMatchObject({
+      source: 'paddle',
+      priceMinor: 9999,
+      paddle: { priceId: PRICE.yearly, interval: 'year' },
+    });
+    const pro = { priceMinor: 500, currency: 'USD', applicationLimit: null, isActive: true };
+    await admin.agent.patch(`${API}/admin/plans/PRO_MONTHLY`).send(pro).expect(409);
+    const basic = {
+      priceMinor: 0,
+      currency: 'USD',
+      applicationLimit: 7,
+      offerLimit: 2,
+      isActive: true,
+    };
+    await admin.agent.patch(`${API}/admin/plans/BASIC`).send(basic).expect(200);
+    expect(
+      (await ctx.prisma.plan.findUniqueOrThrow({ where: { code: 'BASIC' } })).applicationLimit,
+    ).toBe(7);
+  });
+
+  it('demo mode: 1 hour of free Pro on Basic; checkout returns the Paddle.js settings', async () => {
     const b = await blogger();
     const sub = await ctx.prisma.subscription.findUniqueOrThrow({ where: { id: b.subId } });
     expect(sub.trialEndsAt.getTime() - sub.createdAt.getTime()).toBeLessThanOrEqual(
       60 * 60 * 1000 + 5000,
     );
     const state = (await b.agent.get(`${API}/billing/subscription`).expect(200)).body;
+    expect(state.subscription).toMatchObject({ tier: 'PRO', inFreeDays: true, planCode: 'BASIC' });
     expect(state.paddle).toEqual({
       environment: 'sandbox',
       clientToken: 'test_client_token',
@@ -115,9 +219,9 @@ describe('Paddle billing (e2e)', () => {
       .send({ plan: 'PRO_MONTHLY' })
       .expect(200);
     expect(res.body.paddle).toMatchObject({
-      priceId: PRICE.demo,
+      priceId: PRICE.monthly,
       customerEmail: b.email,
-      customData: { bf_subscription_id: b.subId },
+      customData: { bf_user_id: b.id, bf_subscription_id: b.subId },
     });
     const yearly = await b.agent
       .post(`${API}/billing/checkout`)
@@ -153,7 +257,7 @@ describe('Paddle billing (e2e)', () => {
     const sub = await ctx.prisma.subscription.findUniqueOrThrow({ where: { id: b.subId } });
     expect(sub).toMatchObject({
       status: 'ACTIVE',
-      planCode: 'PRO_MONTHLY',
+      planCode: 'PRO_DAILY',
       paddleSubscriptionId: 'sub_01test000000000000000000000',
       cardMask: '•••• 4242',
     });

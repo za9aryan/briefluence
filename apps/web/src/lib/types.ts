@@ -323,6 +323,8 @@ export interface SubscriptionDto {
   provider: 'mock' | 'paddle';
   /** Paddle.js settings when Paddle takes the payments. */
   paddle: PaddleClientConfig | null;
+  /** Length of the free Pro period (720 = 30 days; 1 in the Paddle test mode). */
+  freeProHours: number;
 }
 
 export interface PaymentDto {

@@ -27,7 +27,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
 import { PaymentStatusBadge } from '@/components/domain/badges';
-import { DemoNote, PlanPicker } from '@/components/influencer/StartTrial';
+import { DemoNote, PlanPicker, periodLabel } from '@/components/influencer/StartTrial';
 import { api } from '@/lib/api';
 import { type CheckoutResponse, useRunCheckout, useUpdateCard } from '@/lib/hooks/checkout';
 import { useErrorMessage } from '@/lib/hooks/errors';
@@ -154,9 +154,7 @@ export default function BillingPage() {
                 {planPrice && (
                   <Inline gap={2} align="baseline">
                     <span className="text-h1 font-extrabold text-ink">{planPrice}</span>
-                    <Text tone="muted">
-                      {s.planCode === 'PRO_YEARLY' ? tp('perYear') : tp('perMonth')}
-                    </Text>
+                    <Text tone="muted">{periodLabel(tp, s.planCode)}</Text>
                   </Inline>
                 )}
                 {s.inFreeDays && (

@@ -1,6 +1,7 @@
 'use client';
 import { CURRENCIES, type Currency, type PlanCode } from '@briefluence/shared';
 import {
+  Badge,
   Button,
   Card,
   Field,
@@ -20,6 +21,7 @@ import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
 import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
+import { useFormat } from '@/lib/hooks/format';
 
 interface PlanRow {
   code: PlanCode;
@@ -28,6 +30,61 @@ interface PlanRow {
   applicationLimit: number | null;
   offerLimit: number | null;
   isActive: boolean;
+  /** `paddle`: a Pro plan read from Paddle's prices (edited in Paddle, shown read-only here). */
+  source: 'db' | 'paddle';
+  paddle?: { priceId: string; name: string | null; interval: string | null; frequency: number };
+}
+
+type Interval = 'day' | 'week' | 'month' | 'year' | 'none';
+
+/** A Pro plan managed in Paddle: what bloggers are offered, exactly as Paddle charges it. */
+function PaddlePlanCard({ plan }: { plan: PlanRow }) {
+  const t = useTranslations('admin.plans');
+  const tn = useTranslations('billing.plans.name');
+  const f = useFormat();
+  const interval = (plan.paddle?.interval ?? 'none') as Interval;
+  return (
+    <Card>
+      <Stack gap={4}>
+        <Inline justify="between" align="center" wrap>
+          <Text weight="bold" size="body">
+            {tn(plan.code)}
+          </Text>
+          <Inline gap={2} wrap>
+            {plan.code === 'PRO_DAILY' && <Badge tone="neutral">{t('testOnly')}</Badge>}
+            <Badge tone="primary">{t('fromPaddle')}</Badge>
+          </Inline>
+        </Inline>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Stack gap={1}>
+            <Text size="small" tone="muted">
+              {t('price')}
+            </Text>
+            <Text weight="bold" className="tabular-nums">
+              {f.money(plan.priceMinor, plan.currency)}
+            </Text>
+          </Stack>
+          <Stack gap={1}>
+            <Text size="small" tone="muted">
+              {t('period')}
+            </Text>
+            <Text weight="bold">{t(`every.${interval}`)}</Text>
+          </Stack>
+          <Stack gap={1} className="min-w-0">
+            <Text size="small" tone="muted">
+              {t('priceId')}
+            </Text>
+            <Text className="wrap-anywhere font-mono">{plan.paddle?.priceId ?? '—'}</Text>
+          </Stack>
+        </div>
+        {!plan.isActive && (
+          <Text size="small" tone="muted">
+            {t('archived')}
+          </Text>
+        )}
+      </Stack>
+    </Card>
+  );
 }
 
 /** One plan's settings. Prices are typed in major units (9.99) and stored in minor units. */
@@ -75,6 +132,11 @@ function PlanEditor({ plan }: { plan: PlanRow }) {
             </Text>
             {!basic && <Switch checked={active} onChange={setActive} label={t('active')} />}
           </Inline>
+          {basic && (
+            <Text size="small" tone="muted">
+              {t('basicFeatures')}
+            </Text>
+          )}
           <FieldGrid cols={{ base: 1, sm: 2, lg: 4 }}>
             <Field label={t('price')}>
               {({ id }) =>
@@ -161,17 +223,24 @@ export default function AdminPlansPage() {
   });
   return (
     <Stack gap={6}>
-      <PageHeader title={t('title')} description={t('lead')} />
+      <PageHeader
+        title={t('title')}
+        description={plans.data?.some((p) => p.source === 'paddle') ? t('leadPaddle') : t('lead')}
+      />
       {!plans.data ? (
         <Skeleton className="h-64 rounded-card" />
       ) : (
         <Stack gap={4}>
-          {plans.data.map((p) => (
-            <PlanEditor
-              key={`${p.code}-${p.priceMinor}-${p.currency}-${p.applicationLimit}-${p.offerLimit}-${p.isActive}`}
-              plan={p}
-            />
-          ))}
+          {plans.data.map((p) =>
+            p.source === 'paddle' ? (
+              <PaddlePlanCard key={p.code} plan={p} />
+            ) : (
+              <PlanEditor
+                key={`${p.code}-${p.priceMinor}-${p.currency}-${p.applicationLimit}-${p.offerLimit}-${p.isActive}`}
+                plan={p}
+              />
+            ),
+          )}
         </Stack>
       )}
     </Stack>

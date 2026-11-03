@@ -90,8 +90,10 @@ export class AdminController {
     return this.offersService.reject(id, body.reason);
   }
 
+  /** Admins always see Paddle's current prices (no cache). */
   @Get('plans')
   plans() {
+    this.plansService.refresh();
     return this.plansService.all();
   }
 

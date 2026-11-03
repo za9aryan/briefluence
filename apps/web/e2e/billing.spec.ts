@@ -40,7 +40,7 @@ test('free Pro days → Basic → upgrade to Pro → renew with the saved card',
     await page.goto('/influencer/billing');
     await expect(page.getByText('Choose your plan')).toBeVisible();
     await page.getByRole('button', { name: 'Start with Basic' }).click();
-    await expect(seen(page, 'Your 30 free Pro days have started')).toBeVisible();
+    await expect(seen(page, 'Free Pro is on for 30 days')).toBeVisible();
     await expect(page.getByText(/Pro for free: 30 days left/)).toBeVisible();
     await expect(page.getByText('After that: Basic.')).toBeVisible();
 

@@ -4,6 +4,7 @@ import {
   isNewerEvent,
   isPaidPlan,
   paddleAmountMinor,
+  startPlan,
   type Currency,
   type PlanCode,
 } from '@briefluence/shared';
@@ -40,8 +41,9 @@ interface PaddleTransaction {
 
 export type SimulationScenario = 'renewal_success' | 'renewal_failed' | 'cancellation';
 
-/** Our id travels in Paddle's custom_data so webhooks find the right subscription. */
+/** Our ids travel in Paddle's custom_data so webhooks find (or create) the right subscription. */
 const OUR_ID = 'bf_subscription_id';
+const OUR_USER = 'bf_user_id';
 const WEBHOOK_PATH = '/api/v1/billing/paddle/webhook';
 
 @Injectable()
@@ -77,18 +79,25 @@ export class PaddleBillingService {
   // ─── Actions from the blogger ───────────────────────────
 
   /** Paddle.js checkout for a Pro plan; the subscription itself arrives by webhook. */
-  async checkout(sub: Subscription, planCode: PlanCode, email: string) {
-    const cfg = this.paddle.config!;
-    if (sub.paddleSubscriptionId && (sub.status === 'ACTIVE' || sub.status === 'PAST_DUE'))
+  async checkout(sub: Subscription | null, planCode: PlanCode, email: string, userId: string) {
+    if (sub?.paddleSubscriptionId && (sub.status === 'ACTIVE' || sub.status === 'PAST_DUE'))
       throw new AppError('CONFLICT', 'You already have Pro; switch plans instead');
-    const priceId = cfg.prices[planCode as 'PRO_MONTHLY' | 'PRO_YEARLY'];
+    const priceId = this.priceFor(planCode);
     return {
       paddle: {
         priceId,
         customerEmail: email,
-        customData: { [OUR_ID]: sub.id },
+        customData: sub ? { [OUR_USER]: userId, [OUR_ID]: sub.id } : { [OUR_USER]: userId },
       },
     };
+  }
+
+  private priceFor(planCode: PlanCode) {
+    const id = isPaidPlan(planCode)
+      ? this.paddle.config!.prices[planCode as Exclude<PlanCode, 'BASIC'>]
+      : undefined;
+    if (!id) throw new AppError('VALIDATION_FAILED', 'This plan is not available');
+    return id;
   }
 
   private requireLinked(sub: Subscription) {
@@ -117,8 +126,11 @@ export class PaddleBillingService {
   async switchPlan(sub: Subscription, planCode: PlanCode) {
     if (!isPaidPlan(planCode)) throw new AppError('VALIDATION_FAILED', 'Choose a Pro plan');
     const id = this.requireLinked(sub);
-    const priceId = this.paddle.config!.prices[planCode as 'PRO_MONTHLY' | 'PRO_YEARLY'];
-    await this.apply(sub, await this.paddle.changePrice(id, priceId), this.clock.now());
+    await this.apply(
+      sub,
+      await this.paddle.changePrice(id, this.priceFor(planCode)),
+      this.clock.now(),
+    );
   }
 
   /** Transaction for Paddle.js to open, so the customer can update their card. */
@@ -142,7 +154,12 @@ export class PaddleBillingService {
     const at = new Date(event.occurred_at);
     if (event.event_type.startsWith('subscription.')) {
       const p = event.data as unknown as PaddleSubscription;
-      const sub = await this.find(p.id, p.custom_data);
+      // Only a live subscription may create ours (a first payment); other events need one already.
+      const sub = await this.find(
+        p.id,
+        p.custom_data,
+        p.status === 'active' || p.status === 'trialing',
+      );
       if (!sub)
         return this.logger.warn(`Paddle ${event.event_type} for unknown subscription ${p.id}`);
       if (!isNewerEvent(sub.paddleEventAt, at)) return;
@@ -155,15 +172,45 @@ export class PaddleBillingService {
       return this.transactionFailed(event.data as unknown as PaddleTransaction);
   }
 
-  private async find(paddleId: string | null, customData: Record<string, unknown> | null) {
+  /**
+   * Our subscription for a Paddle one: linked id, then our ids from custom_data. A blogger who paid
+   * before choosing any plan has none yet; with `create` it is made here (no free Pro left), and
+   * `apply` then mirrors Paddle onto it.
+   */
+  private async find(
+    paddleId: string | null,
+    customData: Record<string, unknown> | null,
+    create = false,
+  ): Promise<Subscription | null> {
     if (paddleId) {
       const linked = await this.prisma.subscription.findUnique({
         where: { paddleSubscriptionId: paddleId },
       });
       if (linked) return linked;
     }
-    const ours = typeof customData?.[OUR_ID] === 'string' ? (customData[OUR_ID] as string) : null;
-    return ours ? this.prisma.subscription.findUnique({ where: { id: ours } }) : null;
+    const str = (k: string) =>
+      typeof customData?.[k] === 'string' ? (customData[k] as string) : null;
+    const ours = str(OUR_ID);
+    if (ours) {
+      const sub = await this.prisma.subscription.findUnique({ where: { id: ours } });
+      if (sub) return sub;
+    }
+    const userId = str(OUR_USER);
+    if (!userId) return null;
+    const existing = await this.prisma.subscription.findUnique({ where: { userId } });
+    if (existing || !create) return existing;
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+    if (!user) return null;
+    try {
+      return await this.prisma.subscription.create({
+        data: { userId, ...fromState(startPlan(this.clock.now(), 'BASIC', 0)) },
+      });
+    } catch (err) {
+      // Two webhooks for the same first payment raced; the other one created it.
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002')
+        return this.prisma.subscription.findUnique({ where: { userId } });
+      throw err;
+    }
   }
 
   /** Mirrors Paddle's subscription onto ours; tells the blogger when Pro ended. */
@@ -197,7 +244,7 @@ export class PaddleBillingService {
   /** A payment went through (first checkout or a renewal): record it and tell the blogger. */
   private async transactionCompleted(t: PaddleTransaction, at: Date) {
     if (!t.subscription_id) return;
-    const sub = await this.find(t.subscription_id, t.custom_data);
+    const sub = await this.find(t.subscription_id, t.custom_data, true);
     if (!sub) return this.logger.warn(`Paddle transaction ${t.id} for unknown subscription`);
     const planCode = this.planFor(t.items[0]?.price.id) ?? sub.planCode;
     const currency: Currency =

@@ -488,6 +488,32 @@ export default {
       free: ['Free', 'Бесплатно', 'Անվճար'],
       save: ['Save', 'Сохранить', 'Պահպանել'],
       saved: ['Plan saved', 'Тариф сохранён', 'Փաթեթը պահպանված է'],
+      leadPaddle: [
+        'Basic is free; set its limits here. Pro plans and their prices come from Paddle: change them in Paddle → Catalog → Products, and the website shows the new prices within 5 minutes.',
+        'Basic бесплатный — его лимиты задаются здесь. Тарифы Pro и их цены берутся из Paddle: меняй их в Paddle → Catalog → Products, и сайт покажет новые цены в течение 5 минут.',
+        'Basic-ն անվճար է․ նրա սահմանաչափերը սահմանվում են այստեղ։ Pro փաթեթներն ու դրանց գները գալիս են Paddle-ից․ փոխիր դրանք Paddle → Catalog → Products բաժնում, և կայքը նոր գները ցույց կտա 5 րոպեի ընթացքում։',
+      ],
+      fromPaddle: ['From Paddle', 'Из Paddle', 'Paddle-ից'],
+      testOnly: ['Test mode only', 'Только в тестовом режиме', 'Միայն թեստային ռեժիմում'],
+      archived: [
+        'Archived in Paddle: not offered to bloggers',
+        'Архивирован в Paddle: блогерам не предлагается',
+        'Արխիվացված է Paddle-ում․ բլոգերներին չի առաջարկվում',
+      ],
+      period: ['Billing period', 'Период оплаты', 'Վճարման ժամկետ'],
+      every: {
+        day: ['Every day', 'Каждый день', 'Ամեն օր'],
+        week: ['Every week', 'Каждую неделю', 'Ամեն շաբաթ'],
+        month: ['Every month', 'Каждый месяц', 'Ամեն ամիս'],
+        year: ['Every year', 'Каждый год', 'Ամեն տարի'],
+        none: ['One-time', 'Разово', 'Միանվագ'],
+      },
+      priceId: ['Paddle price ID', 'ID цены в Paddle', 'Paddle-ի գնի ID'],
+      basicFeatures: [
+        'Basic includes the full brief feed with match scores; these limits apply.',
+        'Basic включает всю ленту брифов с совпадением; действуют эти лимиты.',
+        'Basic-ը ներառում է բրիֆների ամբողջ լենտը՝ համընկնումով․ գործում են այս սահմանաչափերը։',
+      ],
     },
     reuse: {
       badge: [

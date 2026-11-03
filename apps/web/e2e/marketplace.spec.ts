@@ -58,7 +58,7 @@ test('sign-up → verify → apply → accept → done', async ({ browser }) => 
   await blogger.getByRole('link', { name: 'See plans' }).click();
   await blogger.waitForURL('**/influencer/billing');
   await blogger.getByRole('button', { name: 'Start with Basic' }).click();
-  await expect(seen(blogger, 'Your 30 free Pro days have started')).toBeVisible();
+  await expect(seen(blogger, 'Free Pro is on for 30 days')).toBeVisible();
   await verifyEmailViaLink(blogger, bloggerEmail);
   await blogger.goto('/influencer/verification');
   await blogger.getByRole('link', { name: 'Connect Instagram' }).click();

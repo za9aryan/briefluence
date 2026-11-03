@@ -16,34 +16,37 @@ export interface PaddleConfig {
   apiKey: string;
   clientToken: string;
   webhookSecret: string;
-  /** Price used when checking out each Pro plan (sandbox "monthly" = the 1-day demo price). */
-  prices: Record<'PRO_MONTHLY' | 'PRO_YEARLY', string>;
-  /** Every price id we know → plan (monthly and demo both mean PRO_MONTHLY). */
+  /** The Paddle price behind each Pro plan. PRO_DAILY (1-day test price) only in the sandbox. */
+  prices: Partial<Record<ProPlanCode, string>>;
+  /** Price id → plan, for webhooks. */
   planByPrice: Map<string, PlanCode>;
   /** Sandbox demo mode: 1 hour of free Pro, simulate buttons for admins. */
   demo: boolean;
 }
 
+export type ProPlanCode = Exclude<PlanCode, 'BASIC'>;
+
 export function paddleConfig(env: Env): PaddleConfig | null {
   if (env.PAYMENT_PROVIDER !== 'paddle') return null;
   const live = env.PADDLE_ENV === 'production';
-  const monthly = live
-    ? env.PADDLE_LIVE_PRICE_MONTHLY!
-    : (env.PADDLE_SANDBOX_PRICE_DEMO ?? env.PADDLE_SANDBOX_PRICE_MONTHLY!);
-  const yearly = live ? env.PADDLE_LIVE_PRICE_YEARLY! : env.PADDLE_SANDBOX_PRICE_YEARLY!;
-  const planByPrice = new Map<string, PlanCode>([
-    [monthly, 'PRO_MONTHLY'],
-    [yearly, 'PRO_YEARLY'],
-  ]);
-  if (!live && env.PADDLE_SANDBOX_PRICE_MONTHLY)
-    planByPrice.set(env.PADDLE_SANDBOX_PRICE_MONTHLY, 'PRO_MONTHLY');
+  const prices: Partial<Record<ProPlanCode, string>> = live
+    ? { PRO_MONTHLY: env.PADDLE_LIVE_PRICE_MONTHLY, PRO_YEARLY: env.PADDLE_LIVE_PRICE_YEARLY }
+    : {
+        PRO_DAILY: env.PADDLE_SANDBOX_PRICE_DEMO,
+        PRO_MONTHLY: env.PADDLE_SANDBOX_PRICE_MONTHLY,
+        PRO_YEARLY: env.PADDLE_SANDBOX_PRICE_YEARLY,
+      };
+  for (const k of Object.keys(prices) as ProPlanCode[]) if (!prices[k]) delete prices[k];
+  const planByPrice = new Map<string, PlanCode>(
+    (Object.entries(prices) as [ProPlanCode, string][]).map(([code, id]) => [id, code]),
+  );
   return {
     environment: env.PADDLE_ENV,
     apiBase: live ? 'https://api.paddle.com' : 'https://sandbox-api.paddle.com',
     apiKey: (live ? env.PADDLE_LIVE_API_KEY : env.PADDLE_SANDBOX_API_KEY)!,
     clientToken: (live ? env.PADDLE_LIVE_CLIENT_TOKEN : env.PADDLE_SANDBOX_CLIENT_TOKEN)!,
     webhookSecret: (live ? env.PADDLE_LIVE_WEBHOOK_SECRET : env.PADDLE_SANDBOX_WEBHOOK_SECRET)!,
-    prices: { PRO_MONTHLY: monthly, PRO_YEARLY: yearly },
+    prices,
     planByPrice,
     demo: !live,
   };
@@ -86,6 +89,16 @@ export interface PaddleSubscription {
   items: { price: { id: string } }[];
 }
 
+/** https://developer.paddle.com/api-reference/prices/overview (fields we use). */
+export interface PaddlePrice {
+  id: string;
+  name: string | null;
+  description: string;
+  status: 'active' | 'archived';
+  billing_cycle: { interval: 'day' | 'week' | 'month' | 'year'; frequency: number } | null;
+  unit_price: { amount: string; currency_code: string };
+}
+
 export interface PaddleNotificationSetting {
   id: string;
   destination: string;
@@ -126,6 +139,11 @@ export class PaddleClient {
       });
     }
     return json.data;
+  }
+
+  /** https://developer.paddle.com/api-reference/prices/get-price */
+  getPrice(id: string) {
+    return this.request<PaddlePrice>('GET', `/prices/${id}`);
   }
 
   getSubscription(id: string) {

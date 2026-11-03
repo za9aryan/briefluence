@@ -2,19 +2,27 @@
   "plans": {
     "title": "Choose your plan",
     "lead": "Every plan starts with 30 days of Pro for free.",
+    "leadPaddle": "Start on free Basic with {duration} of Pro included, or go Pro right away.",
     "upgradeTitle": "Upgrade to Pro",
     "upgradeLead": "Unlimited applications. Cancel any time.",
     "name": {
       "BASIC": "Basic",
+      "PRO_DAILY": "Pro daily (test)",
       "PRO_MONTHLY": "Pro",
       "PRO_YEARLY": "Pro yearly"
     },
+    "duration": {
+      "hours": "{count, plural, one {# hour} other {# hours}}",
+      "days": "{count, plural, one {# day} other {# days}}"
+    },
     "free": "Free",
+    "perDay": "per day",
     "perMonth": "per month",
     "perYear": "per year",
     "save": "Save {value}",
     "features": {
-      "freeDays": "30 days of Pro free to start",
+      "freePro": "{duration} of Pro free to start",
+      "daily": "Renews every day: for testing payments",
       "limit": "{count} applications every 30 days",
       "feed": "Full brief feed with match scores",
       "unlimited": "Unlimited applications",
@@ -28,7 +36,8 @@
     "chooseYearly": "Choose Pro yearly",
     "payNote": "You pay now; your paid period starts after the free days.",
     "payNowNote": "You pay now and your paid period starts today.",
-    "started": "Your 30 free Pro days have started"
+    "startedFor": "Free Pro is on for {duration}",
+    "chooseDaily": "Choose Pro daily"
   },
   "checklist": {
     "title": "Two steps to see briefs",
@@ -36,7 +45,7 @@
     "offersTitle": "Two steps to post offers",
     "offersLead": "You can post offers for brands as soon as both are done.",
     "planTitle": "Choose your plan",
-    "planBody": "Every plan starts with 30 days of Pro for free.",
+    "planBody": "Start with free Basic or go Pro.",
     "planDone": "Done.",
     "planCta": "See plans",
     "verifyTitle": "Get your account verified",
@@ -106,7 +115,7 @@
   "removeCardBody": "Without a card Pro will not renew; you move to Basic when the current period ends.",
   "demo": {
     "title": "Test mode",
-    "body": "Free Pro lasts 1 hour, and Pro renews every day. Pay with the test card {card}, any future date and any CVC. No real money is charged."
+    "body": "Free Pro on Basic lasts 1 hour. To see a renewal soon, pick Pro daily (test). Pay with the test card {card}, any future date and any CVC. No real money is charged."
   },
   "mock": {
     "notice": "Test payment page. On the live site Paddle’s checkout opens instead. No real money is charged.",

@@ -619,6 +619,11 @@ export default {
         'Каждый тариф начинается с 30 дней Pro бесплатно.',
         'Յուրաքանչյուր փաթեթ սկսվում է Pro-ի 30 անվճար օրով։',
       ],
+      leadPaddle: [
+        'Start on free Basic with {duration} of Pro included, or go Pro right away.',
+        'Начни с бесплатного Basic — Pro бесплатно на {duration}, — или сразу подключи Pro.',
+        'Սկսիր անվճար Basic-ով՝ Pro-ն անվճար {duration}, կամ անմիջապես միացրու Pro-ն։',
+      ],
       upgradeTitle: ['Upgrade to Pro', 'Перейти на Pro', 'Անցնել Pro-ի'],
       upgradeLead: [
         'Unlimited applications. Cancel any time.',
@@ -627,18 +632,37 @@ export default {
       ],
       name: {
         BASIC: ['Basic', 'Basic', 'Basic'],
+        PRO_DAILY: ['Pro daily (test)', 'Pro на день (тест)', 'Pro օրական (թեստ)'],
         PRO_MONTHLY: ['Pro', 'Pro', 'Pro'],
         PRO_YEARLY: ['Pro yearly', 'Pro на год', 'Pro տարեկան'],
       },
+      duration: {
+        hours: [
+          '{count, plural, one {# hour} other {# hours}}',
+          '{count, plural, one {# час} few {# часа} many {# часов} other {# часа}}',
+          '{count} ժամ',
+        ],
+        days: [
+          '{count, plural, one {# day} other {# days}}',
+          '{count, plural, one {# день} few {# дня} many {# дней} other {# дня}}',
+          '{count} օր',
+        ],
+      },
       free: ['Free', 'Бесплатно', 'Անվճար'],
+      perDay: ['per day', 'в день', 'օրական'],
       perMonth: ['per month', 'в месяц', 'ամսական'],
       perYear: ['per year', 'в год', 'տարեկան'],
       save: ['Save {value}', 'Выгода {value}', 'Խնայողություն {value}'],
       features: {
-        freeDays: [
-          '30 days of Pro free to start',
-          'Первые 30 дней — Pro бесплатно',
-          'Սկզբում Pro-ի 30 անվճար օր',
+        freePro: [
+          '{duration} of Pro free to start',
+          'Pro бесплатно на {duration}',
+          'Pro-ն անվճար {duration}',
+        ],
+        daily: [
+          'Renews every day: for testing payments',
+          'Продлевается каждый день: для проверки оплаты',
+          'Երկարաձգվում է ամեն օր՝ վճարումները ստուգելու համար',
         ],
         limit: [
           '{count} applications every 30 days',
@@ -685,11 +709,12 @@ export default {
         'Ты платишь сейчас, и оплаченный период начинается сегодня.',
         'Վճարում ես հիմա, և վճարված ժամկետը սկսվում է այսօր։',
       ],
-      started: [
-        'Your 30 free Pro days have started',
-        '30 бесплатных дней Pro начались',
-        'Pro-ի 30 անվճար օրը սկսվեց',
+      startedFor: [
+        'Free Pro is on for {duration}',
+        'Бесплатный Pro включён на {duration}',
+        'Անվճար Pro-ն միացված է {duration}',
       ],
+      chooseDaily: ['Choose Pro daily', 'Выбрать Pro на день', 'Ընտրել Pro օրական'],
     },
     checklist: {
       title: [
@@ -714,9 +739,9 @@ export default {
       ],
       planTitle: ['Choose your plan', 'Выбери тариф', 'Ընտրիր փաթեթը'],
       planBody: [
-        'Every plan starts with 30 days of Pro for free.',
-        'Каждый тариф начинается с 30 дней Pro бесплатно.',
-        'Յուրաքանչյուր փաթեթ սկսվում է Pro-ի 30 անվճար օրով։',
+        'Start with free Basic or go Pro.',
+        'Начни с бесплатного Basic или подключи Pro.',
+        'Սկսիր անվճար Basic-ով կամ միացրու Pro-ն։',
       ],
       planDone: ['Done.', 'Готово.', 'Պատրաստ է։'],
       planCta: ['See plans', 'Смотреть тарифы', 'Դիտել փաթեթները'],
@@ -908,9 +933,9 @@ export default {
     demo: {
       title: ['Test mode', 'Тестовый режим', 'Թեստային ռեժիմ'],
       body: [
-        'Free Pro lasts 1 hour, and Pro renews every day. Pay with the test card {card}, any future date and any CVC. No real money is charged.',
-        'Бесплатный Pro длится 1 час, а Pro продлевается каждый день. Плати тестовой картой {card}, любая будущая дата и любой CVC. Настоящие деньги не списываются.',
-        'Անվճար Pro-ն տևում է 1 ժամ, իսկ Pro-ն երկարաձգվում է ամեն օր։ Վճարիր {card} թեստային քարտով, ցանկացած ապագա ամսաթիվ և ցանկացած CVC։ Իրական գումար չի գանձվում։',
+        'Free Pro on Basic lasts 1 hour. To see a renewal soon, pick Pro daily (test). Pay with the test card {card}, any future date and any CVC. No real money is charged.',
+        'Бесплатный Pro на Basic длится 1 час. Чтобы быстро увидеть продление, выбери Pro на день (тест). Плати тестовой картой {card}, любая будущая дата и любой CVC. Настоящие деньги не списываются.',
+        'Basic-ի անվճար Pro-ն տևում է 1 ժամ։ Երկարաձգումը շուտ տեսնելու համար ընտրիր Pro օրական (թեստ)։ Վճարիր {card} թեստային քարտով, ցանկացած ապագա ամսաթիվ և ցանկացած CVC։ Իրական գումար չի գանձվում։',
       ],
     },
     mock: {

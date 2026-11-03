@@ -12,17 +12,24 @@ and tells us what happened by webhook. We never see card numbers.
 - Cancel / renew again / monthly ↔ yearly / change card go through the Paddle API; the daily job reconciles linked
   subscriptions with Paddle.
 
+## Plans
+
+Pro plans are Paddle prices: the amount, currency and active/archived state are read from Paddle (cached 5 minutes,
+fresh on every visit to Admin → Plans), so the site always shows what checkout charges. Change them in Paddle →
+Catalog → Products. Basic (free) and its limits are edited in Admin → Plans. Choosing Pro creates nothing on our side
+until Paddle confirms the payment; the webhook then creates or updates the blogger's subscription.
+
 ## Demo (sandbox) vs live
 
 `PAYMENT_PROVIDER=paddle` turns Paddle on. `PADDLE_ENV` picks the account:
 
-|                                | `sandbox` (demo)                                                                | `production` (live)         |
-| ------------------------------ | ------------------------------------------------------------------------------- | --------------------------- |
-| Keys                           | `PADDLE_SANDBOX_*`                                                              | `PADDLE_LIVE_*`             |
-| Free Pro after choosing a plan | 1 hour                                                                          | 30 days                     |
-| Pro "monthly" price            | `PADDLE_SANDBOX_PRICE_DEMO` (renews daily)                                      | `PADDLE_LIVE_PRICE_MONTHLY` |
-| Cards                          | test card `4242 4242 4242 4242`, any future date, any CVC                       | real cards                  |
-| Admin → Payments               | "Paddle test mode" panel: simulate a paid renewal, failed renewal, cancellation | hidden                      |
+|                               | `sandbox` (demo)                                                                | `production` (live)     |
+| ----------------------------- | ------------------------------------------------------------------------------- | ----------------------- |
+| Keys                          | `PADDLE_SANDBOX_*`                                                              | `PADDLE_LIVE_*`         |
+| Free Pro after choosing Basic | 1 hour                                                                          | 30 days                 |
+| Plans offered                 | Pro daily (test, `PADDLE_SANDBOX_PRICE_DEMO`), Pro monthly, Pro yearly          | Pro monthly, Pro yearly |
+| Cards                         | test card `4242 4242 4242 4242`, any future date, any CVC                       | real cards              |
+| Admin → Payments              | "Paddle test mode" panel: simulate a paid renewal, failed renewal, cancellation | hidden                  |
 
 Simulations are delivered only to a destination whose traffic source includes simulations; the API switches the
 destination to "all" on the first simulation.

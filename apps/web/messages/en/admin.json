@@ -97,7 +97,21 @@
     "active": "Offered to bloggers",
     "free": "Free",
     "save": "Save",
-    "saved": "Plan saved"
+    "saved": "Plan saved",
+    "leadPaddle": "Basic is free; set its limits here. Pro plans and their prices come from Paddle: change them in Paddle → Catalog → Products, and the website shows the new prices within 5 minutes.",
+    "fromPaddle": "From Paddle",
+    "testOnly": "Test mode only",
+    "archived": "Archived in Paddle: not offered to bloggers",
+    "period": "Billing period",
+    "every": {
+      "day": "Every day",
+      "week": "Every week",
+      "month": "Every month",
+      "year": "Every year",
+      "none": "One-time"
+    },
+    "priceId": "Paddle price ID",
+    "basicFeatures": "Basic includes the full brief feed with match scores; these limits apply."
   },
   "reuse": {
     "badge": "Possible re-registration",

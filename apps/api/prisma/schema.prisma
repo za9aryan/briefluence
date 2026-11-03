@@ -126,6 +126,7 @@ enum SubscriptionStatus {
 /// Blogger plans (admin edits prices and the Basic limit in the Plans table).
 enum PlanCode {
   BASIC
+  PRO_DAILY // Paddle sandbox only: 1-day test price
   PRO_MONTHLY
   PRO_YEARLY
 }

@@ -33,9 +33,10 @@ export const useSubscription = () =>
 
 /**
  * Picks a plan. `start`: the blogger has no plan yet — every plan starts with free Pro days, and
- * Pro also opens the payment page (bank redirect or Paddle overlay). `upgrade`: only Pro plans, straight to payment.
+ * Pro also opens the payment page (test page redirect or Paddle overlay). With Paddle, picking Pro
+ * starts nothing: Pro begins when Paddle confirms the payment. `upgrade`: only Pro plans.
  */
-function usePlanAction(mode: 'start' | 'upgrade') {
+function usePlanAction(mode: 'start' | 'upgrade', paddle: boolean, freePro: string) {
   const t = useTranslations('billing.plans');
   const toast = useToast();
   const errorMessage = useErrorMessage();
@@ -43,18 +44,19 @@ function usePlanAction(mode: 'start' | 'upgrade') {
   const runCheckout = useRunCheckout();
   return useMutation({
     mutationFn: async (plan: PlanCode) => {
-      if (mode === 'start') await api.post('/billing/plan', { plan });
-      if (plan === 'BASIC') return 'started';
+      const pro = plan !== 'BASIC';
+      if (mode === 'start' && !(paddle && pro)) await api.post('/billing/plan', { plan });
+      if (!pro) return 'started';
       // Paddle opens an overlay; the mutation stays pending until it is closed.
       const r = await api.post<CheckoutResponse>('/billing/checkout', { plan });
       await runCheckout(r);
-      return mode === 'start' && !('redirectUrl' in r) ? 'started' : null;
+      return mode === 'start' && !paddle && !('redirectUrl' in r) ? 'started' : null;
     },
     onSuccess: (r) => {
       if (!r) return;
       for (const key of [ME_KEY, ['billing'], ['influencer'], ['feed'], ['deal']])
         void qc.invalidateQueries({ queryKey: key });
-      toast(t('started'));
+      toast(t('startedFor', { duration: freePro }));
     },
     onError: (e) => {
       // A Pro choice still started the free days even if the payment page failed to open.
@@ -69,11 +71,12 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
   const t = useTranslations('billing.plans');
   const f = useFormat();
   const sub = useSubscription();
-  const action = usePlanAction(mode);
+  const paddle = sub.data?.paddle;
+  const freePro = useFreeProDuration(sub.data?.freeProHours);
+  const action = usePlanAction(mode, !!paddle, freePro);
   const plans = (sub.data?.plans ?? []).filter((p) => mode === 'start' || p.code !== 'BASIC');
   const monthly = plans.find((p) => p.code === 'PRO_MONTHLY');
   const freeDaysLeft = mode === 'start' || !!sub.data?.subscription?.inFreeDays;
-  const paddle = sub.data?.paddle;
 
   const price = (p: PlanDto) =>
     p.code === 'BASIC' ? t('free') : f.money(p.priceMinor, p.currency);
@@ -87,19 +90,24 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
   const features = (p: PlanDto): string[] =>
     p.code === 'BASIC'
       ? [
-          t('features.freeDays'),
+          t('features.freePro', { duration: freePro }),
           t('features.limit', { count: p.applicationLimit ?? 0 }),
           ...(p.offerLimit != null ? [t('features.offers', { count: p.offerLimit })] : []),
           t('features.feed'),
         ]
       : [
-          ...(mode === 'start' ? [t('features.freeDays')] : []),
+          ...(mode === 'start' && !paddle ? [t('features.freePro', { duration: freePro })] : []),
           t('features.unlimited'),
           t('features.offersUnlimited'),
-          p.code === 'PRO_YEARLY' ? t('features.yearly') : t('features.cancel'),
+          p.code === 'PRO_YEARLY'
+            ? t('features.yearly')
+            : p.code === 'PRO_DAILY'
+              ? t('features.daily')
+              : t('features.cancel'),
         ];
   const cta: Record<PlanCode, string> = {
     BASIC: t('chooseBasic'),
+    PRO_DAILY: t('chooseDaily'),
     PRO_MONTHLY: t('choosePro'),
     PRO_YEARLY: t('chooseYearly'),
   };
@@ -110,10 +118,21 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
         <Heading level={2} size="h2">
           {mode === 'start' ? t('title') : t('upgradeTitle')}
         </Heading>
-        <Text tone="muted">{mode === 'start' ? t('lead') : t('upgradeLead')}</Text>
+        <Text tone="muted">
+          {mode === 'upgrade'
+            ? t('upgradeLead')
+            : paddle
+              ? t('leadPaddle', { duration: freePro })
+              : t('lead')}
+        </Text>
       </Stack>
       {paddle?.demo && <DemoNote />}
-      <Grid cols={{ base: 1, md: plans.length >= 3 ? 3 : 2 }} gap={4}>
+      <Grid
+        cols={
+          plans.length >= 4 ? { base: 1, md: 2, xl: 4 } : { base: 1, md: plans.length >= 3 ? 3 : 2 }
+        }
+        gap={4}
+      >
         {plans.map((p) => {
           const pro = p.code !== 'BASIC';
           const pct = saving(p);
@@ -134,11 +153,7 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
                 </Inline>
                 <Inline gap={2} align="baseline" wrap>
                   <span className="text-h1 font-extrabold text-ink">{price(p)}</span>
-                  {pro && (
-                    <Text tone="muted">
-                      {p.code === 'PRO_YEARLY' ? t('perYear') : t('perMonth')}
-                    </Text>
-                  )}
+                  {pro && <Text tone="muted">{periodLabel(t, p.code)}</Text>}
                 </Inline>
                 <Stack gap={2} className="flex-1">
                   {features(p).map((x) => (
@@ -169,6 +184,18 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
       </Grid>
     </Stack>
   );
+}
+
+/** "per day / month / year" for a Pro plan. */
+export function periodLabel(t: (key: 'perDay' | 'perMonth' | 'perYear') => string, code: PlanCode) {
+  return code === 'PRO_YEARLY' ? t('perYear') : code === 'PRO_DAILY' ? t('perDay') : t('perMonth');
+}
+
+/** The free Pro period as words: "1 hour" in test mode, "30 days" live. */
+export function useFreeProDuration(hours: number | undefined) {
+  const t = useTranslations('billing.plans.duration');
+  const h = hours ?? 24 * 30;
+  return h < 24 ? t('hours', { count: h }) : t('days', { count: Math.round(h / 24) });
 }
 
 /** Sandbox (demo) mode: short periods and Paddle's test card, no real money. */

@@ -4,7 +4,7 @@ import type { PlanCode, SubscriptionStatus } from '../enums';
 /**
  * Blogger plans:
  * - BASIC: free, limited number of applications per rolling 30 days (limit set by admin).
- * - PRO_MONTHLY / PRO_YEARLY: paid, unlimited.
+ * - PRO_MONTHLY / PRO_YEARLY: paid, unlimited. PRO_DAILY: the same, renews daily (sandbox test).
  * Everyone who chooses a plan first gets TRIAL_DAYS of Pro for free. `planCode` is the plan the
  * blogger chose (or is on); when free days or a paid period end without payment they move to
  * BASIC — nobody "expires" any more.
@@ -12,7 +12,12 @@ import type { PlanCode, SubscriptionStatus } from '../enums';
 export type PlanTier = 'BASIC' | 'PRO';
 
 /** Length of one paid period per plan, in months (BASIC is never charged). */
-export const PLAN_MONTHS: Record<PlanCode, number> = { BASIC: 0, PRO_MONTHLY: 1, PRO_YEARLY: 12 };
+export const PLAN_MONTHS: Record<PlanCode, number> = {
+  BASIC: 0,
+  PRO_DAILY: 0,
+  PRO_MONTHLY: 1,
+  PRO_YEARLY: 12,
+};
 
 export const isPaidPlan = (code: PlanCode) => code !== 'BASIC';
 
@@ -145,8 +150,9 @@ export function applyPaymentSucceeded(
     s.currentPeriodEnd != null;
   const freeDaysLeft = inFreeDays(s, now);
   const start = paidRunning ? s.currentPeriodEnd! : freeDaysLeft ? s.trialEndsAt : now;
-  let periodEnd = addMonths(start, months);
-  if (periodEnd.getTime() <= now.getTime()) periodEnd = addMonths(now, months);
+  const add = (d: Date) => (planCode === 'PRO_DAILY' ? addDays(d, 1) : addMonths(d, months));
+  let periodEnd = add(start);
+  if (periodEnd.getTime() <= now.getTime()) periodEnd = add(now);
   return {
     ...s,
     status: 'ACTIVE',

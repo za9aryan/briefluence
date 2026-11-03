@@ -109,7 +109,7 @@ export const envSchema = z
     /**
      * Paddle Billing (https://developer.paddle.com). Sandbox and live are separate accounts with
      * their own keys and prices; PADDLE_ENV picks the set. Sandbox = demo mode: 1 hour of free Pro,
-     * the 1-day demo price for "monthly", and admin buttons that simulate renewals.
+     * an optional 1-day test plan, and admin buttons that simulate renewals.
      */
     PADDLE_ENV: z.enum(['sandbox', 'production']).default('sandbox'),
     PADDLE_SANDBOX_API_KEY: optional,
@@ -117,7 +117,7 @@ export const envSchema = z
     PADDLE_SANDBOX_WEBHOOK_SECRET: optional,
     PADDLE_SANDBOX_PRICE_MONTHLY: optional,
     PADDLE_SANDBOX_PRICE_YEARLY: optional,
-    /** 1-day price used for "Pro monthly" in the sandbox demo (falls back to the monthly price). */
+    /** Optional 1-day test price, offered as "Pro daily (test)" in the sandbox only. */
     PADDLE_SANDBOX_PRICE_DEMO: optional,
     PADDLE_LIVE_API_KEY: optional,
     PADDLE_LIVE_CLIENT_TOKEN: optional,
@@ -161,15 +161,10 @@ export const envSchema = z
             'PADDLE_SANDBOX_API_KEY',
             'PADDLE_SANDBOX_CLIENT_TOKEN',
             'PADDLE_SANDBOX_WEBHOOK_SECRET',
+            'PADDLE_SANDBOX_PRICE_MONTHLY',
             'PADDLE_SANDBOX_PRICE_YEARLY',
           ] as const);
       need([...keys], `PAYMENT_PROVIDER=paddle with PADDLE_ENV=${e.PADDLE_ENV}`);
-      if (!live && !e.PADDLE_SANDBOX_PRICE_MONTHLY && !e.PADDLE_SANDBOX_PRICE_DEMO)
-        ctx.addIssue({
-          code: 'custom',
-          path: ['PADDLE_SANDBOX_PRICE_DEMO'],
-          message: 'Set the demo or monthly price',
-        });
     }
     const real = (p: Platform) => !e.SOCIAL_MOCK.includes(p);
     if (real('INSTAGRAM'))
