@@ -22,7 +22,7 @@ export function ApplicationMiniCard({ app }: { app: MyApplicationDto }) {
   return (
     <Link
       href={`/influencer/deals/${d.id}`}
-      className="group flex items-center gap-3 rounded-card border border-line bg-surface-raised p-2.5 pr-3 transition-colors hover:border-primary/40 sm:gap-4"
+      className="group flex items-center gap-3 rounded-card border border-line bg-surface-raised p-2.5 pr-3 transition duration-200 hover:border-primary/40 hover:shadow-pop motion-safe:hover:-translate-y-0.5 sm:gap-4"
     >
       <MediaCover
         src={dealCover(d)}

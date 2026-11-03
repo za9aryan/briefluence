@@ -1,6 +1,20 @@
 'use client';
 import type { ApplicationStatus, DealStatus } from '@briefluence/shared';
-import { Avatar, Card, CardHeader, EmptyState, Grid, Inline, ScoreMeter, Skeleton, Stack, Stat, Text, buttonStyles, Icon } from '@briefluence/ui';
+import {
+  Avatar,
+  Card,
+  CardHeader,
+  EmptyState,
+  Grid,
+  Inline,
+  ScoreMeter,
+  Skeleton,
+  Stack,
+  Stat,
+  Text,
+  buttonStyles,
+  Icon,
+} from '@briefluence/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -29,7 +43,10 @@ export default function BrandDashboardPage() {
   const tn = useTranslations('nav');
   const f = useFormat();
   const { data: me } = useMe();
-  const q = useQuery({ queryKey: ['brand', 'dashboard'], queryFn: () => api.get<BrandDashboardDto>('/brands/me/dashboard') });
+  const q = useQuery({
+    queryKey: ['brand', 'dashboard'],
+    queryFn: () => api.get<BrandDashboardDto>('/brands/me/dashboard'),
+  });
   const d = q.data;
   const totalDeals = d ? Object.values(d.deals).reduce((a, b) => a + b, 0) : 0;
 
@@ -44,7 +61,7 @@ export default function BrandDashboardPage() {
           </Link>
         }
       />
-      <Grid cols={{ base: 2, lg: 4 }} gap={{ base: 2, md: 4 }}>
+      <Grid className="bf-stagger" cols={{ base: 2, lg: 4 }} gap={{ base: 2, md: 4 }}>
         {!d ? (
           [0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-28 rounded-card" />)
         ) : (
@@ -73,7 +90,10 @@ export default function BrandDashboardPage() {
           <CardHeader
             title={t('brand.recent')}
             actions={
-              <Link href="/brand/deals" className="text-small font-bold text-primary-text hover:underline">
+              <Link
+                href="/brand/deals"
+                className="text-small font-bold text-primary-text hover:underline"
+              >
                 {tn('deals')}
               </Link>
             }
@@ -81,10 +101,13 @@ export default function BrandDashboardPage() {
           {q.isLoading ? (
             <Skeleton className="h-40" />
           ) : d?.recentApplicants.length ? (
-            <ul className="divide-y divide-line">
+            <ul className="bf-stagger divide-y divide-line">
               {d.recentApplicants.map((a) => (
                 <li key={a.id}>
-                  <Link href={`/brand/deals/${a.deal.id}/applicants`} className="flex items-center gap-4 py-2 hover:bg-surface sm:px-2">
+                  <Link
+                    href={`/brand/deals/${a.deal.id}/applicants`}
+                    className="flex items-center gap-4 py-2 hover:bg-surface sm:px-2"
+                  >
                     <Avatar name={a.influencer.displayName} src={a.influencer.avatarUrl} />
                     <div className="min-w-0 flex-1">
                       <Text weight="bold" truncate>

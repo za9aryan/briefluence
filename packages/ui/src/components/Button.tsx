@@ -31,9 +31,14 @@ export interface ButtonStyleProps {
 }
 
 /** Button classes, also used to style links (e.g. Next.js <Link>) as buttons. */
-export function buttonStyles({ variant = 'primary', size = 'md', block, className }: ButtonStyleProps = {}) {
+export function buttonStyles({
+  variant = 'primary',
+  size = 'md',
+  block,
+  className,
+}: ButtonStyleProps = {}) {
   return cn(
-    'inline-flex items-center justify-center rounded-pill font-bold whitespace-nowrap transition select-none',
+    'inline-flex items-center justify-center rounded-pill font-bold whitespace-nowrap transition select-none motion-safe:active:scale-[0.97]',
     'disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50',
     VARIANT[variant],
     SIZE[size],
@@ -50,7 +55,19 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>, Bu
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { variant, size, block, loading, icon, iconRight, className, children, disabled, type = 'button', ...rest },
+  {
+    variant,
+    size,
+    block,
+    loading,
+    icon,
+    iconRight,
+    className,
+    children,
+    disabled,
+    type = 'button',
+    ...rest
+  },
   ref,
 ) {
   return (

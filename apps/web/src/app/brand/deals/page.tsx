@@ -97,7 +97,7 @@ export default function BrandDealsPage() {
           }
         />
       ) : (
-        <Stack gap={4}>
+        <Stack className="bf-stagger" gap={4}>
           {list.map((d) => (
             <Card key={d.id} p={0} className="flex flex-col overflow-hidden sm:flex-row">
               {/* Brief image (else the brand logo), status and formats on it. */}

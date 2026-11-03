@@ -74,7 +74,7 @@ export default function NotificationsPage() {
         <EmptyState icon="bell" title={t('empty')} />
       ) : (
         <Card p={0} className="overflow-hidden">
-          <ul className="divide-y divide-line">
+          <ul className="bf-stagger divide-y divide-line">
             {list.data.items.map((n) => (
               <li key={n.id}>
                 <button

@@ -81,7 +81,7 @@ export default function MyOffersPage() {
           }
         />
       ) : (
-        <Grid cols={{ base: 1, md: 2, xl: 3 }} gap={4}>
+        <Grid className="bf-stagger" cols={{ base: 1, md: 2, xl: 3 }} gap={4}>
           {list.data.map((o) => {
             const publishLabel = PUBLISH_LABEL[o.status as keyof typeof PUBLISH_LABEL];
             return (

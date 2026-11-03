@@ -112,7 +112,7 @@ export function OfferCard({ offer, href }: { offer: FeedOfferDto; href: string }
   const f = useFormat();
   const top = offer.blogger.socialAccounts[0];
   return (
-    <Card p={0} className="flex h-full flex-col overflow-hidden">
+    <Card interactive p={0} className="flex h-full flex-col overflow-hidden">
       <MediaCover
         aspect="photo"
         src={offer.imageUrl ?? offer.blogger.coverUrl}

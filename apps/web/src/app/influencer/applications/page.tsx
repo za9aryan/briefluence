@@ -98,7 +98,7 @@ export default function MyApplicationsPage() {
           }
         />
       ) : (
-        <Stack gap={4}>
+        <Stack className="bf-stagger" gap={4}>
           {list.map((a) => (
             <Card key={a.id} p={0} className="flex flex-col overflow-hidden sm:flex-row">
               {/* Brief image on the left (on top on phones), status on it. */}

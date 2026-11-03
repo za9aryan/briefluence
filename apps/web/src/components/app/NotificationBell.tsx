@@ -66,7 +66,11 @@ export function NotificationBell() {
     <>
       <Icon name="bell" size="md" />
       {count > 0 && (
-        <span className="pointer-events-none absolute bottom-1 left-[calc(50%+5px)] inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-pill bg-primary px-[5px] text-[10px] font-bold leading-none tabular-nums text-on-primary shadow-sm ring-2 ring-surface">
+        // New key on every change: the badge pops when a notification arrives.
+        <span
+          key={count}
+          className="bf-pop pointer-events-none absolute bottom-1 left-[calc(50%+5px)] inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-pill bg-primary px-[5px] text-[10px] font-bold leading-none tabular-nums text-on-primary shadow-sm ring-2 ring-surface"
+        >
           {count > 9 ? '9+' : count}
         </span>
       )}

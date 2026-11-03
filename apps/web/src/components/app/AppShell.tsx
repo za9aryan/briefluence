@@ -232,7 +232,13 @@ export function AppShell({ role, children }: { role: Role; children: ReactNode }
         </header>
 
         <main className="flex-1">
-          <Container size="xl" py={{ base: 4, md: 6, lg: 8 }} className="flex flex-col gap-4">
+          {/* A new key per page: each page fades in when you move between them. */}
+          <Container
+            key={pathname}
+            size="xl"
+            py={{ base: 4, md: 6, lg: 8 }}
+            className="bf-fade flex flex-col gap-4"
+          >
             <Banners me={me} />
             {children}
           </Container>

@@ -97,6 +97,82 @@
 }
 
 /*
+ * Small motion, used everywhere (all off with reduced motion):
+ * - .bf-stagger: its children rise in (8px, fade) one after another — lists and card grids.
+ * - .bf-rise: one element rises in.  .bf-fade: content fades in (page changes).
+ * - .bf-pop: a badge pops when it appears or its number changes (give it a new key).
+ * Elements are visible at rest; only the entry animates, and only on mount.
+ */
+@layer components {
+  @keyframes bf-rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  @keyframes bf-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes bf-pop {
+    0% {
+      transform: scale(0.6);
+    }
+    60% {
+      transform: scale(1.15);
+    }
+  }
+  .bf-rise,
+  .bf-stagger > * {
+    /* backwards: hidden during its delay, then nothing left behind (no layer, no transform). */
+    animation: bf-rise 0.35s cubic-bezier(0.32, 0.72, 0, 1) backwards;
+  }
+  /* Up to 10 steps of 40ms; later items arrive together so long lists never feel slow. */
+  .bf-stagger > :nth-child(2) {
+    animation-delay: 40ms;
+  }
+  .bf-stagger > :nth-child(3) {
+    animation-delay: 80ms;
+  }
+  .bf-stagger > :nth-child(4) {
+    animation-delay: 120ms;
+  }
+  .bf-stagger > :nth-child(5) {
+    animation-delay: 160ms;
+  }
+  .bf-stagger > :nth-child(6) {
+    animation-delay: 200ms;
+  }
+  .bf-stagger > :nth-child(7) {
+    animation-delay: 240ms;
+  }
+  .bf-stagger > :nth-child(8) {
+    animation-delay: 280ms;
+  }
+  .bf-stagger > :nth-child(9) {
+    animation-delay: 320ms;
+  }
+  .bf-stagger > :nth-child(n + 10) {
+    animation-delay: 360ms;
+  }
+  .bf-fade {
+    animation: bf-fade 0.25s ease-out backwards;
+  }
+  .bf-pop {
+    animation: bf-pop 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bf-rise,
+    .bf-stagger > *,
+    .bf-fade,
+    .bf-pop {
+      animation: none;
+    }
+  }
+}
+
+/*
  * Vyrn toasts in brand colours (selectors from vyrn@5's stylesheet; ours load later and are more
  * specific). Tokens switch with the theme, so light and dark both follow the brand book:
  * success = success green, errors = primary text (no separate red), the rest neutral.

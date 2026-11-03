@@ -431,7 +431,7 @@ export default function DealFeedPage() {
             <Text size="small" tone="muted">
               {t('found', { count: feed.data.total })}
             </Text>
-            <Grid cols={{ base: 1, md: 2, xl: 3 }} gap={6}>
+            <Grid className="bf-stagger" cols={{ base: 1, md: 2, xl: 3 }} gap={6}>
               {feed.data.items.map((d) => (
                 <DealCard key={d.id} deal={d} />
               ))}

@@ -70,7 +70,7 @@ export default function InfluencerDashboardPage() {
 
       <BriefsChecklist />
 
-      <Grid cols={{ base: 2, lg: 4 }} gap={{ base: 2, md: 4 }}>
+      <Grid className="bf-stagger" cols={{ base: 2, lg: 4 }} gap={{ base: 2, md: 4 }}>
         {stats.isLoading || !s ? (
           [0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-28 rounded-card" />)
         ) : (
@@ -111,7 +111,7 @@ export default function InfluencerDashboardPage() {
               ))}
             </Grid>
           ) : feed.data?.items.length ? (
-            <Grid cols={{ base: 1, md: 2, xl: 3 }} gap={6}>
+            <Grid className="bf-stagger" cols={{ base: 1, md: 2, xl: 3 }} gap={6}>
               {feed.data.items.map((d) => (
                 <DealCard key={d.id} deal={d} />
               ))}
@@ -139,7 +139,7 @@ export default function InfluencerDashboardPage() {
           }
         />
         {apps.data?.length ? (
-          <ul className="flex flex-col gap-3">
+          <ul className="bf-stagger flex flex-col gap-3">
             {apps.data.slice(0, 5).map((a) => (
               <li key={a.id}>
                 <ApplicationMiniCard app={a} />

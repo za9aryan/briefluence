@@ -258,7 +258,7 @@ function Browse() {
         <EmptyState icon="search" title={t('emptyFeed')} />
       ) : (
         <>
-          <Grid cols={{ base: 1, md: 2, xl: 3 }} gap={4}>
+          <Grid className="bf-stagger" cols={{ base: 1, md: 2, xl: 3 }} gap={4}>
             {feed.data.items.map((offer) => (
               <OfferCard key={offer.id} offer={offer} href={`/brand/offers/${offer.id}`} />
             ))}
@@ -305,7 +305,7 @@ function MyRequests() {
   if (list.isLoading) return <Skeleton className="h-48 rounded-card" />;
   if (!list.data?.length) return <EmptyState icon="send" title={t('emptyRequests')} />;
   return (
-    <Stack gap={4}>
+    <Stack className="bf-stagger" gap={4}>
       {list.data.map((r) => (
         <Card key={r.id} p={0} className="flex flex-col overflow-hidden sm:flex-row">
           {/* The offer cover (else the blogger's photo), with the request status on it. */}

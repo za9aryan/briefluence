@@ -186,7 +186,7 @@ export default function ApplicantsPage() {
           description={d?.status === 'ACTIVE' ? t('emptyBody') : undefined}
         />
       ) : (
-        <Stack gap={4}>
+        <Stack className="bf-stagger" gap={4}>
           {data.data.items.map((a) => (
             <ApplicantCard
               key={a.id}

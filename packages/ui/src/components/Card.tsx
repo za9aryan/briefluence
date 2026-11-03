@@ -8,7 +8,10 @@ export interface CardProps extends BlockProps {
 }
 
 /** Brand card: surface-raised, border-line, 16px radius, 16px padding (24px from md). */
-export const Card = forwardRef<HTMLElement, CardProps>(function Card({ interactive, className, p = { base: 4, md: 6 }, ...rest }, ref) {
+export const Card = forwardRef<HTMLElement, CardProps>(function Card(
+  { interactive, className, p = { base: 4, md: 6 }, ...rest },
+  ref,
+) {
   return (
     <Block
       ref={ref}
@@ -16,15 +19,35 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card({ interacti
       radius="card"
       bordered
       p={p}
-      className={cn('min-w-0', interactive && 'transition hover:border-primary/40 hover:shadow-pop', className)}
+      className={cn(
+        'min-w-0',
+        interactive &&
+          'transition duration-200 hover:border-primary/40 hover:shadow-pop motion-safe:hover:-translate-y-0.5',
+        className,
+      )}
       {...rest}
     />
   );
 });
 
-export function CardHeader({ title, description, actions, className }: { title: ReactNode; description?: ReactNode; actions?: ReactNode; className?: string }) {
+export function CardHeader({
+  title,
+  description,
+  actions,
+  className,
+}: {
+  title: ReactNode;
+  description?: ReactNode;
+  actions?: ReactNode;
+  className?: string;
+}) {
   return (
-    <div className={cn('mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between', className)}>
+    <div
+      className={cn(
+        'mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between',
+        className,
+      )}
+    >
       <div className="min-w-0">
         <Heading level={3}>{title}</Heading>
         {description && (
@@ -39,5 +62,13 @@ export function CardHeader({ title, description, actions, className }: { title: 
 }
 
 export function CardFooter({ className, ...rest }: HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn('mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-line pt-4', className)} {...rest} />;
+  return (
+    <div
+      className={cn(
+        'mt-6 flex flex-wrap items-center justify-end gap-2 border-t border-line pt-4',
+        className,
+      )}
+      {...rest}
+    />
+  );
 }
