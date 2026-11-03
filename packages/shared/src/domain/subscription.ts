@@ -55,12 +55,19 @@ export function addMonths(d: Date, months: number): Date {
   return r;
 }
 
-/** The blogger chose a plan: free Pro days start now, whatever they chose. */
-export function startPlan(now: Date, planCode: PlanCode): SubscriptionState {
+/**
+ * The blogger chose a plan: free Pro days start now, whatever they chose. `freeMs` shortens them
+ * in the Paddle sandbox demo (1 hour) so the whole flow can be tested quickly.
+ */
+export function startPlan(
+  now: Date,
+  planCode: PlanCode,
+  freeMs: number = TRIAL_DAYS * DAY,
+): SubscriptionState {
   return {
     status: 'TRIALING',
     planCode,
-    trialEndsAt: addDays(now, TRIAL_DAYS),
+    trialEndsAt: new Date(now.getTime() + freeMs),
     currentPeriodEnd: null,
     cancelAtPeriodEnd: false,
     bindingId: null,

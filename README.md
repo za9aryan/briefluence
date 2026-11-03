@@ -33,7 +33,8 @@ pnpm dev                        # web on :3000, API on :4000
 - With `EMAIL_TRANSPORT=log` emails are saved as HTML in `apps/api/.emails/` (verification and reset links are there).
   With Docker, set `EMAIL_TRANSPORT=smtp` and open Mailpit at http://localhost:8025.
 - `SOCIAL_MOCK=true` fakes Instagram/TikTok/YouTube OAuth with generated stats; `PAYMENT_PROVIDER=mock` replaces
-  the Ameriabank page with a test page (cards: always succeeds / renewals decline / declined).
+  the payment page with a test page (cards: always succeeds / renewals decline / declined).
+  `PAYMENT_PROVIDER=paddle` uses Paddle (sandbox demo or live), see [docs/paddle.md](docs/paddle.md).
 
 ### Seeded logins
 
@@ -75,8 +76,9 @@ or shown to brands. Changing a manual account's platform or username, or fixing 
 - **Basic**: free, a limited number of applications per rolling 30 days (default 10).
 - **Pro** (monthly) and **Pro yearly**: unlimited applications.
 
-Every blogger picks a plan and first gets **30 days of Pro for free**. Choosing Pro opens the bank page right away;
-the paid period starts when the free days end. Without payment (or after a cancelled / failed renewal) the blogger
+Every blogger picks a plan and first gets **30 days of Pro for free** (1 hour in the Paddle demo). Choosing Pro
+opens the payment page right away; with the bank, the paid period starts when the free days end; with Paddle it
+starts at payment and Paddle runs the renewals. Without payment (or after a cancelled / failed renewal) the blogger
 moves to Basic — nobody loses access. Prices, currency, Basic's limit and which Pro plans are offered are edited in
 **Admin → Plans**. Prices are never shown on public pages.
 
@@ -204,7 +206,9 @@ One free ARM server runs Postgres, the API, the website and HTTPS: see [docs/ora
 - Real OAuth apps: Meta (Instagram API with Instagram Login, `instagram_business_basic` + `instagram_business_manage_insights`),
   TikTok Login Kit + Display API, Google (YouTube Data + Analytics, sensitive scopes). Redirect URI:
   `{WEB_URL}/api/v1/social/{instagram|tiktok|youtube}/callback`. Submit each for app review; set `SOCIAL_MOCK=false`.
-- Ameriabank vPOS: request API credentials and **binding payments** (director applies in internet banking); confirm
+- Paddle: live account approved (domain, public pricing, refund policy, Terms naming Paddle as merchant of record),
+  live keys and prices in `.env`, `PADDLE_ENV=production` ([docs/paddle.md](docs/paddle.md)).
+- (Alternative) Ameriabank vPOS: request API credentials and **binding payments** (director applies in internet banking); confirm
   whether USD is allowed (otherwise `SUBSCRIPTION_CURRENCY=AMD`, `SUBSCRIPTION_PRICE_MINOR=390000`), the test OrderID
   range (`AMERIA_ORDER_ID_OFFSET`) and the binding `PaymentType`.
 - Have a lawyer review the draft Terms and Privacy pages (all three languages).

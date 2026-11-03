@@ -1,7 +1,13 @@
 import { Logger } from '@nestjs/common';
 import { toMajor, type Currency } from '@briefluence/shared';
 import type { Env } from '../../../config/env';
-import type { ChargeInput, CheckoutInput, CheckoutResult, PaymentOutcome, PaymentProvider } from './types';
+import type {
+  ChargeInput,
+  CheckoutInput,
+  CheckoutResult,
+  PaymentOutcome,
+  PaymentProvider,
+} from './types';
 
 /**
  * Ameriabank vPOS 3.x REST API. There is no official Node SDK; request/response shapes follow
@@ -20,7 +26,9 @@ export class AmeriaProvider implements PaymentProvider {
   private readonly host: string;
 
   constructor(private readonly env: Env) {
-    this.host = env.AMERIA_TEST_MODE ? 'https://servicestest.ameriabank.am/VPOS' : 'https://services.ameriabank.am/VPOS';
+    this.host = env.AMERIA_TEST_MODE
+      ? 'https://servicestest.ameriabank.am/VPOS'
+      : 'https://services.ameriabank.am/VPOS';
   }
 
   /** ISO 4217 numeric codes as expected by vPOS. */
@@ -94,11 +102,21 @@ export class AmeriaProvider implements PaymentProvider {
     }
     // "0-100" = no payment attempt yet (user still on the bank page or abandoned it).
     if (r.ResponseCode === '0-100') return { status: 'PENDING', providerPaymentId, raw };
-    return { status: 'FAILED', providerPaymentId, failureReason: r.TrxnDescription || r.ResponseCode, raw };
+    return {
+      status: 'FAILED',
+      providerPaymentId,
+      failureReason: r.TrxnDescription || r.ResponseCode,
+      raw,
+    };
   }
 
   async chargeBinding(input: ChargeInput): Promise<PaymentOutcome> {
-    type R = { PaymentID: string; ResponseCode: string; TrxnDescription: string; CardNumber: string };
+    type R = {
+      PaymentID: string;
+      ResponseCode: string;
+      TrxnDescription: string;
+      CardNumber: string;
+    };
     try {
       const r = await this.call<R>('MakeBindingPayment', {
         OrderID: Number(input.orderId),
@@ -111,8 +129,14 @@ export class AmeriaProvider implements PaymentProvider {
         Opaque: input.bindingId,
       });
       const raw = this.safeRaw(r as unknown as Record<string, unknown>);
-      if (r.ResponseCode === '00') return { status: 'SUCCEEDED', providerPaymentId: r.PaymentID, cardMask: r.CardNumber, raw };
-      return { status: 'FAILED', providerPaymentId: r.PaymentID, failureReason: r.TrxnDescription || r.ResponseCode, raw };
+      if (r.ResponseCode === '00')
+        return { status: 'SUCCEEDED', providerPaymentId: r.PaymentID, cardMask: r.CardNumber, raw };
+      return {
+        status: 'FAILED',
+        providerPaymentId: r.PaymentID,
+        failureReason: r.TrxnDescription || r.ResponseCode,
+        raw,
+      };
     } catch (err) {
       this.logger.error(`MakeBindingPayment error: ${(err as Error).message}`);
       return { status: 'FAILED', failureReason: 'Bank unavailable' };
@@ -121,7 +145,10 @@ export class AmeriaProvider implements PaymentProvider {
 
   async refund(providerPaymentId: string, amount: number) {
     type R = { ResponseCode: string; ResponseMessage: string };
-    const r = await this.call<R>('RefundPayment', { PaymentID: providerPaymentId, Amount: toMajor(amount) });
+    const r = await this.call<R>('RefundPayment', {
+      PaymentID: providerPaymentId,
+      Amount: toMajor(amount),
+    });
     return { ok: r.ResponseCode === '00', raw: r };
   }
 
@@ -131,6 +158,7 @@ export class AmeriaProvider implements PaymentProvider {
       CardHolderID: bindingId,
       PaymentType: this.env.AMERIA_BINDING_PAYMENT_TYPE,
     });
-    if (r.ResponseCode !== '00') this.logger.warn(`DeactivateBinding returned ${r.ResponseCode} ${r.ResponseMessage}`);
+    if (r.ResponseCode !== '00')
+      this.logger.warn(`DeactivateBinding returned ${r.ResponseCode} ${r.ResponseMessage}`);
   }
 }

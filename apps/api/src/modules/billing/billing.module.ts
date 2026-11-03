@@ -3,9 +3,12 @@ import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { BillingController } from './billing.controller';
 import { BillingService } from './billing.service';
+import { PaddleBillingService } from './paddle/paddle-billing.service';
+import { PaddleClient } from './paddle/paddle.client';
 import { PlansService } from './plans.service';
 import { AmeriaProvider } from './providers/ameria.provider';
 import { MockPaymentProvider } from './providers/mock.provider';
+import { PaddleProviderStub } from './providers/paddle.provider';
 import { PAYMENT_PROVIDER } from './providers/types';
 
 @Module({
@@ -13,15 +16,19 @@ import { PAYMENT_PROVIDER } from './providers/types';
   providers: [
     BillingService,
     PlansService,
+    PaddleClient,
+    PaddleBillingService,
     {
       provide: PAYMENT_PROVIDER,
       inject: [ENV],
       useFactory: (env: Env) =>
         env.PAYMENT_PROVIDER === 'ameriabank'
           ? new AmeriaProvider(env)
-          : new MockPaymentProvider(env),
+          : env.PAYMENT_PROVIDER === 'paddle'
+            ? new PaddleProviderStub()
+            : new MockPaymentProvider(env),
     },
   ],
-  exports: [BillingService, PlansService, PAYMENT_PROVIDER],
+  exports: [BillingService, PlansService, PaddleBillingService, PAYMENT_PROVIDER],
 })
 export class BillingModule {}

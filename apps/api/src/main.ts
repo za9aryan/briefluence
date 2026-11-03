@@ -7,7 +7,8 @@ import { loadEnv } from './config/env';
 
 async function bootstrap() {
   const env = loadEnv();
-  const app = await NestFactory.create(AppModule, { bufferLogs: false });
+  // rawBody: webhooks (Paddle) verify signatures over the exact bytes received.
+  const app = await NestFactory.create(AppModule, { bufferLogs: false, rawBody: true });
   app.enableShutdownHooks();
   configureApp(app, env);
   await app.listen(env.API_PORT);

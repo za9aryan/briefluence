@@ -1,6 +1,7 @@
 'use client';
 import type { PlanCode } from '@briefluence/shared';
 import {
+  Alert,
   Badge,
   Button,
   Card,
@@ -19,6 +20,7 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
+import { type CheckoutResponse, useRunCheckout } from '@/lib/hooks/checkout';
 import { useFormat } from '@/lib/hooks/format';
 import { ME_KEY, useMe } from '@/lib/hooks/session';
 import type { PlanDto, SubscriptionDto } from '@/lib/types';
@@ -31,30 +33,31 @@ export const useSubscription = () =>
 
 /**
  * Picks a plan. `start`: the blogger has no plan yet — every plan starts with free Pro days, and
- * Pro also opens the bank page. `upgrade`: only Pro plans, straight to payment.
+ * Pro also opens the payment page (bank redirect or Paddle overlay). `upgrade`: only Pro plans, straight to payment.
  */
 function usePlanAction(mode: 'start' | 'upgrade') {
   const t = useTranslations('billing.plans');
   const toast = useToast();
   const errorMessage = useErrorMessage();
   const qc = useQueryClient();
+  const runCheckout = useRunCheckout();
   return useMutation({
     mutationFn: async (plan: PlanCode) => {
       if (mode === 'start') await api.post('/billing/plan', { plan });
-      if (plan === 'BASIC') return null;
-      return api.post<{ redirectUrl: string }>('/billing/checkout', { plan });
+      if (plan === 'BASIC') return 'started';
+      // Paddle opens an overlay; the mutation stays pending until it is closed.
+      const r = await api.post<CheckoutResponse>('/billing/checkout', { plan });
+      await runCheckout(r);
+      return mode === 'start' && !('redirectUrl' in r) ? 'started' : null;
     },
     onSuccess: (r) => {
-      if (r?.redirectUrl) {
-        window.location.href = r.redirectUrl;
-        return;
-      }
+      if (!r) return;
       for (const key of [ME_KEY, ['billing'], ['influencer'], ['feed'], ['deal']])
         void qc.invalidateQueries({ queryKey: key });
       toast(t('started'));
     },
     onError: (e) => {
-      // A Pro choice still started the free days even if the bank page failed to open.
+      // A Pro choice still started the free days even if the payment page failed to open.
       void qc.invalidateQueries({ queryKey: ['billing'] });
       void qc.invalidateQueries({ queryKey: ME_KEY });
       toast(errorMessage(e), 'danger');
@@ -70,6 +73,7 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
   const plans = (sub.data?.plans ?? []).filter((p) => mode === 'start' || p.code !== 'BASIC');
   const monthly = plans.find((p) => p.code === 'PRO_MONTHLY');
   const freeDaysLeft = mode === 'start' || !!sub.data?.subscription?.inFreeDays;
+  const paddle = sub.data?.paddle;
 
   const price = (p: PlanDto) =>
     p.code === 'BASIC' ? t('free') : f.money(p.priceMinor, p.currency);
@@ -108,6 +112,7 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
         </Heading>
         <Text tone="muted">{mode === 'start' ? t('lead') : t('upgradeLead')}</Text>
       </Stack>
+      {paddle?.demo && <DemoNote />}
       <Grid cols={{ base: 1, md: plans.length >= 3 ? 3 : 2 }} gap={4}>
         {plans.map((p) => {
           const pro = p.code !== 'BASIC';
@@ -152,9 +157,9 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
                 >
                   {cta[p.code]}
                 </Button>
-                {pro && freeDaysLeft && (
+                {pro && (paddle || freeDaysLeft) && (
                   <Text size="small" tone="muted">
-                    {t('payNote')}
+                    {paddle ? t('payNowNote') : t('payNote')}
                   </Text>
                 )}
               </Stack>
@@ -163,6 +168,16 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
         })}
       </Grid>
     </Stack>
+  );
+}
+
+/** Sandbox (demo) mode: short periods and Paddle's test card, no real money. */
+export function DemoNote() {
+  const t = useTranslations('billing.demo');
+  return (
+    <Alert tone="info" title={t('title')}>
+      {t('body', { card: '4242 4242 4242 4242' })}
+    </Alert>
   );
 }
 

@@ -1,3 +1,4 @@
+import type { PaddleClientConfig } from '@/lib/paddle';
 import type {
   AccountReviewStatus,
   ApplicationStatus,
@@ -319,7 +320,9 @@ export interface SubscriptionDto {
     nextPlan: PlanDto | null;
   } | null;
   plans: PlanDto[];
-  provider: 'mock' | 'ameriabank';
+  provider: 'mock' | 'ameriabank' | 'paddle';
+  /** Paddle.js settings when Paddle takes the payments. */
+  paddle: PaddleClientConfig | null;
 }
 
 export interface PaymentDto {

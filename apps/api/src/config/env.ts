@@ -104,7 +104,25 @@ export const envSchema = z
     APPLE_KEY_ID: optional,
     APPLE_PRIVATE_KEY: optional, // contents of the .p8 key (newlines as \\n are fine)
 
-    PAYMENT_PROVIDER: z.enum(['mock', 'ameriabank']).default('mock'),
+    PAYMENT_PROVIDER: z.enum(['mock', 'ameriabank', 'paddle']).default('mock'),
+    /**
+     * Paddle Billing (https://developer.paddle.com). Sandbox and live are separate accounts with
+     * their own keys and prices; PADDLE_ENV picks the set. Sandbox = demo mode: 1 hour of free Pro,
+     * the 1-day demo price for "monthly", and admin buttons that simulate renewals.
+     */
+    PADDLE_ENV: z.enum(['sandbox', 'production']).default('sandbox'),
+    PADDLE_SANDBOX_API_KEY: optional,
+    PADDLE_SANDBOX_CLIENT_TOKEN: optional,
+    PADDLE_SANDBOX_WEBHOOK_SECRET: optional,
+    PADDLE_SANDBOX_PRICE_MONTHLY: optional,
+    PADDLE_SANDBOX_PRICE_YEARLY: optional,
+    /** 1-day price used for "Pro monthly" in the sandbox demo (falls back to the monthly price). */
+    PADDLE_SANDBOX_PRICE_DEMO: optional,
+    PADDLE_LIVE_API_KEY: optional,
+    PADDLE_LIVE_CLIENT_TOKEN: optional,
+    PADDLE_LIVE_WEBHOOK_SECRET: optional,
+    PADDLE_LIVE_PRICE_MONTHLY: optional,
+    PADDLE_LIVE_PRICE_YEARLY: optional,
     /** Staging / early launch: allow simulated social login and payments with NODE_ENV=production. */
     ALLOW_MOCKS_IN_PRODUCTION: bool,
     AMERIA_TEST_MODE: z
@@ -136,6 +154,30 @@ export const envSchema = z
         ['S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY', 'S3_PUBLIC_URL'],
         'STORAGE_DRIVER=s3',
       );
+    }
+    if (e.PAYMENT_PROVIDER === 'paddle') {
+      const live = e.PADDLE_ENV === 'production';
+      const keys = live
+        ? ([
+            'PADDLE_LIVE_API_KEY',
+            'PADDLE_LIVE_CLIENT_TOKEN',
+            'PADDLE_LIVE_WEBHOOK_SECRET',
+            'PADDLE_LIVE_PRICE_MONTHLY',
+            'PADDLE_LIVE_PRICE_YEARLY',
+          ] as const)
+        : ([
+            'PADDLE_SANDBOX_API_KEY',
+            'PADDLE_SANDBOX_CLIENT_TOKEN',
+            'PADDLE_SANDBOX_WEBHOOK_SECRET',
+            'PADDLE_SANDBOX_PRICE_YEARLY',
+          ] as const);
+      need([...keys], `PAYMENT_PROVIDER=paddle with PADDLE_ENV=${e.PADDLE_ENV}`);
+      if (!live && !e.PADDLE_SANDBOX_PRICE_MONTHLY && !e.PADDLE_SANDBOX_PRICE_DEMO)
+        ctx.addIssue({
+          code: 'custom',
+          path: ['PADDLE_SANDBOX_PRICE_DEMO'],
+          message: 'Set the demo or monthly price',
+        });
     }
     if (e.PAYMENT_PROVIDER === 'ameriabank') {
       need(
@@ -171,6 +213,12 @@ export const envSchema = z
           message: 'mock is not allowed in production',
         });
       }
+      if (e.PAYMENT_PROVIDER === 'paddle' && e.PADDLE_ENV === 'sandbox')
+        ctx.addIssue({
+          code: 'custom',
+          path: ['PADDLE_ENV'],
+          message: 'Use the live Paddle account in production',
+        });
     }
   });
 

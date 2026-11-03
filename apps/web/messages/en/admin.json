@@ -203,6 +203,17 @@
     "count": "Payments",
     "empty": "No payments yet",
     "user": "User",
-    "subscription": "Subscription"
+    "subscription": "Subscription",
+    "demo": {
+      "title": "Paddle test mode",
+      "lead": "Make Paddle send a renewal, a failed payment or a cancellation for a test subscription right now. Each one arrives as a webhook in a few seconds.",
+      "empty": "No Paddle subscriptions yet. Buy Pro with the test card first.",
+      "periodEnd": "Period ends",
+      "actions": "Simulate",
+      "renewal_success": "Renewal paid",
+      "renewal_failed": "Renewal failed",
+      "cancellation": "Cancel",
+      "sent": "Sent. The webhook arrives in a few seconds."
+    }
   }
 }

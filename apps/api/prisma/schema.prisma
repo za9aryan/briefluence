@@ -365,27 +365,32 @@ model PortfolioItem {
 }
 
 model Subscription {
-  id                  String             @id @default(cuid())
-  userId              String             @unique
-  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status              SubscriptionStatus
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status               SubscriptionStatus
   /// Chosen / current plan. Free Pro days come first for every plan; unpaid Pro falls back to BASIC.
-  planCode            PlanCode           @default(BASIC)
+  planCode             PlanCode           @default(BASIC)
   /// Pro plan to switch to at the next renewal (monthly <-> yearly)
-  nextPlanCode        PlanCode?
+  nextPlanCode         PlanCode?
   /// When the blogger moved to Basic; its limit counts applications from then on.
-  basicSince          DateTime?
-  trialEndsAt         DateTime
-  currentPeriodEnd    DateTime?
-  cancelAtPeriodEnd   Boolean            @default(false)
-  bindingId           String? // Ameriabank card binding (CardHolderID) for recurring charges
-  cardMask            String?
-  failedAttempts      Int                @default(0) // spec+: renewal retries on days 1, 3, 5
-  pastDueSince        DateTime? // spec+
-  trialReminderSentAt DateTime? // spec+: send the 3-day reminder once
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @default(now()) @updatedAt
-  payments            Payment[]
+  basicSince           DateTime?
+  trialEndsAt          DateTime
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean            @default(false)
+  bindingId            String? // Ameriabank card binding (CardHolderID) for recurring charges
+  /// Paddle Billing: the subscription Paddle runs (renewals, retries, cancel) and its customer.
+  paddleSubscriptionId String?            @unique
+  paddleCustomerId     String?
+  /// occurred_at of the last Paddle event applied (events can arrive out of order).
+  paddleEventAt        DateTime?
+  cardMask             String?
+  failedAttempts       Int                @default(0) // spec+: renewal retries on days 1, 3, 5
+  pastDueSince         DateTime? // spec+
+  trialReminderSentAt  DateTime? // spec+: send the 3-day reminder once
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @default(now()) @updatedAt
+  payments             Payment[]
 }
 
 model Payment {
@@ -675,4 +680,13 @@ model PushSubscription {
   lastSentAt DateTime?
 
   @@index([userId])
+}
+
+/// Webhook events already processed (Paddle may deliver the same event more than once).
+model BillingEvent {
+  id        String   @id @default(cuid())
+  provider  String
+  eventId   String   @unique
+  type      String
+  createdAt DateTime @default(now())
 }

@@ -32,12 +32,16 @@ export interface ChargeInput extends Omit<CheckoutInput, 'cardHolderId'> {
 
 /** The spec's provider contract: createCheckout, confirm, chargeBinding, refund (+ removeBinding). */
 export interface PaymentProvider {
-  readonly name: 'ameriabank' | 'mock';
+  readonly name: 'ameriabank' | 'mock' | 'paddle';
   createCheckout(input: CheckoutInput): Promise<CheckoutResult>;
   /** Server-to-server confirmation; never trust redirect query params. */
   confirm(providerPaymentId: string): Promise<PaymentOutcome>;
   chargeBinding(input: ChargeInput): Promise<PaymentOutcome>;
-  refund(providerPaymentId: string, amount: number, currency: Currency): Promise<{ ok: boolean; raw?: unknown }>;
+  refund(
+    providerPaymentId: string,
+    amount: number,
+    currency: Currency,
+  ): Promise<{ ok: boolean; raw?: unknown }>;
   removeBinding(bindingId: string): Promise<void>;
 }
 

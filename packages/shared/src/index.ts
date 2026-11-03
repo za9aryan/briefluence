@@ -14,3 +14,4 @@ export * from './domain/accounts';
 export * from './domain/offers';
 export * from './domain/portfolio';
 export * from './domain/support';
+export * from './domain/paddle';

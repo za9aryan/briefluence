@@ -22,7 +22,7 @@ export interface TestCtx {
 
 export async function createTestApp(): Promise<TestCtx> {
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
-  const app = moduleRef.createNestApplication({ logger: ['error'] });
+  const app = moduleRef.createNestApplication({ logger: ['error'], rawBody: true });
   configureApp(app, loadEnv());
   await app.init();
   return {
@@ -40,6 +40,7 @@ export async function resetDb(prisma: PrismaService) {
   const tables = [
     'AuthIdentity',
     'PushSubscription',
+    'BillingEvent',
     'SupportMessage',
     'SupportTicket',
     'OfferView',

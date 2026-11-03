@@ -7,6 +7,10 @@
 	handle /api/v1/ws/* {
 		reverse_proxy api:4000
 	}
+	# Paddle webhooks are signed over the exact request body, so they skip the website proxy.
+	handle /api/v1/billing/paddle/webhook {
+		reverse_proxy api:4000
+	}
 	handle {
 		reverse_proxy web:3000
 	}

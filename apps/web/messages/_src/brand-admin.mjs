@@ -682,6 +682,29 @@ export default {
       empty: ['No payments yet', 'Платежей пока нет', 'Վճարումներ դեռ չկան'],
       user: ['User', 'Пользователь', 'Օգտատեր'],
       subscription: ['Subscription', 'Подписка', 'Բաժանորդագրություն'],
+      demo: {
+        title: ['Paddle test mode', 'Тестовый режим Paddle', 'Paddle-ի թեստային ռեժիմ'],
+        lead: [
+          'Make Paddle send a renewal, a failed payment or a cancellation for a test subscription right now. Each one arrives as a webhook in a few seconds.',
+          'Попроси Paddle прямо сейчас прислать продление, неудачный платёж или отмену для тестовой подписки. Каждое событие придёт вебхуком через несколько секунд.',
+          'Խնդրիր Paddle-ին հենց հիմա ուղարկել թեստային բաժանորդագրության երկարաձգում, չստացված վճարում կամ չեղարկում։ Յուրաքանչյուրը կգա webhook-ով մի քանի վայրկյանում։',
+        ],
+        empty: [
+          'No Paddle subscriptions yet. Buy Pro with the test card first.',
+          'Подписок Paddle пока нет. Сначала купи Pro тестовой картой.',
+          'Paddle-ի բաժանորդագրություններ դեռ չկան։ Նախ գնիր Pro թեստային քարտով։',
+        ],
+        periodEnd: ['Period ends', 'Период до', 'Ժամկետը մինչև'],
+        actions: ['Simulate', 'Симуляция', 'Սիմուլյացիա'],
+        renewal_success: ['Renewal paid', 'Продление оплачено', 'Երկարաձգումը վճարված է'],
+        renewal_failed: ['Renewal failed', 'Продление не прошло', 'Երկարաձգումը չստացվեց'],
+        cancellation: ['Cancel', 'Отменить', 'Չեղարկել'],
+        sent: [
+          'Sent. The webhook arrives in a few seconds.',
+          'Отправлено. Вебхук придёт через несколько секунд.',
+          'Ուղարկված է։ Webhook-ը կգա մի քանի վայրկյանում։',
+        ],
+      },
     },
   },
 };

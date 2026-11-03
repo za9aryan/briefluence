@@ -27,8 +27,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
 import { PaymentStatusBadge } from '@/components/domain/badges';
-import { PlanPicker } from '@/components/influencer/StartTrial';
+import { DemoNote, PlanPicker } from '@/components/influencer/StartTrial';
 import { api } from '@/lib/api';
+import { type CheckoutResponse, useRunCheckout, useUpdateCard } from '@/lib/hooks/checkout';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { useFormat } from '@/lib/hooks/format';
 import { ME_KEY } from '@/lib/hooks/session';
@@ -112,14 +113,18 @@ export default function BillingPage() {
     },
     onError: (e) => toast(errorMessage(e), 'danger'),
   });
+  const runCheckout = useRunCheckout();
   const renew = useMutation({
-    mutationFn: (plan: PlanCode) =>
-      api.post<{ redirectUrl: string }>('/billing/checkout', { plan }),
-    onSuccess: ({ redirectUrl }) => {
-      window.location.href = redirectUrl;
-    },
+    mutationFn: async (plan: PlanCode) =>
+      runCheckout(await api.post<CheckoutResponse>('/billing/checkout', { plan })),
     onError: (e) => toast(errorMessage(e), 'danger'),
   });
+  const updateCard = useUpdateCard();
+  const changeCard = useMutation({
+    mutationFn: updateCard,
+    onError: (e) => toast(errorMessage(e), 'danger'),
+  });
+  const paddle = sub.data?.paddle;
 
   return (
     <Stack gap={6}>
@@ -127,6 +132,7 @@ export default function BillingPage() {
         <ReturnStatus />
       </Suspense>
       <PageHeader title={t('title')} description={t('lead')} />
+      {paddle?.demo && s && <DemoNote />}
 
       {sub.isLoading ? (
         <Skeleton className="h-56 rounded-card" />
@@ -283,7 +289,7 @@ export default function BillingPage() {
                     </Text>
                   )}
                 <Text size="small" tone="muted">
-                  {t('cardsNote')}
+                  {paddle ? t('cardsNotePaddle') : t('cardsNote')}
                 </Text>
               </Stack>
             </Card>
@@ -302,9 +308,21 @@ export default function BillingPage() {
                       {t('nextCharge', { date: f.date(s.nextChargeAt) })}
                     </Text>
                   )}
-                  <Button variant="ghost" size="sm" onClick={() => setConfirm('card')}>
-                    {t('removeCard')}
-                  </Button>
+                  {paddle ? (
+                    // Paddle keeps the card on the subscription; it can be replaced, not removed.
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      loading={changeCard.isPending}
+                      onClick={() => changeCard.mutate()}
+                    >
+                      {t('updateCard')}
+                    </Button>
+                  ) : (
+                    <Button variant="ghost" size="sm" onClick={() => setConfirm('card')}>
+                      {t('removeCard')}
+                    </Button>
+                  )}
                 </Stack>
               ) : (
                 <Text tone="muted">{t('noCard')}</Text>

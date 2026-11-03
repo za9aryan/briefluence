@@ -24,7 +24,7 @@ import {
   type PlanCode,
   type SubscriptionState,
 } from '@briefluence/shared';
-import { Prisma, type Plan, type Subscription } from '@prisma/client';
+import { Prisma, type Plan } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 import { AppError, notFound } from '../../common/app-error';
 import { Clock } from '../../common/clock';
@@ -33,36 +33,16 @@ import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { QueueService } from '../../queue/queue.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { PaddleBillingService } from './paddle/paddle-billing.service';
 import { PlansService } from './plans.service';
+import { fromState, toState } from './state';
 import { PAYMENT_PROVIDER, type PaymentOutcome, type PaymentProvider } from './providers/types';
 
 export const RENEW_JOB = 'billing.renew';
+/** Free Pro in the Paddle sandbox demo. */
+const DEMO_FREE_PRO_MS = 60 * 60 * 1000;
 
-export const toState = (s: Subscription): SubscriptionState => ({
-  status: s.status,
-  planCode: s.planCode,
-  trialEndsAt: s.trialEndsAt,
-  currentPeriodEnd: s.currentPeriodEnd,
-  cancelAtPeriodEnd: s.cancelAtPeriodEnd,
-  bindingId: s.bindingId,
-  failedAttempts: s.failedAttempts,
-  pastDueSince: s.pastDueSince,
-  basicSince: s.basicSince,
-  nextPlanCode: s.nextPlanCode ?? null,
-});
-
-const fromState = (s: SubscriptionState) => ({
-  status: s.status,
-  planCode: s.planCode,
-  trialEndsAt: s.trialEndsAt,
-  currentPeriodEnd: s.currentPeriodEnd,
-  cancelAtPeriodEnd: s.cancelAtPeriodEnd,
-  bindingId: s.bindingId,
-  failedAttempts: s.failedAttempts,
-  pastDueSince: s.pastDueSince,
-  basicSince: s.basicSince,
-  nextPlanCode: s.nextPlanCode ?? null,
-});
+export { toState } from './state';
 
 const publicPlan = (p: Plan) => ({
   code: p.code,
@@ -91,7 +71,13 @@ export class BillingService implements OnModuleInit {
     private readonly plans: PlansService,
     @Inject(PAYMENT_PROVIDER) private readonly provider: PaymentProvider,
     @Inject(ENV) private readonly env: Env,
+    private readonly paddle: PaddleBillingService,
   ) {}
+
+  /** Paddle sandbox demo: free Pro lasts 1 hour instead of 30 days. */
+  private freeProMs() {
+    return this.paddle.demo ? DEMO_FREE_PRO_MS : undefined;
+  }
 
   onModuleInit() {
     this.queue.register<{ subscriptionId: string }>(RENEW_JOB, ({ subscriptionId }) =>
@@ -112,7 +98,12 @@ export class BillingService implements OnModuleInit {
       this.plans.active(),
     ]);
     const now = this.clock.now();
-    const base = { plans: plans.map(publicPlan), provider: this.provider.name };
+    const base = {
+      plans: plans.map(publicPlan),
+      provider: this.provider.name,
+      /** Paddle.js settings (public client token) when Paddle is the provider. */
+      paddle: this.paddle.clientConfig(),
+    };
     if (!sub) return { subscription: null, ...base };
     const state = toState(sub);
     const tier = effectiveTier(state, now);
@@ -174,7 +165,7 @@ export class BillingService implements OnModuleInit {
     if (!plan.isActive) throw new AppError('VALIDATION_FAILED', 'This plan is not available');
     const existing = await this.prisma.subscription.findUnique({ where: { userId } });
     if (!existing) {
-      const s = startPlan(this.clock.now(), planCode);
+      const s = startPlan(this.clock.now(), planCode, this.freeProMs());
       await this.prisma.subscription.create({ data: { userId, ...fromState(s) } });
     } else if (existing.status === 'TRIALING' && !existing.bindingId) {
       await this.prisma.subscription.update({ where: { id: existing.id }, data: { planCode } });
@@ -207,8 +198,14 @@ export class BillingService implements OnModuleInit {
     });
   }
 
-  /** Pays for a Pro plan. During the free days the paid period starts when they end. */
-  async checkout(userId: string, planCode: PlanCode): Promise<{ redirectUrl: string }> {
+  /**
+   * Pays for a Pro plan. Bank providers: a redirect to the payment page. Paddle: settings for the
+   * Paddle.js checkout window (the subscription then arrives by webhook).
+   */
+  async checkout(
+    userId: string,
+    planCode: PlanCode,
+  ): Promise<{ redirectUrl: string } | Awaited<ReturnType<PaddleBillingService['checkout']>>> {
     const sub = await this.requireSub(userId);
     if (!isPaidPlan(planCode)) throw new AppError('VALIDATION_FAILED', 'Basic is free');
     const plan = await this.plans.get(planCode);
@@ -216,6 +213,13 @@ export class BillingService implements OnModuleInit {
     const now = this.clock.now();
     const state = toState(sub);
     if (!canCheckout(state, now)) throw new AppError('CONFLICT', 'Your Pro plan is already active');
+    if (this.paddle.enabled) {
+      const user = await this.prisma.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: { email: true },
+      });
+      return this.paddle.checkout(sub, planCode, user.email);
+    }
     // Renewing without a card (any Pro plan): the new period starts when the paid one ends.
     const cardHolderId = `bf-${sub.id}-${Date.now().toString(36)}`;
     const payment = await this.createPayment(sub.id, 'checkout', plan, { cardHolderId });
@@ -354,8 +358,21 @@ export class BillingService implements OnModuleInit {
     });
   }
 
+  /** Paddle runs the paid subscription: cancel / resume / switch go through its API. */
+  private paddleLinked(sub: { paddleSubscriptionId: string | null; status: string }) {
+    return (
+      this.paddle.enabled &&
+      !!sub.paddleSubscriptionId &&
+      (sub.status === 'ACTIVE' || sub.status === 'PAST_DUE')
+    );
+  }
+
   async cancel(userId: string) {
     const sub = await this.requireSub(userId);
+    if (this.paddleLinked(sub) && isPaidPlan(sub.planCode)) {
+      await this.paddle.cancel(sub);
+      return this.getForUser(userId);
+    }
     const next = applyCancel(toState(sub), this.clock.now());
     await this.prisma.subscription.update({ where: { id: sub.id }, data: fromState(next) });
     return this.getForUser(userId);
@@ -367,6 +384,10 @@ export class BillingService implements OnModuleInit {
     const plan = await this.plans.get(planCode);
     if (!plan.isActive && planCode !== sub.planCode)
       throw new AppError('VALIDATION_FAILED', 'This plan is not available');
+    if (this.paddleLinked(sub)) {
+      await this.paddle.switchPlan(sub, planCode);
+      return this.getForUser(userId);
+    }
     const next = scheduleSwitch(toState(sub), planCode, this.clock.now());
     if (!next) throw new AppError('CONFLICT', 'Switching needs a paid Pro plan with a saved card');
     await this.prisma.subscription.update({ where: { id: sub.id }, data: fromState(next) });
@@ -375,6 +396,10 @@ export class BillingService implements OnModuleInit {
 
   async resume(userId: string) {
     const sub = await this.requireSub(userId);
+    if (this.paddleLinked(sub)) {
+      await this.paddle.resume(sub);
+      return this.getForUser(userId);
+    }
     if (!sub.bindingId) throw new AppError('CONFLICT', 'Add a card by subscribing again');
     await this.prisma.subscription.update({
       where: { id: sub.id },
@@ -386,6 +411,8 @@ export class BillingService implements OnModuleInit {
   /** Deletes the card binding; without a card a Pro period simply ends and the blogger moves to Basic. */
   async removeCard(userId: string) {
     const sub = await this.requireSub(userId);
+    if (this.paddle.enabled)
+      throw new AppError('CONFLICT', 'With Paddle, update your card instead of removing it');
     if (!sub.bindingId) return this.getForUser(userId);
     await this.provider.removeBinding(sub.bindingId);
     const now = this.clock.now();
@@ -401,6 +428,13 @@ export class BillingService implements OnModuleInit {
       data: { ...fromState(next), cardMask: null },
     });
     return this.getForUser(userId);
+  }
+
+  /** Paddle: a transaction Paddle.js opens so the blogger can update their card. */
+  async paymentMethod(userId: string) {
+    const sub = await this.requireSub(userId);
+    if (!this.paddleLinked(sub)) throw new AppError('CONFLICT', 'No paid Pro subscription');
+    return this.paddle.paymentMethodTransaction(sub);
   }
 
   async payments(userId: string) {
@@ -425,6 +459,8 @@ export class BillingService implements OnModuleInit {
 
   /** Charges one due subscription with its saved card. Idempotent: re-checks due-ness first. */
   async renew(subscriptionId: string) {
+    // Paddle charges renewals itself.
+    if (this.paddle.enabled) return;
     const sub = await this.prisma.subscription.findUnique({ where: { id: subscriptionId } });
     const now = this.clock.now();
     if (!sub || !sub.bindingId || !isChargeDue(toState(sub), now)) return;
@@ -506,7 +542,7 @@ export class BillingService implements OnModuleInit {
         }
         continue;
       }
-      if (isChargeDue(state, now)) {
+      if (!this.paddle.enabled && isChargeDue(state, now)) {
         queued++;
         await this.queue.add(
           RENEW_JOB,
@@ -515,6 +551,8 @@ export class BillingService implements OnModuleInit {
         );
       }
     }
+    // Paddle: re-read subscriptions whose period ended without a webhook.
+    if (this.paddle.enabled) await this.paddle.reconcile();
     this.logger.log(
       `Daily billing: ${ending.length} reminders, ${moved} moved to Basic, ${queued} renewals queued`,
     );

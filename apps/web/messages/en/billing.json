@@ -27,7 +27,8 @@
     "choosePro": "Choose Pro",
     "chooseYearly": "Choose Pro yearly",
     "payNote": "You pay now; your paid period starts after the free days.",
-    "started": "Your 30 free Pro days have started"
+    "started": "Your 30 free Pro days have started",
+    "payNowNote": "You pay now and your paid period starts today."
   },
   "checklist": {
     "title": "Two steps to see briefs",
@@ -111,5 +112,12 @@
       "renewal_decline": "Pays now, renewals decline",
       "decline": "Declined"
     }
-  }
+  },
+  "demo": {
+    "title": "Test mode",
+    "body": "Free Pro lasts 1 hour, and Pro renews every day. Pay with the test card {card}, any future date and any CVC. No real money is charged."
+  },
+  "cardsNotePaddle": "Payments are processed by Paddle, our reseller and merchant of record; we never see your card number.",
+  "updateCard": "Change card",
+  "cardUpdatedToast": "Card updated"
 }
