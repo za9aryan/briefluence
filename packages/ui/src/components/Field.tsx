@@ -85,8 +85,9 @@ export function Field({ label, hint, error, required, aside, className, children
   );
 }
 
+// Touch screens get 16px text: iOS Safari zooms the page into any field with smaller text.
 const control =
-  'w-full rounded-sm border border-line bg-surface-raised text-small text-ink placeholder:text-ink-muted transition-colors ' +
+  'w-full rounded-sm border border-line bg-surface-raised text-small pointer-coarse:text-body text-ink placeholder:text-ink-muted transition-colors ' +
   'focus:border-primary focus:outline-none focus:ring-3 focus:ring-primary/15 ' +
   'disabled:cursor-not-allowed disabled:bg-surface aria-invalid:border-primary-text aria-invalid:ring-primary-text/10';
 

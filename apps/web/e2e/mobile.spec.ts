@@ -109,3 +109,22 @@ test('long handles and links stay inside cards on phones', async ({ browser }) =
   expect(v.out).toEqual([]);
   expect(a.out).toEqual([]);
 });
+
+/** iOS Safari zooms into fields with text under 16px; on touch screens every field is 16px. */
+test('form fields use 16px text on touch screens (no zoom on tap)', async ({ browser }) => {
+  const ctx = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+    isMobile: true,
+  });
+  const page = await ctx.newPage();
+  await page.goto('/login');
+  const sizes = await page
+    .locator(
+      'main input:not([type=hidden]):not([type=checkbox]):not([type=radio]), main textarea, main select',
+    )
+    .evaluateAll((els) => els.map((el) => getComputedStyle(el).fontSize));
+  expect(sizes.length).toBeGreaterThan(0);
+  expect(sizes.every((s) => parseFloat(s) >= 16)).toBe(true);
+  await ctx.close();
+});
