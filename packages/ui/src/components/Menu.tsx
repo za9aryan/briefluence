@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import { cn } from '../lib/cn';
+import { Modal } from './Modal';
 
 export interface MenuProps {
   trigger: (props: {
@@ -19,19 +20,22 @@ export interface MenuProps {
   children: (close: () => void) => ReactNode;
   align?: 'start' | 'end';
   className?: string;
+  /** On phones (< sm) open the items in a bottom sheet with this title instead of a popover. */
+  sheet?: { title: ReactNode; closeLabel: string };
 }
 
 /**
  * Lightweight popover menu: closes on outside click, Escape and scroll. The panel is fixed-positioned
  * so it is not clipped by scrolling containers (tables), and opens upwards when there is no room below.
  */
-export function Menu({ trigger, children, align = 'end', className }: MenuProps) {
+export function Menu({ trigger, children, align = 'end', className, sheet }: MenuProps) {
   const [open, setOpen] = useState(false);
+  const [asSheet, setAsSheet] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<CSSProperties>({ visibility: 'hidden' });
   useLayoutEffect(() => {
-    if (!open || !ref.current || !panel.current) return;
+    if (!open || asSheet || !ref.current || !panel.current) return;
     const t = ref.current.getBoundingClientRect();
     const h = panel.current.offsetHeight;
     const up = t.bottom + 8 + h > window.innerHeight && t.top - 8 - h > 0;
@@ -41,9 +45,9 @@ export function Menu({ trigger, children, align = 'end', className }: MenuProps)
         ? { right: Math.max(8, window.innerWidth - t.right) }
         : { left: Math.max(8, t.left) }),
     });
-  }, [open, align]);
+  }, [open, align, asSheet]);
   useEffect(() => {
-    if (!open) return;
+    if (!open || asSheet) return;
     const onDown = (e: MouseEvent) => {
       if (!ref.current?.contains(e.target as Node)) setOpen(false);
     };
@@ -64,19 +68,35 @@ export function Menu({ trigger, children, align = 'end', className }: MenuProps)
       document.removeEventListener('mousedown', onDown);
       document.removeEventListener('keydown', onKey);
     };
-  }, [open]);
+  }, [open, asSheet]);
   return (
     <div ref={ref} className="relative">
       {trigger({
         open,
         toggle: () => {
           setPos({ visibility: 'hidden' });
+          setAsSheet(!!sheet && window.matchMedia('(max-width: 639px)').matches);
           setOpen((o) => !o);
         },
         'aria-expanded': open,
         'aria-haspopup': 'menu',
       })}
-      {open && (
+      {sheet && asSheet && (
+        <Modal
+          open={open}
+          onClose={() => setOpen(false)}
+          title={sheet.title}
+          closeLabel={sheet.closeLabel}
+        >
+          <div
+            role="menu"
+            className="-mx-5 -my-4 flex flex-col py-2 sm:-mx-6 [&>[role=menuitem]]:min-h-12 [&>[role=menuitem]]:px-5 [&>[role=menuitem]]:text-body"
+          >
+            {children(() => setOpen(false))}
+          </div>
+        </Modal>
+      )}
+      {open && !asSheet && (
         <div
           ref={panel}
           role="menu"

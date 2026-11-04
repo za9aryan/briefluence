@@ -15,7 +15,7 @@ import {
   CardHeader,
   EmptyState,
   Field,
-  Grid,
+  Carousel,
   Icon,
   Input,
   UrlInput,
@@ -50,6 +50,7 @@ const EMPTY: Draft = { imageUrl: null, title: '', description: '', linkUrl: '' }
 /** Settings card: the blogger's past work, each item reviewed by an admin before brands see it. */
 export function PortfolioCard() {
   const t = useTranslations('portfolio.settings');
+  const tp = useTranslations('portfolio.view');
   const tf = useTranslations('portfolio.form');
   const tc = useTranslations('common');
   const toast = useToast();
@@ -141,7 +142,12 @@ export function PortfolioCard() {
           <Text size="small" tone="muted">
             {full ? t('limit', { max: PORTFOLIO_MAX_ITEMS }) : t('reviewNote')}
           </Text>
-          <Grid cols={{ base: 2, md: 3, lg: 4 }} gap={4}>
+          <Carousel
+            label={tp('portfolio')}
+            prevLabel={tp('previous')}
+            nextLabel={tp('next')}
+            itemClassName="w-44 sm:w-52"
+          >
             {items.map((i) => (
               <PortfolioTile
                 key={i.id}
@@ -156,6 +162,7 @@ export function PortfolioCard() {
                     )}
                     <div className="mt-2 flex justify-end">
                       <Menu
+                        sheet={{ title: i.title, closeLabel: tc('close') }}
                         trigger={(p) => (
                           <Button
                             variant="ghost"
@@ -197,7 +204,7 @@ export function PortfolioCard() {
                 }
               />
             ))}
-          </Grid>
+          </Carousel>
         </Stack>
       )}
 
