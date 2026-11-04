@@ -25,6 +25,7 @@
     "platforms": "Platforms",
     "formats": "Content format",
     "niches": "Niches",
+    "nichesHint": "Companies filter offers by topic, so pick the ones that fit your content.",
     "idealBrands": "Companies I want to work with",
     "idealBrandsHint": "For example: real estate brokers"
   },
@@ -90,10 +91,6 @@
     "image": {
       "title": "Cover image",
       "desc": "Your best shot for this offer. Without one we show your profile photo."
-    },
-    "niches": {
-      "title": "Niches",
-      "desc": "Helps companies in these topics find your offer."
     },
     "idealBrands": {
       "title": "Companies you want to work with",

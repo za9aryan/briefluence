@@ -72,5 +72,10 @@
   "audienceGender": "Audience gender",
   "topAges": "Top ages",
   "topCountries": "Top countries",
+  "posts": "Posts",
+  "audience": "Audience",
+  "ages": "Age",
+  "women": "Women",
+  "men": "Men",
   "noDemographics": "This platform does not share audience demographics."
 }

@@ -1,5 +1,8 @@
 import {
   AlertCircle,
+  Cake,
+  Mars,
+  Venus,
   AlertTriangle,
   ArrowLeft,
   ArrowRight,
@@ -69,26 +72,58 @@ type SvgIcon = (props: SVGProps<SVGSVGElement>) => React.ReactElement;
 
 // Platform marks drawn locally (lucide no longer ships brand logos); 2px stroke, round caps per brand book.
 const Instagram: SvgIcon = (p) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...p}>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...p}
+  >
     <rect x="3" y="3" width="18" height="18" rx="5" />
     <circle cx="12" cy="12" r="4" />
     <circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" />
   </svg>
 );
 const TikTok: SvgIcon = (p) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...p}>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...p}
+  >
     <path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5" />
     <path d="M14 3c.5 2.8 2.4 4.6 5 5" />
   </svg>
 );
 const YouTube: SvgIcon = (p) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...p}>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...p}
+  >
     <rect x="2.5" y="5.5" width="19" height="13" rx="4" />
     <path d="m10 9.5 5 2.5-5 2.5z" fill="currentColor" />
   </svg>
 );
 const Telegram: SvgIcon = (p) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" {...p}>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...p}
+  >
     <path d="m21 4-18 7.5 6 2 2 6.5 3.5-4.5 5 3.5z" />
     <path d="m9 13.5 8-6" />
   </svg>
@@ -108,6 +143,9 @@ export const ICONS = {
   building: Building2,
   calendar: Calendar,
   check: Check,
+  cake: Cake,
+  female: Venus,
+  male: Mars,
   'check-circle': CheckCircle2,
   'chevron-down': ChevronDown,
   'chevron-left': ChevronLeft,
@@ -175,14 +213,28 @@ export interface IconProps extends Omit<SVGProps<SVGSVGElement>, 'ref'> {
   spin?: boolean;
 }
 
-export function Icon({ name, size = 'sm', tone = 'default', label, spin, className, ...rest }: IconProps) {
+export function Icon({
+  name,
+  size = 'sm',
+  tone = 'default',
+  label,
+  spin,
+  className,
+  ...rest
+}: IconProps) {
   const Cmp = ICONS[name] as SvgIcon;
   return (
     <Cmp
       aria-hidden={label ? undefined : true}
       aria-label={label}
       role={label ? 'img' : undefined}
-      className={cn('shrink-0', SIZE[size], tone === 'default' ? 'text-current' : TONE_TEXT[tone], spin && 'animate-spin', className)}
+      className={cn(
+        'shrink-0',
+        SIZE[size],
+        tone === 'default' ? 'text-current' : TONE_TEXT[tone],
+        spin && 'animate-spin',
+        className,
+      )}
       {...rest}
     />
   );

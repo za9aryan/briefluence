@@ -1,9 +1,10 @@
 'use client';
 import {
   Badge,
+  Button,
   Card,
+  Carousel,
   Disclosure,
-  Grid,
   Icon,
   Modal,
   Stack,
@@ -101,53 +102,76 @@ export function PortfolioTile({
   );
 }
 
-/** Brand-facing grid; tapping an image opens it large with the full description. */
+/**
+ * Company-facing portfolio: a horizontal carousel (swipe on phones, arrows on wider screens when
+ * the cards don't fit). Tapping one opens it large (a sheet on phones) with the full text, and
+ * previous / next to move through the rest.
+ */
 export function PortfolioGallery({
   items,
   compact,
 }: {
   items: PortfolioItemDto[];
-  /** Square thumbnails only (narrow side cards); title, text and link open in the large view. */
+  /** Small square thumbnails only (narrow side cards); title, text and link open in the large view. */
   compact?: boolean;
 }) {
   const t = useTranslations('portfolio.view');
-  const [open, setOpen] = useState<PortfolioItemDto | null>(null);
+  const [index, setIndex] = useState<number | null>(null);
+  const open = index != null ? items[index] : undefined;
+  const go = (d: 1 | -1) =>
+    setIndex((i) => (i == null ? i : (i + d + items.length) % items.length));
   return (
     <>
-      {compact ? (
-        <div className="grid grid-cols-3 gap-2">
-          {items.map((i) => (
+      <Carousel
+        label={t('portfolio')}
+        prevLabel={t('previous')}
+        nextLabel={t('next')}
+        itemClassName={compact ? 'w-24' : 'w-44 sm:w-52'}
+      >
+        {items.map((i, n) =>
+          compact ? (
             <button
               key={i.id}
               type="button"
-              onClick={() => setOpen(i)}
+              onClick={() => setIndex(n)}
               aria-label={i.title}
-              className="aspect-square overflow-hidden rounded-card border border-line bg-surface transition-colors hover:border-primary/40"
+              className="block aspect-square w-full overflow-hidden rounded-card border border-line bg-surface transition hover:border-primary/40 motion-safe:active:scale-[0.97]"
             >
               <img src={i.imageUrl} alt="" loading="lazy" className="size-full object-cover" />
             </button>
-          ))}
-        </div>
-      ) : (
-        <Grid cols={{ base: 2, md: 3, lg: 4 }} gap={4}>
-          {items.map((i) => (
-            <PortfolioTile key={i.id} item={i} onOpen={() => setOpen(i)} />
-          ))}
-        </Grid>
-      )}
+          ) : (
+            <PortfolioTile key={i.id} item={i} onOpen={() => setIndex(n)} />
+          ),
+        )}
+      </Carousel>
       <Modal
         open={!!open}
-        onClose={() => setOpen(null)}
+        onClose={() => setIndex(null)}
         title={open?.title ?? ''}
         size="lg"
         closeLabel={t('close')}
+        footer={
+          items.length > 1 ? (
+            <div className="flex w-full items-center justify-between gap-2">
+              <Button variant="secondary" icon="chevron-left" onClick={() => go(-1)}>
+                {t('previous')}
+              </Button>
+              <Text size="small" tone="muted" className="tabular-nums" aria-live="polite">
+                {t('position', { n: (index ?? 0) + 1, total: items.length })}
+              </Text>
+              <Button variant="secondary" iconRight="chevron-right" onClick={() => go(1)}>
+                {t('next')}
+              </Button>
+            </div>
+          ) : undefined
+        }
       >
         {open && (
-          <Stack gap={4}>
+          <Stack gap={4} key={open.id} className="bf-fade">
             <img
               src={open.imageUrl}
               alt={open.title}
-              className="max-h-[70vh] w-full rounded-card object-contain"
+              className="max-h-[60vh] w-full rounded-card bg-surface object-contain"
             />
             {open.description && (
               <Text className="whitespace-pre-line break-words">{open.description}</Text>

@@ -4,36 +4,90 @@ import { Icon, type IconName } from '../primitives/Icon';
 import { Text } from '../primitives/Typography';
 
 /** 0–100 match score as a compact ring. */
-export function ScoreMeter({ value, label, size = 'md' }: { value: number; label: string; size?: 'sm' | 'md' | 'lg' }) {
+export function ScoreMeter({
+  value,
+  label,
+  size = 'md',
+}: {
+  value: number;
+  label: string;
+  size?: 'sm' | 'md' | 'lg';
+}) {
   const v = Math.max(0, Math.min(100, Math.round(value)));
   const tone = v >= 75 ? 'stroke-success' : v >= 50 ? 'stroke-primary' : 'stroke-ink-muted';
-  const dim = { sm: 'size-11 text-[11px]', md: 'size-12 text-small', lg: 'size-16 text-small' }[size];
+  const dim = { sm: 'size-11 text-[11px]', md: 'size-12 text-small', lg: 'size-16 text-small' }[
+    size
+  ];
   const r = 16;
   const c = 2 * Math.PI * r;
   return (
-    <div className={cn('relative inline-flex shrink-0 items-center justify-center', dim)} role="img" aria-label={`${label}: ${v}%`}>
+    <div
+      className={cn('relative inline-flex shrink-0 items-center justify-center', dim)}
+      role="img"
+      aria-label={`${label}: ${v}%`}
+    >
       <svg viewBox="0 0 40 40" className="absolute inset-0 -rotate-90">
         <circle cx="20" cy="20" r={r} className="fill-none stroke-line" strokeWidth="4" />
-        <circle cx="20" cy="20" r={r} className={cn('fill-none transition-all', tone)} strokeWidth="4" strokeLinecap="round" strokeDasharray={`${(v / 100) * c} ${c}`} />
+        <circle
+          cx="20"
+          cy="20"
+          r={r}
+          className={cn('fill-none transition-all', tone)}
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeDasharray={`${(v / 100) * c} ${c}`}
+        />
       </svg>
       <span className="font-bold tabular-nums text-ink">{v}</span>
     </div>
   );
 }
 
-export function Progress({ value, label, className }: { value: number; label: string; className?: string }) {
+export function Progress({
+  value,
+  label,
+  className,
+}: {
+  value: number;
+  label: string;
+  className?: string;
+}) {
   const v = Math.max(0, Math.min(100, value));
   return (
-    <div role="progressbar" aria-label={label} aria-valuenow={Math.round(v)} aria-valuemin={0} aria-valuemax={100} className={cn('h-2 w-full overflow-hidden rounded-pill bg-line', className)}>
+    <div
+      role="progressbar"
+      aria-label={label}
+      aria-valuenow={Math.round(v)}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      className={cn('h-2 w-full overflow-hidden rounded-pill bg-line', className)}
+    >
       <div className="h-full rounded-pill bg-primary transition-all" style={{ width: `${v}%` }} />
     </div>
   );
 }
 
 /** KPI tile for dashboards. */
-export function Stat({ label, value, icon, hint, className }: { label: ReactNode; value: ReactNode; icon?: IconName; hint?: ReactNode; className?: string }) {
+export function Stat({
+  label,
+  value,
+  icon,
+  hint,
+  className,
+}: {
+  label: ReactNode;
+  value: ReactNode;
+  icon?: IconName;
+  hint?: ReactNode;
+  className?: string;
+}) {
   return (
-    <div className={cn('flex min-w-0 flex-col gap-2 rounded-card border border-line bg-surface-raised p-4 shadow-card md:p-5', className)}>
+    <div
+      className={cn(
+        'flex min-w-0 flex-col gap-2 rounded-card border border-line bg-surface-raised p-4 shadow-card md:p-5',
+        className,
+      )}
+    >
       <div className="flex items-center justify-between gap-2">
         <Text size="small" tone="muted" weight="medium" truncate>
           {label}
@@ -51,7 +105,13 @@ export function Stat({ label, value, icon, hint, className }: { label: ReactNode
 }
 
 /** Key/value list, stacked on phones and two-column from `sm`. */
-export function DescriptionList({ items, className }: { items: { label: ReactNode; value: ReactNode }[]; className?: string }) {
+export function DescriptionList({
+  items,
+  className,
+}: {
+  items: { label: ReactNode; value: ReactNode }[];
+  className?: string;
+}) {
   return (
     <dl className={cn('divide-y divide-line', className)}>
       {items.map((it, i) => (
@@ -65,7 +125,15 @@ export function DescriptionList({ items, className }: { items: { label: ReactNod
 }
 
 /** Wizard steps; labels collapse to numbers on small screens. */
-export function Stepper({ steps, current, onSelect }: { steps: string[]; current: number; onSelect?: (i: number) => void }) {
+export function Stepper({
+  steps,
+  current,
+  onSelect,
+}: {
+  steps: string[];
+  current: number;
+  onSelect?: (i: number) => void;
+}) {
   return (
     <ol className="flex w-full items-center gap-2">
       {steps.map((s, i) => {
@@ -90,9 +158,18 @@ export function Stepper({ steps, current, onSelect }: { steps: string[]; current
               >
                 {done ? <Icon name="check" size="xs" /> : i + 1}
               </span>
-              <span className={cn('hidden truncate text-small md:inline', active ? 'font-bold text-ink' : 'text-ink-muted')}>{s}</span>
+              <span
+                className={cn(
+                  'hidden truncate text-small md:inline',
+                  active ? 'font-bold text-ink' : 'text-ink-muted',
+                )}
+              >
+                {s}
+              </span>
             </button>
-            {i < steps.length - 1 && <span className={cn('h-px flex-1', done ? 'bg-primary' : 'bg-line')} />}
+            {i < steps.length - 1 && (
+              <span className={cn('h-px flex-1', done ? 'bg-primary' : 'bg-line')} />
+            )}
           </li>
         );
       })}
@@ -121,13 +198,104 @@ export function Pagination({
         {labels.summary}
       </Text>
       <div className="flex gap-2">
-        <button type="button" disabled={page <= 1} onClick={() => onChange(page - 1)} className="inline-flex h-11 items-center gap-1 rounded-sm border border-line bg-surface-raised px-3 text-small disabled:opacity-40">
+        <button
+          type="button"
+          disabled={page <= 1}
+          onClick={() => onChange(page - 1)}
+          className="inline-flex h-11 items-center gap-1 rounded-sm border border-line bg-surface-raised px-3 text-small disabled:opacity-40"
+        >
           <Icon name="chevron-left" /> <span className="hidden sm:inline">{labels.prev}</span>
         </button>
-        <button type="button" disabled={page >= pages} onClick={() => onChange(page + 1)} className="inline-flex h-11 items-center gap-1 rounded-sm border border-line bg-surface-raised px-3 text-small disabled:opacity-40">
+        <button
+          type="button"
+          disabled={page >= pages}
+          onClick={() => onChange(page + 1)}
+          className="inline-flex h-11 items-center gap-1 rounded-sm border border-line bg-surface-raised px-3 text-small disabled:opacity-40"
+        >
           <span className="hidden sm:inline">{labels.next}</span> <Icon name="chevron-right" />
         </button>
       </div>
     </nav>
+  );
+}
+
+/**
+ * One row of a share chart: what it is (`leading`: a flag or icon, then `label`), a thin bar and
+ * the value as text. The bar is decorative; the value is always written out.
+ */
+export function ShareRow({
+  label,
+  leading,
+  percent,
+  value,
+  strong,
+}: {
+  label: ReactNode;
+  leading?: ReactNode;
+  /** 0–100, the bar's length. */
+  percent: number;
+  /** The written-out value, e.g. "41.2%". */
+  value: ReactNode;
+  /** The biggest share: full-colour bar. */
+  strong?: boolean;
+}) {
+  const v = Math.max(0, Math.min(100, percent));
+  return (
+    <div className="grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)_auto] items-center gap-3 text-small">
+      <span className="flex min-w-0 items-center gap-2 text-ink">
+        {leading}
+        <span className="truncate">{label}</span>
+      </span>
+      <span aria-hidden className="h-1.5 overflow-hidden rounded-pill bg-line">
+        <span
+          className={cn(
+            'block h-full rounded-pill transition-[width] duration-500',
+            strong ? 'bg-primary' : 'bg-primary/45',
+          )}
+          style={{ width: `${Math.max(v, 2)}%` }}
+        />
+      </span>
+      <span className="tabular-nums text-ink-muted">{value}</span>
+    </div>
+  );
+}
+
+/** Two shares of one whole side by side (e.g. women / men), each labelled with icon and value. */
+export function SplitBar({
+  left,
+  right,
+  label,
+}: {
+  left: { icon: IconName; label: ReactNode; percent: number; value: ReactNode };
+  right: { icon: IconName; label: ReactNode; percent: number; value: ReactNode };
+  label: string;
+}) {
+  const total = Math.max(1, left.percent + right.percent);
+  const l = (left.percent / total) * 100;
+  const side = (s: typeof left, align: 'start' | 'end', tone: string) => (
+    <span
+      className={cn(
+        'flex items-center gap-1.5 text-small',
+        align === 'end' && 'flex-row-reverse text-right',
+      )}
+    >
+      <span className={cn('inline-flex size-7 items-center justify-center rounded-pill', tone)}>
+        <Icon name={s.icon} size="sm" />
+      </span>
+      <span className="text-ink">{s.label}</span>
+      <span className="font-bold tabular-nums text-ink">{s.value}</span>
+    </span>
+  );
+  return (
+    <div role="group" aria-label={label} className="flex flex-col gap-2">
+      <div className="flex items-center justify-between gap-2">
+        {side(left, 'start', 'bg-primary-soft text-primary-text')}
+        {side(right, 'end', 'bg-surface text-ink ring-1 ring-line')}
+      </div>
+      <div aria-hidden className="flex h-2 gap-0.5 overflow-hidden rounded-pill">
+        <span className="h-full rounded-l-pill bg-primary" style={{ width: `${l}%` }} />
+        <span className="h-full flex-1 rounded-r-pill bg-ink/70" />
+      </div>
+    </div>
   );
 }

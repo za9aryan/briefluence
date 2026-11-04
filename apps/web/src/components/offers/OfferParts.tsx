@@ -374,19 +374,22 @@ export function OfferForm({
               />
             )}
           </Field>
-          <OptionalField
-            {...opt('niches')}
-            filled={v.niches.length > 0}
-            onClear={() => set('niches', [] as OfferFormValues['niches'])}
+          <Field
+            label={t('fields.niches')}
+            hint={t('fields.nichesHint')}
+            error={err('niches')}
+            required
           >
-            <ChipGroup
-              multiple
-              aria-label={t('fields.niches')}
-              options={o.niches}
-              value={v.niches as string[]}
-              onChange={(x: string[]) => set('niches', x as OfferFormValues['niches'])}
-            />
-          </OptionalField>
+            {({ invalid }) => (
+              <ChipGroup
+                multiple
+                options={o.niches}
+                value={v.niches as string[]}
+                onChange={(x: string[]) => set('niches', x as OfferFormValues['niches'])}
+                invalid={invalid}
+              />
+            )}
+          </Field>
           <OptionalField
             {...opt('idealBrands')}
             filled={!!v.idealBrands}

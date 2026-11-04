@@ -1,5 +1,16 @@
 'use client';
-import { Badge, Icon, Inline, Progress, Stack, Text } from '@briefluence/ui';
+import {
+  Badge,
+  Flag,
+  Icon,
+  IconBubble,
+  Inline,
+  ShareRow,
+  SplitBar,
+  Stack,
+  Text,
+  type IconName,
+} from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
 import { useFormat } from '@/lib/hooks/format';
 import { PLATFORM_ICON, useOptions } from '@/lib/hooks/options';
@@ -65,67 +76,109 @@ export function AccountLine({
   );
 }
 
-/** Followers, engagement, average views and audience split. */
+/** Age buckets in their natural order ("13-17", "18-24", … "65+"). */
+const ageStart = (k: string) => Number.parseInt(k, 10) || 0;
+
+/**
+ * Followers, engagement, views and posts as tiles with icons; the audience as a women / men split,
+ * age bars and top countries with flags. Every bar's value is written out.
+ */
 export function AccountStats({ account }: { account: SocialAccountDto }) {
   const t = useTranslations('verification');
   const f = useFormat();
   const o = useOptions();
   const g = account.audienceGender;
-  const topCountries = account.audienceCountries
+  const countries = account.audienceCountries
     ? Object.entries(account.audienceCountries)
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
+        .slice(0, 5)
     : [];
   const ages = account.audienceAge
-    ? Object.entries(account.audienceAge)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3)
+    ? Object.entries(account.audienceAge).sort((a, b) => ageStart(a[0]) - ageStart(b[0]))
     : [];
+  const topAge = Math.max(0, ...ages.map(([, v]) => v));
+  const topCountry = countries[0]?.[1] ?? 0;
 
-  // Boxes are at least as wide as their label, so long words (ru/hy) never split; they wrap to
+  // Tiles are at least as wide as their label, so long words (ru/hy) never split; they wrap to
   // the next row on narrow screens instead.
-  const stat = (label: string, value: string) => (
-    <div className="min-w-fit flex-1 rounded-sm bg-surface p-2">
-      <p className="text-small text-ink-muted">{label}</p>
-      <p className="text-body font-bold text-ink tabular-nums">{value}</p>
+  const stat = (icon: IconName, label: string, value: string) => (
+    <div className="flex min-w-fit flex-1 items-center gap-2 rounded-sm bg-surface p-2 pr-3">
+      <IconBubble name={icon} size="sm" tone="primary" />
+      <div>
+        <p className="text-small text-ink-muted">{label}</p>
+        <p className="text-body font-bold text-ink tabular-nums">{value}</p>
+      </div>
     </div>
+  );
+  const heading = (icon: IconName, text: string) => (
+    <p className="flex items-center gap-1.5 text-small font-bold text-ink">
+      <Icon name={icon} size="xs" /> {text}
+    </p>
   );
 
   return (
     <Stack gap={4}>
       <div className="flex flex-wrap gap-2">
-        {stat(t('followers'), f.compact(account.followers))}
+        {stat('users', t('followers'), f.compact(account.followers))}
         {stat(
+          'heart',
           t('engagement'),
           account.engagementRate != null ? f.percent(account.engagementRate) : '—',
         )}
-        {stat(t('avgViews'), account.avgViews != null ? f.compact(account.avgViews) : '—')}
+        {stat('eye', t('avgViews'), account.avgViews != null ? f.compact(account.avgViews) : '—')}
+        {account.mediaCount != null && stat('image', t('posts'), f.compact(account.mediaCount))}
       </div>
-      {g || topCountries.length || ages.length ? (
-        <Stack gap={2}>
+      {g || countries.length || ages.length ? (
+        <Stack gap={4}>
           {g && (
-            <div>
-              <Inline justify="between">
-                <Text size="small" tone="muted">
-                  {t('audienceFemale', { value: f.percent(g.female ?? 0) })}
-                </Text>
-                <Text size="small" tone="muted">
-                  {t('audienceMale', { value: f.percent(g.male ?? 0) })}
-                </Text>
-              </Inline>
-              <Progress value={g.female ?? 0} label={t('audienceGender')} className="mt-1" />
+            <SplitBar
+              label={t('audienceGender')}
+              left={{
+                icon: 'female',
+                label: t('women'),
+                percent: g.female ?? 0,
+                value: f.percent(g.female ?? 0),
+              }}
+              right={{
+                icon: 'male',
+                label: t('men'),
+                percent: g.male ?? 0,
+                value: f.percent(g.male ?? 0),
+              }}
+            />
+          )}
+          {(ages.length > 0 || countries.length > 0) && (
+            <div className="grid gap-4 md:grid-cols-2">
+              {ages.length > 0 && (
+                <Stack gap={2}>
+                  {heading('cake', t('ages'))}
+                  {ages.map(([k, v]) => (
+                    <ShareRow
+                      key={k}
+                      label={k.replace('-', '–')}
+                      percent={(v / (topAge || 1)) * 100}
+                      value={f.percent(v)}
+                      strong={v === topAge}
+                    />
+                  ))}
+                </Stack>
+              )}
+              {countries.length > 0 && (
+                <Stack gap={2}>
+                  {heading('globe', t('topCountries'))}
+                  {countries.map(([k, v]) => (
+                    <ShareRow
+                      key={k}
+                      leading={/^[A-Z]{2}$/i.test(k) ? <Flag code={k} /> : undefined}
+                      label={o.country(k)}
+                      percent={(v / (topCountry || 1)) * 100}
+                      value={f.percent(v)}
+                      strong={v === topCountry}
+                    />
+                  ))}
+                </Stack>
+              )}
             </div>
-          )}
-          {ages.length > 0 && (
-            <Text size="small" tone="muted">
-              {t('topAges')}: {ages.map(([k, v]) => `${k} (${f.percent(v)})`).join(', ')}
-            </Text>
-          )}
-          {topCountries.length > 0 && (
-            <Text size="small" tone="muted">
-              {t('topCountries')}:{' '}
-              {topCountries.map(([k, v]) => `${o.country(k)} (${f.percent(v)})`).join(', ')}
-            </Text>
           )}
         </Stack>
       ) : (

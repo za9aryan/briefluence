@@ -53,7 +53,10 @@
     "faq": "FAQ",
     "openLink": "Open",
     "attached": "Attached work",
-    "close": "Close"
+    "close": "Close",
+    "previous": "Previous work",
+    "next": "Next work",
+    "position": "{n} of {total}"
   },
   "apply": {
     "title": "Attach your work",

@@ -27,6 +27,7 @@ export {
   type TypeSize,
 } from './primitives/Typography';
 export { Icon, ICONS, type IconName, type IconProps } from './primitives/Icon';
+export { Flag } from './primitives/Flag';
 export { Show } from './primitives/Show';
 export { Divider } from './primitives/Divider';
 
@@ -60,6 +61,8 @@ export { FilterDropdown, type FilterOption } from './components/FilterDropdown';
 export { FiltersButton, SheetSection } from './components/FilterSheet';
 export { RangeInput, Slider } from './components/RangeInput';
 export { Modal, type ModalProps } from './components/Modal';
+export { ResponsiveTabs } from './components/ResponsiveTabs';
+export { Carousel } from './components/Carousel';
 export { ConfirmProvider, useConfirm, type ConfirmOptions } from './components/Confirm';
 export { Menu, MenuItem } from './components/Menu';
 export { Tabs, type TabItem } from './components/Tabs';
@@ -72,6 +75,8 @@ export { ToastProvider, useToast, toast, type ToastTone } from './components/Toa
 export {
   ScoreMeter,
   Progress,
+  ShareRow,
+  SplitBar,
   Stat,
   DescriptionList,
   Stepper,

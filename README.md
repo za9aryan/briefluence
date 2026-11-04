@@ -166,6 +166,13 @@ deleted). If an account shows up on a different user than before, admins get a n
 **Possible re-registration** warning (Accounts → Re-registration tab, Verifications, Users) with the full history;
 the blogger keeps working until the admin chooses **Allow**, **Reject account** or **Block user**.
 
+## Forms and visuals
+
+- Briefs and offers need at least one **niche**: both feeds filter by niche, so one without any would never show
+  up in a filtered feed. Other extra fields fold into "+ Add" rows.
+- Country flags are self-hosted SVGs in `apps/web/public/flags` from [flag-icons](https://github.com/lipis/flag-icons)
+  (MIT, see `LICENSE.txt` there), shown with the `Flag` primitive.
+
 ## Deleting an account
 
 Companies and influencers delete their own account in **Settings → Delete account** (`POST /api/v1/account/delete`,

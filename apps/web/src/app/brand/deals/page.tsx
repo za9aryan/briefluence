@@ -14,7 +14,7 @@ import {
   Icon,
   Skeleton,
   Stack,
-  Tabs,
+  ResponsiveTabs,
   Text,
   buttonStyles,
 } from '@briefluence/ui';
@@ -73,10 +73,13 @@ export default function BrandDealsPage() {
           </Link>
         }
       />
-      <Tabs
+      <ResponsiveTabs
         aria-label={t('listTitle')}
         value={tab}
         onChange={setTab}
+        defaultValue="all"
+        filtersLabel={tc('filters')}
+        closeLabel={tc('close')}
         items={TABS.map((s) => ({
           value: s,
           label: s === 'all' ? tc('all') : td(s),

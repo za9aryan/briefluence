@@ -59,6 +59,7 @@ test('blogger offer → admin approves → brand requests → blogger accepts �
   await blogger.getByLabel('Price', { exact: true }).fill('10000');
   await blogger.getByRole('checkbox', { name: 'Instagram' }).click();
   await blogger.getByRole('checkbox', { name: 'Story' }).click();
+  await blogger.getByRole('checkbox', { name: 'Food' }).click();
   // Optional cover image (1×1 PNG; the API checks the magic bytes).
   await blogger.locator('input[type=file]').setInputFiles({
     name: 'cover.png',

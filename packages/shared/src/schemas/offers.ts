@@ -16,7 +16,8 @@ export const offerInputSchema = z.object({
   collaborationType: z.enum(COLLABORATION_TYPES).default('ONE_TIME'),
   platforms: z.array(z.enum(PLATFORMS)).min(1, 'pickOne'),
   contentFormats: z.array(z.enum(CONTENT_FORMATS)).min(1, 'pickOne'),
-  niches: z.array(z.enum(NICHES)).default([]),
+  /** Required: companies filter offers by niche, so an offer without one would be hidden. */
+  niches: z.array(z.enum(NICHES)).min(1, 'pickOne'),
   idealBrands: optionalText(200),
   /** Optional cover (a sample of the work), uploaded through /uploads/offer. */
   imageUrl: optionalUrl,

@@ -26,6 +26,7 @@
     "platforms": "Platforms",
     "formats": "Content format",
     "niches": "Niches",
+    "nichesHint": "Influencers filter briefs by topic, so pick the ones that fit.",
     "collaboration": "Collaboration",
     "collaborationHint": "One promo, or an ongoing partnership.",
     "confidential": "Hide our company from influencers",
@@ -98,10 +99,6 @@
     "cover": {
       "title": "Cover image",
       "desc": "A photo makes your brief stand out in the feed."
-    },
-    "niches": {
-      "title": "Niches",
-      "desc": "Show the brief first to influencers in these topics."
     },
     "engagement": {
       "title": "Minimum engagement",

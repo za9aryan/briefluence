@@ -294,6 +294,11 @@ export default {
     audienceGender: ['Audience gender', 'Пол аудитории', 'Լսարանի սեռ'],
     topAges: ['Top ages', 'Основной возраст', 'Հիմնական տարիքը'],
     topCountries: ['Top countries', 'Основные страны', 'Հիմնական երկրները'],
+    posts: ['Posts', 'Публикации', 'Հրապարակումներ'],
+    audience: ['Audience', 'Аудитория', 'Լսարան'],
+    ages: ['Age', 'Возраст', 'Տարիք'],
+    women: ['Women', 'Женщины', 'Կանայք'],
+    men: ['Men', 'Мужчины', 'Տղամարդիկ'],
     noDemographics: [
       'This platform does not share audience demographics.',
       'Эта платформа не передаёт демографию аудитории.',

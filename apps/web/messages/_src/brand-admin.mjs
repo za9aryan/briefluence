@@ -142,6 +142,11 @@ export default {
       platforms: ['Platforms', 'Платформы', 'Հարթակներ'],
       formats: ['Content format', 'Формат контента', 'Բովանդակության ձևաչափ'],
       niches: ['Niches', 'Ниши', 'Նիշաներ'],
+      nichesHint: [
+        'Influencers filter briefs by topic, so pick the ones that fit.',
+        'Инфлюенсеры фильтруют брифы по темам, так что выбери подходящие.',
+        'Ինֆլյուենսերները բրիֆները զտում են ըստ թեմաների, ուստի ընտրիր համապատասխանները։',
+      ],
       collaboration: ['Collaboration', 'Сотрудничество', 'Համագործակցություն'],
       collaborationHint: [
         'One promo, or an ongoing partnership.',
@@ -293,14 +298,6 @@ export default {
           'A photo makes your brief stand out in the feed.',
           'С фото бриф заметнее в ленте.',
           'Լուսանկարով բրիֆն ավելի նկատելի է լենտում։',
-        ],
-      },
-      niches: {
-        title: ['Niches', 'Ниши', 'Նիշեր'],
-        desc: [
-          'Show the brief first to influencers in these topics.',
-          'Бриф увидят инфлюенсеры с этими темами.',
-          'Բրիֆը կտեսնեն այս թեմաներով ինֆլյուենսերները։',
         ],
       },
       engagement: {

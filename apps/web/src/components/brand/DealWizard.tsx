@@ -320,19 +320,22 @@ export function DealWizard({
                 control={form.control}
                 name="niches"
                 render={({ field }) => (
-                  <OptionalField
-                    {...opt('niches')}
-                    filled={(field.value ?? []).length > 0}
-                    onClear={() => field.onChange([])}
+                  <Field
+                    label={t('fields.niches')}
+                    hint={t('fields.nichesHint')}
+                    error={fe(errors.niches as never)}
+                    required
                   >
-                    <ChipGroup
-                      multiple
-                      aria-label={t('fields.niches')}
-                      options={o.niches}
-                      value={(field.value ?? []) as string[]}
-                      onChange={field.onChange}
-                    />
-                  </OptionalField>
+                    {({ invalid }) => (
+                      <ChipGroup
+                        multiple
+                        options={o.niches}
+                        value={(field.value ?? []) as string[]}
+                        onChange={field.onChange}
+                        invalid={invalid}
+                      />
+                    )}
+                  </Field>
                 )}
               />
               <Controller

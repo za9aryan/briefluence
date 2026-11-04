@@ -117,6 +117,9 @@ export default {
       openLink: ['Open', 'Открыть', 'Բացել'],
       attached: ['Attached work', 'Приложенные работы', 'Կցված աշխատանքներ'],
       close: ['Close', 'Закрыть', 'Փակել'],
+      previous: ['Previous work', 'Предыдущая работа', 'Նախորդ աշխատանքը'],
+      next: ['Next work', 'Следующая работа', 'Հաջորդ աշխատանքը'],
+      position: ['{n} of {total}', '{n} из {total}', '{n}՝ {total}-ից'],
     },
     apply: {
       title: ['Attach your work', 'Приложи свои работы', 'Կցիր քո աշխատանքները'],

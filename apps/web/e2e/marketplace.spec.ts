@@ -99,6 +99,7 @@ test('sign-up → verify → apply → accept → done', async ({ browser }) => 
     .getByLabel('Description')
     .fill('Come for dinner and film a Reels about our new menu, please.');
   await brand.getByRole('checkbox', { name: 'Reel' }).click();
+  await brand.getByRole('checkbox', { name: 'Beauty' }).click();
   await brand.getByRole('button', { name: 'Next', exact: true }).click();
   await expect(brand.getByText('Matching now')).toBeVisible();
   await brand.getByRole('button', { name: 'Next', exact: true }).click();

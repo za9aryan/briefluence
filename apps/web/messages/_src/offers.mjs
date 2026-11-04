@@ -56,6 +56,11 @@ export default {
       platforms: ['Platforms', 'Платформы', 'Հարթակներ'],
       formats: ['Content format', 'Формат контента', 'Բովանդակության ձևաչափ'],
       niches: ['Niches', 'Ниши', 'Նիշաներ'],
+      nichesHint: [
+        'Companies filter offers by topic, so pick the ones that fit your content.',
+        'Компании фильтруют офферы по темам, так что выбери те, что подходят твоему контенту.',
+        'Ընկերությունները առաջարկները զտում են ըստ թեմաների, ուստի ընտրիր քո կոնտենտին համապատասխանները։',
+      ],
       idealBrands: [
         'Companies I want to work with',
         'С какими компаниями хочу работать',
@@ -185,14 +190,6 @@ export default {
           'Your best shot for this offer. Without one we show your profile photo.',
           'Лучший кадр для этого предложения. Без него покажем фото профиля.',
           'Լավագույն կադրը այս առաջարկի համար։ Առանց դրա կցուցադրենք պրոֆիլի նկարը։',
-        ],
-      },
-      niches: {
-        title: ['Niches', 'Ниши', 'Նիշեր'],
-        desc: [
-          'Helps companies in these topics find your offer.',
-          'Поможет компаниям из этих тем найти твоё предложение.',
-          'Կօգնի այս թեմաների ընկերություններին գտնել քո առաջարկը։',
         ],
       },
       idealBrands: {
