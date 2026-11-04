@@ -81,7 +81,7 @@ const ageStart = (k: string) => Number.parseInt(k, 10) || 0;
 
 /**
  * Followers, engagement, views and posts as tiles with icons; the audience as a women / men split,
- * age bars and top countries with flags. Every bar's value is written out.
+ * the top 3 age groups and top countries with flags. Every bar's value is written out.
  */
 export function AccountStats({ account }: { account: SocialAccountDto }) {
   const t = useTranslations('verification');
@@ -94,7 +94,11 @@ export function AccountStats({ account }: { account: SocialAccountDto }) {
         .slice(0, 5)
     : [];
   const ages = account.audienceAge
-    ? Object.entries(account.audienceAge).sort((a, b) => ageStart(a[0]) - ageStart(b[0]))
+    ? // The 3 biggest age groups, shown youngest first.
+      Object.entries(account.audienceAge)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .sort((a, b) => ageStart(a[0]) - ageStart(b[0]))
     : [];
   const topAge = Math.max(0, ...ages.map(([, v]) => v));
   const topCountry = countries[0]?.[1] ?? 0;
@@ -151,7 +155,7 @@ export function AccountStats({ account }: { account: SocialAccountDto }) {
             <div className="grid gap-4 md:grid-cols-2">
               {ages.length > 0 && (
                 <Stack gap={2}>
-                  {heading('cake', t('ages'))}
+                  {heading('cake', t('topAges'))}
                   {ages.map(([k, v]) => (
                     <ShareRow
                       key={k}

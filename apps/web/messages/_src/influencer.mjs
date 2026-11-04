@@ -296,7 +296,6 @@ export default {
     topCountries: ['Top countries', 'Основные страны', 'Հիմնական երկրները'],
     posts: ['Posts', 'Публикации', 'Հրապարակումներ'],
     audience: ['Audience', 'Аудитория', 'Լսարան'],
-    ages: ['Age', 'Возраст', 'Տարիք'],
     women: ['Women', 'Женщины', 'Կանայք'],
     men: ['Men', 'Мужчины', 'Տղամարդիկ'],
     noDemographics: [
