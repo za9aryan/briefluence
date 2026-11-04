@@ -99,12 +99,14 @@ updates and schedules a daily backup at 03:30. Log in again (step 5) so Docker w
 ## 8. Your address
 
 - **With a domain** (e.g. `briefluence.am`): at your DNS provider add an **A record** for the name
-  pointing to the server IP. On Cloudflare set it to **DNS only** (grey cloud) for now so the
+  pointing to the server IP, and a **CNAME** for `www` pointing to the domain (Caddy redirects
+  `www` to the main address). On Cloudflare set it to **DNS only** (grey cloud) for now so the
   HTTPS certificate can be issued; you can turn the orange cloud on later with SSL mode
   _Full (strict)_.
 - **No domain yet**: use `<ip-with-dashes>.sslip.io`, e.g. IP `158.180.12.34` →
   `158-180-12-34.sslip.io`. It works with real HTTPS right away; switch to your domain later
-  (change `.env`, re-run step 10).
+  (change `DOMAIN`, `WEB_URL`, `API_URL`, `CORS_ORIGINS` in `.env`, set
+  `REDIRECT_HOSTS=www.<domain>, <old>.sslip.io`, re-run step 10).
 
 ## 9. Settings
 

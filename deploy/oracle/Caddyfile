@@ -15,3 +15,14 @@
 		reverse_proxy web:3000
 	}
 }
+
+# Other addresses (www, the old sslip.io one) send visitors to the main address. Paddle webhooks
+# are still served there so payments keep working until the Paddle dashboard is updated.
+{$REDIRECT_HOSTS} {
+	handle /api/v1/billing/paddle/webhook {
+		reverse_proxy api:4000
+	}
+	handle {
+		redir https://{$DOMAIN}{uri} permanent
+	}
+}
