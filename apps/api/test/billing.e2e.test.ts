@@ -153,7 +153,10 @@ describe('plans, subscription & payments (e2e)', () => {
       canCheckout: false,
     });
     expect(new Date(paid.currentPeriodEnd).getUTCMonth()).toBe((trialEnd.getUTCMonth() + 1) % 12);
-    expect((await lastEmailTo(ctx, inf.email))?.subject).toBe('Payment received');
+    // In-app only: Paddle emails its own receipt.
+    const notes = await inf.agent.get(`${API}/notifications`).expect(200);
+    expect(notes.body.items.map((n: { type: string }) => n.type)).toContain('PAYMENT_SUCCEEDED');
+    expect((await lastEmailTo(ctx, inf.email))?.subject).not.toBe('Payment received');
 
     // Admin raises the price; the next renewal charges the new price.
     await inf.admin.agent

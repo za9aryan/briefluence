@@ -80,6 +80,12 @@ export class PushService implements OnModuleInit {
     await this.prisma.pushSubscription.deleteMany({ where: { userId, endpoint } });
   }
 
+  /** Whether the user gets push notifications on at least one device. */
+  async reaches(userId: string): Promise<boolean> {
+    if (!this.enabled) return false;
+    return (await this.prisma.pushSubscription.count({ where: { userId } })) > 0;
+  }
+
   /** Called for every new notification; the queue does the sending. */
   async enqueue(notificationId: string) {
     if (!this.enabled) return;

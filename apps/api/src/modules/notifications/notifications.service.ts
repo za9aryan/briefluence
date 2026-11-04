@@ -71,7 +71,11 @@ export class NotificationsService {
     } catch (err) {
       this.logger.error(`Failed to enqueue push: ${(err as Error).message}`);
     }
-    if (EMAIL_POLICY[type] === 'instant' && user) {
+    const policy = EMAIL_POLICY[type];
+    if (
+      user &&
+      (policy === 'instant' || (policy === 'unless-push' && !(await this.pushReaches(userId))))
+    ) {
       try {
         const email = await renderNotificationEmail(locale, {
           title: text.title,
@@ -86,6 +90,15 @@ export class NotificationsService {
       }
     }
     return row;
+  }
+
+  /** A push lookup failure must not cost the user the email. */
+  private async pushReaches(userId: string) {
+    try {
+      return await this.push.reaches(userId);
+    } catch {
+      return false;
+    }
   }
 
   async notifyAdmins(type: NotificationType, payload: NotifyPayload) {

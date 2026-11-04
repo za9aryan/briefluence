@@ -4,7 +4,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { PRESENCE_TTL_MS, RealtimeGateway } from '../src/realtime/realtime.gateway';
 import { NotificationsService } from '../src/modules/notifications/notifications.service';
 import { PushService } from '../src/modules/notifications/push.service';
-import { API, createTestApp, resetDb, signup, type TestCtx } from './helpers';
+import { API, createTestApp, lastEmailTo, resetDb, signup, type TestCtx } from './helpers';
 
 const device = (n: number) => ({
   endpoint: `https://push.example.com/send/device-${n}`,
@@ -161,5 +161,28 @@ describe('web push (e2e)', () => {
     phone.close();
     await new Promise((r) => setTimeout(r, 150));
     expect(gw.visibleEndpoints(user.id).size).toBe(0);
+  });
+
+  it('push replaces the email for most events; money emails always go out', async () => {
+    const user = await signup(ctx, 'INFLUENCER');
+    const notes = ctx.app.get(NotificationsService);
+    const accepted = () =>
+      notes.notify(user.id, 'APPLICATION_ACCEPTED', { params: { deal: 'Reels' }, link: '/x' });
+
+    ctx.email.outbox.length = 0;
+    await accepted();
+    await ctx.queue.drain();
+    expect(await lastEmailTo(ctx, user.email)).toBeDefined();
+
+    await user.agent.post(`${API}/push/subscriptions`).send(device(1)).expect(204);
+    ctx.email.outbox.length = 0;
+    await accepted();
+    await notes.notify(user.id, 'PAYMENT_SUCCEEDED', { params: { plan: 'Pro' } });
+    await ctx.queue.drain();
+    expect(await lastEmailTo(ctx, user.email)).toBeUndefined();
+
+    await notes.notify(user.id, 'PAYMENT_FAILED', { params: {} });
+    await ctx.queue.drain();
+    expect(await lastEmailTo(ctx, user.email)).toBeDefined();
   });
 });

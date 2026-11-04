@@ -155,6 +155,11 @@ sign-in, sign-out and session refresh. In production Caddy routes `/api/v1/ws/*`
   language, tap opens its link) to each device the user enabled, through the job queue. Devices
   the push service reports gone (404/410) are removed. iPhone/iPad allow push only for the app
   added to the Home Screen (iOS 16.4+) and only after a tap; the switch explains this.
+- **Fewer emails:** every notification is in-app and pushed. Email goes out for money (trial
+  ending, payment failed, subscription expired) always; for key moments (profile verified or
+  rejected, application accepted, brief rejected, offer requests, support replies, social
+  account disconnected) only when the user has no push device; plus the daily digests. Admins
+  get no emails. The rules are `EMAIL_POLICY` in `apps/api/src/modules/notifications/catalog.ts`.
 - **Keys:** VAPID keys in `.env` (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, optional
   `VAPID_SUBJECT`). Without them push is off and the switch says so. Generate a pair with
   `node -e "console.log(require('web-push').generateVAPIDKeys())"` in `apps/api`.
