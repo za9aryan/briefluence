@@ -1,14 +1,14 @@
 'use client';
 import type { Role } from '@briefluence/shared';
 import { Alert, Button, Container, Icon, Spinner, Text, cn, type IconName } from '@briefluence/ui';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Logo } from '@/components/common/Logo';
 import { api } from '@/lib/api';
-import { HOME_BY_ROLE, useMe, type Me } from '@/lib/hooks/session';
+import { HOME_BY_ROLE, ME_KEY, useMe, type Me } from '@/lib/hooks/session';
 import { NotificationBell } from './NotificationBell';
 import { UserMenu } from './UserMenu';
 import { AppReminder } from './AppReminder';
@@ -109,6 +109,21 @@ function Banners({ me }: { me: Me }) {
     mutationFn: () => api.post('/auth/resend-verification'),
     onSuccess: () => setResent(true),
   });
+  const qc = useQueryClient();
+  const unverified = !me.emailVerified;
+  // The link is usually opened in another tab (from the mail app): re-check on coming back.
+  useEffect(() => {
+    if (!unverified) return;
+    const recheck = () => {
+      if (document.visibilityState === 'visible') void qc.invalidateQueries({ queryKey: ME_KEY });
+    };
+    window.addEventListener('focus', recheck);
+    document.addEventListener('visibilitychange', recheck);
+    return () => {
+      window.removeEventListener('focus', recheck);
+      document.removeEventListener('visibilitychange', recheck);
+    };
+  }, [unverified, qc]);
   const sub = me.subscription;
   return (
     <>
