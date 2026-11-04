@@ -55,5 +55,6 @@
   "nothingFound": "Ոչինչ չի գտնվել",
   "logoutTitle": "Դուրս գա՞լ հաշվից",
   "logoutText": "Այս սարքում պետք կլինի նորից մուտք գործել։",
-  "logoutConfirm": "Դուրս գալ"
+  "logoutConfirm": "Դուրս գալ",
+  "cityDataCredit": "Քաղաքների տվյալները՝"
 }

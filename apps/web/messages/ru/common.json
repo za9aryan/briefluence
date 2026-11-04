@@ -55,5 +55,6 @@
   "nothingFound": "Ничего не найдено",
   "logoutTitle": "Выйти из аккаунта?",
   "logoutText": "На этом устройстве нужно будет войти снова.",
-  "logoutConfirm": "Выйти"
+  "logoutConfirm": "Выйти",
+  "cityDataCredit": "Данные о городах:"
 }

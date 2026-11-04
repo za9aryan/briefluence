@@ -173,6 +173,15 @@ the blogger keeps working until the admin chooses **Allow**, **Reject account** 
 - Country flags are self-hosted SVGs in `apps/web/public/flags` from [flag-icons](https://github.com/lipis/flag-icons)
   (MIT, see `LICENSE.txt` there), shown with the `Flag` primitive.
 
+## City search
+
+Country and city pickers call `GET /api/v1/geo/cities?country=AM,GE&q=&lang=`. With `GEONAMES_USERNAME` set the API
+searches [GeoNames](https://www.geonames.org/export/geonames-search.html) (cities, towns and villages in the chosen
+countries, biggest first; results cached for a day), else — or when GeoNames fails or hits its free limit of 1,000
+requests an hour — the built-in list. Cities are stored by their main (English) name and shown with the name in the
+viewer's language. The pickers show the "City data: GeoNames (CC BY 4.0)" credit their licence requires. Tests always
+use the built-in list.
+
 ## Deleting an account
 
 Companies and influencers delete their own account in **Settings → Delete account** (`POST /api/v1/account/delete`,

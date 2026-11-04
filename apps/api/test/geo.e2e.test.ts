@@ -21,3 +21,27 @@ describe('city search (e2e)', () => {
     await user.agent.get(`${API}/geo/cities`).expect(400);
   });
 });
+
+describe('GeoNames mapping', () => {
+  it('stores the main name, labels with the matched name, drops duplicates', async () => {
+    const { fromGeoNames } = await import('../src/modules/geo/geo.service');
+    // Shape as returned by searchJSON?style=LONG&lang=ru for "Ерев" (checked 2026-11-04).
+    expect(
+      fromGeoNames(
+        [
+          { toponymName: 'Yerevan', name: 'Ереван', adminName1: 'Ереван', countryCode: 'AM' },
+          { toponymName: 'Yerevan', name: 'Ереван', adminName1: 'Ереван', countryCode: 'AM' },
+          { toponymName: 'Gyumri', name: 'Gyumri', adminName1: '', countryCode: 'AM' },
+          { name: 'no main name', countryCode: 'AM' },
+        ],
+        'ru',
+      ),
+    ).toEqual([
+      { name: 'Yerevan', label: 'Ереван', country: 'AM', region: 'Ереван' },
+      { name: 'Gyumri', label: 'Gyumri', country: 'AM', region: null },
+    ]);
+    expect(
+      fromGeoNames([{ toponymName: 'Munich', name: 'München', countryCode: 'DE' }], 'en'),
+    ).toEqual([{ name: 'Munich', label: 'Munich', country: 'DE', region: null }]);
+  });
+});

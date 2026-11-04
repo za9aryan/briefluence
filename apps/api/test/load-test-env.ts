@@ -18,6 +18,7 @@ export function loadTestEnv() {
     OAUTH_LOGIN_MOCK: 'true',
     PAYMENT_PROVIDER: 'mock',
     RATES_SOURCE: 'static',
+    GEONAMES_USERNAME: '', // built-in city list: tests never call GeoNames
     PROCESS_ROLE: 'all',
     WEB_URL: 'http://localhost:3000',
     JWT_ACCESS_SECRET:

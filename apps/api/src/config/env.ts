@@ -134,6 +134,9 @@ export const envSchema = z
     VAPID_PRIVATE_KEY: optional,
     /** Contact for push services: mailto: or https: URL. */
     VAPID_SUBJECT: z.string().default('mailto:hello@briefluence.am'),
+    // City search (https://www.geonames.org/export/geonames-search.html). Not a secret; unset =
+    // the built-in city list only.
+    GEONAMES_USERNAME: optional,
   })
   .superRefine((e, ctx) => {
     const need = (keys: (keyof typeof e)[], when: string) => {

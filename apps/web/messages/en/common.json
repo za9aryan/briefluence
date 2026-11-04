@@ -55,5 +55,6 @@
   "nothingFound": "Nothing found",
   "logoutTitle": "Log out?",
   "logoutText": "You'll need to sign in again on this device.",
-  "logoutConfirm": "Log out"
+  "logoutConfirm": "Log out",
+  "cityDataCredit": "City data:"
 }

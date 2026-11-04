@@ -26,6 +26,7 @@ const apiEnv = {
   EMAIL_TRANSPORT: 'log',
   STORAGE_DRIVER: 'local',
   RATES_SOURCE: 'static',
+  GEONAMES_USERNAME: '',
   ADMIN_EMAIL: 'admin@briefluence.local',
   ADMIN_PASSWORD: 'Admin12345',
   // The suite signs up many accounts from one IP within a minute; production keeps 10.
