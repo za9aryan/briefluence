@@ -31,6 +31,7 @@ const apiEnv = {
   ADMIN_PASSWORD: 'Admin12345',
   // The suite signs up many accounts from one IP within a minute; production keeps 10.
   AUTH_RATE_LIMIT: '200',
+  SUPPORT_GUEST_IP_LIMIT: '100000',
 };
 
 export default defineConfig({

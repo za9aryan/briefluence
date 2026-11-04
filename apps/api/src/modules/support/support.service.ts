@@ -52,6 +52,14 @@ const publicMessage = (m: SupportMessage) => ({
   createdAt: m.createdAt,
 });
 
+/**
+ * New guest conversations per IP per day. The isolated E2E servers raise it
+ * (SUPPORT_GUEST_IP_LIMIT): every run comes from localhost, so the suite would hit it after a few
+ * runs in a day. Read at import time like AUTH_RATE_LIMIT.
+ */
+const GUEST_TICKETS_PER_IP =
+  Number(process.env.SUPPORT_GUEST_IP_LIMIT) || SUPPORT_GUEST_TICKETS_PER_IP_PER_DAY;
+
 @Injectable()
 export class SupportService {
   private readonly logger = new Logger(SupportService.name);
@@ -160,7 +168,7 @@ export class SupportService {
             })
           : 0,
       ]);
-      if (byEmail >= SUPPORT_GUEST_TICKETS_PER_DAY || byIp >= SUPPORT_GUEST_TICKETS_PER_IP_PER_DAY)
+      if (byEmail >= SUPPORT_GUEST_TICKETS_PER_DAY || byIp >= GUEST_TICKETS_PER_IP)
         throw new AppError('RATE_LIMITED', 'Too many new conversations. Try again tomorrow.');
       guest = { email: data.guestEmail, token: CryptoService.randomToken(32) };
     }
