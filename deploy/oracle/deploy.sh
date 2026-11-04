@@ -4,6 +4,8 @@ set -euo pipefail
 cd "$(dirname "$0")"
 [ -f .env ] || { echo "Missing deploy/oracle/.env — copy .env.example and fill it in first."; exit 1; }
 git -C ../.. pull --ff-only
-docker compose up -d --build
+# The website build downloads its fonts from Google Fonts; a network hiccup fails it, so retry once.
+docker compose build || docker compose build
+docker compose up -d
 docker image prune -f >/dev/null
 docker compose ps
