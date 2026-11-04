@@ -21,7 +21,8 @@ sudo netfilter-persistent save
 
 echo "→ Daily database + uploads backup at 03:30 (kept 14 days in $ROOT/backups)"
 mkdir -p "$ROOT/backups"
-( crontab -l 2>/dev/null | grep -v 'deploy/oracle/backup.sh' ; echo "30 3 * * * $ROOT/deploy/oracle/backup.sh >> $HOME/briefluence-backup.log 2>&1" ) | crontab -
+# `|| true`: with no crontab yet (or nothing left after grep) the pipe fails and set -e would skip the line.
+( { crontab -l 2>/dev/null || true; } | { grep -v 'deploy/oracle/backup.sh' || true; } ; echo "30 3 * * * $ROOT/deploy/oracle/backup.sh >> $HOME/briefluence-backup.log 2>&1" ) | crontab -
 
 echo
 echo "Done. Log out and back in (so Docker works without sudo), then continue with step 8 of docs/oracle-deploy.md."
