@@ -19,6 +19,7 @@ import {
   TR,
   Table,
   Text,
+  cn,
   useToast,
 } from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -66,6 +67,7 @@ export default function BillingPage() {
   const errorMessage = useErrorMessage();
   const qc = useQueryClient();
   const [confirm, setConfirm] = useState<'cancel' | 'card' | null>(null);
+  const [plansOpen, setPlansOpen] = useState(false);
   const sub = useQuery({
     queryKey: ['billing', 'subscription'],
     queryFn: () => api.get<SubscriptionDto>('/billing/subscription'),
@@ -102,13 +104,13 @@ export default function BillingPage() {
     s?.plan && s.plan.code !== 'BASIC' ? f.money(s.plan.priceMinor, s.plan.currency) : null;
   // A paid Pro period is running (renewing or ending).
   const paidPro = !!s?.renewal;
-  // Active Pro plans; "other" = the ones the blogger is not on (for switching).
+  // Active Pro plans (the "See plans" sheet switches between them).
   const proPlans = (sub.data?.plans ?? []).filter((p) => p.code !== 'BASIC');
-  const otherProPlans = proPlans.filter((p) => p.code !== s?.planCode);
   const switchPlan = useMutation({
     mutationFn: (plan: PlanCode) => api.post('/billing/switch', { plan }),
     onSuccess: (_, plan) => {
       refresh();
+      setPlansOpen(false);
       toast(plan === s?.planCode ? t('switchUndoneToast') : t('switchedToast'));
     },
     onError: (e) => toast(errorMessage(e), 'danger'),
@@ -218,43 +220,28 @@ export default function BillingPage() {
                       : t('pastDueNoRetry')}
                   </Alert>
                 )}
-                <Inline gap={2} wrap>
+                {/* Phones: full-width, equal buttons stacked; from sm they sit in a row. */}
+                <div className="grid gap-2 sm:flex sm:flex-wrap">
                   {s.renewal === 'renews' && (
-                    <Button variant="secondary" onClick={() => setConfirm('cancel')}>
+                    <Button variant="neutral" icon="x-circle" onClick={() => setConfirm('cancel')}>
                       {t('cancel')}
                     </Button>
                   )}
                   {s.renewal === 'ends' && s.hasCard && (
-                    <Button loading={action.isPending} onClick={() => action.mutate('resume')}>
+                    <Button
+                      icon="refresh"
+                      loading={action.isPending}
+                      onClick={() => action.mutate('resume')}
+                    >
                       {t('resume')}
                     </Button>
                   )}
                   {/* Monthly <-> yearly: scheduled for the next renewal (needs the saved card). */}
-                  {paidPro &&
-                    s.hasCard &&
-                    (s.nextPlan ? (
-                      <Button
-                        variant="ghost"
-                        loading={switchPlan.isPending}
-                        onClick={() => switchPlan.mutate(s.planCode)}
-                      >
-                        {t('keepPlan', { plan: planName(s.planCode) })}
-                      </Button>
-                    ) : (
-                      otherProPlans.map((p) => (
-                        <Button
-                          key={p.code}
-                          variant="secondary"
-                          loading={switchPlan.isPending && switchPlan.variables === p.code}
-                          onClick={() => switchPlan.mutate(p.code)}
-                        >
-                          {t('switchTo', {
-                            plan: planName(p.code),
-                            price: f.money(p.priceMinor, p.currency),
-                          })}
-                        </Button>
-                      ))
-                    ))}
+                  {paidPro && s.hasCard && proPlans.length > 1 && (
+                    <Button icon="repeat" onClick={() => setPlansOpen(true)}>
+                      {t('seePlans')}
+                    </Button>
+                  )}
                   {s.needsCardToRenew &&
                     proPlans.map((p) => (
                       <Button
@@ -271,21 +258,12 @@ export default function BillingPage() {
                             })}
                       </Button>
                     ))}
-                </Inline>
+                </div>
                 {s.needsCardToRenew && s.currentPeriodEnd && (
                   <Text size="small" tone="muted">
                     {t('renewNote', { date: f.date(s.currentPeriodEnd) })}
                   </Text>
                 )}
-                {paidPro &&
-                  s.hasCard &&
-                  !s.nextPlan &&
-                  otherProPlans.length > 0 &&
-                  s.currentPeriodEnd && (
-                    <Text size="small" tone="muted">
-                      {t('switchNote', { date: f.date(s.currentPeriodEnd) })}
-                    </Text>
-                  )}
                 <Text size="small" tone="muted">
                   {t('cardsNote')}
                 </Text>
@@ -368,6 +346,68 @@ export default function BillingPage() {
           <Text tone="muted">{t('noPayments')}</Text>
         )}
       </Card>
+
+      <Modal
+        open={plansOpen}
+        onClose={() => setPlansOpen(false)}
+        closeLabel={tc('close')}
+        title={t('changePlanTitle')}
+        description={
+          s?.currentPeriodEnd ? t('switchNote', { date: f.date(s.currentPeriodEnd) }) : undefined
+        }
+      >
+        <Stack gap={2}>
+          {proPlans.map((p) => {
+            const current = p.code === s?.planCode;
+            const scheduled = p.code === s?.nextPlan?.code;
+            return (
+              <div
+                key={p.code}
+                className={cn(
+                  'flex flex-wrap items-center gap-3 rounded-card border-2 p-4',
+                  current ? 'border-primary' : 'border-line',
+                )}
+              >
+                <div className="min-w-0 flex-1">
+                  <Inline gap={2} align="center">
+                    <Text weight="bold">{planName(p.code)}</Text>
+                    {current && <Badge tone="primary">{t('currentPlan')}</Badge>}
+                    {scheduled && s?.currentPeriodEnd && (
+                      <Badge tone="neutral">
+                        {t('planStartsOn', { date: f.date(s.currentPeriodEnd) })}
+                      </Badge>
+                    )}
+                  </Inline>
+                  <Text tone="muted" className="tabular-nums">
+                    {f.money(p.priceMinor, p.currency)} {periodLabel(tp, p.code)}
+                  </Text>
+                </div>
+                {current && s?.nextPlan ? (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    loading={switchPlan.isPending}
+                    onClick={() => switchPlan.mutate(p.code)}
+                  >
+                    {t('keepPlan', { plan: planName(p.code) })}
+                  </Button>
+                ) : (
+                  !current &&
+                  !s?.nextPlan && (
+                    <Button
+                      size="sm"
+                      loading={switchPlan.isPending && switchPlan.variables === p.code}
+                      onClick={() => switchPlan.mutate(p.code)}
+                    >
+                      {t('switchShort')}
+                    </Button>
+                  )
+                )}
+              </div>
+            );
+          })}
+        </Stack>
+      </Modal>
 
       <Modal
         open={!!confirm}

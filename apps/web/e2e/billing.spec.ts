@@ -69,9 +69,11 @@ test('free Pro days → Basic → upgrade to Pro → renew with the saved card',
     await expect(page.getByText('Auto-renewal on')).toBeVisible();
 
     // Switch to yearly at the next renewal, then change of mind.
-    await page.getByRole('button', { name: /Switch to Pro yearly/ }).click();
+    await page.getByRole('button', { name: 'See plans' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Switch' }).click();
     await expect(page.getByText(/you switch to Pro yearly/)).toBeVisible();
-    await page.getByRole('button', { name: 'Keep Pro' }).click();
+    await page.getByRole('button', { name: 'See plans' }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Keep Pro' }).click();
     await expect(seen(page, 'You stay on your current plan')).toBeVisible();
     await expect(page.getByText(/you switch to Pro yearly/)).toHaveCount(0);
 

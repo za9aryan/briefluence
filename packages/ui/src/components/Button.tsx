@@ -9,6 +9,8 @@ const VARIANT = {
   soft: 'bg-primary-soft text-primary-text hover:brightness-97',
   ghost: 'text-ink-muted hover:bg-primary-soft/60 hover:text-ink',
   danger: 'border-2 border-primary-text text-primary-text hover:bg-primary-soft',
+  /** Quiet outline for a step back (cancel, leave): reads as "not the main action" at a glance. */
+  neutral: 'border-2 border-line text-ink hover:bg-surface',
   link: 'h-auto! px-0! text-primary-text underline-offset-4 hover:underline',
 } as const;
 

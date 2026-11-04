@@ -874,6 +874,11 @@ export default {
       '{date} կանցնես {plan}-ի՝ {price} պահպանված քարտից։',
     ],
     keepPlan: ['Keep {plan}', 'Оставить {plan}', 'Թողնել {plan}-ը'],
+    seePlans: ['See plans', 'Посмотреть тарифы', 'Դիտել փաթեթները'],
+    changePlanTitle: ['Change plan', 'Сменить тариф', 'Փոխել փաթեթը'],
+    currentPlan: ['Current', 'Текущий', 'Ընթացիկ'],
+    planStartsOn: ['From {date}', 'С {date}', '{date}-ից'],
+    switchShort: ['Switch', 'Перейти', 'Անցնել'],
     switchedToast: [
       'Plan change scheduled',
       'Смена тарифа запланирована',
