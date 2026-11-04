@@ -15,6 +15,8 @@ const norm = (s: string) => s.toLocaleLowerCase().normalize('NFD').replace(/[̀-
 const GEONAMES_URL = 'https://secure.geonames.org/searchJSON';
 /** Cities, towns and villages; not districts (PPLX) or historical / abandoned places. */
 const FCODES = ['PPLC', 'PPLA', 'PPLA2', 'PPLA3', 'PPLA4', 'PPL', 'PPLL', 'PPLS', 'PPLF', 'PPLG'];
+/** Only Latin letters (with accents), spaces and punctuation. */
+const LATIN = /^[\p{Script=Latin}\p{P}\p{Zs}\d]+$/u;
 const TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_CACHE = 2000;
 
@@ -26,8 +28,10 @@ export interface GeoNamesPlace {
 }
 
 /**
- * GeoNames results → our options: stored by the main name, labelled in the viewer's language
- * (English: the main name, e.g. "Munich" rather than the matched "München").
+ * GeoNames results → our options: stored by the main name, labelled in the viewer's language.
+ * `name` is whatever alternate name matched the query, so it is used only when it is written in a
+ * non-Latin script (ru / hy: "Ереван", "Երևան"); otherwise the main name ("Dilijan", not the
+ * matched alias "Dili"; "Munich", not "München").
  */
 export function fromGeoNames(places: GeoNamesPlace[], lang: string): CityOption[] {
   const seen = new Set<string>();
@@ -40,7 +44,7 @@ export function fromGeoNames(places: GeoNamesPlace[], lang: string): CityOption[
     seen.add(key);
     out.push({
       name,
-      label: lang === 'en' ? name : p.name?.trim() || name,
+      label: lang !== 'en' && p.name && !LATIN.test(p.name) ? p.name.trim() : name,
       country: p.countryCode,
       region: p.adminName1?.trim() || null,
     });
