@@ -6,6 +6,7 @@ import {
   PLATFORMS,
   type ManualAccountInput,
   type Platform,
+  stripScheme,
 } from '@briefluence/shared';
 import { Button, FieldGrid, Modal, Stack, Text, useToast } from '@briefluence/ui';
 import { useMutation } from '@tanstack/react-query';
@@ -34,7 +35,7 @@ function toValues(a: SocialAccountDto): FormValues {
     platform: a.platform,
     username: a.username,
     followers: a.followers,
-    profileUrl: a.profileUrl,
+    profileUrl: stripScheme(a.profileUrl),
     avgViews: a.avgViews,
     engagementRate: a.engagementRate,
     audienceFemale: a.audienceGender?.female ?? null,
@@ -150,11 +151,11 @@ function ManualAccountDialog({ open, account, usedPlatforms, onClose, onSaved }:
           </FieldGrid>
           <TextField
             name="profileUrl"
-            type="url"
+            url
             label={t('profileUrl')}
             hint={t('profileUrlHint')}
             aside={tc('optional')}
-            placeholder="https://"
+            placeholder="instagram.com/yourname"
             register={form.register}
             error={errors.profileUrl}
           />

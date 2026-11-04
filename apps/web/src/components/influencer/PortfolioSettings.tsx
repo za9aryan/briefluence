@@ -5,6 +5,8 @@ import {
   FAQ_KEYS,
   PORTFOLIO_MAX_ITEMS,
   type FaqKey,
+  stripScheme,
+  withScheme,
 } from '@briefluence/shared';
 import {
   Alert,
@@ -16,6 +18,7 @@ import {
   Grid,
   Icon,
   Input,
+  UrlInput,
   Menu,
   MenuItem,
   Modal,
@@ -69,7 +72,7 @@ export function PortfolioCard() {
             imageUrl: item.imageUrl,
             title: item.title,
             description: item.description ?? '',
-            linkUrl: item.linkUrl ?? '',
+            linkUrl: stripScheme(item.linkUrl),
           }
         : EMPTY,
     );
@@ -83,7 +86,7 @@ export function PortfolioCard() {
         imageUrl: draft.imageUrl,
         title: draft.title.trim(),
         description: draft.description.trim() || null,
-        linkUrl: draft.linkUrl.trim() || null,
+        linkUrl: withScheme(draft.linkUrl) || null,
       };
       return editing
         ? api.put<PortfolioItemDto>(`/influencers/me/portfolio/${editing}`, body)
@@ -256,13 +259,11 @@ export function PortfolioCard() {
           </Field>
           <Field label={tf('link')} hint={tf('linkHint')} aside={tc('optional')}>
             {({ id, describedBy }) => (
-              <Input
+              <UrlInput
                 id={id}
                 aria-describedby={describedBy}
-                type="url"
-                inputMode="url"
                 maxLength={500}
-                placeholder="https://"
+                placeholder="instagram.com/p/…"
                 value={draft.linkUrl}
                 onChange={(e) => setDraft((d) => ({ ...d, linkUrl: e.target.value }))}
               />

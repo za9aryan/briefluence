@@ -119,7 +119,10 @@ export default {
       close: ['Close', 'Закрыть', 'Փակել'],
       previous: ['Previous work', 'Предыдущая работа', 'Նախորդ աշխատանքը'],
       next: ['Next work', 'Следующая работа', 'Հաջորդ աշխատանքը'],
-      position: ['{n} of {total}', '{n} из {total}', '{n}՝ {total}-ից'],
+      position: ['{n} / {total}', '{n} / {total}', '{n} / {total}'],
+      prevShort: ['Previous', 'Назад', 'Նախորդը'],
+      nextShort: ['Next', 'Далее', 'Հաջորդը'],
+      seeWork: ['See the work', 'Посмотреть работу', 'Դիտել աշխատանքը'],
     },
     apply: {
       title: ['Attach your work', 'Приложи свои работы', 'Կցիր քո աշխատանքները'],

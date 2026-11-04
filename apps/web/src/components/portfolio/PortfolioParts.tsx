@@ -2,8 +2,10 @@
 import {
   Badge,
   Button,
+  buttonStyles,
   Card,
   Carousel,
+  CoverChip,
   Disclosure,
   Icon,
   Modal,
@@ -36,20 +38,26 @@ function hostname(url: string) {
   }
 }
 
-/** External link to where the work lives. Blogger-supplied, so no referrer and nofollow. */
+/**
+ * "See the work" button to where the work lives (the site's name shows on hover). Influencer-
+ * supplied, so no referrer and nofollow.
+ */
 export function PortfolioLink({ url, className }: { url: string; className?: string }) {
+  const t = useTranslations('portfolio.view');
   return (
     <a
       href={url}
       target="_blank"
       rel="noopener noreferrer nofollow ugc"
-      className={cn(
-        'inline-flex min-h-11 max-w-full items-center gap-1 text-small font-bold text-primary-text hover:underline',
-        className,
-      )}
+      title={hostname(url)}
+      className={buttonStyles({
+        variant: 'secondary',
+        size: 'sm',
+        className: cn('self-start', className),
+      })}
     >
+      {t('seeWork')}
       <Icon name="external" size="xs" />
-      <span className="truncate">{hostname(url)}</span>
     </a>
   );
 }
@@ -152,15 +160,24 @@ export function PortfolioGallery({
         closeLabel={t('close')}
         footer={
           items.length > 1 ? (
-            <div className="flex w-full items-center justify-between gap-2">
-              <Button variant="secondary" icon="chevron-left" onClick={() => go(-1)}>
-                {t('previous')}
+            <div className="grid w-full grid-cols-2 gap-2">
+              <Button
+                variant="secondary"
+                block
+                icon="chevron-left"
+                aria-label={t('previous')}
+                onClick={() => go(-1)}
+              >
+                {t('prevShort')}
               </Button>
-              <Text size="small" tone="muted" className="tabular-nums" aria-live="polite">
-                {t('position', { n: (index ?? 0) + 1, total: items.length })}
-              </Text>
-              <Button variant="secondary" iconRight="chevron-right" onClick={() => go(1)}>
-                {t('next')}
+              <Button
+                variant="secondary"
+                block
+                iconRight="chevron-right"
+                aria-label={t('next')}
+                onClick={() => go(1)}
+              >
+                {t('nextShort')}
               </Button>
             </div>
           ) : undefined
@@ -168,11 +185,22 @@ export function PortfolioGallery({
       >
         {open && (
           <Stack gap={4} key={open.id} className="bf-fade">
-            <img
-              src={open.imageUrl}
-              alt={open.title}
-              className="max-h-[60vh] w-full rounded-card bg-surface object-contain"
-            />
+            <div className="relative">
+              <img
+                src={open.imageUrl}
+                alt={open.title}
+                className="max-h-[60vh] w-full rounded-card bg-surface object-contain"
+              />
+              {items.length > 1 && (
+                <span className="absolute right-2 top-2">
+                  <CoverChip>
+                    <span className="tabular-nums" aria-live="polite">
+                      {t('position', { n: (index ?? 0) + 1, total: items.length })}
+                    </span>
+                  </CoverChip>
+                </span>
+              )}
+            </div>
             {open.description && (
               <Text className="whitespace-pre-line break-words">{open.description}</Text>
             )}

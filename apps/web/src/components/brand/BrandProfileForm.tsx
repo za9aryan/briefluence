@@ -1,6 +1,11 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { brandProfileSchema, DEFAULT_COUNTRY, type BrandProfileInput } from '@briefluence/shared';
+import {
+  brandProfileSchema,
+  DEFAULT_COUNTRY,
+  stripScheme,
+  type BrandProfileInput,
+} from '@briefluence/shared';
 import { Button, Field, FieldGrid, Heading, Stack, Text } from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
@@ -35,8 +40,8 @@ export function BrandProfileForm({
     defaultValues: {
       companyName: initial?.companyName ?? '',
       logoUrl: initial?.logoUrl ?? null,
-      website: initial?.website ?? '',
-      instagramUrl: initial?.instagramUrl ?? '',
+      website: stripScheme(initial?.website),
+      instagramUrl: stripScheme(initial?.instagramUrl),
       description: initial?.description ?? '',
       country: initial?.country ?? DEFAULT_COUNTRY,
       city: initial?.city ?? '',
@@ -92,18 +97,18 @@ export function BrandProfileForm({
             />
             <TextField
               name="website"
-              type="url"
+              url
               icon="globe"
-              placeholder="https://"
+              placeholder="yourcafe.am"
               label={t('website')}
               register={form.register}
               error={errors.website}
             />
             <TextField
               name="instagramUrl"
-              type="url"
+              url
               icon="instagram"
-              placeholder="https://instagram.com/…"
+              placeholder="instagram.com/yourcafe"
               label={t('instagramUrl')}
               register={form.register}
               error={errors.instagramUrl}

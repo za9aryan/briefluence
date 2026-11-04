@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { dealInputSchema, feedQuerySchema, signupSchema } from './schemas';
+import {
+  dealInputSchema,
+  feedQuerySchema,
+  signupSchema,
+  stripScheme,
+  webUrl,
+  withScheme,
+} from './schemas';
 
 const base = {
   title: 'Coffee shop launch',
@@ -36,6 +43,16 @@ describe('schemas', () => {
   });
   it('requires at least one niche (feeds filter by it)', () => {
     expect(dealInputSchema.safeParse({ ...base, niches: [] }).success).toBe(false);
+  });
+  it('adds https:// to typed links and keeps full ones', () => {
+    expect(withScheme(' instagram.com/ani ')).toBe('https://instagram.com/ani');
+    expect(withScheme('http://old.am')).toBe('http://old.am');
+    expect(withScheme('HTTPS://a.am')).toBe('HTTPS://a.am');
+    expect(withScheme('')).toBe('');
+    expect(stripScheme('https://a.am/x')).toBe('a.am/x');
+    expect(webUrl.parse('cafe.am')).toBe('https://cafe.am');
+    expect(webUrl.parse('')).toBeNull();
+    expect(webUrl.safeParse('not a url at all').success).toBe(false);
   });
   it('rejects inverted ranges', () => {
     expect(dealInputSchema.safeParse({ ...base, minFollowers: 10, maxFollowers: 5 }).success).toBe(

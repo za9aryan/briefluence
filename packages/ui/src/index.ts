@@ -48,6 +48,7 @@ export {
   Field,
   Input,
   AmountInput,
+  UrlInput,
   Textarea,
   Select,
   Checkbox,

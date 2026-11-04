@@ -151,6 +151,51 @@ export const Textarea = forwardRef<
 });
 
 /**
+ * A web address: a grey "https://" block in front, so people type just "instagram.com/ani".
+ * A pasted full link loses its scheme as it lands in the field (no "https://https://"); the shared
+ * `webUrl` schema puts it back. Works with react-hook-form's register or as a controlled input.
+ */
+export const UrlInput = forwardRef<HTMLInputElement, Omit<InputProps, 'type' | 'suffix'>>(
+  function UrlInput({ icon, invalid, className, onChange, ...rest }, ref) {
+    return (
+      <div
+        className={cn(
+          'flex h-11 w-full items-stretch overflow-hidden rounded-sm border bg-surface-raised transition-colors',
+          'focus-within:border-primary focus-within:ring-3 focus-within:ring-primary/15',
+          invalid ? 'border-primary-text' : 'border-line',
+          className,
+        )}
+      >
+        <span
+          aria-hidden
+          className="flex shrink-0 select-none items-center gap-1.5 border-r border-line bg-surface px-3 text-small text-ink-muted pointer-coarse:text-body"
+        >
+          {icon && <Icon name={icon} size="sm" />}
+          https://
+        </span>
+        <input
+          ref={ref}
+          type="text"
+          inputMode="url"
+          autoComplete="url"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          aria-invalid={invalid || undefined}
+          className="min-w-0 flex-1 bg-transparent px-3 text-small text-ink outline-none placeholder:text-ink-muted pointer-coarse:text-body"
+          {...rest}
+          onChange={(e) => {
+            const bare = e.target.value.replace(/^\s*https?:\/\//i, '');
+            if (bare !== e.target.value) e.target.value = bare;
+            onChange?.(e);
+          }}
+        />
+      </div>
+    );
+  },
+);
+
+/**
  * An amount with its currency picked inside the same field ("12 000 | ֏ AMD ▾"), so changing the
  * currency visibly changes the amount's unit. `currency` goes to the <select> (value, onChange,
  * name, ref from react-hook-form's register); `currencies` are its options.

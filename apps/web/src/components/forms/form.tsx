@@ -1,8 +1,14 @@
 'use client';
-import { Alert, Field, Input, Textarea, Select, type InputProps } from '@briefluence/ui';
+import { Alert, Field, Input, Textarea, Select, UrlInput, type InputProps } from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
-import type { FieldError, FieldValues, Path, UseFormRegister, UseFormSetError } from 'react-hook-form';
+import type {
+  FieldError,
+  FieldValues,
+  Path,
+  UseFormRegister,
+  UseFormSetError,
+} from 'react-hook-form';
 import { ApiError } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 
@@ -40,18 +46,37 @@ interface TextFieldProps<T extends FieldValues> extends Omit<InputProps, 'name'>
   hint?: ReactNode;
   aside?: ReactNode;
   valueAsNumber?: boolean;
+  /** A web address: "https://" shown in front (see UrlInput). */
+  url?: boolean;
 }
 
-export function TextField<T extends FieldValues>({ name, label, register, error, hint, aside, required, valueAsNumber, ...rest }: TextFieldProps<T>) {
+export function TextField<T extends FieldValues>({
+  name,
+  label,
+  register,
+  error,
+  hint,
+  aside,
+  required,
+  valueAsNumber,
+  url,
+  ...rest
+}: TextFieldProps<T>) {
   const fe = useFieldError();
+  const Control = url ? UrlInput : Input;
   return (
     <Field label={label} error={fe(error)} hint={hint} required={required} aside={aside}>
       {({ id, describedBy, invalid }) => (
-        <Input
+        <Control
           id={id}
           aria-describedby={describedBy}
           invalid={invalid}
-          {...register(name, valueAsNumber ? { setValueAs: (v) => (v === '' || v == null ? null : Number(v)) } : undefined)}
+          {...register(
+            name,
+            valueAsNumber
+              ? { setValueAs: (v) => (v === '' || v == null ? null : Number(v)) }
+              : undefined,
+          )}
           {...rest}
         />
       )}
@@ -86,7 +111,15 @@ export function TextAreaField<T extends FieldValues>({
   return (
     <Field label={label} error={fe(error)} hint={hint} aside={aside} required={required}>
       {({ id, describedBy, invalid }) => (
-        <Textarea id={id} aria-describedby={describedBy} invalid={invalid} rows={rows} maxLength={maxLength} placeholder={placeholder} {...register(name)} />
+        <Textarea
+          id={id}
+          aria-describedby={describedBy}
+          invalid={invalid}
+          rows={rows}
+          maxLength={maxLength}
+          placeholder={placeholder}
+          {...register(name)}
+        />
       )}
     </Field>
   );
@@ -115,7 +148,12 @@ export function SelectField<T extends FieldValues>({
   return (
     <Field label={label} error={fe(error)} required={required} hint={hint}>
       {({ id, describedBy, invalid }) => (
-        <Select id={id} aria-describedby={describedBy} invalid={invalid} {...register(name, { setValueAs: (v) => (v === '' ? null : v) })}>
+        <Select
+          id={id}
+          aria-describedby={describedBy}
+          invalid={invalid}
+          {...register(name, { setValueAs: (v) => (v === '' ? null : v) })}
+        >
           {placeholder !== undefined && <option value="">{placeholder}</option>}
           {options.map((o) => (
             <option key={o.value} value={o.value}>

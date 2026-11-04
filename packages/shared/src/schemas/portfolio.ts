@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { FAQ_ANSWER_MAX_LENGTH } from '../constants';
-import { optionalText, optionalUrl } from './common';
+import { optionalText, webUrl } from './common';
 
 /** One portfolio item: an image (uploaded through /uploads/portfolio), title, optional text and link. */
 export const portfolioItemSchema = z.object({
@@ -8,7 +8,7 @@ export const portfolioItemSchema = z.object({
   title: z.string().trim().min(2).max(80),
   description: optionalText(500),
   /** Where the work lives (Reel, TikTok, YouTube, a site): shown to brands as a link. */
-  linkUrl: optionalUrl,
+  linkUrl: webUrl,
 });
 export type PortfolioItemInput = z.input<typeof portfolioItemSchema>;
 export type PortfolioItemData = z.output<typeof portfolioItemSchema>;

@@ -56,7 +56,10 @@
     "close": "Փակել",
     "previous": "Նախորդ աշխատանքը",
     "next": "Հաջորդ աշխատանքը",
-    "position": "{n}՝ {total}-ից"
+    "position": "{n} / {total}",
+    "prevShort": "Նախորդը",
+    "nextShort": "Հաջորդը",
+    "seeWork": "Դիտել աշխատանքը"
   },
   "apply": {
     "title": "Կցիր քո աշխատանքները",

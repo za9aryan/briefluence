@@ -65,7 +65,8 @@ test('portfolio + FAQ: blogger adds work → admin approves → brand sees it an
     .setInputFiles({ name: 'story.png', mimeType: 'image/png', buffer: PNG });
   await expect(blogger.getByRole('dialog').getByRole('button', { name: 'Change' })).toBeVisible();
   await blogger.getByLabel('Title').fill(`Story for a coffee shop ${id}`);
-  await blogger.getByLabel('Link').fill('https://www.instagram.com/p/abc123/');
+  // Typed without https:// (the field shows it in front); stored as a full link.
+  await blogger.getByLabel('Link').fill('www.instagram.com/p/abc123/');
   await blogger.getByRole('dialog').getByRole('button', { name: 'Save' }).click();
   await expect(blogger.getByText('In review')).toBeVisible();
   await blogger.getByLabel('Who is your audience?').fill('Women 20–30 in Yerevan who love food');
@@ -144,7 +145,10 @@ test('portfolio + FAQ: blogger adds work → admin approves → brand sees it an
   await expect(brand.getByText('Women 20–30 in Yerevan who love food')).toBeVisible();
   // Unanswered questions stay hidden.
   await expect(brand.getByText('What companies have you worked with?')).toHaveCount(0);
-  await expect(brand.getByRole('link', { name: 'instagram.com' })).toBeVisible();
+  await expect(brand.getByRole('link', { name: 'See the work' }).first()).toHaveAttribute(
+    'href',
+    'https://www.instagram.com/p/abc123/',
+  );
   if (shots) await brand.screenshot({ path: `${shots}/brand.png`, fullPage: true });
 
   // ── The blogger card on an offer page shows the same portfolio and FAQ ──

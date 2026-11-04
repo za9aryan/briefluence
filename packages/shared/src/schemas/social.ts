@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { AUDIENCE_AGE_BUCKETS } from '../constants';
 import { PLATFORMS, type Platform } from '../enums';
-import { countryCode, optionalUrl } from './common';
+import { countryCode, webUrl } from './common';
 
 const optionalInt = (max: number) =>
   z
@@ -33,7 +33,7 @@ export const manualAccountSchema = z
       .transform((v) => v.replace(/^@/, ''))
       .pipe(z.string().regex(/^[A-Za-z0-9._-]{1,60}$/, 'invalidUsername')),
     followers: z.number().int().min(0).max(1_000_000_000),
-    profileUrl: optionalUrl,
+    profileUrl: webUrl,
     avgViews: optionalInt(10_000_000_000),
     engagementRate: optionalPercent,
     audienceFemale: optionalPercent,

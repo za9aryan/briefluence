@@ -56,7 +56,10 @@
     "close": "Close",
     "previous": "Previous work",
     "next": "Next work",
-    "position": "{n} of {total}"
+    "position": "{n} / {total}",
+    "prevShort": "Previous",
+    "nextShort": "Next",
+    "seeWork": "See the work"
   },
   "apply": {
     "title": "Attach your work",

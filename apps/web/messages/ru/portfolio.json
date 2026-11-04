@@ -56,7 +56,10 @@
     "close": "Закрыть",
     "previous": "Предыдущая работа",
     "next": "Следующая работа",
-    "position": "{n} из {total}"
+    "position": "{n} / {total}",
+    "prevShort": "Назад",
+    "nextShort": "Далее",
+    "seeWork": "Посмотреть работу"
   },
   "apply": {
     "title": "Приложи свои работы",
