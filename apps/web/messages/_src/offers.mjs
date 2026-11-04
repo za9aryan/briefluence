@@ -1,4 +1,4 @@
-// Blogger offers ("1 Story for 10,000 AMD"): what bloggers sell, what brands request. Every leaf is [en, ru, hy].
+// Blogger offers ("1 Story for $50"): what bloggers sell, what brands request. Every leaf is [en, ru, hy].
 export default {
   offers: {
     confirmClose: {
@@ -19,9 +19,9 @@ export default {
     ],
     newOffer: ['New offer', 'Новое предложение', 'Նոր առաջարկ'],
     emptyMine: [
-      'No offers yet. Start with something simple, like "1 Story for 10,000 AMD".',
-      'Предложений пока нет. Начни с простого, например «1 сторис за 10 000 драм».',
-      'Առաջարկներ դեռ չկան։ Սկսիր պարզից, օրինակ՝ «1 սթորի 10 000 դրամով»։',
+      'No offers yet. Start with something simple, like "1 Story for $50".',
+      'Предложений пока нет. Начни с простого, например «1 сторис за $50».',
+      'Առաջարկներ դեռ չկան։ Սկսիր պարզից, օրինակ՝ «1 սթորի $50-ով»։',
     ],
     newTitle: ['New offer', 'Новое предложение', 'Նոր առաջարկ'],
     editTitle: ['Edit offer', 'Изменить предложение', 'Խմբագրել առաջարկը'],

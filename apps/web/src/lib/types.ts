@@ -339,7 +339,7 @@ export interface PaymentDto {
   providerOrderId: string;
 }
 
-/** Blogger offer ("1 Story for 10,000 AMD"). Review fields only reach the owner and admins. */
+/** Blogger offer ("1 Story for $50"). Review fields only reach the owner and admins. */
 export interface OfferDto {
   id: string;
   influencerId: string;
