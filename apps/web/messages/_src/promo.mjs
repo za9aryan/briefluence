@@ -3,6 +3,54 @@
 export default {
   promo: {
     sample: ['Example', 'Пример', 'Օրինակ'],
+    briefs: {
+      hotel: {
+        brand: ['Alpenhof Guest House', 'Гестхаус «Альпенхоф»', 'Alpenhof հյուրատուն'],
+      },
+      coffee: { brand: ['Nordic Roast', 'Nordic Roast', 'Nordic Roast'] },
+    },
+    insights: {
+      eyebrow: ['Search insights', 'Аналитика поиска', 'Որոնումների վերլուծություն'],
+      title: [
+        'See what influencers are looking for',
+        'Смотри, что ищут инфлюенсеры',
+        'Տես, թե ինչ են փնտրում ինֆլյուենսերները',
+      ],
+      lead: [
+        'We count what verified influencers search for and which briefs they open. You see the trends and shape your next brief around them.',
+        'Мы считаем, что ищут проверенные инфлюенсеры и какие брифы они открывают. Ты видишь тренды и строишь следующий бриф под них.',
+        'Մենք հաշվում ենք, թե ինչ են փնտրում ստուգված ինֆլյուենսերները և որ բրիֆներն են բացում։ Դու տեսնում ես միտումները և դրանց հիման վրա կազմում հաջորդ բրիֆը։',
+      ],
+      points: {
+        wants: [
+          'Which niches, formats and platforms are in demand right now',
+          'Какие ниши, форматы и платформы сейчас в спросе',
+          'Որ նիշաները, ձևաչափերը և հարթակներն են հիմա պահանջված',
+        ],
+        money: [
+          'Money or barter, and the budgets influencers look for',
+          'Деньги или бартер и какие бюджеты ищут инфлюенсеры',
+          'Գումար, թե բարտեր, և ինչ բյուջեներ են փնտրում ինֆլյուենսերները',
+        ],
+        cities: [
+          'Where they want to collaborate, day by day',
+          'Где они хотят сотрудничать, день за днём',
+          'Որտեղ են ուզում համագործակցել՝ օր առ օր',
+        ],
+      },
+      privacy: [
+        'Anonymous totals only. No one’s personal data.',
+        'Только анонимные итоги, без чьих-либо личных данных.',
+        'Միայն անանուն ընդհանուր թվեր՝ առանց որևէ մեկի անձնական տվյալների։',
+      ],
+      searches: ['Searches', 'Поиски', 'Որոնումներ'],
+      opens: ['Brief opens', 'Открытия брифов', 'Բրիֆների բացումներ'],
+      mostWanted: [
+        'Most wanted: {format}',
+        'Чаще всего ищут: {format}',
+        'Ամենաշատ փնտրվողը՝ {format}',
+      ],
+    },
     analytics: {
       eyebrow: [
         'Influencer analytics',

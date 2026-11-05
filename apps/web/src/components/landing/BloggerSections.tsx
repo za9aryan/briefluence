@@ -8,19 +8,20 @@ import {
   Icon,
   IconBubble,
   Inline,
-  ScoreMeter,
   Stack,
   Text,
   buttonStyles,
   type IconName,
 } from '@briefluence/ui';
 import { getTranslations } from 'next-intl/server';
-import { ExamplePrice } from './ExamplePrice';
+import { SampleBriefCard, SampleOfferCard } from './SampleCards';
 import { FeatureItem, Section } from '@/components/common/Section';
 
 /** /for-influencers: the two ways to earn, each with a static preview built from real UI parts. */
 export async function EarnWays() {
   const t = await getTranslations('landing.influencers.earn');
+  const tp = await getTranslations('promo');
+  const ts = await getTranslations('showcase');
   return (
     <Section title={t('title')} lead={t('lead')}>
       <Grid cols={{ base: 1, lg: 2 }} gap={6}>
@@ -29,37 +30,35 @@ export async function EarnWays() {
             <Heading level={3}>{t('briefs.title')}</Heading>
             <Text tone="muted">{t('briefs.body')}</Text>
           </Stack>
-          {/* Decorative sample brief: nothing here is clickable. */}
-          <Card p={4} aria-hidden className="pointer-events-none select-none">
-            <Inline justify="between">
-              <Badge tone="primary">{t('brief.type')}</Badge>
-              <Text size="small" tone="muted">
-                {t('brief.meta')}
+          {/* Decorative sample brief in the feed's card style, with why it fits. */}
+          <div aria-hidden className="pointer-events-none mx-auto w-full max-w-sm select-none">
+            <SampleBriefCard
+              image="/showcase/coffee.webp"
+              brand={tp('briefs.coffee.brand')}
+              meta={t('brief.meta')}
+              title={t('brief.title')}
+              slots={3}
+              match={88}
+              payment="MONEY"
+              budget={[80, 130]}
+              formats={['REEL']}
+              views={640}
+              applicants={9}
+              className="pb-6"
+            />
+            <Card p={4} className="relative -mt-6 ml-auto w-11/12 shadow-pop sm:-mr-8">
+              <Text size="small" weight="bold">
+                {t('brief.why')}
               </Text>
-            </Inline>
-            <Inline justify="between" align="start" gap={4} className="mt-4">
-              <Stack gap={1}>
-                <Heading level={3}>{t('brief.title')}</Heading>
-                <Text size="small" weight="bold">
-                  <ExamplePrice amount={80} to={130} currency="USD" />
-                </Text>
-              </Stack>
-              <ScoreMeter value={88} label={t('brief.match')} />
-            </Inline>
-            <Text size="small" tone="muted" className="mt-4">
-              {t('brief.why')}
-            </Text>
-            <Inline gap={2} wrap className="mt-2">
-              {(['city', 'age', 'followers'] as const).map((k) => (
-                <Badge key={k} tone="success" icon="check">
-                  {t(`brief.reasons.${k}`)}
-                </Badge>
-              ))}
-            </Inline>
-            <div className={buttonStyles({ block: true, className: 'mt-6' })}>
-              {t('brief.apply')}
-            </div>
-          </Card>
+              <Inline gap={2} wrap className="mt-2">
+                {(['city', 'age', 'followers'] as const).map((k) => (
+                  <Badge key={k} variant="small" tone="success" icon="check">
+                    {t(`brief.reasons.${k}`)}
+                  </Badge>
+                ))}
+              </Inline>
+            </Card>
+          </div>
         </Stack>
 
         <Stack gap={4}>
@@ -67,27 +66,19 @@ export async function EarnWays() {
             <Heading level={3}>{t('offers.title')}</Heading>
             <Text tone="muted">{t('offers.body')}</Text>
           </Stack>
-          {/* Decorative sample service card with an incoming request. */}
-          <Stack gap={4} aria-hidden className="pointer-events-none select-none">
-            <Card p={4}>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                <Stack gap={1}>
-                  <Inline gap={2}>
-                    <Badge icon="instagram">Reels</Badge>
-                  </Inline>
-                  <Heading level={3} className="mt-2">
-                    {t('offer.title')}
-                  </Heading>
-                  <Text size="small" tone="muted">
-                    {t('offer.body')}
-                  </Text>
-                </Stack>
-                <span className="shrink-0 text-h2 font-extrabold text-ink">
-                  <ExamplePrice amount={50} currency="USD" />
-                </span>
-              </div>
-            </Card>
-            <Card p={4} className="ml-auto w-full sm:w-5/6">
+          {/* Decorative sample offer with an incoming request. */}
+          <div aria-hidden className="pointer-events-none mx-auto w-full max-w-sm select-none">
+            <SampleOfferCard
+              image="/showcase/zofia.webp"
+              name={ts('offers.zofia.name')}
+              meta={ts('offers.zofia.city')}
+              title={t('offer.title')}
+              body={t('offer.body')}
+              format="REEL"
+              price={50}
+              className="pb-6"
+            />
+            <Card p={4} className="relative -mt-6 ml-auto w-11/12 shadow-pop sm:-mr-8">
               <Inline gap={4} align="start">
                 <IconBubble name="building" tone="primary" />
                 <Stack gap={2} className="min-w-0 flex-1">
@@ -101,7 +92,7 @@ export async function EarnWays() {
                 </Stack>
               </Inline>
             </Card>
-          </Stack>
+          </div>
         </Stack>
       </Grid>
     </Section>

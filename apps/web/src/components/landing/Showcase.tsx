@@ -21,6 +21,7 @@ import type { ReactNode } from 'react';
 import { INTL_LOCALE, type Locale } from '@/i18n/config';
 import { PLATFORM_ICON } from '@/lib/hooks/options';
 import { ExamplePrice } from './ExamplePrice';
+import { Initials } from './SampleCards';
 import css from './Showcase.module.css';
 
 /* Made-up examples for the homepage; texts live in messages (`showcase.*`), prices in USD and
@@ -263,23 +264,5 @@ function Panel({
       </div>
       {children}
     </div>
-  );
-}
-
-/** Round avatar with a name's initials (sample cards have no profile photos). */
-function Initials({ name }: { name: string }) {
-  const letters = name
-    .replace(/[«»"]/g, '')
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w[0]?.toUpperCase())
-    .join('');
-  return (
-    <span
-      aria-hidden
-      className="inline-flex size-8 shrink-0 items-center justify-center rounded-pill bg-primary-soft text-small font-extrabold text-primary-text"
-    >
-      {letters}
-    </span>
   );
 }

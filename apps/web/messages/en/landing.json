@@ -11,13 +11,8 @@
     }
   },
   "preview": {
-    "barter": "Money + barter",
     "meta": "Tyrol · 2 days ago",
     "title": "A Reel about a weekend at our guest house",
-    "subtitle": "A guest house in the Tyrolean Alps invites 2 influencers with 5k+ followers",
-    "city": "Tyrol",
-    "match": "Match",
-    "apply": "Apply",
     "accepted": "You’re in! The guest house is holding a room for you this Friday",
     "stay": "+ a weekend for two"
   },
@@ -184,17 +179,14 @@
         "body": "Say what you do and for how much. Companies send requests, and you accept the ones you like."
       },
       "brief": {
-        "type": "Paid",
         "meta": "Berlin · today",
         "title": "Reels for a new coffee shop",
-        "match": "Match",
         "why": "Why it fits you",
         "reasons": {
           "city": "Berlin",
           "age": "Audience 18–34",
           "followers": "5K+ followers"
-        },
-        "apply": "Apply"
+        }
       },
       "offer": {
         "title": "1 Reels about your product",

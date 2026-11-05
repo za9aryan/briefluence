@@ -1,5 +1,27 @@
 {
   "sample": "Example",
+  "briefs": {
+    "hotel": {
+      "brand": "Alpenhof Guest House"
+    },
+    "coffee": {
+      "brand": "Nordic Roast"
+    }
+  },
+  "insights": {
+    "eyebrow": "Search insights",
+    "title": "See what influencers are looking for",
+    "lead": "We count what verified influencers search for and which briefs they open. You see the trends and shape your next brief around them.",
+    "points": {
+      "wants": "Which niches, formats and platforms are in demand right now",
+      "money": "Money or barter, and the budgets influencers look for",
+      "cities": "Where they want to collaborate, day by day"
+    },
+    "privacy": "Anonymous totals only. No one’s personal data.",
+    "searches": "Searches",
+    "opens": "Brief opens",
+    "mostWanted": "Most wanted: {format}"
+  },
   "analytics": {
     "eyebrow": "Influencer analytics",
     "title": "Know who you’re working with before you say yes",

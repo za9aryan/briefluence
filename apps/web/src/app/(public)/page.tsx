@@ -7,7 +7,6 @@ import {
   Heading,
   Icon,
   Inline,
-  ScoreMeter,
   Stack,
   Text,
   buttonStyles,
@@ -15,13 +14,14 @@ import {
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { FeatureItem, Section } from '@/components/common/Section';
-import { ExamplePrice } from '@/components/landing/ExamplePrice';
 import { ProcessFunnel } from '@/components/landing/ProcessFunnel';
+import { SampleBriefCard } from '@/components/landing/SampleCards';
 import { Showcase } from '@/components/landing/Showcase';
 
 export default async function LandingPage() {
   const t = await getTranslations('landing');
   const tw = await getTranslations('showcase');
+  const tp = await getTranslations('promo');
   const steps = ['post', 'match', 'accept', 'publish'] as const;
 
   return (
@@ -58,49 +58,36 @@ export default async function LandingPage() {
               </Inline>
             </Stack>
 
-            {/* Promo card preview, built from the brand book's card pattern */}
-            <Stack gap={4} className="mx-auto w-full max-w-md">
-              <Card p={4}>
-                <Inline justify="between">
-                  <Badge tone="barter">{t('preview.barter')}</Badge>
-                  <Text size="small" tone="muted">
-                    {t('preview.meta')}
-                  </Text>
-                </Inline>
-                <Inline justify="between" align="start" gap={4} className="mt-4">
-                  <Stack gap={1}>
-                    <Heading level={3}>{t('preview.title')}</Heading>
-                    <Text size="small" tone="muted">
-                      {t('preview.subtitle')}
-                    </Text>
-                    {/* Money in the visitor's currency, plus the stay. */}
-                    <Text weight="bold" className="mt-1">
-                      <ExamplePrice amount={50} currency="USD" /> {t('preview.stay')}
-                    </Text>
-                  </Stack>
-                  <ScoreMeter value={92} label={t('preview.match')} />
-                </Inline>
-                <Inline gap={2} wrap className="mt-4">
-                  <Badge icon="instagram">Reel</Badge>
-                  <Badge tone="primary" icon="pin">
-                    {t('preview.city')}
-                  </Badge>
-                </Inline>
-                <div
-                  className={buttonStyles({ block: true, className: 'pointer-events-none mt-6' })}
-                >
-                  {t('preview.apply')}
-                </div>
-              </Card>
-              <Card p={4} className="ml-auto w-5/6">
-                <Inline gap={2}>
+            {/* Sample brief in the feed's card style, with the moment you get picked */}
+            <div className="mx-auto w-full max-w-sm">
+              <SampleBriefCard
+                image="/showcase/hotel.webp"
+                brand={tp('briefs.hotel.brand')}
+                meta={t('preview.meta')}
+                title={t('preview.title')}
+                slots={2}
+                match={92}
+                payment="MIXED"
+                budget={50}
+                barter={t('preview.stay')}
+                formats={['REEL']}
+                views={1240}
+                applicants={14}
+                className="pb-6"
+              />
+              <Card
+                p={4}
+                aria-hidden
+                className="relative -mt-6 ml-auto w-11/12 shadow-pop sm:-mr-8"
+              >
+                <Inline gap={2} align="start">
                   <Icon name="check-circle" tone="success" size="md" />
                   <Text size="small" weight="bold">
                     {t('preview.accepted')}
                   </Text>
                 </Inline>
               </Card>
-            </Stack>
+            </div>
           </Grid>
         </Container>
       </section>

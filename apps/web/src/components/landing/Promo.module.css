@@ -205,10 +205,50 @@
   }
 }
 
+/* Trend lines draw in left to right; their areas fade in under them. */
+.draw {
+  stroke-dasharray: 1;
+  animation: draw 1.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.fade {
+  animation: fade 1.2s ease 0.5s both;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Horizontal bars grow in once. */
+.grow {
+  transform-origin: left;
+  animation: growX 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes growX {
+  from {
+    transform: scaleX(0.05);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .float,
   .floatSlow,
   .bar,
+  .draw,
+  .fade,
+  .grow,
   .pop {
     animation: none;
   }

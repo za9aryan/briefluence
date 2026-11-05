@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { AudiencePage } from '@/components/common/AudiencePage';
 import { BrandAnalytics } from '@/components/landing/BrandAnalytics';
+import { BrandInsights } from '@/components/landing/BrandInsights';
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getTranslations('nav'))('forBrands') };
@@ -12,7 +13,12 @@ export default function ForBrandsPage() {
     <AudiencePage
       ns="brands"
       cta="/signup?role=BRAND"
-      afterHero={<BrandAnalytics cta="/signup?role=BRAND" />}
+      afterHero={
+        <>
+          <BrandAnalytics cta="/signup?role=BRAND" />
+          <BrandInsights cta="/signup?role=BRAND" />
+        </>
+      }
       stats={['roi', 'buy', 'banner']}
       features={[
         ['targeting', 'target'],
