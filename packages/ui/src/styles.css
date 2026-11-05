@@ -80,6 +80,13 @@
   .bf-modal[open]::backdrop {
     opacity: 1;
   }
+  /* Closing: slides out while still open, then the dialog closes (see Modal). */
+  .bf-modal[open][data-closing] {
+    transform: translateY(100vh);
+  }
+  .bf-modal[open][data-closing]::backdrop {
+    opacity: 0;
+  }
   @starting-style {
     .bf-modal[open] {
       transform: translateY(100vh);

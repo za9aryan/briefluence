@@ -93,11 +93,23 @@ export function Modal({
     if (!d) return;
     if (open) {
       setMounted(true);
+      delete d.dataset.closing;
       if (!d.open) d.showModal();
       return;
     }
-    if (d.open) d.close();
-    const t = window.setTimeout(() => setMounted(false), CLOSE_MS);
+    // Slide out while still open (in the top layer), then close. Closing first would leave the
+    // panel animating in the page itself on browsers without `overlay` transitions (Safari), where
+    // it flashes at the top of the page.
+    if (!d.open) {
+      setMounted(false);
+      return;
+    }
+    d.dataset.closing = '';
+    const t = window.setTimeout(() => {
+      d.close();
+      delete d.dataset.closing;
+      setMounted(false);
+    }, CLOSE_MS);
     return () => window.clearTimeout(t);
   }, [open]);
 
@@ -107,6 +119,11 @@ export function Modal({
       aria-labelledby={titleId}
       aria-describedby={description ? descId : undefined}
       onClose={onClose}
+      // Escape: let the slide-out run instead of the browser closing it at once.
+      onCancel={(e) => {
+        e.preventDefault();
+        onClose();
+      }}
       onClick={(e) => {
         if (e.target === ref.current) onClose();
       }}

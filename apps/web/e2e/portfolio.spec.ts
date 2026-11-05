@@ -68,6 +68,7 @@ test('portfolio + FAQ: blogger adds work → admin approves → brand sees it an
   // Typed without https:// (the field shows it in front); stored as a full link.
   await blogger.getByLabel('Link').fill('www.instagram.com/p/abc123/');
   await blogger.getByRole('dialog').getByRole('button', { name: 'Save' }).click();
+  await expect(blogger.getByRole('dialog')).toBeHidden();
   await expect(blogger.getByText('In review')).toBeVisible();
   await blogger.getByLabel('Who is your audience?').fill('Women 20–30 in Yerevan who love food');
   await blogger.getByRole('button', { name: 'Save' }).last().click();
