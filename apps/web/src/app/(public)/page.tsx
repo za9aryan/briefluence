@@ -14,6 +14,7 @@ import {
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { FeatureItem, Section } from '@/components/common/Section';
+import { BrandInsights } from '@/components/landing/BrandInsights';
 import { ProcessFunnel } from '@/components/landing/ProcessFunnel';
 import { SampleBriefCard } from '@/components/landing/SampleCards';
 import { Showcase } from '@/components/landing/Showcase';
@@ -125,6 +126,9 @@ export default async function LandingPage() {
           ))}
         </Grid>
       </Section>
+
+      {/* What influencers are looking for (sample of the companies' Insights page) */}
+      <BrandInsights cta="/signup?role=BRAND" />
 
       {/* Two audiences */}
       <Section>
