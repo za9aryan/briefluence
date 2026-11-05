@@ -1,0 +1,102 @@
+/*
+ * Homepage sample panels. Briefs sit on a soft primary tint with a dot grid; offers on an ink panel
+ * with a primary glow and faint grid lines. Tokens only, so both themes follow the brand book.
+ */
+.panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.panel::before,
+.panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.briefs {
+  background: var(--bf-primary-soft);
+}
+
+.briefs::before {
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--bf-primary) 22%, transparent) 1px,
+    transparent 1.5px
+  );
+  background-size: 18px 18px;
+  mask-image: linear-gradient(to bottom, black, transparent 70%);
+}
+
+.briefs::after {
+  background:
+    radial-gradient(
+      40rem 22rem at 100% 0%,
+      color-mix(in oklab, var(--bf-primary) 24%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      28rem 18rem at 0% 100%,
+      color-mix(in oklab, var(--bf-surface-raised) 70%, transparent),
+      transparent 70%
+    );
+}
+
+.offers {
+  background: var(--bf-ink);
+  color: var(--bf-surface);
+}
+
+.offers::before {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--bf-surface) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--bf-surface) 7%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse at 30% 0%, black, transparent 75%);
+}
+
+.offers::after {
+  background:
+    radial-gradient(
+      36rem 20rem at 0% 0%,
+      color-mix(in oklab, var(--bf-primary) 45%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      30rem 18rem at 100% 100%,
+      color-mix(in oklab, var(--bf-primary) 30%, transparent),
+      transparent 70%
+    );
+}
+
+/* Text on the ink panel. */
+.offersMuted {
+  color: color-mix(in oklab, var(--bf-surface) 72%, transparent);
+}
+
+/* Label chip at the top of each panel. */
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  padding: 0.375rem 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.briefs .label {
+  background: var(--bf-surface-raised);
+  color: var(--bf-primary-text);
+}
+
+.offers .label {
+  background: color-mix(in oklab, var(--bf-surface) 12%, transparent);
+  color: var(--bf-surface);
+}

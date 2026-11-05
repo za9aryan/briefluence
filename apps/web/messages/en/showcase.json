@@ -1,15 +1,19 @@
 {
   "eyebrow": "Examples",
   "title": "What you’ll find on briefluence",
-  "lead": "Companies post briefs for money, barter or both. Bloggers post what they film and for how much.",
+  "lead": "Companies post briefs for money, barter or both. Influencers post what they film and for how much.",
   "previous": "Previous",
   "next": "Next",
   "sample": "Example",
   "briefsTitle": "Briefs from companies",
   "briefsCta": "Post a brief for free",
-  "offersTitle": "Offers from bloggers",
+  "forCompanies": "For companies",
+  "forInfluencers": "For influencers",
+  "briefsLead": "Say what you need, who it’s for and what you pay: money, barter or both.",
+  "offersLead": "Name a format and a price. Companies send a request, you say yes or no.",
+  "offersTitle": "Offers from influencers",
   "offersCta": "Post your offer",
-  "wanted": "{count, plural, one {# blogger wanted} other {# bloggers wanted}}",
+  "wanted": "{count, plural, one {# influencer wanted} other {# influencers wanted}}",
   "followers": "{count} followers",
   "briefs": {
     "coffee": {

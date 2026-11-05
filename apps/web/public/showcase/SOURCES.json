@@ -1,0 +1,74 @@
+{
+  "coffee": {
+    "title": "Dials lights coffee machine",
+    "source": "rawpixel",
+    "page": "https://www.rawpixel.com/image/3303548/free-photo-image-espresso-machine-alloy-wheel-barista",
+    "license": "CC0 1.0"
+  },
+  "hotel": {
+    "title": "Chalet Wood",
+    "source": "stocksnap",
+    "page": "https://stocksnap.io/photo/chalet-wood-7PBFL1ERJT",
+    "license": "CC0 1.0"
+  },
+  "skincare": {
+    "title": "Close bottle beard oil",
+    "source": "rawpixel",
+    "page": "https://www.rawpixel.com/image/5919429/close-bottle-beard-oil",
+    "license": "CC0 1.0"
+  },
+  "bakery": {
+    "title": "Croissants",
+    "source": "flickr",
+    "page": "https://www.flickr.com/photos/29155878@N03/22142307894",
+    "license": "CC0 1.0"
+  },
+  "gym": {
+    "title": "Free gym equipments image",
+    "source": "rawpixel",
+    "page": "https://www.rawpixel.com/image/5926463/photo-image-light-public-domain-black",
+    "license": "CC0 1.0"
+  },
+  "outdoor": {
+    "title": "pixabay-1796562",
+    "source": "flickr",
+    "page": "https://www.flickr.com/photos/146630347@N08/32342152965",
+    "license": "CC0 1.0"
+  },
+  "anna": {
+    "title": "Barista Latte",
+    "source": "stocksnap",
+    "page": "https://stocksnap.io/photo/barista-latte-DTKOOFPC06",
+    "license": "CC0 1.0"
+  },
+  "lukas": {
+    "title": "Free weight kettlebells floor closeup",
+    "source": "rawpixel",
+    "page": "https://www.rawpixel.com/image/5903677/photo-image-public-domain-blue-free",
+    "license": "CC0 1.0"
+  },
+  "marie": {
+    "title": "Makeup Products",
+    "source": "stocksnap",
+    "page": "https://stocksnap.io/photo/makeup-products-I8SLDUOMYC",
+    "license": "CC0 1.0"
+  },
+  "dmitry": {
+    "title": "Saint Petersburg, Russia",
+    "source": "flickr",
+    "page": "https://www.flickr.com/photos/43547009@N00/32249993827",
+    "license": "CC0 1.0"
+  },
+  "giulia": {
+    "title": "Breakfast Food",
+    "source": "stocksnap",
+    "page": "https://stocksnap.io/photo/breakfast-food-OC8WX0E0X3",
+    "license": "CC0 1.0"
+  },
+  "zofia": {
+    "title": "Hands holding Xperia",
+    "source": "flickr",
+    "page": "https://www.flickr.com/photos/135396164@N05/22545149226",
+    "license": "CC0 1.0"
+  }
+}

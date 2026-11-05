@@ -1,4 +1,4 @@
-// Homepage examples: sample briefs and blogger offers (made-up companies and bloggers, shown as
+// Homepage examples: sample briefs and influencer offers (made-up companies and influencers, shown as
 // examples). Every leaf is [en, ru, hy].
 export default {
   showcase: {
@@ -9,21 +9,37 @@ export default {
       'Ինչ կգտնես briefluence-ում',
     ],
     lead: [
-      'Companies post briefs for money, barter or both. Bloggers post what they film and for how much.',
-      'Компании публикуют брифы за деньги, бартер или и то и другое. Блогеры — что они снимают и за сколько.',
-      'Ընկերությունները հրապարակում են բրիֆներ գումարով, բարտերով կամ երկուսով։ Բլոգերները՝ ինչ են նկարում և ինչ արժե։',
+      'Companies post briefs for money, barter or both. Influencers post what they film and for how much.',
+      'Компании публикуют брифы за деньги, бартер или и то и другое. Инфлюенсеры — что они снимают и за сколько.',
+      'Ընկերությունները հրապարակում են բրիֆներ գումարով, բարտերով կամ երկուսով։ Ինֆլյուենսերները՝ ինչ են նկարում և ինչ արժե։',
     ],
     previous: ['Previous', 'Назад', 'Նախորդը'],
     next: ['Next', 'Далее', 'Հաջորդը'],
     sample: ['Example', 'Пример', 'Օրինակ'],
     briefsTitle: ['Briefs from companies', 'Брифы компаний', 'Ընկերությունների բրիֆները'],
     briefsCta: ['Post a brief for free', 'Разместить бриф бесплатно', 'Անվճար տեղադրել բրիֆ'],
-    offersTitle: ['Offers from bloggers', 'Предложения блогеров', 'Բլոգերների առաջարկները'],
+    forCompanies: ['For companies', 'Для компаний', 'Ընկերությունների համար'],
+    forInfluencers: ['For influencers', 'Для инфлюенсеров', 'Ինֆլյուենսերների համար'],
+    briefsLead: [
+      'Say what you need, who it’s for and what you pay: money, barter or both.',
+      'Напиши, что нужно, для какой аудитории и что ты платишь: деньги, бартер или всё вместе.',
+      'Գրիր, թե ինչ է պետք, ում համար և ինչ ես վճարում՝ գումար, բարտեր կամ երկուսը միասին։',
+    ],
+    offersLead: [
+      'Name a format and a price. Companies send a request, you say yes or no.',
+      'Укажи формат и цену. Компании присылают запрос, а ты решаешь, соглашаться или нет.',
+      'Նշիր ձևաչափը և գինը։ Ընկերություններն ուղարկում են հարցում, իսկ դու որոշում ես՝ համաձայնել, թե ոչ։',
+    ],
+    offersTitle: [
+      'Offers from influencers',
+      'Предложения инфлюенсеров',
+      'Ինֆլյուենսերների առաջարկները',
+    ],
     offersCta: ['Post your offer', 'Разместить своё предложение', 'Տեղադրել քո առաջարկը'],
     wanted: [
-      '{count, plural, one {# blogger wanted} other {# bloggers wanted}}',
-      '{count, plural, one {Нужен # блогер} few {Нужны # блогера} many {Нужно # блогеров} other {Нужно # блогера}}',
-      '{count, plural, other {Անհրաժեշտ է # բլոգեր}}',
+      '{count, plural, one {# influencer wanted} other {# influencers wanted}}',
+      '{count, plural, one {Нужен # инфлюенсер} few {Нужны # инфлюенсера} many {Нужно # инфлюенсеров} other {Нужно # инфлюенсера}}',
+      '{count, plural, other {Անհրաժեշտ է # ինֆլյուենսեր}}',
     ],
     followers: ['{count} followers', '{count} подписчиков', '{count} հետևորդ'],
     briefs: {
