@@ -22,6 +22,7 @@ import {
   Menu,
   MenuItem,
   Modal,
+  OptionalField,
   Skeleton,
   Stack,
   Text,
@@ -344,24 +345,33 @@ export function FaqCard({ profile }: { profile: InfluencerProfileDto | null | un
       <CardHeader title={t('title')} description={t('lead')} />
       <Stack gap={4}>
         {FAQ_KEYS.map((k) => (
-          <Field
+          <OptionalField
             key={k}
-            label={t(`questions.${k}`)}
-            aside={`${answers[k].length}/${FAQ_ANSWER_MAX_LENGTH}`}
+            title={t(`questions.${k}`)}
+            description={t(`why.${k}`)}
+            filled={!!answers[k].trim()}
+            onClear={() => setAnswers((a) => ({ ...a, [k]: '' }))}
+            addLabel={t('add')}
+            removeLabel={t('remove')}
           >
-            {({ id, describedBy }) => (
-              <Textarea
-                id={id}
-                name={FIELD[k]}
-                aria-describedby={describedBy}
-                rows={3}
-                maxLength={FAQ_ANSWER_MAX_LENGTH}
-                value={answers[k]}
-                placeholder={t(`placeholders.${k}`)}
-                onChange={(e) => setAnswers((a) => ({ ...a, [k]: e.target.value }))}
-              />
-            )}
-          </Field>
+            <Field
+              label={<span className="sr-only">{t(`questions.${k}`)}</span>}
+              aside={`${answers[k].length}/${FAQ_ANSWER_MAX_LENGTH}`}
+            >
+              {({ id, describedBy }) => (
+                <Textarea
+                  id={id}
+                  name={FIELD[k]}
+                  aria-describedby={describedBy}
+                  rows={3}
+                  maxLength={FAQ_ANSWER_MAX_LENGTH}
+                  value={answers[k]}
+                  placeholder={t(`placeholders.${k}`)}
+                  onChange={(e) => setAnswers((a) => ({ ...a, [k]: e.target.value }))}
+                />
+              )}
+            </Field>
+          </OptionalField>
         ))}
         <div className="flex justify-end">
           <Button loading={save.isPending} onClick={() => save.mutate()}>

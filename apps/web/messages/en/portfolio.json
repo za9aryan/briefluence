@@ -48,6 +48,13 @@
   },
   "faq": {
     "title": "About your work",
+    "add": "Answer",
+    "remove": "Remove",
+    "why": {
+      "brandsWorked": "Past work builds trust: name a few companies or kinds of places.",
+      "audience": "Helps companies see whether your followers are their customers.",
+      "brandsWanted": "Companies that fit you will reach out more often."
+    },
     "lead": "Optional. Companies see only the questions you answer.",
     "questions": {
       "brandsWorked": "What companies have you worked with?",

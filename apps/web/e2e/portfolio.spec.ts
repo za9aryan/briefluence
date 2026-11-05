@@ -70,6 +70,12 @@ test('portfolio + FAQ: blogger adds work → admin approves → brand sees it an
   await blogger.getByRole('dialog').getByRole('button', { name: 'Save' }).click();
   await expect(blogger.getByRole('dialog')).toBeHidden();
   await expect(blogger.getByText('In review')).toBeVisible();
+  // Each question is folded until the blogger chooses to answer it.
+  await blogger
+    .locator('.rounded-card', { hasText: 'Who is your audience?' })
+    .last()
+    .getByRole('button', { name: 'Answer' })
+    .click();
   await blogger.getByLabel('Who is your audience?').fill('Women 20–30 in Yerevan who love food');
   await blogger.getByRole('button', { name: 'Save' }).last().click();
   await expect(blogger.getByText('Saved', { exact: true }).first()).toBeVisible();

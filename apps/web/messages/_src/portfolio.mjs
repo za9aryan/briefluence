@@ -108,6 +108,25 @@ export default {
     },
     faq: {
       title: ['About your work', 'О твоей работе', 'Քո աշխատանքի մասին'],
+      add: ['Answer', 'Ответить', 'Պատասխանել'],
+      remove: ['Remove', 'Убрать', 'Հեռացնել'],
+      why: {
+        brandsWorked: [
+          'Past work builds trust: name a few companies or kinds of places.',
+          'Прошлые проекты вызывают доверие: назови несколько компаний или типов заведений.',
+          'Նախկին աշխատանքները վստահություն են ներշնչում․ նշիր մի քանի ընկերություն կամ վայրերի տեսակներ։',
+        ],
+        audience: [
+          'Helps companies see whether your followers are their customers.',
+          'Помогает компаниям понять, их ли клиенты твои подписчики.',
+          'Օգնում է ընկերություններին հասկանալ՝ արդյոք քո հետևորդները իրենց հաճախորդներն են։',
+        ],
+        brandsWanted: [
+          'Companies that fit you will reach out more often.',
+          'Подходящие тебе компании будут писать чаще.',
+          'Քեզ համապատասխան ընկերությունները ավելի հաճախ կգրեն։',
+        ],
+      },
       lead: [
         'Optional. Companies see only the questions you answer.',
         'Необязательно. Компании видят только те вопросы, на которые ты ответил.',
