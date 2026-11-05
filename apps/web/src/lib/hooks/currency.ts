@@ -1,7 +1,9 @@
 'use client';
 import { CURRENCIES, type Currency, type Rates } from '@briefluence/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useLocale } from 'next-intl';
 import { useEffect, useState } from 'react';
+import type { Locale } from '@/i18n/config';
 import { api } from '../api';
 import { ME_KEY, useMe, type Me } from './session';
 
@@ -29,12 +31,19 @@ function readCookie(): Currency | null {
   return v && CURRENCIES.includes(v) ? v : null;
 }
 
-/** Currency amounts are shown in: the account setting when signed in, else a cookie, else AMD. */
+/** A guest's currency before they pick one: follows the site language. */
+const LOCALE_CURRENCY: Record<Locale, Currency> = { en: 'USD', ru: 'RUB', hy: 'AMD' };
+
+/**
+ * Currency amounts are shown in: the account setting when signed in, else a cookie, else the one
+ * that goes with the site language.
+ */
 export function useDisplayCurrency(): Currency {
   const { data: me } = useMe();
+  const locale = useLocale() as Locale;
   const [cookie, setCookie] = useState<Currency | null>(null);
   useEffect(() => setCookie(readCookie()), []);
-  return me?.currency ?? cookie ?? 'AMD';
+  return me?.currency ?? cookie ?? LOCALE_CURRENCY[locale] ?? 'AMD';
 }
 
 export function useSetCurrency() {

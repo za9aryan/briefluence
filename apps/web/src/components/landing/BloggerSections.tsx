@@ -41,7 +41,7 @@ export async function EarnWays() {
               <Stack gap={1}>
                 <Heading level={3}>{t('brief.title')}</Heading>
                 <Text size="small" weight="bold">
-                  <ExamplePrice amount={30_000} to={50_000} currency="AMD" />
+                  <ExamplePrice amount={80} to={130} currency="USD" />
                 </Text>
               </Stack>
               <ScoreMeter value={88} label={t('brief.match')} />
@@ -83,7 +83,7 @@ export async function EarnWays() {
                   </Text>
                 </Stack>
                 <span className="shrink-0 text-h2 font-extrabold text-ink">
-                  <ExamplePrice amount={20_000} currency="AMD" />
+                  <ExamplePrice amount={50} currency="USD" />
                 </span>
               </div>
             </Card>

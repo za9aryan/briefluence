@@ -1,10 +1,9 @@
 {
   "meta": {
     "title": "briefluence — briefs for influencers",
-    "description": "Companies post promo briefs for free. Verified influencers in Armenia apply to the ones that fit."
+    "description": "Companies post promo briefs for free. Verified influencers apply to the ones that fit."
   },
-  "tagline": "Where companies in Armenia meet verified influencers.",
-  "madeIn": "Made in Yerevan",
+  "tagline": "Where companies meet verified influencers.",
   "language": "Language",
   "loading": "Loading…",
   "save": "Save",

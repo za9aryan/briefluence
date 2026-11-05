@@ -57,7 +57,7 @@ export async function PublicFooter() {
           ))}
         </Grid>
         <Text size="small" tone="muted" className="mt-8">
-          © {new Date().getFullYear()} briefluence · {tc('madeIn')}
+          © {new Date().getFullYear()} briefluence
         </Text>
       </Container>
     </footer>

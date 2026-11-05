@@ -1,6 +1,5 @@
 {
   "hero": {
-    "badge": "Now in Armenia",
     "title": "Companies post briefs. Influencers reply.",
     "lead": "Companies publish promo briefs for free. Active influencers with 5k–100k followers see the ones that fit them and apply — for money or barter.",
     "ctaBrand": "Post a brief for free",
@@ -8,15 +7,15 @@
     "points": {
       "free": "Free for companies",
       "verified": "Stats from official APIs",
-      "local": "Made for Armenia"
+      "options": "Money, barter or both"
     }
   },
   "preview": {
     "barter": "Money + barter",
-    "meta": "Dilijan · 2 days ago",
+    "meta": "Tyrol · 2 days ago",
     "title": "A Reel about a weekend at our guest house",
-    "subtitle": "A guest house in the Dilijan forest invites 2 influencers with 5k+ followers",
-    "city": "Dilijan",
+    "subtitle": "A guest house in the Tyrolean Alps invites 2 influencers with 5k+ followers",
+    "city": "Tyrol",
     "match": "Match",
     "apply": "Apply",
     "accepted": "You’re in! The guest house is holding a room for you this Friday",
@@ -186,12 +185,12 @@
       },
       "brief": {
         "type": "Paid",
-        "meta": "Yerevan · today",
+        "meta": "Berlin · today",
         "title": "Reels for a new coffee shop",
         "match": "Match",
         "why": "Why it fits you",
         "reasons": {
-          "city": "Yerevan",
+          "city": "Berlin",
           "age": "Audience 18–34",
           "followers": "5K+ followers"
         },

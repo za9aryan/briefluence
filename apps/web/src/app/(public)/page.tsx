@@ -17,9 +17,11 @@ import Link from 'next/link';
 import { FeatureItem, Section } from '@/components/common/Section';
 import { ExamplePrice } from '@/components/landing/ExamplePrice';
 import { ProcessFunnel } from '@/components/landing/ProcessFunnel';
+import { Showcase } from '@/components/landing/Showcase';
 
 export default async function LandingPage() {
   const t = await getTranslations('landing');
+  const tw = await getTranslations('showcase');
   const steps = ['post', 'match', 'accept', 'publish'] as const;
 
   return (
@@ -29,7 +31,6 @@ export default async function LandingPage() {
         <Container py={{ base: 8, md: 16 }}>
           <Grid cols={{ base: 1, lg: 2 }} gap={{ base: 8, lg: 16 }} className="items-center">
             <Stack gap={6} align="start">
-              <Badge tone="primary">{t('hero.badge')}</Badge>
               <Heading level={1}>{t('hero.title')}</Heading>
               <Text tone="muted" className="max-w-xl">
                 {t('hero.lead')}
@@ -46,7 +47,7 @@ export default async function LandingPage() {
                 </Link>
               </Stack>
               <Inline gap={4} wrap>
-                {(['free', 'verified', 'local'] as const).map((k) => (
+                {(['free', 'verified', 'options'] as const).map((k) => (
                   <Inline key={k} gap={1}>
                     <Icon name="check" tone="success" />
                     <Text size="small" tone="muted">
@@ -117,6 +118,11 @@ export default async function LandingPage() {
           ['contacts', 'phone'],
         ]}
       />
+
+      {/* Sample briefs and offers */}
+      <Section eyebrow={tw('eyebrow')} title={tw('title')} lead={tw('lead')}>
+        <Showcase />
+      </Section>
 
       {/* How it works */}
       <Section raised eyebrow={t('how.eyebrow')} title={t('how.title')} lead={t('how.lead')}>

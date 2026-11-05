@@ -1,0 +1,82 @@
+{
+  "eyebrow": "Examples",
+  "title": "What you’ll find on briefluence",
+  "lead": "Companies post briefs for money, barter or both. Bloggers post what they film and for how much.",
+  "previous": "Previous",
+  "next": "Next",
+  "sample": "Example",
+  "briefsTitle": "Briefs from companies",
+  "briefsCta": "Post a brief for free",
+  "offersTitle": "Offers from bloggers",
+  "offersCta": "Post your offer",
+  "wanted": "{count, plural, one {# blogger wanted} other {# bloggers wanted}}",
+  "followers": "{count} followers",
+  "briefs": {
+    "coffee": {
+      "brand": "Nordic Roast",
+      "city": "Stockholm",
+      "title": "Reels about our new coffee bar"
+    },
+    "hotel": {
+      "brand": "Alpenblick Hotel",
+      "city": "Innsbruck",
+      "title": "A weekend in the Alps, filmed for Reels",
+      "barter": "Two nights for two with breakfast"
+    },
+    "skincare": {
+      "brand": "Lumière Skin",
+      "city": "Paris",
+      "title": "Try our new serum on camera",
+      "barter": "+ a full skincare set"
+    },
+    "bakery": {
+      "brand": "Bulka Bakery",
+      "city": "Moscow",
+      "title": "Stories about our morning croissants",
+      "barter": "Breakfast for two every week for a month"
+    },
+    "gym": {
+      "brand": "Pulse Lab",
+      "city": "Berlin",
+      "title": "Show your first week at our studio"
+    },
+    "outdoor": {
+      "brand": "Sever Outdoor",
+      "city": "Saint Petersburg",
+      "title": "Test our winter jacket in real frost",
+      "barter": "+ the jacket is yours"
+    }
+  },
+  "offers": {
+    "anna": {
+      "name": "Anna Sokolova",
+      "city": "Moscow",
+      "title": "3 Stories about your café"
+    },
+    "lukas": {
+      "name": "Lukas Weber",
+      "city": "Berlin",
+      "title": "A Reel from your gym or studio"
+    },
+    "marie": {
+      "name": "Marie Dubois",
+      "city": "Lyon",
+      "title": "Unboxing Reel for beauty brands"
+    },
+    "dmitry": {
+      "name": "Dmitry Orlov",
+      "city": "Saint Petersburg",
+      "title": "City walk Stories with a stop at your place"
+    },
+    "giulia": {
+      "name": "Giulia Rossi",
+      "city": "Milan",
+      "title": "Restaurant review Reel"
+    },
+    "zofia": {
+      "name": "Zofia Nowak",
+      "city": "Warsaw",
+      "title": "A Story with your link sticker"
+    }
+  }
+}
