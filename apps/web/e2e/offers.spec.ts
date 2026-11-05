@@ -76,6 +76,18 @@ test('blogger offer → admin approves → brand requests → blogger accepts �
   await expect(blogger.getByRole('img', { name: title })).toBeVisible();
   if (process.env.E2E_SHOTS)
     await blogger.screenshot({ path: `${process.env.E2E_SHOTS}/my-offers.png`, fullPage: true });
+  // On phones the card's actions open in a bottom sheet named after the offer.
+  await blogger.setViewportSize({ width: 360, height: 800 });
+  await blogger.getByRole('button', { name: 'Actions' }).first().click();
+  await expect(blogger.getByRole('dialog').getByRole('heading', { name: title })).toBeVisible();
+  await expect(blogger.getByRole('dialog').getByRole('menuitem').first()).toBeVisible();
+  if (process.env.E2E_SHOTS) {
+    await blogger.waitForTimeout(400); // the sheet slides in
+    await blogger.screenshot({ path: `${process.env.E2E_SHOTS}/offer-actions-m.png` });
+  }
+  await blogger.keyboard.press('Escape');
+  await expect(blogger.getByRole('dialog')).toBeHidden();
+  await blogger.setViewportSize({ width: 1280, height: 720 });
 
   // ── Admin approves the offer on the review page ──
   await admin.goto('/admin/offer-review');

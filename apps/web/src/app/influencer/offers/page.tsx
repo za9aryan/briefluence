@@ -155,8 +155,11 @@ function OfferActionsMenu({
   act: ReturnType<typeof useOfferActions>;
 }) {
   const t = useTranslations('offers');
+  const tc = useTranslations('common');
   return (
     <Menu
+      // Phones: the actions open in a bottom sheet, like the portfolio card's.
+      sheet={{ title: o.title, closeLabel: tc('close') }}
       trigger={(p) => (
         <Button
           variant="ghost"
@@ -174,6 +177,7 @@ function OfferActionsMenu({
         <>
           {isOfferEditable(o.status) && (
             <Link
+              role="menuitem"
               href={`/influencer/offers/${o.id}/edit`}
               onClick={close}
               className="flex min-h-11 items-center gap-2 px-4 text-small text-ink hover:bg-surface"

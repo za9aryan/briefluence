@@ -176,6 +176,7 @@ export default function BrandDealsPage() {
                       {t('applicants')}
                     </Link>
                     <Menu
+                      sheet={{ title: d.title, closeLabel: tc('close') }}
                       trigger={(p) => (
                         <Button
                           variant="ghost"
@@ -193,6 +194,7 @@ export default function BrandDealsPage() {
                         <>
                           {canEditDeal(d.status) && (
                             <Link
+                              role="menuitem"
                               href={`/brand/deals/${d.id}/edit`}
                               onClick={close}
                               className="flex min-h-11 items-center gap-2 px-4 text-small text-ink hover:bg-surface"
