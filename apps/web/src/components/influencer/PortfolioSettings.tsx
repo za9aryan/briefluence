@@ -153,7 +153,11 @@ export function PortfolioCard() {
               <PortfolioTile
                 key={i.id}
                 item={i}
-                top={<PortfolioStatusBadge status={i.reviewStatus} />}
+                // Approved is the normal state: only "in review" / "rejected" get a badge (the
+                // long approved label would also run under the actions button).
+                top={
+                  i.reviewStatus !== 'APPROVED' && <PortfolioStatusBadge status={i.reviewStatus} />
+                }
                 topRight={
                   <Menu
                     sheet={{ title: i.title, closeLabel: tc('close') }}
