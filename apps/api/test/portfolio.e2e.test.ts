@@ -249,9 +249,11 @@ describe('blogger portfolio & FAQ (e2e)', () => {
     const mine = await inf.agent.get(`${API}/influencers/me/public`).expect(200);
     const brand = await signup(ctx, 'BRAND');
     const seen = await brand.agent.get(`${API}/influencers/${inf.profileId}`).expect(200);
-    const { status, ...view } = mine.body;
+    const { status, access, ...view } = mine.body;
     expect(status).toBe('APPROVED');
-    expect(view).toEqual(seen.body);
+    // Exactly the brand view; only who is looking differs.
+    expect(access).toBe('owner');
+    expect({ ...view, access: 'brand' }).toEqual(seen.body);
     expect(view.contacts).toBeNull();
     // The preview itself counts no profile view (only the brand's visit does).
     const after = await ctx.prisma.influencerProfile.findUniqueOrThrow({

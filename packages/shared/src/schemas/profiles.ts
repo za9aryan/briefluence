@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { LANGUAGES, NICHES } from '../constants';
 import { isValidContact, normalizeContact } from '../contact';
+import { normalizePublicUsername, publicUsernameProblem } from '../domain/username';
 import { CONTACT_METHODS, GENDERS, type ContactMethod } from '../enums';
 import { countryCode, optionalText, optionalUrl, webUrl } from './common';
 
@@ -68,6 +69,21 @@ export const influencerProfileSchema = z
   .transform(normalizeContactFields);
 export type InfluencerProfileInput = z.input<typeof influencerProfileSchema>;
 export type InfluencerProfileData = z.output<typeof influencerProfileSchema>;
+
+/** The blogger's public link name (briefluence.com/@anna); null removes it. */
+export const usernameSchema = z
+  .string()
+  .transform(normalizePublicUsername)
+  .superRefine((v, ctx) => {
+    const problem = publicUsernameProblem(v);
+    if (problem)
+      ctx.addIssue({
+        code: 'custom',
+        message: `username${problem[0]!.toUpperCase()}${problem.slice(1)}`,
+      });
+  });
+export const setUsernameSchema = z.object({ username: usernameSchema.nullable() });
+export type SetUsernameInput = z.input<typeof setUsernameSchema>;
 
 export const brandProfileSchema = z
   .object({

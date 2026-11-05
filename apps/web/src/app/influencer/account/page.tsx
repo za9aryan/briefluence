@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { PageHeader } from '@/components/app/AppShell';
 import { InfluencerProfileForm } from '@/components/influencer/ProfileForm';
 import { FaqCard, PortfolioCard } from '@/components/influencer/PortfolioSettings';
+import { UsernameCard } from '@/components/influencer/UsernameCard';
 import { api } from '@/lib/api';
 import { ME_KEY } from '@/lib/hooks/session';
 import type { InfluencerProfileDto } from '@/lib/types';
@@ -35,6 +36,15 @@ export default function InfluencerAccountPage() {
           </Link>
         }
       />
+      {profile.data && (
+        <UsernameCard
+          profile={profile.data}
+          onSaved={(p) => {
+            qc.setQueryData(['influencer', 'me'], p);
+            void qc.invalidateQueries({ queryKey: ['influencer', 'preview'] });
+          }}
+        />
+      )}
       <Card>
         <CardHeader title={t('profile')} />
         {profile.isLoading ? (

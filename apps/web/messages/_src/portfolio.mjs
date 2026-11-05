@@ -2,6 +2,39 @@
 // Regenerate JSON: node scripts/write-messages.mjs messages/_src/portfolio.mjs
 export default {
   portfolio: {
+    // Public blogger page (briefluence.com/@username) and the offers row on a blogger's profile.
+    public: {
+      offers: ['Offers', 'Предложения', 'Առաջարկներ'],
+      statsLocked: [
+        'Followers, reach and audience are shown to signed-in brands.',
+        'Подписчики, охваты и аудитория видны брендам после входа.',
+        'Հետևորդները, դիտումները և լսարանը տեսանելի են մուտք գործած բրենդներին։',
+      ],
+      signInToSee: ['Sign in to see', 'Войти, чтобы увидеть', 'Մուտք գործել՝ տեսնելու համար'],
+      priceLocked: ['Price after sign-in', 'Цена после входа', 'Գինը՝ մուտքից հետո'],
+      gateTitle: [
+        'Sign in to see more',
+        'Войди, чтобы увидеть больше',
+        'Մուտք գործիր՝ ավելին տեսնելու համար',
+      ],
+      gateText: [
+        'Prices, stats and collaboration requests are for brands on briefluence. Joining is free.',
+        'Цены, статистика и запросы на сотрудничество доступны брендам на briefluence. Регистрация бесплатная.',
+        'Գները, վիճակագրությունը և համագործակցության հարցումները հասանելի են briefluence-ի բրենդներին։ Գրանցումն անվճար է։',
+      ],
+      logIn: ['Log in', 'Войти', 'Մուտք'],
+      joinAsBrand: ['Join as a brand', 'Зарегистрироваться как бренд', 'Գրանցվել որպես բրենդ'],
+      notLive: [
+        'Only you can see this page for now. It goes live after your profile is verified.',
+        'Пока эту страницу видишь только ты. Она откроется для всех после верификации профиля.',
+        'Առայժմ այս էջը տեսնում ես միայն դու։ Այն հասանելի կդառնա բոլորին պրոֆիլի վերիֆիկացիայից հետո։',
+      ],
+      metaDescription: [
+        '{name} on briefluence: portfolio and collaboration offers.',
+        '{name} на briefluence: портфолио и предложения для сотрудничества.',
+        '{name}-ը briefluence-ում՝ պորտֆոլիո և համագործակցության առաջարկներ։',
+      ],
+    },
     settings: {
       title: ['Portfolio', 'Портфолио', 'Պորտֆոլիո'],
       lead: [

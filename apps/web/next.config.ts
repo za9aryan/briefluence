@@ -37,7 +37,11 @@ const nextConfig: NextConfig = {
   // The browser talks to the API through the web origin, so auth cookies are first-party
   // and OAuth / payment redirects land on the same site.
   async rewrites() {
-    return [{ source: '/api/v1/:path*', destination: `${apiOrigin}/api/v1/:path*` }];
+    return [
+      { source: '/api/v1/:path*', destination: `${apiOrigin}/api/v1/:path*` },
+      // Public blogger pages: briefluence.com/@username (the page lives at /u/[username]).
+      { source: '/@:username', destination: '/u/:username' },
+    ];
   },
   async headers() {
     return [

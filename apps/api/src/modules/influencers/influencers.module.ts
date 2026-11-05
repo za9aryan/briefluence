@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { InfluencersController } from './influencers.controller';
+import { InfluencersController, PublicInfluencersController } from './influencers.controller';
 import { InfluencersService } from './influencers.service';
 import { PortfolioController } from './portfolio.controller';
 import { PortfolioService } from './portfolio.service';
 
 @Module({
-  controllers: [InfluencersController, PortfolioController],
+  controllers: [InfluencersController, PublicInfluencersController, PortfolioController],
   providers: [InfluencersService, PortfolioService],
   exports: [InfluencersService],
 })

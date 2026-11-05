@@ -977,6 +977,26 @@ export default {
   },
   account: {
     title: ['Account', 'Аккаунт', 'Հաշիվ'],
+    publicLink: ['Your public page', 'Твоя публичная страница', 'Քո հանրային էջը'],
+    publicLinkLead: [
+      'Pick a username to get a short link to your profile. Anyone can open it, even without an account; stats and prices stay visible only to brands.',
+      'Выбери имя пользователя и получи короткую ссылку на свой профиль. Её может открыть кто угодно, даже без аккаунта; статистика и цены видны только брендам.',
+      'Ընտրիր օգտանուն և ստացիր կարճ հղում քո պրոֆիլին։ Այն կարող է բացել ցանկացած մեկը, նույնիսկ առանց հաշվի․ վիճակագրությունն ու գները տեսանելի են միայն բրենդներին։',
+    ],
+    username: ['Username', 'Имя пользователя', 'Օգտանուն'],
+    usernameHint: [
+      '3–30 characters: Latin letters, numbers, dots and underscores.',
+      '3–30 символов: латинские буквы, цифры, точки и подчёркивания.',
+      '3–30 նիշ՝ լատինական տառեր, թվեր, կետեր և ընդգծումներ։',
+    ],
+    copyLink: ['Copy link', 'Скопировать ссылку', 'Պատճենել հղումը'],
+    linkCopied: ['Link copied', 'Ссылка скопирована', 'Հղումը պատճենվեց'],
+    openPage: ['Open page', 'Открыть страницу', 'Բացել էջը'],
+    pageNotLive: [
+      'Your page goes live after your profile is verified.',
+      'Страница откроется после верификации профиля.',
+      'Էջը հասանելի կդառնա պրոֆիլի վերիֆիկացիայից հետո։',
+    ],
     influencerLead: [
       'Your profile, portfolio and answers, as companies will see them.',
       'Твой профиль, портфолио и ответы — то, что увидят компании.',

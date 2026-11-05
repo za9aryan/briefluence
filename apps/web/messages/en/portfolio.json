@@ -1,4 +1,16 @@
 {
+  "public": {
+    "offers": "Offers",
+    "statsLocked": "Followers, reach and audience are shown to signed-in brands.",
+    "signInToSee": "Sign in to see",
+    "priceLocked": "Price after sign-in",
+    "gateTitle": "Sign in to see more",
+    "gateText": "Prices, stats and collaboration requests are for brands on briefluence. Joining is free.",
+    "logIn": "Log in",
+    "joinAsBrand": "Join as a brand",
+    "notLive": "Only you can see this page for now. It goes live after your profile is verified.",
+    "metaDescription": "{name} on briefluence: portfolio and collaboration offers."
+  },
   "settings": {
     "title": "Portfolio",
     "lead": "Show work you’ve already done. Companies see approved items on your profile, and you can attach up to {max} when you apply.",

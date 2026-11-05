@@ -18,6 +18,33 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { publicPortfolioItem } from './portfolio.service';
 import { publicAccount } from './serializers';
 
+/** Active offers shown on a blogger's profile (newest first). */
+const PROFILE_OFFERS = {
+  where: { status: 'ACTIVE' },
+  orderBy: { publishedAt: 'desc' },
+  select: {
+    id: true,
+    title: true,
+    imageUrl: true,
+    priceMinor: true,
+    currency: true,
+    collaborationType: true,
+    platforms: true,
+    contentFormats: true,
+  },
+} satisfies Prisma.InfluencerProfile$offersArgs;
+
+const PROFILE_INCLUDE = {
+  socialAccounts: { orderBy: { followers: 'desc' } },
+  portfolio: { orderBy: { createdAt: 'desc' } },
+  offers: PROFILE_OFFERS,
+} satisfies Prisma.InfluencerProfileInclude;
+
+type ProfileWithParts = Prisma.InfluencerProfileGetPayload<{ include: typeof PROFILE_INCLUDE }>;
+
+/** Who is looking at a public profile page; decides how much of it they see. */
+export type ProfileAccess = 'admin' | 'brand' | 'owner' | 'guest';
+
 @Injectable()
 export class InfluencersService {
   constructor(
@@ -113,10 +140,7 @@ export class InfluencersService {
   async getForViewer(viewer: AuthUser, influencerId: string) {
     const p = await this.prisma.influencerProfile.findUnique({
       where: { id: influencerId },
-      include: {
-        socialAccounts: { orderBy: { followers: 'desc' } },
-        portfolio: { orderBy: { createdAt: 'desc' } },
-      },
+      include: PROFILE_INCLUDE,
     });
     if (!p || (p.status !== 'APPROVED' && viewer.role !== 'ADMIN')) throw notFound('Influencer');
 
@@ -136,7 +160,95 @@ export class InfluencersService {
         data: { profileViews: { increment: 1 } },
       });
     }
-    return this.publicView(p, { admin: viewer.role === 'ADMIN', showContacts });
+    return {
+      ...this.publicView(p, { admin: viewer.role === 'ADMIN', showContacts }),
+      access: (viewer.role === 'ADMIN' ? 'admin' : 'brand') as ProfileAccess,
+    };
+  }
+
+  // ─── Public page: briefluence.com/@username ─────────────
+
+  /** Sets (or with null removes) the blogger's public link name. */
+  async setUsername(userId: string, username: string | null) {
+    try {
+      await this.prisma.influencerProfile.update({ where: { userId }, data: { username } });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002')
+        throw new AppError('USERNAME_TAKEN', 'This username is taken');
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025')
+        throw new AppError('PROFILE_INCOMPLETE', 'Complete your profile first');
+      throw e;
+    }
+    return this.getMine(userId);
+  }
+
+  /**
+   * The public page by username. Live only for verified, active bloggers (the owner and admins
+   * also see it before that). Brands and admins get the full brand view; everyone else (guests,
+   * other bloggers) gets the guest view without numbers, prices or contacts.
+   */
+  async getByUsername(viewer: AuthUser | undefined, username: string) {
+    const p = await this.prisma.influencerProfile.findUnique({
+      where: { username: username.toLowerCase() },
+      include: { ...PROFILE_INCLUDE, user: { select: { blockedAt: true } } },
+    });
+    const owner = !!viewer && p?.userId === viewer.id;
+    const live = !!p && p.status === 'APPROVED' && !p.user.blockedAt;
+    if (!p || (!live && !owner && viewer?.role !== 'ADMIN')) throw notFound('Influencer');
+    if (viewer?.role === 'BRAND' || viewer?.role === 'ADMIN')
+      return { ...(await this.getForViewer(viewer, p.id)), username: p.username, live };
+    if (owner)
+      return {
+        ...this.publicView(p, { admin: false, showContacts: false }),
+        access: 'owner' as ProfileAccess,
+        live,
+      };
+    return { ...this.guestView(p), live };
+  }
+
+  /** Usernames of live public pages, for the sitemap. */
+  async publicUsernames() {
+    const rows = await this.prisma.influencerProfile.findMany({
+      where: { username: { not: null }, status: 'APPROVED', user: { blockedAt: null } },
+      select: { username: true, approvedAt: true },
+      orderBy: { approvedAt: 'desc' },
+      take: 5000,
+    });
+    return rows.map((r) => ({ username: r.username!, approvedAt: r.approvedAt }));
+  }
+
+  /** What a signed-out visitor sees: who the blogger is and their work, no stats or prices. */
+  private guestView(p: ProfileWithParts) {
+    return {
+      access: 'guest' as ProfileAccess,
+      id: p.id,
+      username: p.username,
+      displayName: p.displayName,
+      avatarUrl: p.avatarUrl,
+      bio: p.bio,
+      country: p.country,
+      city: p.city,
+      languages: p.languages,
+      niches: p.niches,
+      verified: p.status === 'APPROVED',
+      socialAccounts: p.socialAccounts.filter(isAccountUsable).map((a) => ({
+        id: a.id,
+        platform: a.platform,
+        username: a.username,
+        profileUrl: a.profileUrl,
+      })),
+      contacts: null,
+      faq: answeredFaq(p),
+      portfolio: p.portfolio
+        .filter(isPortfolioVisible)
+        .map((i) => ({ ...publicPortfolioItem(i), reviewNote: null })),
+      offers: p.offers.map(({ priceMinor, currency: _c, ...o }) => ({
+        ...o,
+        priceMinor: null,
+        currency: null,
+        hasPrice: priceMinor != null,
+      })),
+    };
   }
 
   /**
@@ -147,23 +259,23 @@ export class InfluencersService {
   async previewForBrands(userId: string) {
     const p = await this.prisma.influencerProfile.findUnique({
       where: { userId },
-      include: {
-        socialAccounts: { orderBy: { followers: 'desc' } },
-        portfolio: { orderBy: { createdAt: 'desc' } },
-      },
+      include: PROFILE_INCLUDE,
     });
     if (!p) throw notFound('Influencer');
-    return { ...this.publicView(p, { admin: false, showContacts: false }), status: p.status };
+    return {
+      ...this.publicView(p, { admin: false, showContacts: false }),
+      access: 'owner' as ProfileAccess,
+      status: p.status,
+    };
   }
 
   private publicView(
-    p: Prisma.InfluencerProfileGetPayload<{
-      include: { socialAccounts: true; portfolio: true };
-    }>,
+    p: ProfileWithParts,
     { admin, showContacts }: { admin: boolean; showContacts: boolean },
   ) {
     return {
       id: p.id,
+      username: p.username,
       displayName: p.displayName,
       avatarUrl: p.avatarUrl,
       bio: p.bio,
@@ -183,6 +295,7 @@ export class InfluencersService {
       // Only answered questions and approved work; brands see nothing for empty sections.
       faq: answeredFaq(p),
       portfolio: p.portfolio.filter((i) => admin || isPortfolioVisible(i)).map(publicPortfolioItem),
+      offers: p.offers.map((o) => ({ ...o, hasPrice: o.priceMinor != null })),
     };
   }
 }

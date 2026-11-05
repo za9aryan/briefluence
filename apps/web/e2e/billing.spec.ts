@@ -80,11 +80,16 @@ test('free Pro days → Basic → upgrade to Pro → renew with the saved card',
     // A month later the daily job charges the saved card.
     await admin.advanceDays(32);
     await admin.runJob('billing-daily');
+    // The E2E database keeps earlier runs' subscriptions, and their renewals are charged in the
+    // same run, so allow time for the queue to reach this one.
     await expect
-      .poll(async () => {
-        await page.reload();
-        return page.getByRole('cell', { name: 'Renewal' }).count();
-      })
+      .poll(
+        async () => {
+          await page.reload();
+          return page.getByRole('cell', { name: 'Renewal' }).count();
+        },
+        { timeout: 90_000 },
+      )
       .toBe(1);
     await expect(page.getByRole('cell', { name: 'Paid' })).toHaveCount(2);
   } finally {

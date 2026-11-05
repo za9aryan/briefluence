@@ -1,13 +1,15 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Post, Put, Req } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiTags } from '@nestjs/swagger';
 import {
   feedQuerySchema,
   influencerProfileSchema,
+  setUsernameSchema,
   type InfluencerProfileData,
 } from '@briefluence/shared';
 import { AppError } from '../../common/app-error';
-import type { AuthUser } from '../../common/auth-user';
-import { CurrentUser, Roles } from '../../common/decorators';
+import type { AuthedRequest, AuthUser } from '../../common/auth-user';
+import { CurrentUser, Public, Roles } from '../../common/decorators';
 import { ApiZodBody, ZodBody } from '../../common/zod';
 import { InfluencersService } from './influencers.service';
 
@@ -64,6 +66,17 @@ export class InfluencersController {
     await this.influencers.saveFilters(user.id, clean);
   }
 
+  /** Public link name: briefluence.com/@username. */
+  @Roles('INFLUENCER')
+  @Put('me/username')
+  @ApiZodBody(setUsernameSchema)
+  setUsername(
+    @CurrentUser() user: AuthUser,
+    @ZodBody(setUsernameSchema) body: { username: string | null },
+  ) {
+    return this.influencers.setUsername(user.id, body.username);
+  }
+
   /** The blogger's own profile exactly as brands see it (preview). */
   @Roles('INFLUENCER')
   @Get('me/public')
@@ -75,5 +88,29 @@ export class InfluencersController {
   @Get(':id')
   get(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     return this.influencers.getForViewer(user, id);
+  }
+}
+
+/**
+ * Public blogger pages (briefluence.com/@username), open without signing in. A signed-in brand or
+ * admin gets the full brand view; everyone else the guest view (no stats, prices or contacts).
+ */
+@ApiTags('public')
+@Controller('public/influencers')
+export class PublicInfluencersController {
+  constructor(private readonly influencers: InfluencersService) {}
+
+  @Public()
+  @Get()
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  usernames() {
+    return this.influencers.publicUsernames();
+  }
+
+  @Public()
+  @Get(':username')
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
+  get(@Req() req: AuthedRequest, @Param('username') username: string) {
+    return this.influencers.getByUsername(req.user, username);
   }
 }

@@ -164,6 +164,22 @@ sign-in, sign-out and session refresh. In production Caddy routes `/api/v1/ws/*`
   `VAPID_SUBJECT`). Without them push is off and the switch says so. Generate a pair with
   `node -e "console.log(require('web-push').generateVAPIDKeys())"` in `apps/api`.
 
+## Public blogger pages
+
+- **Link:** a blogger picks a username on **Account → Your public page** and gets
+  `briefluence.com/@username` (Next.js rewrites `/@:username` to `app/(public)/u/[username]`).
+  Usernames are 3–30 lowercase letters, digits, `.` and `_` (rules and reserved names:
+  `packages/shared/src/domain/username.ts`), unique, and can be changed or removed.
+- **Who sees what:** the page is live only for verified, unblocked bloggers (the owner sees it
+  earlier with a note). Signed-in brands and admins get the full profile; guests and other
+  bloggers get the guest view (`GET /public/influencers/:username`): name, photo, bio, niches,
+  accounts as links, portfolio and offers, but no stats, prices, contacts, gender or age.
+  Locked parts open a "Sign in to see more" sheet (log in, or join as a brand).
+- **Offers row:** active offers show as a carousel on every blogger profile (brand view, preview,
+  public page); a card opens the offer page, or the sign-in sheet for guests.
+- **Search:** the page is server-rendered with title, description, canonical URL and Open Graph;
+  `robots.txt` keeps the signed-in app out and `sitemap.xml` lists every live blogger page.
+
 ## Re-registration warning
 
 Every link of a social account to a profile is kept in `SocialAccountLink` (also after the account or user is

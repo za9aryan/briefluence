@@ -49,6 +49,8 @@ export interface SocialAccountDto {
 
 export interface InfluencerProfileDto {
   id: string;
+  /** Public link name: briefluence.com/@username. */
+  username: string | null;
   displayName: string;
   avatarUrl: string | null;
   bio: string | null;
@@ -340,6 +342,30 @@ export interface PaymentDto {
 }
 
 /** Blogger offer ("1 Story for $50"). Review fields only reach the owner and admins. */
+/** Who is looking at a blogger's profile; guests (and other bloggers) see no stats or prices. */
+export type ProfileAccess = 'admin' | 'brand' | 'owner' | 'guest';
+
+/** An active offer on a blogger's profile. Guests get no price; `hasPrice` says whether there is one. */
+export interface ProfileOfferDto {
+  id: string;
+  title: string;
+  imageUrl: string | null;
+  priceMinor: number | null;
+  currency: Currency | null;
+  hasPrice: boolean;
+  collaborationType: CollaborationType;
+  platforms: Platform[];
+  contentFormats: ContentFormat[];
+}
+
+/** A social account as signed-out visitors see it: only where to find the blogger. */
+export interface GuestAccountDto {
+  id: string;
+  platform: Platform;
+  username: string;
+  profileUrl: string;
+}
+
 export interface OfferDto {
   id: string;
   influencerId: string;

@@ -151,46 +151,63 @@ export const Textarea = forwardRef<
 });
 
 /**
+ * A text field with a fixed grey block in front (e.g. "briefluence.com/@"), so people type only
+ * their part. The block is decorative: give the field a label that says what goes in.
+ */
+export const PrefixInput = forwardRef<
+  HTMLInputElement,
+  Omit<InputProps, 'suffix'> & { prefix: ReactNode }
+>(function PrefixInput({ prefix, icon, invalid, className, ...rest }, ref) {
+  return (
+    <div
+      className={cn(
+        'flex h-11 w-full items-stretch overflow-hidden rounded-sm border bg-surface-raised transition-colors',
+        'focus-within:border-primary focus-within:ring-3 focus-within:ring-primary/15',
+        invalid ? 'border-primary-text' : 'border-line',
+        className,
+      )}
+    >
+      <span
+        aria-hidden
+        className="flex shrink-0 select-none items-center gap-1.5 border-r border-line bg-surface px-3 text-small text-ink-muted pointer-coarse:text-body"
+      >
+        {icon && <Icon name={icon} size="sm" />}
+        {prefix}
+      </span>
+      <input
+        ref={ref}
+        type="text"
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
+        aria-invalid={invalid || undefined}
+        className="min-w-0 flex-1 bg-transparent px-3 text-small text-ink outline-none placeholder:text-ink-muted pointer-coarse:text-body"
+        {...rest}
+      />
+    </div>
+  );
+});
+
+/**
  * A web address: a grey "https://" block in front, so people type just "instagram.com/ani".
  * A pasted full link loses its scheme as it lands in the field (no "https://https://"); the shared
  * `webUrl` schema puts it back. Works with react-hook-form's register or as a controlled input.
  */
 export const UrlInput = forwardRef<HTMLInputElement, Omit<InputProps, 'type' | 'suffix'>>(
-  function UrlInput({ icon, invalid, className, onChange, ...rest }, ref) {
+  function UrlInput({ onChange, ...rest }, ref) {
     return (
-      <div
-        className={cn(
-          'flex h-11 w-full items-stretch overflow-hidden rounded-sm border bg-surface-raised transition-colors',
-          'focus-within:border-primary focus-within:ring-3 focus-within:ring-primary/15',
-          invalid ? 'border-primary-text' : 'border-line',
-          className,
-        )}
-      >
-        <span
-          aria-hidden
-          className="flex shrink-0 select-none items-center gap-1.5 border-r border-line bg-surface px-3 text-small text-ink-muted pointer-coarse:text-body"
-        >
-          {icon && <Icon name={icon} size="sm" />}
-          https://
-        </span>
-        <input
-          ref={ref}
-          type="text"
-          inputMode="url"
-          autoComplete="url"
-          autoCapitalize="none"
-          autoCorrect="off"
-          spellCheck={false}
-          aria-invalid={invalid || undefined}
-          className="min-w-0 flex-1 bg-transparent px-3 text-small text-ink outline-none placeholder:text-ink-muted pointer-coarse:text-body"
-          {...rest}
-          onChange={(e) => {
-            const bare = e.target.value.replace(/^\s*https?:\/\//i, '');
-            if (bare !== e.target.value) e.target.value = bare;
-            onChange?.(e);
-          }}
-        />
-      </div>
+      <PrefixInput
+        ref={ref}
+        prefix="https://"
+        inputMode="url"
+        autoComplete="url"
+        {...rest}
+        onChange={(e) => {
+          const bare = e.target.value.replace(/^\s*https?:\/\//i, '');
+          if (bare !== e.target.value) e.target.value = bare;
+          onChange?.(e);
+        }}
+      />
     );
   },
 );

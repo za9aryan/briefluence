@@ -1,5 +1,13 @@
 {
   "title": "Account",
+  "publicLink": "Your public page",
+  "publicLinkLead": "Pick a username to get a short link to your profile. Anyone can open it, even without an account; stats and prices stay visible only to brands.",
+  "username": "Username",
+  "usernameHint": "3–30 characters: Latin letters, numbers, dots and underscores.",
+  "copyLink": "Copy link",
+  "linkCopied": "Link copied",
+  "openPage": "Open page",
+  "pageNotLive": "Your page goes live after your profile is verified.",
   "influencerLead": "Your profile, portfolio and answers, as companies will see them.",
   "brandLead": "Your company profile, as influencers will see it.",
   "settingsTitle": "Settings",
