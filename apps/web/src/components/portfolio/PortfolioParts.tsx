@@ -62,7 +62,11 @@ export function PortfolioLink({ url, className }: { url: string; className?: str
   );
 }
 
-/** One item: image on top, title, a short description and the link. `top`/`footer` for badges and actions. */
+/**
+ * One item in a row: the image and the title only (the description and the link are in the large
+ * view, so long links never stretch a narrow card). `top`/`footer` for badges and actions; with
+ * `onOpen` the whole card opens the large view.
+ */
 export function PortfolioTile({
   item,
   top,
@@ -74,38 +78,29 @@ export function PortfolioTile({
   footer?: ReactNode;
   onOpen?: () => void;
 }) {
-  const image = (
-    <img src={item.imageUrl} alt={item.title} loading="lazy" className="size-full object-cover" />
-  );
-  return (
-    <Card p={0} className="flex h-full flex-col overflow-hidden">
+  const content = (
+    <>
       <div className="relative aspect-[4/5] bg-surface">
-        {onOpen ? (
-          <button
-            type="button"
-            onClick={onOpen}
-            className="block size-full"
-            aria-label={item.title}
-          >
-            {image}
-          </button>
-        ) : (
-          image
-        )}
+        <img src={item.imageUrl} alt="" loading="lazy" className="size-full object-cover" />
         {top && <div className="absolute left-2 top-2">{top}</div>}
       </div>
-      <Stack gap={1} className="flex-1 p-4">
-        <Text weight="bold" className="break-words">
+      <div className="p-4">
+        <Text weight="bold" className="line-clamp-2 break-words">
           {item.title}
         </Text>
-        {item.description && (
-          <Text size="small" tone="muted" className="line-clamp-3 break-words">
-            {item.description}
-          </Text>
-        )}
-        {item.linkUrl && <PortfolioLink url={item.linkUrl} className="mt-auto" />}
-        {footer}
-      </Stack>
+      </div>
+    </>
+  );
+  return (
+    <Card p={0} interactive={!!onOpen} className="flex h-full flex-col overflow-hidden">
+      {onOpen ? (
+        <button type="button" onClick={onOpen} className="block w-full flex-1 text-left">
+          {content}
+        </button>
+      ) : (
+        <div className="flex-1">{content}</div>
+      )}
+      {footer && <div className="px-4 pb-4">{footer}</div>}
     </Card>
   );
 }
@@ -124,10 +119,15 @@ export function PortfolioGallery({
   compact?: boolean;
 }) {
   const t = useTranslations('portfolio.view');
-  const [index, setIndex] = useState<number | null>(null);
-  const open = index != null ? items[index] : undefined;
-  const go = (d: 1 | -1) =>
-    setIndex((i) => (i == null ? i : (i + d + items.length) % items.length));
+  // The index stays when the view closes, so the sheet keeps its content while it slides away.
+  const [index, setIndex] = useState(0);
+  const [isOpen, setOpen] = useState(false);
+  const open = items[Math.min(index, items.length - 1)];
+  const show = (n: number) => {
+    setIndex(n);
+    setOpen(true);
+  };
+  const go = (d: 1 | -1) => setIndex((i) => (i + d + items.length) % items.length);
   return (
     <>
       <Carousel
@@ -141,20 +141,20 @@ export function PortfolioGallery({
             <button
               key={i.id}
               type="button"
-              onClick={() => setIndex(n)}
+              onClick={() => show(n)}
               aria-label={i.title}
               className="block aspect-square w-full overflow-hidden rounded-card border border-line bg-surface transition hover:border-primary/40 motion-safe:active:scale-[0.97]"
             >
               <img src={i.imageUrl} alt="" loading="lazy" className="size-full object-cover" />
             </button>
           ) : (
-            <PortfolioTile key={i.id} item={i} onOpen={() => setIndex(n)} />
+            <PortfolioTile key={i.id} item={i} onOpen={() => show(n)} />
           ),
         )}
       </Carousel>
       <Modal
-        open={!!open}
-        onClose={() => setIndex(null)}
+        open={isOpen && !!open}
+        onClose={() => setOpen(false)}
         title={open?.title ?? ''}
         size="lg"
         closeLabel={t('close')}
@@ -195,7 +195,7 @@ export function PortfolioGallery({
                 <span className="absolute right-2 top-2">
                   <CoverChip>
                     <span className="tabular-nums" aria-live="polite">
-                      {t('position', { n: (index ?? 0) + 1, total: items.length })}
+                      {t('position', { n: index + 1, total: items.length })}
                     </span>
                   </CoverChip>
                 </span>

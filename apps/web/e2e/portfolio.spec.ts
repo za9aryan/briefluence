@@ -145,10 +145,14 @@ test('portfolio + FAQ: blogger adds work → admin approves → brand sees it an
   await expect(brand.getByText('Women 20–30 in Yerevan who love food')).toBeVisible();
   // Unanswered questions stay hidden.
   await expect(brand.getByText('What companies have you worked with?')).toHaveCount(0);
-  await expect(brand.getByRole('link', { name: 'See the work' }).first()).toHaveAttribute(
-    'href',
-    'https://www.instagram.com/p/abc123/',
-  );
+  // Cards show the image and title; the link is in the large view.
+  await expect(brand.getByRole('link', { name: 'See the work' })).toHaveCount(0);
+  await brand.getByRole('button', { name: `Story for a coffee shop ${id}` }).click();
+  await expect(
+    brand.getByRole('dialog').getByRole('link', { name: 'See the work' }),
+  ).toHaveAttribute('href', 'https://www.instagram.com/p/abc123/');
+  await brand.keyboard.press('Escape');
+  await expect(brand.getByRole('dialog')).toBeHidden();
   if (shots) await brand.screenshot({ path: `${shots}/brand.png`, fullPage: true });
 
   // ── The blogger card on an offer page shows the same portfolio and FAQ ──
