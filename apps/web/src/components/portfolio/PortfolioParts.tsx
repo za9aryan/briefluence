@@ -64,25 +64,27 @@ export function PortfolioLink({ url, className }: { url: string; className?: str
 
 /**
  * One item in a row: the image and the title only (the description and the link are in the large
- * view, so long links never stretch a narrow card). `top`/`footer` for badges and actions; with
- * `onOpen` the whole card opens the large view.
+ * view, so long links never stretch a narrow card). `top` (left) and `topRight` sit on the image,
+ * e.g. a status badge and an actions button; `footer` goes under the title. With `onOpen` the
+ * image and title open the large view.
  */
 export function PortfolioTile({
   item,
   top,
+  topRight,
   footer,
   onOpen,
 }: {
   item: PortfolioItemDto;
   top?: ReactNode;
+  topRight?: ReactNode;
   footer?: ReactNode;
   onOpen?: () => void;
 }) {
   const content = (
     <>
-      <div className="relative aspect-[4/5] bg-surface">
+      <div className="aspect-[4/5] bg-surface">
         <img src={item.imageUrl} alt="" loading="lazy" className="size-full object-cover" />
-        {top && <div className="absolute left-2 top-2">{top}</div>}
       </div>
       <div className="p-4">
         <Text weight="bold" className="line-clamp-2 break-words">
@@ -92,7 +94,7 @@ export function PortfolioTile({
     </>
   );
   return (
-    <Card p={0} interactive={!!onOpen} className="flex h-full flex-col overflow-hidden">
+    <Card p={0} interactive={!!onOpen} className="relative flex h-full flex-col overflow-hidden">
       {onOpen ? (
         <button type="button" onClick={onOpen} className="block w-full flex-1 text-left">
           {content}
@@ -100,7 +102,10 @@ export function PortfolioTile({
       ) : (
         <div className="flex-1">{content}</div>
       )}
-      {footer && <div className="px-4 pb-4">{footer}</div>}
+      {/* Outside the open button, so actions on the image are their own buttons. */}
+      {top && <div className="absolute left-2 top-2">{top}</div>}
+      {topRight && <div className="absolute right-2 top-2">{topRight}</div>}
+      {footer && <div className="-mt-2 px-4 pb-4">{footer}</div>}
     </Card>
   );
 }

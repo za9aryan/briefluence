@@ -70,6 +70,17 @@ test('portfolio + FAQ: blogger adds work → admin approves → brand sees it an
   await blogger.getByRole('dialog').getByRole('button', { name: 'Save' }).click();
   await expect(blogger.getByRole('dialog')).toBeHidden();
   await expect(blogger.getByText('In review')).toBeVisible();
+  // Edit / delete sit behind the actions button on the card's image.
+  await blogger.getByRole('button', { name: 'Actions' }).click();
+  await expect(blogger.getByRole('menuitem', { name: 'Edit' })).toBeVisible();
+  if (shots) await blogger.screenshot({ path: `${shots}/tile-menu.png` });
+  await blogger.keyboard.press('Escape');
+  if (shots) {
+    await blogger.setViewportSize({ width: 360, height: 800 });
+    await blogger.getByText('In review').scrollIntoViewIfNeeded();
+    await blogger.screenshot({ path: `${shots}/tile-m.png` });
+    await blogger.setViewportSize({ width: 1280, height: 720 });
+  }
   // Each question is folded until the blogger chooses to answer it.
   await blogger
     .locator('.rounded-card', { hasText: 'Who is your audience?' })

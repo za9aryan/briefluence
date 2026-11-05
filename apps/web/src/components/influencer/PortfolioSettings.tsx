@@ -154,54 +154,54 @@ export function PortfolioCard() {
                 key={i.id}
                 item={i}
                 top={<PortfolioStatusBadge status={i.reviewStatus} />}
-                footer={
-                  <>
-                    {i.reviewStatus === 'REJECTED' && i.reviewNote && (
-                      <Text size="small" className="break-words text-primary-text">
-                        {t('rejectedReason', { reason: i.reviewNote })}
-                      </Text>
-                    )}
-                    <div className="mt-2 flex justify-end">
-                      <Menu
-                        sheet={{ title: i.title, closeLabel: tc('close') }}
-                        trigger={(p) => (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            aria-label={t('actions')}
-                            onClick={p.toggle}
-                            aria-expanded={p['aria-expanded']}
-                            aria-haspopup={p['aria-haspopup']}
-                          >
-                            <Icon name="menu" />
-                          </Button>
-                        )}
+                topRight={
+                  <Menu
+                    sheet={{ title: i.title, closeLabel: tc('close') }}
+                    trigger={(p) => (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label={t('actions')}
+                        onClick={p.toggle}
+                        aria-expanded={p['aria-expanded']}
+                        aria-haspopup={p['aria-haspopup']}
+                        className="bg-surface-raised/90 text-ink shadow-pop hover:bg-surface-raised"
                       >
-                        {(closeMenu) => (
-                          <>
-                            <MenuItem
-                              className="min-h-11 px-4"
-                              onClick={() => {
-                                closeMenu();
-                                open(i);
-                              }}
-                            >
-                              <Icon name="edit" /> {t('edit')}
-                            </MenuItem>
-                            <MenuItem
-                              className="min-h-11 px-4 text-primary-text"
-                              onClick={() => {
-                                closeMenu();
-                                setDeleting(i);
-                              }}
-                            >
-                              <Icon name="trash" /> {t('delete')}
-                            </MenuItem>
-                          </>
-                        )}
-                      </Menu>
-                    </div>
-                  </>
+                        <Icon name="menu" />
+                      </Button>
+                    )}
+                  >
+                    {(closeMenu) => (
+                      <>
+                        <MenuItem
+                          className="min-h-11 px-4"
+                          onClick={() => {
+                            closeMenu();
+                            open(i);
+                          }}
+                        >
+                          <Icon name="edit" /> {t('edit')}
+                        </MenuItem>
+                        <MenuItem
+                          className="min-h-11 px-4 text-primary-text"
+                          onClick={() => {
+                            closeMenu();
+                            setDeleting(i);
+                          }}
+                        >
+                          <Icon name="trash" /> {t('delete')}
+                        </MenuItem>
+                      </>
+                    )}
+                  </Menu>
+                }
+                footer={
+                  i.reviewStatus === 'REJECTED' &&
+                  i.reviewNote && (
+                    <Text size="small" className="break-words text-primary-text">
+                      {t('rejectedReason', { reason: i.reviewNote })}
+                    </Text>
+                  )
                 }
               />
             ))}
