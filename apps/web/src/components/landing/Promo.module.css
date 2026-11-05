@@ -1,0 +1,215 @@
+/*
+ * Illustrations on /for-brands (analytics stage) and /for-influencers (toolkit bento + phone).
+ * Tokens only. Floating cards drift gently; reduced motion keeps them still.
+ */
+.stage {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--bf-primary-soft);
+}
+
+.stage::before,
+.stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.stage::before {
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--bf-primary) 22%, transparent) 1px,
+    transparent 1.5px
+  );
+  background-size: 18px 18px;
+  mask-image: radial-gradient(ellipse at 50% 40%, black, transparent 75%);
+}
+
+.stage::after {
+  background:
+    radial-gradient(
+      26rem 20rem at 100% 0%,
+      color-mix(in oklab, var(--bf-primary) 28%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      22rem 16rem at 0% 100%,
+      color-mix(in oklab, var(--bf-primary) 16%, transparent),
+      transparent 70%
+    );
+}
+
+/* Ink panel behind the toolkit grid. */
+.dark {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--bf-ink);
+  color: var(--bf-surface);
+}
+
+.dark::before,
+.dark::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.dark::before {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--bf-surface) 7%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--bf-surface) 7%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse at 50% 0%, black, transparent 70%);
+}
+
+.dark::after {
+  background:
+    radial-gradient(
+      40rem 22rem at 15% 0%,
+      color-mix(in oklab, var(--bf-primary) 45%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      30rem 20rem at 100% 100%,
+      color-mix(in oklab, var(--bf-primary) 28%, transparent),
+      transparent 70%
+    );
+}
+
+.muted {
+  color: color-mix(in oklab, var(--bf-surface) 72%, transparent);
+}
+
+.eyebrow {
+  color: color-mix(in oklab, var(--bf-primary) 55%, var(--bf-surface));
+}
+
+/* Tiles of the toolkit grid: raised cards with a soft glow on hover. */
+.tile {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .tile:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 48px -24px color-mix(in oklab, var(--bf-primary) 60%, transparent);
+  }
+}
+
+/* Gentle drift for the floating cards. */
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.floatSlow {
+  animation: float 8s ease-in-out -3s infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -8px;
+  }
+}
+
+/* Age bars grow in once. */
+.bar {
+  transform-origin: bottom;
+  animation: grow 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes grow {
+  from {
+    transform: scaleY(0.05);
+  }
+}
+
+/* Phone mock-up with a lock screen. */
+.phone {
+  position: relative;
+  width: min(100%, 17rem);
+  aspect-ratio: 9 / 18.5;
+  border-radius: 2.5rem;
+  padding: 0.6rem;
+  background: var(--bf-ink);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--bf-surface) 18%, transparent),
+    0 40px 80px -30px color-mix(in oklab, var(--bf-primary) 70%, transparent);
+}
+
+.screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 2rem;
+  background-size: cover;
+  background-position: center;
+}
+
+.screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--bf-scrim) 10%, transparent),
+    color-mix(in oklab, var(--bf-scrim) 45%, transparent)
+  );
+}
+
+.notch {
+  position: absolute;
+  top: 0.6rem;
+  left: 50%;
+  z-index: 2;
+  width: 5.5rem;
+  height: 1.4rem;
+  translate: -50% 0;
+  border-radius: 9999px;
+  background: var(--bf-ink);
+}
+
+/* Notifications on the lock screen: frosted glass. */
+.notification {
+  background: color-mix(in oklab, var(--bf-surface-raised) 82%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Notifications slide in one after another. */
+.pop {
+  animation: pop 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+    scale: 0.96;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float,
+  .floatSlow,
+  .bar,
+  .pop {
+    animation: none;
+  }
+}

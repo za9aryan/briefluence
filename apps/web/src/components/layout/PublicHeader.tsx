@@ -23,7 +23,7 @@ export function PublicHeader() {
     <header className="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur">
       <Container className="flex h-16 items-center justify-between gap-4">
         <Logo compact />
-        <nav className="hidden items-center gap-1 md:flex" aria-label={t('main')}>
+        <nav className="hidden items-center gap-1 lg:flex" aria-label={t('main')}>
           {links.map((l) => (
             <Link
               key={l.href}
@@ -70,7 +70,7 @@ export function PublicHeader() {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            className="lg:hidden"
             aria-label={t('menu')}
             aria-expanded={open}
             onClick={() => setOpen((o) => !o)}
@@ -80,7 +80,7 @@ export function PublicHeader() {
         </div>
       </Container>
       {open && (
-        <nav className="border-t border-line bg-surface md:hidden" aria-label={t('main')}>
+        <nav className="border-t border-line bg-surface lg:hidden" aria-label={t('main')}>
           <Container className="flex flex-col py-2">
             {[...links, ...(me ? [] : [{ href: '/login', label: t('login') }])].map((l) => (
               <Link

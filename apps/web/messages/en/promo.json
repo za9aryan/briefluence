@@ -1,0 +1,86 @@
+{
+  "sample": "Example",
+  "analytics": {
+    "eyebrow": "Influencer analytics",
+    "title": "Know who you’re working with before you say yes",
+    "lead": "Every applicant comes with numbers pulled straight from Instagram, TikTok or YouTube. No screenshots, no guessing.",
+    "points": {
+      "official": "Followers, views and engagement from the platform’s official API",
+      "audience": "Who the audience is: age, gender and countries",
+      "match": "A match score that shows how well each influencer fits your brief"
+    },
+    "card": {
+      "name": "Anna Sokolova",
+      "city": "Moscow",
+      "niche": "Food and cafés",
+      "verified": "Verified",
+      "synced": "Synced from Instagram today",
+      "followers": "Followers",
+      "avgViews": "Avg. views",
+      "er": "Engagement",
+      "posts": "Posts",
+      "age": "Audience age",
+      "gender": "Audience gender",
+      "women": "Women",
+      "men": "Men",
+      "countries": "Top countries",
+      "match": "Match with your brief",
+      "core": "{percent} of the audience is 18–34"
+    }
+  },
+  "toolkit": {
+    "eyebrow": "Your toolkit",
+    "title": "Everything for collabs, right in your pocket",
+    "lead": "Briefs that fit you, offers companies can book, your own public page, and notifications that find you wherever you are.",
+    "cta": "Join as an influencer",
+    "push": {
+      "title": "Push notifications",
+      "body": "New briefs, replies from companies and requests for your offers land on your phone the moment they happen.",
+      "time": "9:41",
+      "date": "Thursday, 6 November",
+      "now": "now",
+      "min": "2 min ago",
+      "hour": "1 h ago",
+      "n1title": "New brief for you · Match 92",
+      "n1body": "Reels about our new coffee bar",
+      "n2title": "You’re accepted",
+      "n2body": "Nordic Roast accepted your application. Their contacts are open.",
+      "n3title": "New request",
+      "n3body": "Bulka Bakery wants “3 Stories about your café”"
+    },
+    "email": {
+      "title": "A daily email digest",
+      "body": "Missed something? Once a day you get the new briefs that fit you in one short email.",
+      "from": "briefluence",
+      "subject": "3 new briefs for you today",
+      "r1": "Reels about our new coffee bar",
+      "r2": "A weekend in the Alps, filmed for Reels",
+      "r3": "Try our new serum on camera",
+      "barter": "Barter"
+    },
+    "match": {
+      "title": "A match score on every brief",
+      "body": "See at a glance how well a brief fits you, and why.",
+      "label": "Match",
+      "city": "Your city",
+      "age": "Audience 18–34",
+      "followers": "5K+ followers"
+    },
+    "track": {
+      "title": "Track every application",
+      "body": "Applied, viewed, shortlisted, accepted: you always know where you stand."
+    },
+    "offers": {
+      "title": "Sell your own offers",
+      "body": "Set a format and a price. Companies send requests, you accept the ones you like.",
+      "item": "3 Stories about your café",
+      "requests": "{count, plural, one {# new request} other {# new requests}}"
+    },
+    "page": {
+      "title": "Your own public page",
+      "body": "Your stats, portfolio and offers on one link. Put it in your bio and let companies come to you.",
+      "handle": "anna",
+      "copy": "Copy link"
+    }
+  }
+}

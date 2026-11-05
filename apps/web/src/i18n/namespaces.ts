@@ -6,6 +6,7 @@ export const NAMESPACES = [
   'auth',
   'landing',
   'showcase',
+  'promo',
   'legal',
   'onboarding',
   'verification',
