@@ -81,6 +81,20 @@ describe('blogger offers (e2e)', () => {
     expect(feed.items[0].blogger).not.toHaveProperty('contactValue');
     expect((await b.agent.get(`${API}/offers/feed?format=REEL`).expect(200)).body.total).toBe(0);
 
+    // Search finds the offer by the blogger's name and @username too, not only by its texts.
+    const name = influencerProfile.displayName.split(' ')[0]!.toLowerCase();
+    expect(
+      (await b.agent.get(`${API}/offers/feed`).query({ q: name }).expect(200)).body.total,
+    ).toBe(1);
+    await ctx.prisma.influencerProfile.updateMany({ data: { username: 'offer_maker' } });
+    expect(
+      (await b.agent.get(`${API}/offers/feed`).query({ q: '@Offer_Maker' }).expect(200)).body.total,
+    ).toBe(1);
+    expect(
+      (await b.agent.get(`${API}/offers/feed`).query({ q: 'nobody-like-this' }).expect(200)).body
+        .total,
+    ).toBe(0);
+
     // Views: once per brand per day.
     await b.agent.get(`${API}/offers/${created.body.id}`).expect(200);
     await b.agent.get(`${API}/offers/${created.body.id}`).expect(200);

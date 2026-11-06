@@ -294,6 +294,13 @@ export class OffersService {
               { title: { contains: q.q, mode: 'insensitive' } },
               { description: { contains: q.q, mode: 'insensitive' } },
               { idealBrands: { contains: q.q, mode: 'insensitive' } },
+              // The blogger: by name, or by @username (with or without the "@").
+              { influencer: { displayName: { contains: q.q, mode: 'insensitive' } } },
+              {
+                influencer: {
+                  username: { contains: q.q.replace(/^@/, ''), mode: 'insensitive' },
+                },
+              },
             ],
           }
         : {}),

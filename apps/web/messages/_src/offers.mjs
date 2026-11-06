@@ -178,7 +178,11 @@ export default {
     ],
     tabBrowse: ['Browse', 'Все предложения', 'Բոլոր առաջարկները'],
     tabRequests: ['My requests', 'Мои запросы', 'Իմ հարցումները'],
-    search: ['Search offers', 'Поиск предложений', 'Որոնել առաջարկներ'],
+    search: [
+      'Search offers or influencers',
+      'Поиск по предложениям и инфлюенсерам',
+      'Որոնել առաջարկներ կամ ինֆլյուենսերներ',
+    ],
     sortNewest: ['Newest', 'Сначала новые', 'Նորերը'],
     sortPrice: ['Lowest price', 'Сначала дешевле', 'Ամենաէժանները'],
     optional: {
