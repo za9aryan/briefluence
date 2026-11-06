@@ -15,7 +15,7 @@ import type {
   SocialAccountDto,
 } from '@/lib/types';
 import { ProfileHero } from './ProfileHero';
-import { GuestGate, LockedPanel, ProfileOffers } from './ProfileOffers';
+import { GuestGate, LockedStats, ProfileOffers } from './ProfileOffers';
 
 interface ProfileBase {
   id: string;
@@ -70,7 +70,7 @@ export function InfluencerPublicProfile({ p }: { p: PublicInfluencer }) {
             <Card key={a.id}>
               <Stack gap={4}>
                 <AccountBanner account={a} />
-                <LockedPanel onUnlock={() => setGate(true)}>{tpub('statsLocked')}</LockedPanel>
+                <LockedStats onUnlock={() => setGate(true)}>{tpub('statsLocked')}</LockedStats>
               </Stack>
             </Card>
           ))}
