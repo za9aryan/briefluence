@@ -25,12 +25,12 @@ import s from './ProcessFunnel.module.css';
 const HOURS = [3, 2, 4, 1, 2, 2];
 
 const SLOTS: { path: number[]; r: number; w: string }[] = [
-  { path: [-14, -21, -20, -18, -8, -23], r: -6, w: '2.1s' },
-  { path: [16, -10, 10, -14, 20, -6], r: 5, w: '2.6s' },
-  { path: [-16, 1, -10, 5, -21, -2], r: 4, w: '1.9s' },
-  { path: [14, 13, 20, 9, 8, 16], r: -5, w: '2.4s' },
-  { path: [-12, 24, -19, 27, -6, 21], r: 6, w: '2.8s' },
-  { path: [16, 35, 10, 32, 21, 37], r: -4, w: '2.2s' },
+  { path: [-14, -21, -20, -18, -8, -23], r: -6, w: '0.62s' },
+  { path: [16, -10, 10, -14, 20, -6], r: 5, w: '0.8s' },
+  { path: [-16, 1, -10, 5, -21, -2], r: 4, w: '0.55s' },
+  { path: [14, 13, 20, 9, 8, 16], r: -5, w: '0.72s' },
+  { path: [-12, 24, -19, 27, -6, 21], r: 6, w: '0.9s' },
+  { path: [16, 35, 10, 32, 21, 37], r: -4, w: '0.66s' },
 ];
 
 function chipStyle({ path, r, w }: (typeof SLOTS)[number], i: number) {
@@ -102,7 +102,9 @@ export async function ProcessFunnel({
                 <span className={s.wobble}>
                   <Icon name={icon} size="sm" className={s.chipIcon} />
                   {t(`chores.${key}`)}
-                  <span className={s.cost}>+{tp('hours', { count: HOURS[i]! })}</span>
+                  <span className={s.cost} style={{ '--d': `${i * -0.23}s` } as CSSProperties}>
+                    +{tp('hours', { count: HOURS[i]! })}
+                  </span>
                   <span className={s.strike} />
                 </span>
               </div>

@@ -1,5 +1,5 @@
 /*
- * "Six chores → one brief": a 12s loop on an ink stage, pure CSS.
+ * "Six chores → one brief": a 10s loop on an ink stage, pure CSS.
  *  0–40%  chaos: chores drift, each tagged with the hours it costs; the timer ticks up to 14 h.
  * 40–48%  a line strikes through every chore.
  * 48–56%  they swirl into the center; a ring bursts.
@@ -19,7 +19,7 @@
   isolation: isolate;
   overflow: hidden;
   aspect-ratio: 4 / 5;
-  background: var(--bf-ink);
+  background: color-mix(in oklab, var(--bf-primary) 45%, var(--bf-ink));
   color: var(--bf-surface);
 }
 
@@ -35,48 +35,67 @@
   }
 }
 
-/* Grid lines and two glows; the center glow brightens when the card lands. */
+/* Background: a magenta-to-plum aurora that slowly turns (::before), and faint rings that keep
+   shrinking toward the center like a vortex (::after), pulling the chores in. */
 .stage::before,
 .stage::after {
   content: '';
   position: absolute;
-  inset: 0;
   z-index: -1;
   pointer-events: none;
 }
 
 .stage::before {
-  background-image:
-    linear-gradient(color-mix(in oklab, var(--bf-surface) 7%, transparent) 1px, transparent 1px),
-    linear-gradient(
-      90deg,
-      color-mix(in oklab, var(--bf-surface) 7%, transparent) 1px,
-      transparent 1px
+  inset: -50%;
+  background:
+    radial-gradient(
+      closest-side at 32% 30%,
+      color-mix(in oklab, var(--bf-primary) 95%, var(--bf-surface)),
+      transparent
+    ),
+    radial-gradient(closest-side at 70% 68%, var(--bf-ink), transparent),
+    radial-gradient(
+      closest-side at 72% 28%,
+      color-mix(in oklab, var(--bf-primary-text) 80%, var(--bf-ink)),
+      transparent
+    ),
+    radial-gradient(
+      closest-side at 28% 74%,
+      color-mix(in oklab, var(--bf-primary) 70%, var(--bf-ink)),
+      transparent
     );
-  background-size: 32px 32px;
-  mask-image: radial-gradient(ellipse at 50% 50%, black, transparent 75%);
+  filter: blur(30px);
+  animation: aurora 18s linear infinite;
+}
+
+@keyframes aurora {
+  to {
+    rotate: 360deg;
+  }
 }
 
 .stage::after {
-  background: radial-gradient(
+  inset: 0;
+  background: repeating-radial-gradient(
     circle at 50% 50%,
-    color-mix(in oklab, var(--bf-primary) 45%, transparent),
-    transparent 55%
+    transparent calc(0px - var(--ring)) calc(34px - var(--ring)),
+    color-mix(in oklab, var(--bf-surface) 12%, transparent) calc(34px - var(--ring))
+      calc(36px - var(--ring))
   );
-  animation: glow 12s ease-in-out infinite;
+  mask-image: radial-gradient(circle at 50% 50%, black 15%, transparent 72%);
+  animation: vortex 1.4s linear infinite;
 }
 
-@keyframes glow {
-  0%,
-  48% {
-    opacity: 0.35;
-  }
-  60%,
-  90% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.35;
+/* Shift the ring pattern one step (36px) inward per cycle: rings flow into the center, seamlessly. */
+@property --ring {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes vortex {
+  to {
+    --ring: 36px;
   }
 }
 
@@ -120,13 +139,13 @@
 }
 
 .count {
-  color: color-mix(in oklab, var(--bf-primary) 60%, var(--bf-surface));
-  animation: count 12s linear infinite;
+  color: var(--bf-surface);
+  animation: count 10s linear infinite;
 }
 
 .num {
   counter-reset: h var(--hours);
-  animation: tick 12s linear infinite;
+  animation: tick 10s linear infinite;
 }
 
 .num::after {
@@ -160,7 +179,7 @@
 .now {
   color: var(--bf-success);
   filter: brightness(1.6);
-  animation: now 12s ease-out infinite;
+  animation: now 10s ease-out infinite;
 }
 
 @keyframes now {
@@ -185,7 +204,7 @@
   top: 50%;
   left: 50%;
   translate: -50% -50%;
-  animation: chip 12s ease-in-out infinite;
+  animation: chip 10s cubic-bezier(0.45, 0.05, 0.3, 1.35) infinite;
   opacity: 0;
 }
 
@@ -218,8 +237,22 @@
   padding: 1px 7px;
   font-size: 0.85em;
   font-weight: 800;
-  background: var(--bf-primary);
-  color: var(--bf-on-primary);
+  background: var(--bf-surface-raised);
+  color: var(--bf-primary-text);
+  animation: alarm 0.7s ease-in-out infinite alternate;
+  animation-delay: var(--d, 0s);
+}
+
+/* The "+3 h" tags pulse like alerts. */
+@keyframes alarm {
+  from {
+    scale: 1;
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--bf-surface) 60%, transparent);
+  }
+  to {
+    scale: 1.18;
+    box-shadow: 0 0 0 5px color-mix(in oklab, var(--bf-surface) 0%, transparent);
+  }
 }
 
 /* The line that crosses each chore out. */
@@ -232,7 +265,7 @@
   border-radius: 9999px;
   background: var(--bf-surface);
   transform-origin: left;
-  animation: strike 12s ease-in-out infinite;
+  animation: strike 10s ease-in-out infinite;
 }
 
 @keyframes strike {
@@ -246,6 +279,7 @@
   }
 }
 
+/* Chaos: a new spot about every half second, overshooting a little (bouncy timing). */
 @keyframes chip {
   0% {
     opacity: 0;
@@ -253,31 +287,59 @@
         calc(var(--x1) * var(--sx, 1)),
         calc(var(--y1) * var(--sy, 1) + var(--ry, 0cqh))
       )
-      scale(0.8);
+      scale(0.4);
   }
-  5% {
+  4% {
     opacity: 1;
     transform: translate(
         calc(var(--x1) * var(--sx, 1)),
         calc(var(--y1) * var(--sy, 1) + var(--ry, 0cqh))
       )
-      scale(1);
+      scale(1.08);
   }
-  18% {
+  9% {
     transform: translate(
         calc(var(--x2) * var(--sx, 1)),
         calc(var(--y2) * var(--sy, 1) + var(--ry, 0cqh))
       )
-      rotate(var(--r));
+      rotate(var(--r)) scale(1);
   }
-  30% {
+  14% {
     transform: translate(
         calc(var(--x3) * var(--sx, 1)),
         calc(var(--y3) * var(--sy, 1) + var(--ry, 0cqh))
       )
       rotate(calc(var(--r) * -1));
   }
-  40%,
+  19% {
+    transform: translate(
+        calc(var(--x1) * var(--sx, 1)),
+        calc(var(--y1) * var(--sy, 1) + var(--ry, 0cqh))
+      )
+      rotate(calc(var(--r) * 0.5)) scale(1.05);
+  }
+  24% {
+    transform: translate(
+        calc(var(--x2) * var(--sx, 1)),
+        calc(var(--y2) * var(--sy, 1) + var(--ry, 0cqh))
+      )
+      rotate(calc(var(--r) * -1)) scale(1);
+  }
+  29% {
+    transform: translate(
+        calc(var(--x3) * var(--sx, 1)),
+        calc(var(--y3) * var(--sy, 1) + var(--ry, 0cqh))
+      )
+      rotate(var(--r));
+  }
+  34% {
+    transform: translate(
+        calc(var(--x2) * var(--sx, 1)),
+        calc(var(--y2) * var(--sy, 1) + var(--ry, 0cqh))
+      )
+      rotate(calc(var(--r) * -0.5)) scale(1.05);
+  }
+  39%,
   47% {
     opacity: 1;
     transform: translate(
@@ -289,16 +351,23 @@
   56%,
   100% {
     opacity: 0;
-    transform: translate(0, 0) rotate(160deg) scale(0.1);
+    transform: translate(0, 0) rotate(220deg) scale(0.1);
   }
 }
 
+/* Fast jitter on the inner pill: shaky, restless. */
 @keyframes wobble {
-  from {
-    transform: translate(-4px, 3px);
+  0% {
+    transform: translate(-5px, 3px) rotate(-2deg);
   }
-  to {
-    transform: translate(4px, -3px);
+  33% {
+    transform: translate(4px, -4px) rotate(2.5deg);
+  }
+  66% {
+    transform: translate(-3px, -2px) rotate(-1deg);
+  }
+  100% {
+    transform: translate(5px, 4px) rotate(2deg);
   }
 }
 
@@ -313,7 +382,7 @@
   border-radius: 9999px;
   border: 2px solid var(--bf-primary);
   opacity: 0;
-  animation: burst 12s ease-out infinite;
+  animation: burst 10s ease-out infinite;
 }
 
 @keyframes burst {
@@ -345,7 +414,7 @@
   color: var(--bf-ink);
   box-shadow: 0 30px 60px -24px color-mix(in oklab, var(--bf-primary) 70%, black);
   opacity: 0;
-  animation: result 12s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  animation: result 10s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
 }
 
 @keyframes result {
@@ -379,7 +448,7 @@
   padding: 6px;
   background: var(--bf-surface);
   opacity: 0;
-  animation: row 12s ease-out infinite;
+  animation: row 10s ease-out infinite;
   animation-delay: calc(var(--i) * 0.35s);
 }
 
@@ -442,7 +511,7 @@
   box-shadow: 0 14px 28px -12px var(--bf-success);
   translate: -50% 0;
   opacity: 0;
-  animation: toast 12s cubic-bezier(0.3, 1.4, 0.5, 1) infinite;
+  animation: toast 10s cubic-bezier(0.3, 1.4, 0.5, 1) infinite;
 }
 
 @keyframes toast {
@@ -486,9 +555,11 @@
 
 /* Reduced motion: the finished state only. */
 @media (prefers-reduced-motion: reduce) {
+  .stage::before,
   .stage::after,
   .chip,
   .wobble,
+  .cost,
   .strike,
   .count,
   .num,
@@ -498,10 +569,6 @@
   .row,
   .toast {
     animation: none;
-  }
-
-  .stage::after {
-    opacity: 1;
   }
 
   .chip,
