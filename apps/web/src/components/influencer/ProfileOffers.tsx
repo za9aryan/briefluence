@@ -74,10 +74,23 @@ export function ProfileOffers({
               <OfferMeta offer={o} />
               <div className="mt-auto border-t border-line pt-3">
                 {o.hasPrice && o.priceMinor == null ? (
-                  <Text size="small" weight="bold" tone="muted">
-                    <Icon name="lock" size="xs" className="mr-1 inline" />
-                    {tp('priceLocked')}
-                  </Text>
+                  // Guests: a blurred placeholder (never the real price, they don't get it) under a lock pill.
+                  <span className="flex flex-col gap-1">
+                    <span className="flex items-center gap-2">
+                      <span
+                        aria-hidden
+                        className="select-none text-h2 font-extrabold tabular-nums text-ink blur-[5px]"
+                      >
+                        88 000
+                      </span>
+                      <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-pill bg-ink text-surface shadow-pop">
+                        <Icon name="lock" size="xs" />
+                      </span>
+                    </span>
+                    <Text as="span" size="small" weight="bold" tone="muted">
+                      {tp('priceLocked')}
+                    </Text>
+                  </span>
                 ) : (
                   <OfferPrice
                     offer={{ priceMinor: o.priceMinor, currency: o.currency ?? 'AMD' }}
