@@ -42,6 +42,7 @@ export {
 export { Card, CardHeader, CardFooter, type CardProps } from './components/Card';
 export { Badge, type BadgeProps, type BadgeTone } from './components/Badge';
 export { IconBubble, type IconBubbleTone } from './components/IconBubble';
+export { PlatformLogo, PLATFORM_GLOW, type PlatformKey } from './components/PlatformLogo';
 export { MediaCover, CoverChip } from './components/MediaCover';
 export { Avatar, type AvatarProps } from './components/Avatar';
 export {

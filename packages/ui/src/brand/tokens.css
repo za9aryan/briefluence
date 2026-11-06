@@ -27,6 +27,22 @@
   --bf-chart-2: #2a78d6;
   --bf-chart-3: #1baf7a;
 
+  /* Third-party platform marks, in their own brand colors (same in both themes). Only for
+     PlatformLogo tiles, never as surfaces or text in our UI. */
+  --bf-instagram: linear-gradient(
+    45deg,
+    #feda75 0%,
+    #fa7e1e 25%,
+    #d62976 50%,
+    #962fbf 75%,
+    #4f5bd5 100%
+  );
+  --bf-instagram-glow: #d62976;
+  --bf-tiktok: #010101;
+  --bf-tiktok-cyan: #25f4ee;
+  --bf-tiktok-red: #fe2c55;
+  --bf-youtube: #ff0000;
+
   /* Type */
   --bf-font-display: 'Syne', 'Manrope', system-ui, sans-serif;
   --bf-font-sans: 'Manrope', 'Noto Sans Armenian', system-ui, -apple-system, 'Segoe UI', sans-serif;

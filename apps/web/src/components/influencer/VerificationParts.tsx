@@ -1,7 +1,8 @@
 'use client';
 import { PLATFORMS, type Platform } from '@briefluence/shared';
-import { Avatar, Badge, Icon, LogoMark, cn } from '@briefluence/ui';
+import { Avatar, Badge, Icon, LogoMark, PLATFORM_GLOW, PlatformLogo, cn } from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
+import type { CSSProperties } from 'react';
 import { API_BASE } from '@/lib/api';
 import { useFormat } from '@/lib/hooks/format';
 import { PLATFORM_ICON } from '@/lib/hooks/options';
@@ -78,10 +79,11 @@ export function ConnectTiles({ used }: { used: Platform[] }) {
   const tp = useTranslations('enums.platform');
   return (
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-4">
-      {PLATFORMS.map((pl) =>
+      {PLATFORMS.map((pl) => {
+        const glow = { '--glow': PLATFORM_GLOW[pl] } as CSSProperties;
         // One account per platform: a platform already added shows as done.
-        used.includes(pl) ? (
-          <div key={pl} className={cn(css.tile, css.done, 'rounded-card p-4')}>
+        return used.includes(pl) ? (
+          <div key={pl} style={glow} className={cn(css.tile, css.done, 'rounded-card p-4')}>
             <TileBody
               platform={pl}
               title={t('platformAdded', { platform: tp(pl) })}
@@ -92,6 +94,7 @@ export function ConnectTiles({ used }: { used: Platform[] }) {
         ) : (
           <a
             key={pl}
+            style={glow}
             href={`${API_BASE}/social/${pl.toLowerCase()}/connect`}
             className={cn(css.tile, css.open, 'rounded-card p-4')}
           >
@@ -101,8 +104,8 @@ export function ConnectTiles({ used }: { used: Platform[] }) {
               sub={t('hero.official')}
             />
           </a>
-        ),
-      )}
+        );
+      })}
     </div>
   );
 }
@@ -119,25 +122,33 @@ function TileBody({
   done?: boolean;
 }) {
   return (
-    <div className="flex items-center gap-4 sm:flex-col sm:items-start">
-      <span className={cn(css.platform, 'relative')}>
-        <Icon name={PLATFORM_ICON[platform]} size="md" />
-        {done && (
-          <span className={css.check}>
-            <Icon name="check" size="xs" />
+    <>
+      {/* Big faint mark in the corner, in the platform's color. */}
+      <Icon aria-hidden name={PLATFORM_ICON[platform]} className={css.watermark} />
+      <div className="relative flex items-center gap-4 sm:flex-col sm:items-start">
+        <span className={cn(css.logo, 'relative')}>
+          <PlatformLogo platform={platform} />
+          {done && (
+            <span className={css.check}>
+              <Icon name="check" size="xs" />
+            </span>
+          )}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="font-bold text-ink">{title}</p>
+          <p className="text-small text-ink-muted">{sub}</p>
+        </div>
+        {!done && (
+          <span className={cn(css.go, 'sm:absolute sm:right-0 sm:top-0')}>
+            <Icon name="arrow-right" size="xs" />
           </span>
         )}
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="font-bold text-ink">{title}</p>
-        <p className="text-small text-ink-muted">{sub}</p>
       </div>
-      {!done && <Icon name="arrow-right" className={cn(css.arrow, 'shrink-0 sm:hidden')} />}
-    </div>
+    </>
   );
 }
 
-/** Decorative: briefluence in the middle, the three platforms around it on dashed links. */
+/** Decorative: the three platforms on curved links flowing into briefluence. */
 export function ConnectOrbit({ used }: { used: Platform[] }) {
   const t = useTranslations('verification');
   const pos: Record<Platform, string> = {
@@ -163,7 +174,7 @@ export function ConnectOrbit({ used }: { used: Platform[] }) {
       </span>
       {PLATFORMS.map((pl) => (
         <span key={pl} className={cn(css.node, pos[pl], used.includes(pl) && css.nodeOn)}>
-          <Icon name={PLATFORM_ICON[pl]} size="sm" />
+          <PlatformLogo platform={pl} size="sm" />
         </span>
       ))}
     </div>
