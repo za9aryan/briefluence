@@ -255,7 +255,21 @@ function Browse() {
           ))}
         </Grid>
       ) : !feed.data?.items.length ? (
-        <EmptyState icon="search" title={t('emptyFeed')} />
+        <EmptyState
+          icon="search"
+          title={t('emptyFeed')}
+          action={
+            filters.q || countActive(filters) ? (
+              <Button
+                variant="secondary"
+                icon="refresh"
+                onClick={() => setFilters({ ...EMPTY, sort: filters.sort })}
+              >
+                {tc('reset')}
+              </Button>
+            ) : undefined
+          }
+        />
       ) : (
         <>
           <Grid className="bf-stagger" cols={{ base: 1, md: 2, xl: 3 }} gap={4}>

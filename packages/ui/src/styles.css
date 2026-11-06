@@ -209,3 +209,143 @@
 .vyrn-toast.vyrn-toast[data-type='loading'] {
   --vyrn-accent: var(--bf-ink-muted);
 }
+
+/*
+ * Empty and error states (EmptyState / ErrorState): a soft tinted panel with a fading dot grid,
+ * and a small scene — two dashed "ghost" cards fanned out behind a white card that holds the
+ * icon, with two sparkles drifting around. Still with reduced motion.
+ */
+@layer components {
+  .bf-empty {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background:
+      radial-gradient(
+        28rem 14rem at 50% 0%,
+        color-mix(in oklab, var(--bf-primary) 12%, transparent),
+        transparent 70%
+      ),
+      var(--bf-surface-raised);
+  }
+  .bf-empty::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: radial-gradient(
+      color-mix(in oklab, var(--bf-primary) 20%, transparent) 1px,
+      transparent 1.5px
+    );
+    background-size: 18px 18px;
+    mask-image: radial-gradient(ellipse at 50% 30%, black, transparent 65%);
+  }
+  .bf-empty-art {
+    position: relative;
+    width: 7.5rem;
+    height: 6rem;
+  }
+  .bf-empty-ghost,
+  .bf-empty-front {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 4.75rem;
+    height: 5.25rem;
+    border-radius: 14px;
+    translate: -50% -50%;
+  }
+  .bf-empty-ghost {
+    border: 1.5px dashed color-mix(in oklab, var(--bf-primary) 35%, transparent);
+    background: color-mix(in oklab, var(--bf-surface-raised) 70%, transparent);
+  }
+  .bf-empty-ghost:nth-child(1) {
+    rotate: -14deg;
+    translate: -95% -50%;
+  }
+  .bf-empty-ghost:nth-child(2) {
+    rotate: 12deg;
+    translate: -5% -46%;
+  }
+  .bf-empty-front {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid var(--bf-line);
+    background: var(--bf-surface-raised);
+    box-shadow: 0 18px 36px -20px color-mix(in oklab, var(--bf-primary) 70%, transparent);
+    animation: bf-empty-float 5s ease-in-out infinite;
+  }
+  /* Skeleton lines under the icon: "nothing filled in yet". */
+  .bf-empty-front::after {
+    content: '';
+    width: 2.25rem;
+    height: 5px;
+    border-radius: 9999px;
+    background: var(--bf-line);
+    box-shadow: 0 9px 0 -1px var(--bf-line);
+    margin-bottom: 6px;
+  }
+  .bf-empty-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 12px;
+    background: linear-gradient(
+      135deg,
+      var(--bf-primary),
+      color-mix(in oklab, var(--bf-primary) 60%, var(--bf-ink))
+    );
+    color: var(--bf-on-primary);
+  }
+  .bf-empty-error .bf-empty-badge {
+    background: var(--bf-ink);
+    color: var(--bf-surface);
+  }
+  .bf-empty-spark {
+    position: absolute;
+    color: var(--bf-primary);
+    animation: bf-empty-twinkle 3s ease-in-out infinite;
+  }
+  .bf-empty-spark:nth-of-type(1) {
+    top: 0;
+    right: 0.25rem;
+  }
+  .bf-empty-spark:nth-of-type(2) {
+    bottom: 0.25rem;
+    left: 0;
+    scale: 0.7;
+    animation-delay: -1.5s;
+  }
+  /* Compact version inside cards and menus. */
+  .bf-empty-sm .bf-empty-art {
+    scale: 0.7;
+    margin: -1rem 0 -0.75rem;
+  }
+  @keyframes bf-empty-float {
+    50% {
+      translate: -50% -56%;
+    }
+  }
+  @keyframes bf-empty-twinkle {
+    0%,
+    100% {
+      opacity: 0.3;
+      rotate: 0deg;
+    }
+    50% {
+      opacity: 1;
+      rotate: 20deg;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bf-empty-front,
+    .bf-empty-spark {
+      animation: none;
+    }
+  }
+}

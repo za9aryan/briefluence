@@ -4,17 +4,7 @@ import type {
   SubscriptionStatus,
   VerificationStatus,
 } from '@briefluence/shared';
-import {
-  Card,
-  CardHeader,
-  EmptyState,
-  Grid,
-  Inline,
-  Skeleton,
-  Stack,
-  Stat,
-  Text,
-} from '@briefluence/ui';
+import { Card, CardHeader, EmptyState, Grid, Inline, Skeleton, Stack, Stat } from '@briefluence/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -147,7 +137,7 @@ export default function InfluencerDashboardPage() {
             ))}
           </ul>
         ) : (
-          <Text tone="muted">{t('noApplications')}</Text>
+          <EmptyState size="sm" icon="send" title={t('noApplications')} />
         )}
       </Card>
     </Stack>

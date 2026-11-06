@@ -27,7 +27,14 @@ export function Alert({
 }) {
   const a = ALERT[tone];
   return (
-    <div role={tone === 'danger' ? 'alert' : 'status'} className={cn('flex flex-col gap-2 rounded-card border p-4 sm:flex-row sm:items-center', a.box, className)}>
+    <div
+      role={tone === 'danger' ? 'alert' : 'status'}
+      className={cn(
+        'flex flex-col gap-2 rounded-card border p-4 sm:flex-row sm:items-center',
+        a.box,
+        className,
+      )}
+    >
       <div className="flex min-w-0 flex-1 gap-3">
         <Icon name={a.icon} size="md" className="mt-px" />
         <div className="min-w-0 text-small">
@@ -40,33 +47,64 @@ export function Alert({
   );
 }
 
+/**
+ * "Nothing here yet" (and, with `tone="error"`, "couldn't load"): a small scene — dashed ghost cards
+ * fanned out behind a card that holds the icon — over a soft tinted panel, then the title, a line
+ * of explanation and one action.
+ */
 export function EmptyState({
   icon = 'inbox',
   title,
   description,
   action,
+  tone = 'default',
+  size = 'md',
   className,
 }: {
   icon?: IconName;
   title: ReactNode;
   description?: ReactNode;
   action?: ReactNode;
+  tone?: 'default' | 'error';
+  /** sm: inside a card or menu — smaller scene, no frame. */
+  size?: 'sm' | 'md';
   className?: string;
 }) {
   return (
-    <div className={cn('flex flex-col items-center rounded-card border border-dashed border-line bg-surface-raised px-6 py-12 text-center', className)}>
-      <span className="mb-4 inline-flex size-12 items-center justify-center rounded-pill bg-primary-soft">
-        <Icon name={icon} size="lg" tone="accent" />
-      </span>
-      <Heading level={3} size="body">
+    <div
+      className={cn(
+        'bf-empty flex flex-col items-center text-center',
+        size === 'md'
+          ? 'rounded-card border border-line px-6 py-10 sm:py-12'
+          : 'bf-empty-sm rounded-sm px-4 py-6',
+        tone === 'error' && 'bf-empty-error',
+        className,
+      )}
+    >
+      <div aria-hidden className="bf-empty-art mb-6">
+        <span className="bf-empty-ghost" />
+        <span className="bf-empty-ghost" />
+        <span className="bf-empty-front">
+          <span className="bf-empty-badge">
+            <Icon name={icon} size="md" />
+          </span>
+        </span>
+        {tone === 'default' && (
+          <>
+            <Icon name="sparkles" size="sm" tone="accent" className="bf-empty-spark" />
+            <Icon name="sparkles" size="sm" tone="accent" className="bf-empty-spark" />
+          </>
+        )}
+      </div>
+      <Heading level={3} size={size === 'md' ? 'h2' : 'body'} className="max-w-md">
         {title}
       </Heading>
       {description && (
-        <Text tone="muted" className="mt-1 max-w-md">
+        <Text tone="muted" className="mt-2 max-w-md">
           {description}
         </Text>
       )}
-      {action && <div className="mt-5">{action}</div>}
+      {action && <div className="mt-6">{action}</div>}
     </div>
   );
 }
@@ -77,7 +115,10 @@ export function Skeleton({ className }: { className?: string }) {
 
 export function Spinner({ label, className }: { label: string; className?: string }) {
   return (
-    <div role="status" className={cn('flex items-center justify-center gap-2 py-10 text-ink-muted', className)}>
+    <div
+      role="status"
+      className={cn('flex items-center justify-center gap-2 py-10 text-ink-muted', className)}
+    >
       <Icon name="spinner" size="md" spin />
       <span className="sr-only">{label}</span>
     </div>
@@ -85,6 +126,16 @@ export function Spinner({ label, className }: { label: string; className?: strin
 }
 
 /** Error block with retry, for failed queries. */
-export function ErrorState({ title, description, retry }: { title: ReactNode; description?: ReactNode; retry?: ReactNode }) {
-  return <EmptyState icon="alert" title={title} description={description} action={retry} />;
+export function ErrorState({
+  title,
+  description,
+  retry,
+}: {
+  title: ReactNode;
+  description?: ReactNode;
+  retry?: ReactNode;
+}) {
+  return (
+    <EmptyState tone="error" icon="alert" title={title} description={description} action={retry} />
+  );
 }

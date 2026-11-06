@@ -1,5 +1,5 @@
 'use client';
-import { Icon, Menu, Text, cn } from '@briefluence/ui';
+import { EmptyState, Icon, Menu, Text, cn } from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
@@ -153,7 +153,9 @@ export function NotificationBell() {
                     </li>
                   ))
                 ) : (
-                  <li className="px-4 py-8 text-center text-small text-ink-muted">{t('empty')}</li>
+                  <li>
+                    <EmptyState size="sm" icon="bell" title={t('empty')} />
+                  </li>
                 )}
               </ul>
               <Link

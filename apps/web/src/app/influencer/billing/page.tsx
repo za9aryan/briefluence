@@ -1,6 +1,7 @@
 'use client';
 import type { PlanCode } from '@briefluence/shared';
 import {
+  EmptyState,
   Alert,
   Badge,
   Button,
@@ -343,7 +344,7 @@ export default function BillingPage() {
             </TBody>
           </Table>
         ) : (
-          <Text tone="muted">{t('noPayments')}</Text>
+          <EmptyState size="sm" icon="wallet" title={t('noPayments')} />
         )}
       </Card>
 

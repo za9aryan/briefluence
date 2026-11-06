@@ -1,6 +1,7 @@
 'use client';
 import { PLATFORMS, type Platform, type ErrorCode } from '@briefluence/shared';
 import {
+  EmptyState,
   Alert,
   Button,
   Card,
@@ -173,7 +174,7 @@ export default function VerificationPage() {
         {profile.isLoading ? (
           <Skeleton className="h-32" />
         ) : accounts.length === 0 ? (
-          <Text tone="muted">{t('noAccounts')}</Text>
+          <EmptyState size="sm" icon="users" title={t('noAccounts')} />
         ) : (
           <Stack gap={6}>
             {accounts.map((a) => (
