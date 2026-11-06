@@ -5,15 +5,12 @@ import {
   Button,
   Card,
   CardHeader,
-  Grid,
-  Icon,
   Inline,
   Modal,
   Skeleton,
   Stack,
   Stepper,
   Text,
-  buttonStyles,
   useToast,
 } from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -23,11 +20,15 @@ import { Suspense, useEffect, useRef, useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
 import { AccountLine, AccountStats } from '@/components/domain/AccountStats';
 import { ManualAccountModal } from '@/components/influencer/ManualAccountModal';
+import {
+  ConnectOrbit,
+  ConnectTiles,
+  VerifiedPanel,
+} from '@/components/influencer/VerificationParts';
 import { VerificationBadge } from '@/components/domain/badges';
-import { API_BASE, ApiError, api } from '@/lib/api';
+import { ApiError, api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { useFormat } from '@/lib/hooks/format';
-import { PLATFORM_ICON } from '@/lib/hooks/options';
 import { ME_KEY } from '@/lib/hooks/session';
 import type { InfluencerProfileDto, SocialAccountDto } from '@/lib/types';
 
@@ -58,7 +59,6 @@ function OAuthResult() {
 export default function VerificationPage() {
   const t = useTranslations('verification');
   const tc = useTranslations('common');
-  const tp = useTranslations('enums.platform');
   const toast = useToast();
   const errorMessage = useErrorMessage();
   const f = useFormat();
@@ -133,45 +133,22 @@ export default function VerificationPage() {
           {t('pendingBody')}
         </Alert>
       )}
-      {status === 'APPROVED' && (
-        <Alert tone="success" title={t('approvedTitle')}>
-          {t('approvedBody')}
-        </Alert>
-      )}
+      {status === 'APPROVED' && p && <VerifiedPanel profile={p} />}
 
       <Card>
-        <CardHeader title={t('connectTitle')} description={t('connectLead')} />
+        <CardHeader
+          title={t('connectTitle')}
+          description={t('connectLead')}
+          actions={
+            <div className="hidden sm:block">
+              <ConnectOrbit used={usedPlatforms} />
+            </div>
+          }
+        />
         <Alert tone="info" className="mb-4">
           {t('publicNote')}
         </Alert>
-        <Grid cols={{ base: 1, sm: 3 }} gap={2}>
-          {PLATFORMS.map((pl) =>
-            // One account per platform: a platform already added shows as done.
-            usedPlatforms.includes(pl) ? (
-              <span
-                key={pl}
-                aria-disabled
-                className={buttonStyles({
-                  variant: 'secondary',
-                  block: true,
-                  className: 'pointer-events-none opacity-50',
-                })}
-              >
-                <Icon name="check" />
-                {t('platformAdded', { platform: tp(pl) })}
-              </span>
-            ) : (
-              <a
-                key={pl}
-                href={`${API_BASE}/social/${pl.toLowerCase()}/connect`}
-                className={buttonStyles({ variant: 'secondary', block: true })}
-              >
-                <Icon name={PLATFORM_ICON[pl]} />
-                {t('connect', { platform: tp(pl) })}
-              </a>
-            ),
-          )}
-        </Grid>
+        <ConnectTiles used={usedPlatforms} />
         <Text size="small" tone="muted" className="mt-4">
           {t('instagramNote')}
         </Text>

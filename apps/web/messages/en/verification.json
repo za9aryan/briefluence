@@ -76,5 +76,12 @@
   "audience": "Audience",
   "women": "Women",
   "men": "Men",
-  "noDemographics": "This platform does not share audience demographics."
+  "noDemographics": "This platform does not share audience demographics.",
+  "hero": {
+    "seen": "How companies see you",
+    "fresh": "Up to date",
+    "official": "Official login, read-only",
+    "connected": "Connected",
+    "linkLabel": "Linked to briefluence"
+  }
 }

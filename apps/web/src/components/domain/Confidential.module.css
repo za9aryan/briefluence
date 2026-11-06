@@ -1,0 +1,166 @@
+/*
+ * Confidential company: a "redacted" look. Ink tiles with fine diagonal stripes, a frosted lock
+ * seal, blacked-out lines and a stamp. Tokens only; reduced motion keeps it still.
+ */
+.tile {
+  background:
+    repeating-linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--bf-surface) 9%, transparent) 0 2px,
+      transparent 2px 7px
+    ),
+    linear-gradient(
+      135deg,
+      var(--bf-ink),
+      color-mix(in oklab, var(--bf-primary) 45%, var(--bf-ink))
+    );
+  color: var(--bf-surface);
+}
+
+/* Cover of a confidential brief without its own image. */
+.cover {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background:
+    radial-gradient(
+      60% 80% at 80% 0%,
+      color-mix(in oklab, var(--bf-primary) 55%, transparent),
+      transparent 70%
+    ),
+    repeating-linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--bf-surface) 6%, transparent) 0 2px,
+      transparent 2px 9px
+    ),
+    var(--bf-ink);
+  color: var(--bf-surface);
+}
+
+/* Blacked-out lines along the bottom, like a redacted document. */
+.lines {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  opacity: 0.5;
+}
+
+.lines span {
+  display: block;
+  height: 6px;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--bf-surface) 30%, transparent);
+}
+
+/* Frosted round seal with a lock and a slow halo. */
+.seal {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--bf-surface) 14%, transparent);
+  border: 1px solid color-mix(in oklab, var(--bf-surface) 28%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 12px 30px -12px color-mix(in oklab, var(--bf-primary) 80%, transparent);
+}
+
+.seal::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  border: 1px dashed color-mix(in oklab, var(--bf-surface) 30%, transparent);
+  animation: spin 18s linear infinite;
+}
+
+.sealSmall {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.sealSmall::after {
+  inset: -5px;
+}
+
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.hint {
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  background: color-mix(in oklab, var(--bf-surface) 12%, transparent);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+/* Dossier on the brief page: dashed frame, redacted name, a stamp and the reveal steps. */
+.dossier {
+  position: relative;
+  overflow: hidden;
+  border: 1px dashed color-mix(in oklab, var(--bf-ink) 25%, transparent);
+  background:
+    repeating-linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--bf-ink) 3%, transparent) 0 2px,
+      transparent 2px 9px
+    ),
+    var(--bf-surface);
+}
+
+.redacted {
+  display: block;
+  height: 0.75rem;
+  border-radius: 4px;
+  background: var(--bf-ink);
+}
+
+.stamp {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  rotate: -8deg;
+  border: 2px solid var(--bf-primary-text);
+  border-radius: 6px;
+  padding: 0.125rem 0.5rem;
+  color: var(--bf-primary-text);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.step {
+  position: relative;
+}
+
+/* Dotted line down from each step icon to the next one. */
+.step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 2rem;
+  left: calc(1rem - 1px);
+  height: 0.5rem;
+  border-left: 2px dotted color-mix(in oklab, var(--bf-primary) 45%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seal::after {
+    animation: none;
+  }
+}

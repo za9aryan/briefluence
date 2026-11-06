@@ -3,7 +3,7 @@ import { Icon, Inline, MediaCover, Text } from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { ApplicationStatusBadge } from '@/components/domain/badges';
-import { isHiddenBrand, useBrandName } from '@/components/domain/BrandIdentity';
+import { ConfidentialCover, isHiddenBrand, useBrandName } from '@/components/domain/BrandIdentity';
 import { Compensation } from '@/components/domain/Compensation';
 import { dealCover } from '@/components/domain/DealCard';
 import { useFormat } from '@/lib/hooks/format';
@@ -29,10 +29,14 @@ export function ApplicationMiniCard({ app }: { app: MyApplicationDto }) {
         alt=""
         className="aspect-square size-20 shrink-0 rounded-[12px] sm:size-24"
         fallback={
-          <Icon
-            name={isHiddenBrand(d.brand) ? 'lock' : PLATFORM_ICON[d.platforms[0] ?? 'INSTAGRAM']}
-            className="size-8 text-primary/30"
-          />
+          isHiddenBrand(d.brand) ? (
+            <ConfidentialCover compact />
+          ) : (
+            <Icon
+              name={PLATFORM_ICON[d.platforms[0] ?? 'INSTAGRAM']}
+              className="size-8 text-primary/30"
+            />
+          )
         }
       />
       <div className="flex min-w-0 flex-1 flex-col gap-1">

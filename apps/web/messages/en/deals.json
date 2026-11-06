@@ -5,7 +5,14 @@
   "applicants": "{count, plural, =0 {no applicants yet} one {# applicant} other {# applicants}}",
   "confidential": {
     "name": "Confidential company",
-    "note": "The company keeps its name private for business reasons. You'll see who it is once they accept you."
+    "note": "The company keeps its name private for business reasons. You'll see who it is once they accept you.",
+    "stamp": "Confidential",
+    "reveal": "Revealed once you’re accepted",
+    "steps": {
+      "apply": "You apply",
+      "accepted": "The company accepts you",
+      "open": "Name and contacts open"
+    }
   },
   "views": "{count, plural, one {# view} other {# views}}",
   "viewsHint": "How many influencers opened this brief",

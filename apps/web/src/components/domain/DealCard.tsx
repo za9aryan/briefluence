@@ -16,7 +16,7 @@ import Link from 'next/link';
 import { useFormat } from '@/lib/hooks/format';
 import { PLATFORM_ICON } from '@/lib/hooks/options';
 import type { FeedDealDto } from '@/lib/types';
-import { BrandAvatar, isHiddenBrand, useBrandName } from './BrandIdentity';
+import { BrandAvatar, ConfidentialCover, isHiddenBrand, useBrandName } from './BrandIdentity';
 import { ApplicationStatusBadge, CollaborationBadge } from './badges';
 import { Compensation } from './Compensation';
 
@@ -39,6 +39,14 @@ export function DealCard({ deal }: { deal: FeedDealDto }) {
             ))}
             <span className="truncate">{deal.contentFormats.map((x) => tf(x)).join(', ')}</span>
           </CoverChip>
+        }
+        topRight={
+          isHiddenBrand(deal.brand) && deal.imageUrl ? (
+            <CoverChip>
+              <Icon name="lock" size="xs" />
+              <span className="truncate">{t('confidential.stamp')}</span>
+            </CoverChip>
+          ) : undefined
         }
       />
       <div className="flex flex-1 flex-col gap-4 p-4">
@@ -118,10 +126,8 @@ export function DealCoverFallback({
   brand: FeedDealDto['brand'];
   platforms: FeedDealDto['platforms'];
 }) {
+  if (isHiddenBrand(brand)) return <ConfidentialCover />;
   return (
-    <Icon
-      name={isHiddenBrand(brand) ? 'lock' : PLATFORM_ICON[platforms[0] ?? 'INSTAGRAM']}
-      className="size-16 text-primary/25"
-    />
+    <Icon name={PLATFORM_ICON[platforms[0] ?? 'INSTAGRAM']} className="size-16 text-primary/25" />
   );
 }
