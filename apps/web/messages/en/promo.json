@@ -8,6 +8,21 @@
       "brand": "Nordic Roast"
     }
   },
+  "funnel": {
+    "time": "Time on chores",
+    "hours": "{count} h",
+    "now": "now 5 min",
+    "brand": {
+      "title": "Your brief",
+      "sub": "Influencers who fit",
+      "toast": "Contacts open"
+    },
+    "influencer": {
+      "title": "Briefs for you",
+      "sub": "Matched to your audience",
+      "toast": "You’re accepted"
+    }
+  },
   "insights": {
     "eyebrow": "Search insights",
     "title": "See what influencers are looking for",
