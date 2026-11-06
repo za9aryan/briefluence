@@ -13,16 +13,6 @@ export default {
       time: ['Time on chores', 'Время на рутину', 'Ժամանակ առօրյա գործերի վրա'],
       hours: ['{count} h', '{count} ч', '{count} ժ'],
       now: ['now 5 min', 'теперь 5 мин', 'հիմա 5 րոպե'],
-      brand: {
-        title: ['Your brief', 'Твой бриф', 'Քո բրիֆը'],
-        sub: ['Influencers who fit', 'Подходящие инфлюенсеры', 'Համապատասխան ինֆլյուենսերներ'],
-        toast: ['Contacts open', 'Контакты открыты', 'Կոնտակտները բաց են'],
-      },
-      influencer: {
-        title: ['Briefs for you', 'Брифы для тебя', 'Բրիֆներ քեզ համար'],
-        sub: ['Matched to your audience', 'Под твою аудиторию', 'Քո լսարանին համապատասխան'],
-        toast: ['You’re accepted', 'Тебя выбрали', 'Քեզ ընտրեցին'],
-      },
     },
     insights: {
       eyebrow: ['Search insights', 'Аналитика поиска', 'Որոնումների վերլուծություն'],
