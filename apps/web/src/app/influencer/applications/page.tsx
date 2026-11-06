@@ -1,10 +1,5 @@
 'use client';
-import {
-  canWithdraw,
-  contactDisplay,
-  contactHref,
-  type ApplicationStatus,
-} from '@briefluence/shared';
+import { canWithdraw, type ApplicationStatus } from '@briefluence/shared';
 import {
   Alert,
   Button,
@@ -19,6 +14,7 @@ import {
   ResponsiveTabs,
   Text,
   buttonStyles,
+  cn,
   useToast,
 } from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -26,11 +22,11 @@ import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
-import { CONTACT_ICON } from '@/components/brand/ContactMethodFields';
 import { BrandAvatar, useBrandName } from '@/components/domain/BrandIdentity';
 import { DealCoverFallback, dealCover } from '@/components/domain/DealCard';
 import { ApplicationStatusBadge } from '@/components/domain/badges';
 import { Compensation } from '@/components/domain/Compensation';
+import { CollabPanel } from '@/components/influencer/CollabPanel';
 import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { useFormat } from '@/lib/hooks/format';
@@ -48,7 +44,6 @@ const GROUPS: Record<'active' | 'shortlisted' | 'accepted' | 'closed', Applicati
 export default function MyApplicationsPage() {
   const t = useTranslations('applications');
   const tr = useTranslations('enums.rejectionReason');
-  const tm = useTranslations('enums.contactMethod');
   const tf = useTranslations('enums.contentFormat');
   const f = useFormat();
   const brandName = useBrandName();
@@ -104,7 +99,16 @@ export default function MyApplicationsPage() {
       ) : (
         <Stack className="bf-stagger" gap={4}>
           {list.map((a) => (
-            <Card key={a.id} p={0} className="flex flex-col overflow-hidden sm:flex-row">
+            <Card
+              key={a.id}
+              p={0}
+              className={cn(
+                'flex flex-col overflow-hidden sm:flex-row',
+                // Accepted and done: green frame, so the good news stands out in the list.
+                GROUPS.accepted.includes(a.status) &&
+                  'border-2 border-success shadow-[0_16px_40px_-24px_var(--bf-success)]',
+              )}
+            >
               {/* Brief image on the left (on top on phones), status on it. */}
               <MediaCover
                 src={dealCover(a.deal)}
@@ -155,40 +159,12 @@ export default function MyApplicationsPage() {
                   </Alert>
                 )}
                 {a.brandContact && (
-                  <Alert
-                    tone="success"
-                    title={a.status === 'COMPLETED' ? t('doneTitle') : t('collabTitle')}
-                  >
-                    <Stack gap={1}>
-                      <span className="mb-1">
-                        {a.status === 'COMPLETED' ? t('doneBody') : t('collabBody')}
-                      </span>
-                      {(a.brandContact.name || a.brandContact.position) && (
-                        <span>
-                          {[a.brandContact.name, a.brandContact.position]
-                            .filter(Boolean)
-                            .join(' · ')}
-                        </span>
-                      )}
-                      {a.brandContact.method && a.brandContact.value && (
-                        <a
-                          href={
-                            contactHref(a.brandContact.method, a.brandContact.value) ?? undefined
-                          }
-                          target={a.brandContact.method === 'PHONE' ? undefined : '_blank'}
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 font-bold underline"
-                        >
-                          <Icon name={CONTACT_ICON[a.brandContact.method]} />
-                          {tm(a.brandContact.method)}:{' '}
-                          {contactDisplay(a.brandContact.method, a.brandContact.value)}
-                        </a>
-                      )}
-                      {a.deal.publishBy && (
-                        <span>{t('publishBy', { date: f.date(a.deal.publishBy) })}</span>
-                      )}
-                    </Stack>
-                  </Alert>
+                  <CollabPanel
+                    done={a.status === 'COMPLETED'}
+                    contact={a.brandContact}
+                    brandName={brandName(a.deal.brand)}
+                    publishBy={a.deal.publishBy}
+                  />
                 )}
                 {a.status === 'COMPLETED' && a.postUrl && (
                   <a

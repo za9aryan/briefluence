@@ -1,0 +1,160 @@
+/*
+ * "Have a great collab!" panel. Success tint with a soft glow, a seal that pops in with one ring
+ * pulse, a little confetti, and the contact as a ticket-like pass. Tokens only; reduced motion
+ * keeps everything still.
+ */
+.panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--bf-success) 30%, transparent);
+  background:
+    radial-gradient(
+      24rem 12rem at 0% 0%,
+      color-mix(in oklab, var(--bf-success) 18%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      20rem 10rem at 100% 100%,
+      color-mix(in oklab, var(--bf-primary) 8%, transparent),
+      transparent 70%
+    ),
+    color-mix(in oklab, var(--bf-success) 7%, var(--bf-surface-raised));
+}
+
+.confetti {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.piece {
+  position: absolute;
+  opacity: 0.85;
+  animation: drop 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+}
+
+.bar {
+  width: 14px;
+  height: 4px;
+  border-radius: 9999px;
+}
+
+@keyframes drop {
+  from {
+    opacity: 0;
+    translate: 0 -14px;
+  }
+}
+
+/* Round seal with a ring that pulses once. */
+.seal {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  background: var(--bf-success);
+  color: var(--bf-on-primary);
+  box-shadow: 0 10px 24px -10px var(--bf-success);
+  animation: seal 0.6s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
+.seal::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 2px solid color-mix(in oklab, var(--bf-success) 45%, transparent);
+  animation: ring 1.4s ease-out 0.3s both;
+}
+
+@keyframes seal {
+  from {
+    scale: 0.4;
+    opacity: 0;
+  }
+}
+
+@keyframes ring {
+  from {
+    scale: 0.8;
+    opacity: 1;
+  }
+  to {
+    scale: 1.35;
+    opacity: 0;
+  }
+}
+
+/* Pass with a tear-off stub: dashed line and two notches. */
+.pass {
+  box-shadow: 0 12px 32px -20px color-mix(in oklab, var(--bf-success) 70%, transparent);
+  border: 1px solid color-mix(in oklab, var(--bf-success) 20%, transparent);
+}
+
+.stub {
+  position: relative;
+  border-top: 1px dashed color-mix(in oklab, var(--bf-success) 35%, transparent);
+}
+
+.stub::before,
+.stub::after {
+  content: '';
+  position: absolute;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--bf-success) 7%, var(--bf-surface-raised));
+  border: 1px solid color-mix(in oklab, var(--bf-success) 20%, transparent);
+}
+
+.stub::before {
+  left: -8px;
+  clip-path: inset(0 0 0 50%);
+}
+
+.stub::after {
+  right: -8px;
+  clip-path: inset(0 50% 0 0);
+}
+
+.cta {
+  background: var(--bf-success);
+  color: var(--bf-on-primary);
+  transition:
+    filter 0.2s ease,
+    translate 0.2s ease;
+}
+
+.cta:hover {
+  filter: brightness(1.08);
+}
+
+.cta:focus-visible {
+  outline: 2px solid var(--bf-success);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .piece,
+  .seal,
+  .seal::after {
+    animation: none;
+  }
+
+  .seal::after {
+    opacity: 0;
+  }
+}
