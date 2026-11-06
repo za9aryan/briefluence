@@ -9,6 +9,7 @@ import {
   LogoMark,
   PlatformLogo,
   ScoreMeter,
+  Text,
   cn,
   type IconName,
 } from '@briefluence/ui';
@@ -16,23 +17,30 @@ import { useTranslations } from 'next-intl';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import css from './FeatureTour.module.css';
 
-type Key = 'feed' | 'verified' | 'track' | 'direct';
-const ART: Record<Key, () => ReactNode> = {
-  feed: FeedArt,
-  verified: VerifiedArt,
-  track: TrackArt,
-  direct: DirectArt,
-};
+export type TourItem = { key: string; icon: IconName; title: string; body: string; art: ReactNode };
 
 /**
- * /for-influencers: the four features as a tour. A numbered list on one side (the active item
- * opens, with a progress bar that moves the tour on every few seconds), and an illustration of the
- * active feature on the other. Pauses on hover/focus and off screen; with reduced motion it never
- * moves on by itself. Texts: `landing.influencers.features.<key>`; sample data in `promo`.
+ * A numbered list on one side (the active item opens, with a progress bar that moves the tour on
+ * every few seconds) and an illustration of the active item on the other. Pauses on hover/focus
+ * and off screen; with reduced motion it never moves on by itself. Used for the /for-influencers
+ * features and the home page's "How it works".
  */
-export function FeatureTour({ items }: { items: [Key, IconName][] }) {
-  const t = useTranslations('landing.influencers.features');
-  const tp = useTranslations('promo.features');
+export function Tour({
+  id,
+  eyebrow,
+  title,
+  lead,
+  items,
+  raised = true,
+}: {
+  /** Unique per page (tab ids). */
+  id: string;
+  eyebrow: string;
+  title: string;
+  lead?: string;
+  items: TourItem[];
+  raised?: boolean;
+}) {
   const [active, setActive] = useState(0);
   const [hold, setHold] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -48,18 +56,22 @@ export function FeatureTour({ items }: { items: [Key, IconName][] }) {
     return () => io.disconnect();
   }, []);
 
-  const key = items[active]![0];
-  const Art = ART[key];
+  const current = items[active]!;
   const running = visible && !hold;
 
   return (
-    <section className="bg-surface-raised">
+    <section className={raised ? 'bg-surface-raised' : undefined}>
       <Container py={{ base: 8, md: 12, lg: 16 }}>
         <div className="mb-8 max-w-2xl md:mb-12">
-          <Eyebrow>{tp('eyebrow')}</Eyebrow>
+          <Eyebrow>{eyebrow}</Eyebrow>
           <Heading level={2} className="mt-2">
-            {tp('title')}
+            {title}
           </Heading>
+          {lead && (
+            <Text tone="muted" className="mt-2">
+              {lead}
+            </Text>
+          )}
         </div>
         <div
           ref={ref}
@@ -74,31 +86,31 @@ export function FeatureTour({ items }: { items: [Key, IconName][] }) {
             aria-orientation="vertical"
             className="order-2 flex flex-col gap-2 lg:order-1"
           >
-            {items.map(([k, icon], i) => {
+            {items.map((it, i) => {
               const on = i === active;
               return (
                 <button
-                  key={k}
+                  key={it.key}
                   type="button"
                   role="tab"
-                  id={`tour-tab-${k}`}
+                  id={`${id}-tab-${it.key}`}
                   aria-selected={on}
-                  aria-controls="tour-panel"
+                  aria-controls={`${id}-panel`}
                   onClick={() => setActive(i)}
                   className={cn(css.item, on && css.on, 'rounded-card p-4 text-left')}
                 >
                   <span className="flex items-center gap-4">
                     <span className={css.badge}>
-                      <Icon name={icon} size="md" />
+                      <Icon name={it.icon} size="md" />
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className={css.num}>{String(i + 1).padStart(2, '0')}</span>
-                      <span className="block text-h2 font-bold text-ink">{t(`${k}.title`)}</span>
+                      <span className="block text-h2 font-bold text-ink">{it.title}</span>
                     </span>
                   </span>
                   <span className={css.body}>
                     <span className="block overflow-hidden">
-                      <span className="block pt-2 text-ink-muted">{t(`${k}.body`)}</span>
+                      <span className="block pt-2 text-ink-muted">{it.body}</span>
                     </span>
                   </span>
                   {on && (
@@ -117,18 +129,47 @@ export function FeatureTour({ items }: { items: [Key, IconName][] }) {
           </div>
 
           <div
-            id="tour-panel"
+            id={`${id}-panel`}
             role="tabpanel"
-            aria-labelledby={`tour-tab-${key}`}
+            aria-labelledby={`${id}-tab-${current.key}`}
             className={cn(css.stage, 'order-1 rounded-lg lg:order-2')}
           >
-            <div key={key} aria-hidden className={cn(css.scene, 'pointer-events-none select-none')}>
-              <Art />
+            <div
+              key={current.key}
+              aria-hidden
+              className={cn(css.scene, 'pointer-events-none select-none')}
+            >
+              {current.art}
             </div>
           </div>
         </div>
       </Container>
     </section>
+  );
+}
+
+type Key = 'feed' | 'verified' | 'track' | 'direct';
+const ART: Record<Key, () => ReactNode> = {
+  feed: FeedArt,
+  verified: VerifiedArt,
+  track: TrackArt,
+  direct: DirectArt,
+};
+
+/** /for-influencers: the four features. Texts: `landing.influencers.features.<key>`. */
+export function FeatureTour({ items }: { items: [Key, IconName][] }) {
+  const t = useTranslations('landing.influencers.features');
+  const tp = useTranslations('promo.features');
+  return (
+    <Tour
+      id="features"
+      eyebrow={tp('eyebrow')}
+      title={tp('title')}
+      items={items.map(([k, icon]) => {
+        const Art = ART[k];
+        return { key: k, icon, title: t(`${k}.title`), body: t(`${k}.body`), art: <Art /> };
+      })}
+    />
   );
 }
 

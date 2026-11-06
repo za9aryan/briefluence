@@ -22,6 +22,33 @@
     "write": "Write to them",
     "person": "Marta · Marketing"
   },
+  "how": {
+    "post": {
+      "form": "New brief",
+      "title": "Reels about our new coffee bar",
+      "city": "Berlin",
+      "audience": "5K–100K followers",
+      "age": "Audience 18–34",
+      "publish": "Publish",
+      "published": "Published"
+    },
+    "match": {
+      "pitch": "Hi! I film cozy coffee spots in Berlin every week, and my audience loves them.",
+      "pitchLabel": "Your pitch",
+      "apply": "Apply"
+    },
+    "accept": {
+      "accepted": "Accepted",
+      "you": "You",
+      "swap": "You both see each other’s contacts"
+    },
+    "publish": {
+      "m1": "Could you post the Reel on Friday?",
+      "m2": "Deal! Friday at 7 pm.",
+      "m3": "Perfect, we pay right after the post.",
+      "done": "Collab done"
+    }
+  },
   "insights": {
     "eyebrow": "Search insights",
     "title": "See what influencers are looking for",

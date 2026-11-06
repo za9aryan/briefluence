@@ -15,6 +15,7 @@ import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { FeatureItem, Section } from '@/components/common/Section';
 import { BrandInsights } from '@/components/landing/BrandInsights';
+import { HowItWorks } from '@/components/landing/HowItWorks';
 import { ProcessFunnel } from '@/components/landing/ProcessFunnel';
 import { SampleBriefCard } from '@/components/landing/SampleCards';
 import { Showcase } from '@/components/landing/Showcase';
@@ -23,7 +24,6 @@ export default async function LandingPage() {
   const t = await getTranslations('landing');
   const tw = await getTranslations('showcase');
   const tp = await getTranslations('promo');
-  const steps = ['post', 'match', 'accept', 'publish'] as const;
 
   return (
     <>
@@ -112,20 +112,8 @@ export default async function LandingPage() {
         <Showcase />
       </Section>
 
-      {/* How it works */}
-      <Section raised eyebrow={t('how.eyebrow')} title={t('how.title')} lead={t('how.lead')}>
-        <Grid cols={{ base: 1, sm: 2, lg: 4 }} gap={6}>
-          {steps.map((s, i) => (
-            <Stack key={s} gap={2}>
-              <span className="mb-2 inline-flex size-11 items-center justify-center rounded-pill bg-primary text-body font-extrabold text-on-primary">
-                {i + 1}
-              </span>
-              <Heading level={3}>{t(`how.steps.${s}.title`)}</Heading>
-              <Text tone="muted">{t(`how.steps.${s}.body`)}</Text>
-            </Stack>
-          ))}
-        </Grid>
-      </Section>
+      {/* How it works: the four steps as a tour */}
+      <HowItWorks />
 
       {/* What influencers are looking for (sample of the companies' Insights page) */}
       <BrandInsights cta="/signup?role=BRAND" />

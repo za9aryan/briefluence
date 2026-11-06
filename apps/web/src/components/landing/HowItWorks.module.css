@@ -1,0 +1,337 @@
+/*
+ * Scenes of the home page "How it works" tour (the tour itself: FeatureTour.module.css).
+ * Each scene replays when its step becomes active. Tokens only; reduced motion shows the end state.
+ */
+
+/* 1. Brief form */
+.typed {
+  animation: fadeIn 0.4s ease 0.15s both;
+}
+
+.pop {
+  animation: pop 0.45s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    scale: 0.5;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+/* "Publish" button that turns into a green "Published". */
+.publish {
+  position: relative;
+  display: grid;
+  min-height: 44px;
+  border-radius: 9999px;
+  background: var(--bf-primary);
+  color: var(--bf-on-primary);
+  font-weight: 700;
+  overflow: hidden;
+  animation: published 0.4s ease 2.4s both;
+}
+
+.publishIdle,
+.publishDone {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.publishIdle {
+  animation: hideUp 0.3s ease 2.4s both;
+}
+
+.publishDone {
+  animation: showUp 0.35s ease 2.5s both;
+}
+
+@keyframes published {
+  0% {
+    scale: 1;
+  }
+  40% {
+    scale: 0.96;
+  }
+  100% {
+    scale: 1;
+    background: var(--bf-success);
+  }
+}
+
+@keyframes hideUp {
+  to {
+    opacity: 0;
+    translate: 0 -12px;
+  }
+}
+
+@keyframes showUp {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+
+/* 2. Match + pitch */
+.score {
+  display: inline-flex;
+  animation: pop 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) 0.4s both;
+}
+
+.caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: -2px;
+  background: var(--bf-primary);
+  animation: blink 0.9s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.apply {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  border-radius: 9999px;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 700;
+  background: color-mix(in oklab, var(--bf-primary) 35%, var(--bf-surface-raised));
+  color: var(--bf-on-primary);
+  transition:
+    background 0.3s ease,
+    scale 0.3s ease;
+}
+
+.applyReady {
+  background: var(--bf-primary);
+  scale: 1.05;
+  box-shadow: 0 12px 24px -12px var(--bf-primary);
+}
+
+/* 3. Accepted */
+.side {
+  animation: slideIn 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.side:first-child {
+  --from: -24px;
+}
+
+.side:last-child {
+  --from: 24px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    translate: var(--from, 0) 0;
+  }
+}
+
+.link {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: var(--bf-surface-raised);
+  color: var(--bf-ink-muted);
+  border: 1px solid var(--bf-line);
+  animation: linkOn 0.4s ease 1.3s both;
+}
+
+@keyframes linkOn {
+  to {
+    background: var(--bf-success);
+    color: var(--bf-on-primary);
+    border-color: var(--bf-success);
+  }
+}
+
+.contact {
+  position: relative;
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 4px;
+  border-radius: 9999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--bf-surface);
+  color: var(--bf-ink);
+  filter: blur(3px);
+  animation: clear 0.5s ease 1.4s both;
+}
+
+@keyframes clear {
+  to {
+    filter: none;
+    background: color-mix(in oklab, var(--bf-success) 12%, var(--bf-surface-raised));
+    color: var(--bf-success);
+  }
+}
+
+.lockIcon {
+  animation: shrink 0.2s ease 1.4s both;
+}
+
+.tgIcon {
+  width: 0;
+  opacity: 0;
+  animation: grow 0.25s ease 1.45s both;
+}
+
+@keyframes shrink {
+  to {
+    width: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes grow {
+  to {
+    width: 12px;
+    opacity: 1;
+  }
+}
+
+/* Stamp that slams onto the scene. */
+.stamp {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: -50% -50%;
+  rotate: -10deg;
+  border: 3px solid var(--bf-success);
+  border-radius: 10px;
+  padding: 4px 14px;
+  font-size: clamp(14px, 4vw, 20px);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bf-success);
+  background: color-mix(in oklab, var(--bf-surface-raised) 85%, transparent);
+  animation: stamp 0.45s cubic-bezier(0.5, 0, 0.6, 1.6) 0.8s both;
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    scale: 2.4;
+  }
+}
+
+.swap {
+  animation: fadeIn 0.4s ease 1.7s both;
+}
+
+/* 4. Chat */
+.bubble {
+  max-width: 85%;
+  border-radius: 18px;
+  padding: 8px 14px;
+  font-size: 13px;
+  line-height: 1.4;
+  animation: bubble 0.4s cubic-bezier(0.3, 1.3, 0.5, 1) both;
+}
+
+.theirs {
+  align-self: flex-start;
+  border-bottom-left-radius: 6px;
+  background: var(--bf-surface);
+  color: var(--bf-ink);
+  transform-origin: bottom left;
+}
+
+.mine {
+  align-self: flex-end;
+  border-bottom-right-radius: 6px;
+  background: var(--bf-primary);
+  color: var(--bf-on-primary);
+  transform-origin: bottom right;
+}
+
+@keyframes bubble {
+  from {
+    opacity: 0;
+    scale: 0.6;
+    translate: 0 8px;
+  }
+}
+
+.done {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  border-radius: 9999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  background: var(--bf-success);
+  color: var(--bf-on-primary);
+  box-shadow: 0 12px 24px -12px var(--bf-success);
+  animation: pop 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typed,
+  .pop,
+  .publish,
+  .publishIdle,
+  .publishDone,
+  .score,
+  .caret,
+  .side,
+  .link,
+  .contact,
+  .lockIcon,
+  .tgIcon,
+  .stamp,
+  .swap,
+  .bubble,
+  .done {
+    animation: none;
+  }
+
+  .publish {
+    background: var(--bf-success);
+  }
+
+  .publishIdle,
+  .lockIcon {
+    display: none;
+  }
+
+  .tgIcon {
+    width: 12px;
+    opacity: 1;
+  }
+
+  .contact {
+    filter: none;
+  }
+}

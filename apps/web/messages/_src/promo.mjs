@@ -31,6 +31,57 @@ export default {
       write: ['Write to them', 'Напиши им', 'Գրիր նրանց'],
       person: ['Marta · Marketing', 'Марта · маркетинг', 'Մարտա · մարքեթինգ'],
     },
+    how: {
+      post: {
+        form: ['New brief', 'Новый бриф', 'Նոր բրիֆ'],
+        title: [
+          'Reels about our new coffee bar',
+          'Reels о нашем новом кофе-баре',
+          'Reels մեր նոր սրճարանի մասին',
+        ],
+        city: ['Berlin', 'Берлин', 'Բեռլին'],
+        audience: ['5K–100K followers', '5K–100K подписчиков', '5K–100K հետևորդ'],
+        age: ['Audience 18–34', 'Аудитория 18–34', 'Լսարան 18–34'],
+        publish: ['Publish', 'Опубликовать', 'Հրապարակել'],
+        published: ['Published', 'Опубликован', 'Հրապարակված է'],
+      },
+      match: {
+        pitch: [
+          'Hi! I film cozy coffee spots in Berlin every week, and my audience loves them.',
+          'Привет! Я каждую неделю снимаю уютные кофейни Берлина, и моей аудитории это нравится.',
+          'Բարև։ Ամեն շաբաթ նկարում եմ Բեռլինի հարմարավետ սրճարանները, և իմ լսարանին դա շատ է դուր գալիս։',
+        ],
+        pitchLabel: ['Your pitch', 'Твой питч', 'Քո փիչը'],
+        apply: ['Apply', 'Откликнуться', 'Դիմել'],
+      },
+      accept: {
+        accepted: ['Accepted', 'Принят', 'Ընդունված'],
+        you: ['You', 'Ты', 'Դու'],
+        swap: [
+          'You both see each other’s contacts',
+          'Вы оба видите контакты друг друга',
+          'Դուք երկուսդ տեսնում եք միմյանց կոնտակտները',
+        ],
+      },
+      publish: {
+        m1: [
+          'Could you post the Reel on Friday?',
+          'Сможешь выложить Reels в пятницу?',
+          'Կկարողանա՞ս Reels-ը հրապարակել ուրբաթ օրը։',
+        ],
+        m2: [
+          'Deal! Friday at 7 pm.',
+          'Договорились! В пятницу в 19:00.',
+          'Պայմանավորվեցինք։ Ուրբաթ, ժամը 19:00-ին։',
+        ],
+        m3: [
+          'Perfect, we pay right after the post.',
+          'Отлично, оплатим сразу после поста.',
+          'Հիանալի է, կվճարենք հրապարակումից անմիջապես հետո։',
+        ],
+        done: ['Collab done', 'Коллаб выполнен', 'Համագործակցությունն ավարտված է'],
+      },
+    },
     insights: {
       eyebrow: ['Search insights', 'Аналитика поиска', 'Որոնումների վերլուծություն'],
       title: [
