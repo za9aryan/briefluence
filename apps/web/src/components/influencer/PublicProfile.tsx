@@ -1,24 +1,11 @@
 'use client';
-import {
-  Alert,
-  Avatar,
-  Card,
-  CardHeader,
-  Grid,
-  Heading,
-  Icon,
-  Inline,
-  Stack,
-  Text,
-} from '@briefluence/ui';
+import { Alert, Card, CardHeader, Grid, Heading, Stack } from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import type { ContactMethod } from '@briefluence/shared';
-import { AccountLine, AccountStats } from '@/components/domain/AccountStats';
+import { AccountBanner, AccountStats } from '@/components/domain/AccountStats';
 import { ContactLink } from '@/components/domain/ContactLink';
-import { VerifiedBadge } from '@/components/domain/badges';
 import { FaqAnswers, PortfolioGallery } from '@/components/portfolio/PortfolioParts';
-import { PLATFORM_ICON, useOptions } from '@/lib/hooks/options';
 import type {
   FaqAnswerDto,
   GuestAccountDto,
@@ -27,6 +14,7 @@ import type {
   ProfileOfferDto,
   SocialAccountDto,
 } from '@/lib/types';
+import { ProfileHero } from './ProfileHero';
 import { GuestGate, LockedPanel, ProfileOffers } from './ProfileOffers';
 
 interface ProfileBase {
@@ -71,44 +59,17 @@ export function InfluencerPublicProfile({ p }: { p: PublicInfluencer }) {
   const t = useTranslations('applications.brand');
   const tp = useTranslations('portfolio.view');
   const tpub = useTranslations('portfolio.public');
-  const o = useOptions();
   const [gate, setGate] = useState(false);
   const guest = p.access === 'guest';
   return (
     <Stack gap={6}>
-      <Card>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <Avatar size="xl" name={p.displayName} src={p.avatarUrl} />
-          <Stack gap={1}>
-            <Inline gap={2} wrap>
-              <h1 className="text-h1 font-extrabold text-ink">{p.displayName}</h1>
-              {p.verified && <VerifiedBadge />}
-            </Inline>
-            <Text tone="muted">{[p.city, o.country(p.country)].filter(Boolean).join(', ')}</Text>
-            <Text size="small" tone="muted">
-              {[p.niches.map(o.niche).join(', '), p.languages.map(o.language).join(', ')]
-                .filter(Boolean)
-                .join(' · ')}
-            </Text>
-          </Stack>
-        </div>
-        {p.bio && <Text className="mt-4">{p.bio}</Text>}
-      </Card>
+      <ProfileHero p={p} />
       {p.access === 'guest' ? (
         <Grid cols={{ base: 1, md: 2 }} gap={6}>
           {p.socialAccounts.map((a) => (
             <Card key={a.id}>
               <Stack gap={4}>
-                <a
-                  href={a.profileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-w-0 max-w-full items-center gap-1 self-start font-bold text-ink hover:underline"
-                >
-                  <Icon name={PLATFORM_ICON[a.platform]} />
-                  <span className="min-w-0 wrap-anywhere">@{a.username}</span>
-                  <Icon name="external" size="xs" tone="muted" />
-                </a>
+                <AccountBanner account={a} />
                 <LockedPanel onUnlock={() => setGate(true)}>{tpub('statsLocked')}</LockedPanel>
               </Stack>
             </Card>
@@ -126,8 +87,10 @@ export function InfluencerPublicProfile({ p }: { p: PublicInfluencer }) {
           <Grid cols={{ base: 1, md: 2 }} gap={6}>
             {p.socialAccounts.map((a) => (
               <Card key={a.id}>
-                <CardHeader title={<AccountLine account={a} />} />
-                <AccountStats account={a} />
+                <Stack gap={6}>
+                  <AccountBanner account={a} />
+                  <AccountStats account={a} audienceOnly />
+                </Stack>
               </Card>
             ))}
           </Grid>

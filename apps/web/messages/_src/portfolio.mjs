@@ -175,6 +175,13 @@ export default {
       prevShort: ['Previous', 'Назад', 'Նախորդը'],
       nextShort: ['Next', 'Далее', 'Հաջորդը'],
       seeWork: ['See the work', 'Посмотреть работу', 'Դիտել աշխատանքը'],
+      hero: {
+        reach: ['Total reach', 'Общий охват', 'Ընդհանուր լսարան'],
+        followers: ['Followers', 'Подписчики', 'Հետևորդներ'],
+        engagement: ['Engagement', 'Вовлечённость', 'Ներգրավվածություն'],
+        open: ['Open profile', 'Открыть профиль', 'Բացել պրոֆիլը'],
+        about: ['About', 'О себе', 'Իմ մասին'],
+      },
     },
     apply: {
       title: ['Attach your work', 'Приложи свои работы', 'Կցիր քո աշխատանքները'],

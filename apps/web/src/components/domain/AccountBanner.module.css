@@ -1,0 +1,43 @@
+/* Social account header on a profile: a soft glow in the platform's color (--glow, inline). */
+.banner {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--glow) 18%, var(--bf-line));
+  background:
+    radial-gradient(
+      18rem 10rem at 100% 0%,
+      color-mix(in oklab, var(--glow) 16%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      14rem 8rem at 0% 100%,
+      color-mix(in oklab, var(--glow) 8%, transparent),
+      transparent 70%
+    ),
+    var(--bf-surface);
+}
+
+.open {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--bf-ink);
+  color: var(--bf-surface);
+  transition: background 0.2s ease;
+}
+
+.open:hover {
+  background: color-mix(in oklab, var(--glow) 70%, var(--bf-ink));
+}
+
+.open:focus-visible {
+  outline: 2px solid var(--bf-primary);
+  outline-offset: 2px;
+}

@@ -78,7 +78,14 @@
     "position": "{n} / {total}",
     "prevShort": "Previous",
     "nextShort": "Next",
-    "seeWork": "See the work"
+    "seeWork": "See the work",
+    "hero": {
+      "reach": "Total reach",
+      "followers": "Followers",
+      "engagement": "Engagement",
+      "open": "Open profile",
+      "about": "About"
+    }
   },
   "apply": {
     "title": "Attach your work",

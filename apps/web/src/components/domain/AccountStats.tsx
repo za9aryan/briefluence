@@ -2,6 +2,9 @@
 import {
   Badge,
   Flag,
+  PLATFORM_GLOW,
+  PlatformLogo,
+  cn,
   Icon,
   IconBubble,
   Inline,
@@ -14,7 +17,9 @@ import {
 import { useTranslations } from 'next-intl';
 import { useFormat } from '@/lib/hooks/format';
 import { PLATFORM_ICON, useOptions } from '@/lib/hooks/options';
-import type { SocialAccountDto } from '@/lib/types';
+import type { GuestAccountDto, SocialAccountDto } from '@/lib/types';
+import type { CSSProperties } from 'react';
+import css from './AccountBanner.module.css';
 
 /** One-line summary: platform, @username, followers, ER. */
 export function AccountLine({
@@ -76,6 +81,87 @@ export function AccountLine({
   );
 }
 
+/**
+ * Header of a social account on a profile: the platform's logo in its colors, a large @username,
+ * followers and engagement as big numbers (when the viewer may see them) and an "Open profile"
+ * button, on a soft glow in the platform's color.
+ */
+export function AccountBanner({ account }: { account: SocialAccountDto | GuestAccountDto }) {
+  const t = useTranslations('verification');
+  const th = useTranslations('portfolio.view.hero');
+  const tp = useTranslations('enums.platform');
+  const f = useFormat();
+  const full = 'followers' in account ? account : null;
+  return (
+    <div
+      className={cn(css.banner, '@container rounded-card p-4')}
+      style={{ '--glow': PLATFORM_GLOW[account.platform] } as CSSProperties}
+    >
+      <div className="flex items-center gap-4 pr-12">
+        <PlatformLogo platform={account.platform} label={tp(account.platform)} />
+        <div className="min-w-0 flex-1">
+          <p className="text-small text-ink-muted">{tp(account.platform)}</p>
+          <p className="text-h2 font-extrabold text-ink wrap-anywhere">@{account.username}</p>
+        </div>
+      </div>
+      <a
+        href={account.profileUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={th('open')}
+        title={th('open')}
+        className={css.open}
+      >
+        <Icon name="external" size="sm" />
+      </a>
+      {full && (
+        <div className="mt-4 flex flex-col gap-2">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2 @lg:grid-cols-4">
+            {(
+              [
+                [th('followers'), f.compact(full.followers)],
+                [
+                  th('engagement'),
+                  full.engagementRate != null ? f.percent(full.engagementRate) : '—',
+                ],
+                [t('avgViews'), full.avgViews != null ? f.compact(full.avgViews) : '—'],
+                [t('posts'), full.mediaCount != null ? f.compact(full.mediaCount) : '—'],
+              ] as const
+            ).map(([label, value]) => (
+              <span key={label} className="flex min-w-0 flex-col">
+                <span className="truncate text-label uppercase text-ink-muted">{label}</span>
+                <span className="text-h2 font-extrabold tabular-nums text-ink">{value}</span>
+              </span>
+            ))}
+          </div>
+          <span className="flex flex-wrap gap-2 empty:hidden">
+            {full.reviewStatus === 'PENDING' && (
+              <Badge tone="neutral" icon="clock">
+                {t('review.pending')}
+              </Badge>
+            )}
+            {full.reviewStatus === 'REJECTED' && (
+              <Badge tone="danger" icon="x-circle">
+                {t('review.rejected')}
+              </Badge>
+            )}
+            {full.source === 'MANUAL' && (
+              <Badge tone="neutral" icon="edit">
+                {t('manual.badge')}
+              </Badge>
+            )}
+            {full.needsReconnect && (
+              <Badge tone="danger" icon="warning">
+                {t('needsReconnect')}
+              </Badge>
+            )}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /** Age buckets in their natural order ("13-17", "18-24", … "65+"). */
 const ageStart = (k: string) => Number.parseInt(k, 10) || 0;
 
@@ -83,7 +169,14 @@ const ageStart = (k: string) => Number.parseInt(k, 10) || 0;
  * Followers, engagement, views and posts as tiles with icons; the audience as a women / men split,
  * the top 3 age groups and top countries with flags. Every bar's value is written out.
  */
-export function AccountStats({ account }: { account: SocialAccountDto }) {
+export function AccountStats({
+  account,
+  audienceOnly,
+}: {
+  account: SocialAccountDto;
+  /** Skip the number tiles (an AccountBanner above already shows them). */
+  audienceOnly?: boolean;
+}) {
   const t = useTranslations('verification');
   const f = useFormat();
   const o = useOptions();
@@ -122,16 +215,18 @@ export function AccountStats({ account }: { account: SocialAccountDto }) {
 
   return (
     <Stack gap={4}>
-      <div className="flex flex-wrap gap-2">
-        {stat('users', t('followers'), f.compact(account.followers))}
-        {stat(
-          'heart',
-          t('engagement'),
-          account.engagementRate != null ? f.percent(account.engagementRate) : '—',
-        )}
-        {stat('eye', t('avgViews'), account.avgViews != null ? f.compact(account.avgViews) : '—')}
-        {account.mediaCount != null && stat('image', t('posts'), f.compact(account.mediaCount))}
-      </div>
+      {!audienceOnly && (
+        <div className="flex flex-wrap gap-2">
+          {stat('users', t('followers'), f.compact(account.followers))}
+          {stat(
+            'heart',
+            t('engagement'),
+            account.engagementRate != null ? f.percent(account.engagementRate) : '—',
+          )}
+          {stat('eye', t('avgViews'), account.avgViews != null ? f.compact(account.avgViews) : '—')}
+          {account.mediaCount != null && stat('image', t('posts'), f.compact(account.mediaCount))}
+        </div>
+      )}
       {g || countries.length || ages.length ? (
         <Stack gap={4}>
           {g && (

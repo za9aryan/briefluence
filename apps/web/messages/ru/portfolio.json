@@ -78,7 +78,14 @@
     "position": "{n} / {total}",
     "prevShort": "Назад",
     "nextShort": "Далее",
-    "seeWork": "Посмотреть работу"
+    "seeWork": "Посмотреть работу",
+    "hero": {
+      "reach": "Общий охват",
+      "followers": "Подписчики",
+      "engagement": "Вовлечённость",
+      "open": "Открыть профиль",
+      "about": "О себе"
+    }
   },
   "apply": {
     "title": "Приложи свои работы",
