@@ -1,0 +1,448 @@
+/*
+ * Feature tour on /for-influencers: a numbered list (active item opens, with a progress bar that
+ * moves the tour on) and a stage that shows the active feature. Tokens only. Reduced motion: no
+ * progress animation, so the tour never moves on by itself; scenes appear without motion.
+ */
+
+/* List items. */
+.item {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.item:hover {
+  background: var(--bf-surface);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--bf-primary);
+  outline-offset: 2px;
+}
+
+.on {
+  border-color: color-mix(in oklab, var(--bf-primary) 30%, transparent);
+  background: var(--bf-surface);
+  box-shadow: 0 18px 40px -28px color-mix(in oklab, var(--bf-primary) 80%, transparent);
+}
+
+.badge {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 14px;
+  background: var(--bf-primary-soft);
+  color: var(--bf-primary-text);
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    rotate 0.3s ease;
+}
+
+.on .badge {
+  background: var(--bf-primary);
+  color: var(--bf-on-primary);
+  rotate: -6deg;
+}
+
+.num {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--bf-ink-muted);
+}
+
+.on .num {
+  color: var(--bf-primary-text);
+}
+
+/* Body opens smoothly (grid rows 0fr → 1fr). */
+.body {
+  display: grid;
+  grid-template-rows: 0fr;
+  padding-left: 4rem;
+  transition: grid-template-rows 0.35s ease;
+}
+
+.on .body {
+  grid-template-rows: 1fr;
+}
+
+/* Progress bar along the bottom of the active item; its end moves the tour on. */
+.track {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 0.5rem;
+  height: 3px;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--bf-primary) 12%, transparent);
+  overflow: hidden;
+}
+
+.progress {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--bf-primary);
+  transform-origin: left;
+  animation: progress 5.5s linear both;
+}
+
+@keyframes progress {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+/* Stage: soft tint, dot grid, glow. */
+.stage {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22rem;
+  padding: 2.5rem 1rem;
+  background: var(--bf-primary-soft);
+}
+
+@media (min-width: 640px) {
+  .stage {
+    min-height: 26rem;
+    padding: 3rem 2.5rem;
+  }
+}
+
+.stage::before,
+.stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.stage::before {
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--bf-primary) 22%, transparent) 1px,
+    transparent 1.5px
+  );
+  background-size: 18px 18px;
+  mask-image: radial-gradient(ellipse at 50% 50%, black, transparent 75%);
+}
+
+.stage::after {
+  background:
+    radial-gradient(
+      24rem 18rem at 100% 0%,
+      color-mix(in oklab, var(--bf-primary) 26%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      20rem 16rem at 0% 100%,
+      color-mix(in oklab, var(--bf-surface-raised) 80%, transparent),
+      transparent 70%
+    );
+}
+
+/* Each scene enters with a soft rise. */
+.scene {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  animation: scene 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes scene {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+    scale: 0.97;
+  }
+}
+
+.card {
+  border-radius: 16px;
+  border: 1px solid var(--bf-line);
+  background: var(--bf-surface-raised);
+  box-shadow: 0 24px 48px -28px color-mix(in oklab, var(--bf-primary) 70%, transparent);
+}
+
+.dim {
+  opacity: 0.85;
+}
+
+.rise {
+  animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 9999px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--bf-ink);
+  color: var(--bf-surface);
+  box-shadow: 0 12px 24px -12px var(--bf-ink);
+}
+
+.source {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 9999px;
+  padding: 4px 12px 4px 4px;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--bf-surface-raised);
+  color: var(--bf-ink);
+  border: 1px solid var(--bf-line);
+  box-shadow: 0 12px 24px -14px color-mix(in oklab, var(--bf-ink) 60%, transparent);
+}
+
+.float {
+  animation: float 5s ease-in-out infinite;
+}
+
+.floatSlow {
+  animation: float 7s ease-in-out -2s infinite;
+}
+
+@keyframes float {
+  50% {
+    translate: 0 -6px;
+  }
+}
+
+/* Verified seal with a ring that pulses. */
+.seal {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  background: var(--bf-success);
+  color: var(--bf-on-primary);
+  animation: pop 0.6s cubic-bezier(0.3, 1.5, 0.5, 1) 0.2s both;
+}
+
+.seal::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: inherit;
+  border: 2px solid var(--bf-success);
+  animation: ping 1.8s ease-out 0.6s infinite;
+}
+
+@keyframes pop {
+  from {
+    scale: 0.3;
+    opacity: 0;
+  }
+}
+
+@keyframes ping {
+  from {
+    opacity: 0.7;
+    scale: 0.9;
+  }
+  to {
+    opacity: 0;
+    scale: 1.5;
+  }
+}
+
+/* Application pipeline: a rail that fills and steps that light up one after another. */
+.rail {
+  position: absolute;
+  top: 1rem;
+  bottom: 1rem;
+  left: calc(1rem - 1.5px);
+  width: 3px;
+  border-radius: 9999px;
+  background: var(--bf-line);
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(var(--bf-primary), var(--bf-success));
+  transform-origin: top;
+  animation: fill 2.2s ease-in-out 0.3s both;
+}
+
+@keyframes fill {
+  from {
+    scale: 1 0;
+  }
+}
+
+.step {
+  animation: rise 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.dot {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background: var(--bf-primary-soft);
+  color: var(--bf-primary-text);
+  box-shadow: 0 0 0 4px var(--bf-surface-raised);
+}
+
+.dotWin {
+  background: var(--bf-success);
+  color: var(--bf-on-primary);
+}
+
+/* Direct contact: the lock turns into a check, the contact lights up. */
+.lock {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: var(--bf-surface);
+  color: var(--bf-ink);
+  animation: unlock 0.5s ease 0.9s both;
+}
+
+.lockClosed,
+.lockOpen {
+  position: absolute;
+}
+
+.lockClosed {
+  animation: hide 0.3s ease 0.9s both;
+}
+
+.lockOpen {
+  animation: show 0.4s cubic-bezier(0.3, 1.5, 0.5, 1) 1s both;
+}
+
+@keyframes unlock {
+  to {
+    background: var(--bf-success);
+    color: var(--bf-on-primary);
+  }
+}
+
+@keyframes hide {
+  to {
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+
+@keyframes show {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+
+.contact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 9999px;
+  padding: 6px 6px 6px 14px;
+  font-size: 13px;
+  background: var(--bf-surface);
+  color: var(--bf-ink);
+  filter: blur(4px);
+  animation: clear 0.6s ease 1.1s both;
+}
+
+@keyframes clear {
+  to {
+    filter: none;
+    background: color-mix(in oklab, var(--bf-success) 10%, var(--bf-surface-raised));
+  }
+}
+
+.write {
+  flex-shrink: 0;
+  border-radius: 9999px;
+  padding: 6px 12px;
+  font-weight: 700;
+  background: var(--bf-success);
+  color: var(--bf-on-primary);
+}
+
+.unlocked {
+  background: var(--bf-success);
+  box-shadow: 0 12px 24px -12px var(--bf-success);
+  animation: pop 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) 1.3s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress {
+    animation: none;
+    scale: 0 1;
+  }
+
+  .scene,
+  .rise,
+  .float,
+  .floatSlow,
+  .seal,
+  .seal::after,
+  .fill,
+  .step,
+  .lock,
+  .lockClosed,
+  .lockOpen,
+  .contact,
+  .unlocked {
+    animation: none;
+  }
+
+  .lockClosed {
+    opacity: 0;
+  }
+
+  .lock {
+    background: var(--bf-success);
+    color: var(--bf-on-primary);
+  }
+
+  .contact {
+    filter: none;
+  }
+}

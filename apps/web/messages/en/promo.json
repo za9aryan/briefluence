@@ -13,6 +13,15 @@
     "hours": "{count} h",
     "now": "now 5 min"
   },
+  "features": {
+    "eyebrow": "What you get",
+    "title": "Built for influencers, not for spam",
+    "sorted": "Best match first",
+    "source": "From the official API",
+    "unlocked": "Contacts open",
+    "write": "Write to them",
+    "person": "Marta · Marketing"
+  },
   "insights": {
     "eyebrow": "Search insights",
     "title": "See what influencers are looking for",

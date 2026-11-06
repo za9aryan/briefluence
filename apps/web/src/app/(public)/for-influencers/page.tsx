@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { AudiencePage } from '@/components/common/AudiencePage';
 import { BloggerFaq, EarnWays, NoCatch } from '@/components/landing/BloggerSections';
+import { FeatureTour } from '@/components/landing/FeatureTour';
 import { InfluencerToolkit } from '@/components/landing/InfluencerToolkit';
 import { ProcessFunnel } from '@/components/landing/ProcessFunnel';
 
@@ -20,6 +21,16 @@ export default function ForInfluencersPage() {
         ['track', 'send'],
         ['direct', 'message'],
       ]}
+      featuresBlock={
+        <FeatureTour
+          items={[
+            ['feed', 'sparkles'],
+            ['verified', 'verified'],
+            ['track', 'send'],
+            ['direct', 'message'],
+          ]}
+        />
+      }
       afterHero={
         <>
           <ProcessFunnel

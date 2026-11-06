@@ -21,6 +21,7 @@ export async function AudiencePage({
   cta,
   stats,
   afterHero,
+  featuresBlock,
   children,
 }: {
   ns: 'brands' | 'influencers';
@@ -30,6 +31,8 @@ export async function AudiencePage({
   stats?: string[];
   /** Extra blocks right under the hero. */
   afterHero?: ReactNode;
+  /** Replaces the plain feature grid (e.g. an interactive tour). */
+  featuresBlock?: ReactNode;
   /** Extra blocks after the feature list. */
   children?: ReactNode;
 }) {
@@ -80,19 +83,21 @@ export async function AudiencePage({
           </Container>
         </section>
       ) : null}
-      <Section raised>
-        <Grid cols={{ base: 1, md: 2 }} gap={8}>
-          {features.map(([k, icon]) => (
-            <FeatureItem
-              key={k}
-              icon={<Icon name={icon} size="md" />}
-              title={t(`features.${k}.title`)}
-            >
-              {t(`features.${k}.body`)}
-            </FeatureItem>
-          ))}
-        </Grid>
-      </Section>
+      {featuresBlock ?? (
+        <Section raised>
+          <Grid cols={{ base: 1, md: 2 }} gap={8}>
+            {features.map(([k, icon]) => (
+              <FeatureItem
+                key={k}
+                icon={<Icon name={icon} size="md" />}
+                title={t(`features.${k}.title`)}
+              >
+                {t(`features.${k}.body`)}
+              </FeatureItem>
+            ))}
+          </Grid>
+        </Section>
+      )}
       {children}
     </>
   );

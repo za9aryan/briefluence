@@ -14,6 +14,23 @@ export default {
       hours: ['{count} h', '{count} ч', '{count} ժ'],
       now: ['now 5 min', 'теперь 5 мин', 'հիմա 5 րոպե'],
     },
+    features: {
+      eyebrow: ['What you get', 'Что ты получаешь', 'Ինչ ես ստանում'],
+      title: [
+        'Built for influencers, not for spam',
+        'Сделано для инфлюенсеров, а не для спама',
+        'Ստեղծված ինֆլյուենսերների համար, ոչ թե սպամի',
+      ],
+      sorted: [
+        'Best match first',
+        'Сначала лучшие совпадения',
+        'Սկզբում՝ լավագույն համընկնումները',
+      ],
+      source: ['From the official API', 'Из официального API', 'Պաշտոնական API-ից'],
+      unlocked: ['Contacts open', 'Контакты открыты', 'Կոնտակտները բաց են'],
+      write: ['Write to them', 'Напиши им', 'Գրիր նրանց'],
+      person: ['Marta · Marketing', 'Марта · маркетинг', 'Մարտա · մարքեթինգ'],
+    },
     insights: {
       eyebrow: ['Search insights', 'Аналитика поиска', 'Որոնումների վերլուծություն'],
       title: [
