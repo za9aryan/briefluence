@@ -78,7 +78,7 @@ export class AuthService {
 
   async login(input: LoginInput, locale?: string): Promise<Session> {
     const user = await this.prisma.user.findUnique({ where: { email: input.email } });
-    // Unknown email or a Google/Apple-only account (no password): same answer and similar timing,
+    // Unknown email or a Google-only account (no password): same answer and similar timing,
     // so the response does not reveal which emails exist.
     if (!user?.passwordHash) {
       this.dummyHash ??= this.hashPassword('dummy-password-1');
@@ -240,7 +240,7 @@ export class AuthService {
 
   async changePassword(userId: string, input: ChangePasswordInput) {
     const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
-    // Accounts created with Google / Apple have no password yet: they may set one directly.
+    // Accounts created with Google have no password yet: they may set one directly.
     if (user.passwordHash) {
       const ok = await argon2.verify(user.passwordHash, input.currentPassword).catch(() => false);
       if (!ok) throw new AppError('INVALID_CREDENTIALS', 'Current password is wrong');

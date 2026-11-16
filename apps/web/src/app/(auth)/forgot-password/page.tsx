@@ -41,7 +41,14 @@ export default function ForgotPasswordPage() {
           <form onSubmit={onSubmit} noValidate>
             <Stack gap={4}>
               <FormError message={error} />
-              <TextField name="email" type="email" autoComplete="email" label={t('email')} register={form.register} error={form.formState.errors.email} />
+              <TextField
+                name="email"
+                type="email"
+                autoComplete="email"
+                label={t('email')}
+                register={form.register}
+                error={form.formState.errors.email}
+              />
               <Button type="submit" block loading={form.formState.isSubmitting}>
                 {t('sendResetLink')}
               </Button>

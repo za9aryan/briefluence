@@ -1,4 +1,11 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { ThrottlerException } from '@nestjs/throttler';
 import type { ApiErrorBody, ErrorCode } from '@briefluence/shared';
 import type { Response } from 'express';
@@ -24,13 +31,16 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return;
     }
     if (exception instanceof ThrottlerException) {
-      res.status(429).json({ error: { code: 'RATE_LIMITED', message: 'Too many requests, slow down' } });
+      res
+        .status(429)
+        .json({ error: { code: 'RATE_LIMITED', message: 'Too many requests, slow down' } });
       return;
     }
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
       const r = exception.getResponse();
-      const message = typeof r === 'string' ? r : ((r as { message?: string }).message ?? exception.message);
+      const message =
+        typeof r === 'string' ? r : ((r as { message?: string }).message ?? exception.message);
       const body: ApiErrorBody = {
         error: { code: BY_STATUS[status] ?? 'INTERNAL', message: String(message) },
       };
@@ -39,8 +49,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
     // Never echo internal error messages (may contain secrets or SQL) to the client.
     this.logger.error(exception instanceof Error ? exception.stack : String(exception));
-    res
-      .status(HttpStatus.INTERNAL_SERVER_ERROR)
-      .json({ error: { code: 'INTERNAL', message: 'Something went wrong' } } satisfies ApiErrorBody);
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      error: { code: 'INTERNAL', message: 'Something went wrong' },
+    } satisfies ApiErrorBody);
   }
 }

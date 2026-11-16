@@ -25,7 +25,7 @@ const ROLES: { value: 'BRAND' | 'INFLUENCER'; icon: IconName }[] = [
   { value: 'INFLUENCER', icon: 'user' },
 ];
 
-/** Last step of "Continue with Google / Apple" for someone new: pick a role and accept the terms. */
+/** Last step of "Continue with Google" for someone new: pick a role and accept the terms. */
 function CompleteSignup() {
   const t = useTranslations('auth');
   const tf = useTranslations('errors.field');

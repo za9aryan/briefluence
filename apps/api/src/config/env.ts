@@ -85,25 +85,16 @@ export const envSchema = z
     RATES_SOURCE: z.enum(['cba', 'static']).default('cba'),
 
     /**
-     * Google / Apple sign-in: which providers use the simulated login ("true" = both, "false" = none,
-     * or a list like "apple"). Real providers need their keys (Google reuses GOOGLE_CLIENT_ID/SECRET).
+     * "Continue with Google": "true" = the simulated login page (development and tests only;
+     * production refuses it, see below). Real Google sign-in uses GOOGLE_CLIENT_ID / SECRET.
      */
     OAUTH_LOGIN_MOCK: z
       .string()
       .default('false')
-      .transform((v): ('google' | 'apple')[] => {
+      .transform((v): 'google'[] => {
         const x = v.trim().toLowerCase();
-        if (x === 'true' || x === '1') return ['google', 'apple'];
-        if (x === 'false' || x === '0' || x === '') return [];
-        return x
-          .split(',')
-          .map((p) => p.trim())
-          .filter((p): p is 'google' | 'apple' => p === 'google' || p === 'apple');
+        return x === 'true' || x === '1' || x === 'google' ? ['google'] : [];
       }),
-    APPLE_CLIENT_ID: optional, // Services ID, e.g. am.briefluence.web
-    APPLE_TEAM_ID: optional,
-    APPLE_KEY_ID: optional,
-    APPLE_PRIVATE_KEY: optional, // contents of the .p8 key (newlines as \\n are fine)
 
     /** `mock` = the fake payment page (local dev and tests); `paddle` = real checkout. */
     PAYMENT_PROVIDER: z.enum(['mock', 'paddle']).default('mock'),
@@ -178,13 +169,15 @@ export const envSchema = z
     if (real('YOUTUBE'))
       need(['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'], 'YouTube is not mocked (SOCIAL_MOCK)');
     if (e.EMAIL_TRANSPORT === 'resend') need(['RESEND_API_KEY'], 'EMAIL_TRANSPORT=resend');
+    // The simulated sign-in lets anyone type any email: never in production, not even with
+    // ALLOW_MOCKS_IN_PRODUCTION.
+    if (e.NODE_ENV === 'production' && e.OAUTH_LOGIN_MOCK.length)
+      ctx.addIssue({
+        code: 'custom',
+        path: ['OAUTH_LOGIN_MOCK'],
+        message: 'Must be false in production (simulated sign-in accepts any email)',
+      });
     if (e.NODE_ENV === 'production' && !e.ALLOW_MOCKS_IN_PRODUCTION) {
-      if (e.OAUTH_LOGIN_MOCK.length)
-        ctx.addIssue({
-          code: 'custom',
-          path: ['OAUTH_LOGIN_MOCK'],
-          message: 'Must be false in production',
-        });
       if (e.SOCIAL_MOCK.length)
         ctx.addIssue({
           code: 'custom',

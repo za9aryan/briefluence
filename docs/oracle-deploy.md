@@ -190,7 +190,7 @@ scp -i ~/Downloads/ssh-key-*.key "ubuntu@YOUR_SERVER_IP:~/briefluence/backups/*"
 Manual backup: `./deploy/oracle/backup.sh`. Restore (asks for confirmation, backs up first):
 `./deploy/oracle/restore.sh backups/db-YYYY-MM-DD_HHMM.dump`.
 
-**Going live for real**: as Instagram/TikTok/Google/Apple apps and the live Paddle account are approved, put
+**Going live for real**: as Instagram/TikTok/Google apps and the live Paddle account are approved, put
 their keys in `.env`, set the matching mock switch to `false` (`SOCIAL_MOCK`, `OAUTH_LOGIN_MOCK`,
 `PAYMENT_PROVIDER=paddle` with `PADDLE_ENV=production`, see [paddle.md](paddle.md)), and once all are real set `ALLOW_MOCKS_IN_PRODUCTION=false`. For
 real emails create a free Resend account, verify the domain, set `EMAIL_TRANSPORT=resend` and

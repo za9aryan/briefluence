@@ -33,7 +33,8 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
 
   onModuleInit() {
     if (!this.env.REDIS_URL) {
-      if (this.env.NODE_ENV === 'production') throw new Error('REDIS_URL is required in production');
+      if (this.env.NODE_ENV === 'production')
+        throw new Error('REDIS_URL is required in production');
       this.logger.log('REDIS_URL not set: running jobs in-process');
       return;
     }
@@ -60,7 +61,9 @@ export class QueueService implements OnModuleInit, OnModuleDestroy {
       },
       { connection: this.connection!, concurrency: 5 },
     );
-    this.worker.on('failed', (job, err) => this.logger.error(`Job ${job?.name} failed: ${err.message}`));
+    this.worker.on('failed', (job, err) =>
+      this.logger.error(`Job ${job?.name} failed: ${err.message}`),
+    );
     this.logger.log('BullMQ worker started');
   }
 

@@ -16,7 +16,10 @@ export class ZodPipe<T extends z.ZodType> implements PipeTransform {
 
 function jsonSchema(schema: z.ZodType) {
   try {
-    return z.toJSONSchema(schema, { io: 'input', unrepresentable: 'any' }) as Record<string, unknown>;
+    return z.toJSONSchema(schema, { io: 'input', unrepresentable: 'any' }) as Record<
+      string,
+      unknown
+    >;
   } catch {
     return { type: 'object' };
   }
@@ -24,6 +27,7 @@ function jsonSchema(schema: z.ZodType) {
 
 /** Validates the request body with a shared Zod schema and documents it in Swagger. */
 export const ZodBody = (schema: z.ZodType): ParameterDecorator => Body(new ZodPipe(schema));
-export const ApiZodBody = (schema: z.ZodType) => applyDecorators(ApiBody({ schema: jsonSchema(schema) }));
+export const ApiZodBody = (schema: z.ZodType) =>
+  applyDecorators(ApiBody({ schema: jsonSchema(schema) }));
 export const ZodQuery = (schema: z.ZodType): ParameterDecorator => Query(new ZodPipe(schema));
 export const ApiZodQuery = (name: string) => ApiQuery({ name, required: false });

@@ -11,7 +11,10 @@ export class EmailVerifiedGuard implements CanActivate {
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
     const user = ctx.switchToHttp().getRequest<AuthedRequest>().user;
     if (!user) throw new AppError('UNAUTHORIZED', 'Sign in required');
-    const row = await this.prisma.user.findUnique({ where: { id: user.id }, select: { emailVerifiedAt: true } });
+    const row = await this.prisma.user.findUnique({
+      where: { id: user.id },
+      select: { emailVerifiedAt: true },
+    });
     if (!row?.emailVerifiedAt) throw new AppError('EMAIL_NOT_VERIFIED', 'Verify your email first');
     return true;
   }

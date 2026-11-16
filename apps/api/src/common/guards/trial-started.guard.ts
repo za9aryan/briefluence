@@ -14,7 +14,10 @@ export class TrialStartedGuard implements CanActivate {
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
     const user = ctx.switchToHttp().getRequest<AuthedRequest>().user;
     if (!user) throw new AppError('UNAUTHORIZED', 'Sign in required');
-    const sub = await this.prisma.subscription.findUnique({ where: { userId: user.id }, select: { id: true } });
+    const sub = await this.prisma.subscription.findUnique({
+      where: { userId: user.id },
+      select: { id: true },
+    });
     if (!sub) throw new AppError('TRIAL_NOT_STARTED', 'Start your free month to see briefs');
     return true;
   }

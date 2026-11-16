@@ -11,14 +11,34 @@ const base = {
 
 describe('loadEnv', () => {
   it('rejects simulated login / payments in production by default', () => {
-    expect(() => loadEnv({ ...base, NODE_ENV: 'production', SOCIAL_MOCK: 'true', PAYMENT_PROVIDER: 'mock' })).toThrow(/SOCIAL_MOCK/);
+    expect(() =>
+      loadEnv({ ...base, NODE_ENV: 'production', SOCIAL_MOCK: 'true', PAYMENT_PROVIDER: 'mock' }),
+    ).toThrow(/SOCIAL_MOCK/);
   });
   it('allows them with ALLOW_MOCKS_IN_PRODUCTION (staging / pre-approval launch)', () => {
-    const env = loadEnv({ ...base, NODE_ENV: 'production', SOCIAL_MOCK: 'true', PAYMENT_PROVIDER: 'mock', ALLOW_MOCKS_IN_PRODUCTION: 'true' });
+    const env = loadEnv({
+      ...base,
+      NODE_ENV: 'production',
+      SOCIAL_MOCK: 'true',
+      PAYMENT_PROVIDER: 'mock',
+      ALLOW_MOCKS_IN_PRODUCTION: 'true',
+    });
     expect(env.SOCIAL_MOCK).toEqual(['INSTAGRAM', 'TIKTOK', 'YOUTUBE']);
+  });
+  it('never allows the simulated Google sign-in in production, even with the override', () => {
+    const prod = {
+      ...base,
+      NODE_ENV: 'production',
+      SOCIAL_MOCK: 'true',
+      ALLOW_MOCKS_IN_PRODUCTION: 'true',
+    };
+    expect(() => loadEnv({ ...prod, OAUTH_LOGIN_MOCK: 'true' })).toThrow(/OAUTH_LOGIN_MOCK/);
+    expect(loadEnv({ ...prod, OAUTH_LOGIN_MOCK: 'false' }).OAUTH_LOGIN_MOCK).toEqual([]);
   });
   it('takes the port from PORT when API_PORT is not set', () => {
     expect(loadEnv({ ...base, SOCIAL_MOCK: 'true', PORT: '10000' }).API_PORT).toBe(10000);
-    expect(loadEnv({ ...base, SOCIAL_MOCK: 'true', PORT: '10000', API_PORT: '4500' }).API_PORT).toBe(4500);
+    expect(
+      loadEnv({ ...base, SOCIAL_MOCK: 'true', PORT: '10000', API_PORT: '4500' }).API_PORT,
+    ).toBe(4500);
   });
 });

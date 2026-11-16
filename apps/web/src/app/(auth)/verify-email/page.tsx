@@ -16,7 +16,9 @@ function Verify() {
   const qc = useQueryClient();
   const { data: me } = useMe();
   const errorMessage = useErrorMessage();
-  const [state, setState] = useState<'idle' | 'loading' | 'ok' | 'error'>(token ? 'loading' : 'idle');
+  const [state, setState] = useState<'idle' | 'loading' | 'ok' | 'error'>(
+    token ? 'loading' : 'idle',
+  );
   const [error, setError] = useState('');
   const sent = useRef(false);
 
@@ -40,7 +42,11 @@ function Verify() {
     <Card p={{ base: 6, md: 8 }}>
       <Stack gap={4} align="center" className="text-center">
         <span className="inline-flex size-14 items-center justify-center rounded-pill bg-primary-soft">
-          <Icon name={state === 'ok' ? 'check-circle' : 'mail'} size="lg" tone={state === 'ok' ? 'success' : 'accent'} />
+          <Icon
+            name={state === 'ok' ? 'check-circle' : 'mail'}
+            size="lg"
+            tone={state === 'ok' ? 'success' : 'accent'}
+          />
         </span>
         <Heading level={1} size="h2">
           {state === 'ok' ? t('verifiedTitle') : t('checkInboxTitle')}

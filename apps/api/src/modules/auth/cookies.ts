@@ -11,8 +11,16 @@ function base(env: Env): CookieOptions {
 
 export function setSessionCookies(res: Response, env: Env, s: Session) {
   const b = base(env);
-  res.cookie(COOKIE_ACCESS, s.accessToken, { ...b, path: '/', maxAge: env.ACCESS_TOKEN_TTL_SECONDS * 1000 });
-  res.cookie(COOKIE_REFRESH, s.refreshToken, { ...b, path: REFRESH_COOKIE_PATH, expires: s.refreshExpiresAt });
+  res.cookie(COOKIE_ACCESS, s.accessToken, {
+    ...b,
+    path: '/',
+    maxAge: env.ACCESS_TOKEN_TTL_SECONDS * 1000,
+  });
+  res.cookie(COOKIE_REFRESH, s.refreshToken, {
+    ...b,
+    path: REFRESH_COOKIE_PATH,
+    expires: s.refreshExpiresAt,
+  });
   res.cookie(COOKIE_ROLE, s.user.role, { ...b, path: '/', expires: s.refreshExpiresAt });
 }
 

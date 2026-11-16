@@ -37,20 +37,28 @@ export class RatesService implements OnModuleInit {
     if (this.env.NODE_ENV === 'test' || this.env.RATES_SOURCE === 'static') return;
     // Refresh in the background if stored rates are missing or older than a day.
     void this.get()
-      .then((s) => (this.clock.now().getTime() - s.fetchedAt.getTime() > STALE_MS || s.source === 'fallback' ? this.refresh() : null))
+      .then((s) =>
+        this.clock.now().getTime() - s.fetchedAt.getTime() > STALE_MS || s.source === 'fallback'
+          ? this.refresh()
+          : null,
+      )
       .catch(() => undefined);
   }
 
   async get(): Promise<RatesSnapshot> {
     if (this.cache && Date.now() - this.cache.at < CACHE_MS) return this.cache.snapshot;
-    if (this.env.RATES_SOURCE === 'static') return this.remember({ rates: FALLBACK, source: 'static', fetchedAt: this.clock.now() });
+    if (this.env.RATES_SOURCE === 'static')
+      return this.remember({ rates: FALLBACK, source: 'static', fetchedAt: this.clock.now() });
     const rows = await this.prisma.exchangeRate.findMany();
     if (CURRENCIES.every((c) => rows.some((r) => r.currency === c))) {
       const rates = Object.fromEntries(rows.map((r) => [r.currency, r.amdPerUnit])) as Rates;
       const oldest = rows.reduce((d, r) => (r.fetchedAt < d ? r.fetchedAt : d), rows[0]!.fetchedAt);
       return this.remember({ rates, source: rows[0]!.source, fetchedAt: oldest });
     }
-    return (await this.refresh()) ?? this.remember({ rates: FALLBACK, source: 'fallback', fetchedAt: this.clock.now() });
+    return (
+      (await this.refresh()) ??
+      this.remember({ rates: FALLBACK, source: 'fallback', fetchedAt: this.clock.now() })
+    );
   }
 
   /** Fetches fresh rates (CBA, then open.er-api) and stores them. Returns null if both fail. */
@@ -71,7 +79,9 @@ export class RatesService implements OnModuleInit {
             }),
           ),
         );
-        this.logger.log(`Exchange rates updated from ${name}: USD ${rates.USD} AMD, RUB ${rates.RUB} AMD`);
+        this.logger.log(
+          `Exchange rates updated from ${name}: USD ${rates.USD} AMD, RUB ${rates.RUB} AMD`,
+        );
         return this.remember({ rates, source: name, fetchedAt });
       } catch (err) {
         this.logger.warn(`Exchange rates from ${name} failed: ${(err as Error).message}`);
@@ -99,24 +109,32 @@ export class RatesService implements OnModuleInit {
       '<soap:Body><ExchangeRatesLatest xmlns="http://www.cba.am/" /></soap:Body></soap:Envelope>';
     const res = await fetch('https://api.cba.am/exchangerates.asmx', {
       method: 'POST',
-      headers: { 'Content-Type': 'text/xml; charset=utf-8', SOAPAction: '"http://www.cba.am/ExchangeRatesLatest"' },
+      headers: {
+        'Content-Type': 'text/xml; charset=utf-8',
+        SOAPAction: '"http://www.cba.am/ExchangeRatesLatest"',
+      },
       body,
       signal: AbortSignal.timeout(15_000),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const xml = await res.text();
     const rate = (iso: string) => {
-      const m = new RegExp(`<ISO>${iso}</ISO><Amount>([\\d.]+)</Amount><Rate>([\\d.]+)</Rate>`).exec(xml);
+      const m = new RegExp(
+        `<ISO>${iso}</ISO><Amount>([\\d.]+)</Amount><Rate>([\\d.]+)</Rate>`,
+      ).exec(xml);
       return m ? Number(m[2]) / Number(m[1]) : undefined; // AMD per 1 unit
     };
     return this.validate({ AMD: 1, USD: rate('USD'), RUB: rate('RUB') });
   }
 
   private async fromOpenErApi(): Promise<Rates> {
-    const res = await fetch('https://open.er-api.com/v6/latest/USD', { signal: AbortSignal.timeout(15_000) });
+    const res = await fetch('https://open.er-api.com/v6/latest/USD', {
+      signal: AbortSignal.timeout(15_000),
+    });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = (await res.json()) as { result?: string; rates?: Record<string, number> };
-    if (json.result !== 'success' || !json.rates?.AMD || !json.rates.RUB) throw new Error('unexpected response');
+    if (json.result !== 'success' || !json.rates?.AMD || !json.rates.RUB)
+      throw new Error('unexpected response');
     const amdPerUsd = json.rates.AMD;
     return this.validate({ AMD: 1, USD: amdPerUsd, RUB: amdPerUsd / json.rates.RUB });
   }

@@ -41,8 +41,8 @@ const safeNext = (v: unknown) =>
   typeof v === 'string' && v.startsWith('/') && !v.startsWith('//') ? v : undefined;
 
 /**
- * "Continue with Google / Apple". Existing identity → sign in; existing account with the same
- * verified email → link and sign in; otherwise create the account (role from the sign-up page, or
+ * "Continue with Google". Existing identity → sign in; existing account with the same verified
+ * email → link and sign in (never with the simulated login: its email is just typed in); otherwise create the account (role from the sign-up page, or
  * chosen on /signup/complete together with accepting the terms).
  */
 @Injectable()
@@ -163,9 +163,16 @@ export class OAuthLoginService {
       include: { user: true },
     });
     if (identity) return identity.user;
-    // Link to an existing account only when the provider vouches for the email.
+    // Link to an existing account only when the provider vouches for the email. The simulated
+    // login vouches for nothing (anyone can type any address), so it never takes over an account.
     if (p.email && p.emailVerified) {
       const user = await this.prisma.user.findUnique({ where: { email: p.email } });
+      if (user && this.env.OAUTH_LOGIN_MOCK.includes(provider)) {
+        throw new AppError(
+          'CONFLICT',
+          'An account with this email already exists. Log in with your password.',
+        );
+      }
       if (user) {
         await this.prisma.authIdentity.create({
           data: { userId: user.id, provider, subject: p.subject, email: p.email },

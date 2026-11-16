@@ -36,7 +36,7 @@ export const resetPasswordSchema = z.object({
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 export const changePasswordSchema = z.object({
-  /** Empty for Google/Apple-only accounts setting their first password; the API checks it otherwise. */
+  /** Empty for Google-only accounts setting their first password; the API checks it otherwise. */
   currentPassword: z.string().max(128).default(''),
   newPassword: passwordSchema,
 });
@@ -53,7 +53,7 @@ export const notificationSettingsSchema = z
   .refine((v) => Object.keys(v).length > 0, { message: 'invalid' });
 export type NotificationSettingsInput = z.infer<typeof notificationSettingsSchema>;
 
-/** Delete my account. Accounts with a password confirm with it; Google/Apple-only accounts send ''. */
+/** Delete my account. Accounts with a password confirm with it; Google-only accounts send ''. */
 export const deleteAccountSchema = z.object({
   password: z.string().max(128).default(''),
 });

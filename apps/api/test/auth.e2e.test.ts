@@ -33,14 +33,23 @@ describe('auth (e2e)', () => {
   });
 
   it('rejects invalid input, admin sign-up, and duplicate emails', async () => {
-    const bad = await ctx.http().post(`${API}/auth/signup`).send({ email: 'x', password: '1', role: 'BRAND' }).expect(400);
+    const bad = await ctx
+      .http()
+      .post(`${API}/auth/signup`)
+      .send({ email: 'x', password: '1', role: 'BRAND' })
+      .expect(400);
     expect(bad.body.error.code).toBe('VALIDATION_FAILED');
     await ctx
       .http()
       .post(`${API}/auth/signup`)
       .send({ email: 'a@test.am', password: 'secret123', role: 'ADMIN', acceptTerms: true })
       .expect(400);
-    const body = { email: 'dup@test.am', password: 'secret123', role: 'INFLUENCER', acceptTerms: true };
+    const body = {
+      email: 'dup@test.am',
+      password: 'secret123',
+      role: 'INFLUENCER',
+      acceptTerms: true,
+    };
     await ctx.http().post(`${API}/auth/signup`).send(body).expect(201);
     const dup = await ctx.http().post(`${API}/auth/signup`).send(body).expect(409);
     expect(dup.body.error.code).toBe('EMAIL_TAKEN');
@@ -48,7 +57,11 @@ describe('auth (e2e)', () => {
 
   it('logs in and out; wrong password is rejected', async () => {
     const { email } = await signup(ctx, 'INFLUENCER');
-    const wrong = await ctx.http().post(`${API}/auth/login`).send({ email, password: 'nope1234' }).expect(401);
+    const wrong = await ctx
+      .http()
+      .post(`${API}/auth/login`)
+      .send({ email, password: 'nope1234' })
+      .expect(401);
     expect(wrong.body.error.code).toBe('INVALID_CREDENTIALS');
     const agent = ctx.agent();
     await agent.post(`${API}/auth/login`).send({ email, password: 'secret123' }).expect(200);
@@ -79,7 +92,11 @@ describe('auth (e2e)', () => {
     const token = tokenFrom(mail!.html, 'verify-email');
     await agent.post(`${API}/auth/verify-email`).send({ token }).expect(200);
     expect((await agent.get(`${API}/auth/me`)).body.emailVerified).toBe(true);
-    await ctx.http().post(`${API}/auth/verify-email`).send({ token: 'garbage-token-value' }).expect(401);
+    await ctx
+      .http()
+      .post(`${API}/auth/verify-email`)
+      .send({ token: 'garbage-token-value' })
+      .expect(401);
   });
 
   it('resends the verification email', async () => {
@@ -91,11 +108,23 @@ describe('auth (e2e)', () => {
 
   it('resets the password with a single-use link and signs out other sessions', async () => {
     const { agent, email } = await signup(ctx, 'BRAND');
-    await ctx.http().post(`${API}/auth/forgot-password`).send({ email: 'nobody@test.am' }).expect(204);
+    await ctx
+      .http()
+      .post(`${API}/auth/forgot-password`)
+      .send({ email: 'nobody@test.am' })
+      .expect(204);
     await ctx.http().post(`${API}/auth/forgot-password`).send({ email }).expect(204);
     const token = tokenFrom((await lastEmailTo(ctx, email))!.html, 'reset-password');
-    await ctx.http().post(`${API}/auth/reset-password`).send({ token, password: 'newpass123' }).expect(204);
-    const reused = await ctx.http().post(`${API}/auth/reset-password`).send({ token, password: 'other1234' }).expect(401);
+    await ctx
+      .http()
+      .post(`${API}/auth/reset-password`)
+      .send({ token, password: 'newpass123' })
+      .expect(204);
+    const reused = await ctx
+      .http()
+      .post(`${API}/auth/reset-password`)
+      .send({ token, password: 'other1234' })
+      .expect(401);
     expect(reused.body.error.code).toBe('INVALID_TOKEN');
     await agent.post(`${API}/auth/refresh`).expect(401);
     await ctx.http().post(`${API}/auth/login`).send({ email, password: 'newpass123' }).expect(200);
@@ -103,8 +132,14 @@ describe('auth (e2e)', () => {
 
   it('changes password and notification settings', async () => {
     const { agent, email } = await signup(ctx, 'INFLUENCER');
-    await agent.post(`${API}/auth/change-password`).send({ currentPassword: 'wrong', newPassword: 'abc12345' }).expect(401);
-    await agent.post(`${API}/auth/change-password`).send({ currentPassword: 'secret123', newPassword: 'abc12345' }).expect(204);
+    await agent
+      .post(`${API}/auth/change-password`)
+      .send({ currentPassword: 'wrong', newPassword: 'abc12345' })
+      .expect(401);
+    await agent
+      .post(`${API}/auth/change-password`)
+      .send({ currentPassword: 'secret123', newPassword: 'abc12345' })
+      .expect(204);
     await agent.get(`${API}/auth/me`).expect(200);
     await ctx.http().post(`${API}/auth/login`).send({ email, password: 'abc12345' }).expect(200);
     await agent.patch(`${API}/auth/settings`).send({ digestEmails: false }).expect(204);
@@ -117,7 +152,11 @@ describe('auth (e2e)', () => {
     await agent.get(`${API}/admin/stats`).expect(403);
     await ctx.http().get(`${API}/auth/me`).expect(401);
     await ctx.prisma.user.update({ where: { email }, data: { blockedAt: new Date() } });
-    const res = await ctx.http().post(`${API}/auth/login`).send({ email, password: 'secret123' }).expect(403);
+    const res = await ctx
+      .http()
+      .post(`${API}/auth/login`)
+      .send({ email, password: 'secret123' })
+      .expect(403);
     expect(res.body.error.code).toBe('ACCOUNT_BLOCKED');
   });
 });

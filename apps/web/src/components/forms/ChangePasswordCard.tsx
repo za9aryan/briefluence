@@ -18,7 +18,7 @@ export function ChangePasswordCard() {
   const toast = useToast();
   const qc = useQueryClient();
   const { data: me } = useMe();
-  // Accounts created with Google / Apple have no password yet: they set one without the current.
+  // Accounts created with Google have no password yet: they set one without the current.
   const hasPassword = me?.hasPassword ?? true;
   const [error, setError] = useState<string | null>(null);
   const form = useForm<z.input<typeof changePasswordSchema>, unknown, ChangePasswordInput>({

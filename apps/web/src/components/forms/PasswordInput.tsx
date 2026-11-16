@@ -29,7 +29,15 @@ export function PasswordField<T extends FieldValues>({
     <Field label={label} error={fe(error)} hint={hint} aside={aside}>
       {({ id, describedBy, invalid }) => (
         <div className="relative">
-          <Input id={id} type={show ? 'text' : 'password'} autoComplete={autoComplete} aria-describedby={describedBy} invalid={invalid} className="pr-12" {...register(name)} />
+          <Input
+            id={id}
+            type={show ? 'text' : 'password'}
+            autoComplete={autoComplete}
+            aria-describedby={describedBy}
+            invalid={invalid}
+            className="pr-12"
+            {...register(name)}
+          />
           <button
             type="button"
             onClick={() => setShow((s) => !s)}

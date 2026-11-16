@@ -5,11 +5,11 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import { Logo } from '@/components/common/Logo';
 
-/** Development stand-in for the Google / Apple consent screen (OAUTH_LOGIN_MOCK only). */
+/** Development stand-in for the Google consent screen (OAUTH_LOGIN_MOCK only; never in production). */
 function MockConsent() {
   const t = useTranslations('auth.social.mock');
   const params = useSearchParams();
-  const provider = params.get('provider') === 'apple' ? 'Apple' : 'Google';
+  const provider = 'Google';
   const state = params.get('state') ?? '';
   const redirect = params.get('redirect') ?? '';
   const [email, setEmail] = useState('');

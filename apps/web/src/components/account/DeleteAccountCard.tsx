@@ -12,7 +12,7 @@ import { unlinkPushFromAccount } from '@/lib/pwa';
 
 /**
  * Companies and influencers delete their own account (POST /account/delete). Accounts with a
- * password confirm with it; Google / Apple-only accounts type their email instead.
+ * password confirm with it; Google-only accounts type their email instead.
  */
 export function DeleteAccountCard() {
   const t = useTranslations('account');

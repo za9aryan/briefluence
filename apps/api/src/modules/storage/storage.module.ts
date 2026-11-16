@@ -3,5 +3,9 @@ import { StorageController } from './storage.controller';
 import { StorageService } from './storage.service';
 
 @Global()
-@Module({ controllers: [StorageController], providers: [StorageService], exports: [StorageService] })
+@Module({
+  controllers: [StorageController],
+  providers: [StorageService],
+  exports: [StorageService],
+})
 export class StorageModule {}

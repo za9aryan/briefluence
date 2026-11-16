@@ -55,9 +55,9 @@ pnpm dev                        # web on :3000, API on :4000
 - Browser E2E tests use their own servers (:4100 / :3100) and database `briefluence_e2e`; API tests use
   `briefluence_test`. Neither touches your dev database.
 
-## Sign in with Google / Apple
+## Sign in with Google
 
-The login and sign-up pages have "Continue with Google / Apple". Locally they are simulated (`OAUTH_LOGIN_MOCK=true`): you type any email on a test page. To make them real, see [docs/social-login-setup.md](docs/social-login-setup.md).
+The login and sign-up pages have "Continue with Google". Locally it is simulated (`OAUTH_LOGIN_MOCK=true`): you type any email on a test page (new accounts only; never allowed in production). To make it real, see [docs/social-login-setup.md](docs/social-login-setup.md).
 
 ## Manually added social accounts
 
@@ -206,7 +206,7 @@ use the built-in list.
 ## Deleting an account
 
 Companies and influencers delete their own account in **Settings → Delete account** (`POST /api/v1/account/delete`,
-confirmed with the password; Google/Apple-only accounts type their email). The account is anonymized, not removed:
+confirmed with the password; Google-only accounts type their email). The account is anonymized, not removed:
 a running Paddle subscription is cancelled immediately, then personal data, sign-in methods, sessions, social
 accounts (with tokens), portfolio, notifications and push subscriptions are deleted, briefs and offers close, open
 applications and offer requests are withdrawn, and the user gets `deletedAt` + `blockedAt` (so every "not blocked"

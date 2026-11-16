@@ -62,11 +62,10 @@ export class OAuthLoginController {
     @Query('next') next: string | undefined,
     @Res() res: Response,
   ) {
-    const { url, nonce, provider: p } = await this.oauth.start(provider, role, next);
+    const { url, nonce } = await this.oauth.start(provider, role, next);
     res.cookie(NONCE_COOKIE, nonce, {
       httpOnly: true,
-      // Apple returns with a cross-site form POST, which only carries SameSite=None (Secure) cookies.
-      sameSite: p === 'apple' && this.env.COOKIE_SECURE ? 'none' : 'lax',
+      sameSite: 'lax',
       secure: this.env.COOKIE_SECURE,
       domain: this.env.COOKIE_DOMAIN,
       path: COOKIE_PATH,
@@ -84,18 +83,6 @@ export class OAuthLoginController {
     @Res() res: Response,
   ) {
     return this.handleCallback(provider, q, req, res);
-  }
-
-  /** Apple posts the result (response_mode=form_post). */
-  @Public()
-  @Post(':provider/callback')
-  callbackPost(
-    @Param('provider') provider: string,
-    @Body() body: Record<string, string>,
-    @Req() req: Request,
-    @Res() res: Response,
-  ) {
-    return this.handleCallback(provider, body ?? {}, req, res);
   }
 
   private async handleCallback(

@@ -4,7 +4,7 @@ import { API, createTestApp, resetDb, signup, type TestCtx } from './helpers';
 const mockCode = (email: string, name = 'Test Person') =>
   `mock:${Buffer.from(JSON.stringify({ email, name })).toString('base64url')}`;
 
-describe('sign in with Google / Apple (e2e, simulated providers)', () => {
+describe('sign in with Google (e2e, simulated provider)', () => {
   let ctx: TestCtx;
   beforeAll(async () => {
     ctx = await createTestApp();
@@ -17,38 +17,28 @@ describe('sign in with Google / Apple (e2e, simulated providers)', () => {
   });
 
   /** start → (simulated consent) → callback; returns the final redirect URL. */
-  async function signIn(
-    agent: ReturnType<TestCtx['agent']>,
-    provider: 'google' | 'apple',
-    email: string,
-    query = '',
-  ) {
-    const start = await agent.get(`${API}/auth/oauth/${provider}/start${query}`).expect(302);
+  async function signIn(agent: ReturnType<TestCtx['agent']>, email: string, query = '') {
+    const start = await agent.get(`${API}/auth/oauth/google/start${query}`).expect(302);
     const consent = new URL(start.headers.location as string);
     expect(consent.pathname).toBe('/oauth/mock');
     const state = consent.searchParams.get('state')!;
-    const cb =
-      provider === 'apple'
-        ? await agent
-            .post(`${API}/auth/oauth/apple/callback`)
-            .type('form')
-            .send({ code: mockCode(email), state })
-            .expect(302)
-        : await agent
-            .get(`${API}/auth/oauth/google/callback`)
-            .query({ code: mockCode(email), state })
-            .expect(302);
+    const cb = await agent
+      .get(`${API}/auth/oauth/google/callback`)
+      .query({ code: mockCode(email), state })
+      .expect(302);
     return new URL(cb.headers.location as string);
   }
 
   it('lists the available providers', async () => {
     const res = await ctx.http().get(`${API}/auth/oauth/providers`).expect(200);
-    expect(res.body.providers).toEqual(['google', 'apple']);
+    expect(res.body.providers).toEqual(['google']);
+    // Apple sign-in is gone.
+    await ctx.http().get(`${API}/auth/oauth/apple/start`).expect(404);
   });
 
   it('creates an account from the sign-up page (role known) with a verified email and no password', async () => {
     const agent = ctx.agent();
-    const back = await signIn(agent, 'google', 'new.blogger@gmail.com', '?role=INFLUENCER');
+    const back = await signIn(agent, 'new.blogger@gmail.com', '?role=INFLUENCER');
     expect(back.pathname).toBe('/influencer/dashboard');
     const me = await agent.get(`${API}/auth/me`).expect(200);
     expect(me.body).toMatchObject({
@@ -75,7 +65,7 @@ describe('sign in with Google / Apple (e2e, simulated providers)', () => {
 
   it('sends a new person from the login page to choose a role, then creates the account', async () => {
     const agent = ctx.agent();
-    const back = await signIn(agent, 'apple', 'brand.owner@icloud.com');
+    const back = await signIn(agent, 'brand.owner@gmail.com');
     expect(back.pathname).toBe('/signup/complete');
     const token = back.searchParams.get('token')!;
     await agent
@@ -86,20 +76,21 @@ describe('sign in with Google / Apple (e2e, simulated providers)', () => {
       .post(`${API}/auth/oauth/complete`)
       .send({ token, role: 'BRAND', acceptTerms: true })
       .expect(200);
-    expect(res.body).toMatchObject({ email: 'brand.owner@icloud.com', role: 'BRAND' });
+    expect(res.body).toMatchObject({ email: 'brand.owner@gmail.com', role: 'BRAND' });
     await agent.get(`${API}/auth/me`).expect(200);
   });
 
-  it('links to an existing account with the same email and signs back in next time', async () => {
+  it('never takes over an existing account: the simulated login only types an email', async () => {
     const existing = await signup(ctx, 'BRAND');
+    const back = await signIn(ctx.agent(), existing.email);
+    expect(back.searchParams.get('error')).toBe('CONFLICT');
+    expect(await ctx.prisma.authIdentity.count({ where: { userId: existing.id } })).toBe(0);
+  });
+
+  it('signs back in with a known identity, and not as a second account', async () => {
     const agent = ctx.agent();
-    const back = await signIn(agent, 'google', existing.email);
-    expect(back.pathname).toBe('/brand/dashboard');
-    expect((await agent.get(`${API}/auth/me`)).body.id).toBe(existing.id);
-    expect(await ctx.prisma.authIdentity.count({ where: { userId: existing.id } })).toBe(1);
-    // Second time: found by identity, no duplicate.
-    const again = ctx.agent();
-    await signIn(again, 'google', existing.email);
+    await signIn(agent, 'returning@gmail.com', '?role=INFLUENCER');
+    await signIn(ctx.agent(), 'returning@gmail.com');
     expect(await ctx.prisma.user.count()).toBe(1);
   });
 
@@ -117,9 +108,12 @@ describe('sign in with Google / Apple (e2e, simulated providers)', () => {
       'INVALID_TOKEN',
     );
 
-    const u = await signup(ctx, 'INFLUENCER');
-    await ctx.prisma.user.update({ where: { id: u.id }, data: { blockedAt: new Date() } });
-    const blocked = await signIn(ctx.agent(), 'google', u.email);
+    await signIn(ctx.agent(), 'later.blocked@gmail.com', '?role=INFLUENCER');
+    await ctx.prisma.user.updateMany({
+      where: { email: 'later.blocked@gmail.com' },
+      data: { blockedAt: new Date() },
+    });
+    const blocked = await signIn(ctx.agent(), 'later.blocked@gmail.com');
     expect(blocked.searchParams.get('error')).toBe('ACCOUNT_BLOCKED');
   });
 });

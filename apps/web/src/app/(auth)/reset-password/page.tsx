@@ -54,8 +54,21 @@ function ResetForm() {
         <Stack gap={4}>
           {!token && <Alert tone="danger">{t('resetNoToken')}</Alert>}
           <FormError message={error} />
-          <PasswordField name="password" autoComplete="new-password" label={t('newPassword')} hint={t('passwordHint')} register={form.register} error={form.formState.errors.password} />
-          <PasswordField name="confirm" autoComplete="new-password" label={t('confirmPassword')} register={form.register} error={form.formState.errors.confirm} />
+          <PasswordField
+            name="password"
+            autoComplete="new-password"
+            label={t('newPassword')}
+            hint={t('passwordHint')}
+            register={form.register}
+            error={form.formState.errors.password}
+          />
+          <PasswordField
+            name="confirm"
+            autoComplete="new-password"
+            label={t('confirmPassword')}
+            register={form.register}
+            error={form.formState.errors.confirm}
+          />
           <Button type="submit" block disabled={!token} loading={form.formState.isSubmitting}>
             {t('setPassword')}
           </Button>
