@@ -27,6 +27,12 @@ export interface SocialProvider {
   /** Returns fresh tokens when they are close to expiry, or null when no refresh is needed. */
   refreshIfNeeded(tokens: TokenSet, now: Date): Promise<TokenSet | null>;
   fetchStats(accessToken: string): Promise<SocialStats>;
+  /**
+   * Revokes our access at the platform (when the influencer removes the account or deletes their
+   * profile). Missing when the platform has no revoke endpoint (Instagram Login: the user removes
+   * the app in Instagram's settings).
+   */
+  revoke?(tokens: TokenSet): Promise<void>;
 }
 
 /** The user revoked access or the token can no longer be refreshed; they must reconnect. */
@@ -42,10 +48,15 @@ export class ProviderError extends Error {}
 export function toPercents(counts: Record<string, number>): Record<string, number> {
   const total = Object.values(counts).reduce((a, b) => a + b, 0);
   if (total <= 0) return {};
-  return Object.fromEntries(Object.entries(counts).map(([k, v]) => [k, Math.round((v / total) * 1000) / 10]));
+  return Object.fromEntries(
+    Object.entries(counts).map(([k, v]) => [k, Math.round((v / total) * 1000) / 10]),
+  );
 }
 
-export async function fetchJson<T>(url: string, init?: RequestInit): Promise<{ status: number; body: T }> {
+export async function fetchJson<T>(
+  url: string,
+  init?: RequestInit,
+): Promise<{ status: number; body: T }> {
   const res = await fetch(url, { ...init, signal: AbortSignal.timeout(15_000) });
   const text = await res.text();
   let body: unknown;

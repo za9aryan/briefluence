@@ -45,8 +45,15 @@ export class InstagramProvider implements SocialProvider {
       redirect_uri: redirectUri,
       code,
     });
-    type Short = { access_token?: string; data?: { access_token: string }[]; error_message?: string };
-    const short = await fetchJson<Short>('https://api.instagram.com/oauth/access_token', { method: 'POST', body: form });
+    type Short = {
+      access_token?: string;
+      data?: { access_token: string }[];
+      error_message?: string;
+    };
+    const short = await fetchJson<Short>('https://api.instagram.com/oauth/access_token', {
+      method: 'POST',
+      body: form,
+    });
     const shortToken = short.body.access_token ?? short.body.data?.[0]?.access_token;
     if (!shortToken) throw new ProviderError(`Instagram code exchange failed (${short.status})`);
 
@@ -58,7 +65,8 @@ export class InstagramProvider implements SocialProvider {
     });
     type Long = { access_token?: string; expires_in?: number };
     const long = await fetchJson<Long>(`https://graph.instagram.com/access_token?${q}`);
-    if (!long.body.access_token) throw new ProviderError(`Instagram long-lived exchange failed (${long.status})`);
+    if (!long.body.access_token)
+      throw new ProviderError(`Instagram long-lived exchange failed (${long.status})`);
     return {
       accessToken: long.body.access_token,
       expiresAt: long.body.expires_in ? new Date(Date.now() + long.body.expires_in * 1000) : null,
@@ -66,10 +74,15 @@ export class InstagramProvider implements SocialProvider {
   }
 
   async refreshIfNeeded(tokens: TokenSet, now: Date): Promise<TokenSet | null> {
-    if (tokens.expiresAt && tokens.expiresAt.getTime() <= now.getTime()) throw new TokenRevokedError('Token expired');
+    if (tokens.expiresAt && tokens.expiresAt.getTime() <= now.getTime())
+      throw new TokenRevokedError('Token expired');
     // Long-lived tokens can be refreshed once they are 24h old; refresh when <15 days are left.
-    if (tokens.expiresAt && tokens.expiresAt.getTime() - now.getTime() > 15 * 86_400_000) return null;
-    const q = new URLSearchParams({ grant_type: 'ig_refresh_token', access_token: tokens.accessToken });
+    if (tokens.expiresAt && tokens.expiresAt.getTime() - now.getTime() > 15 * 86_400_000)
+      return null;
+    const q = new URLSearchParams({
+      grant_type: 'ig_refresh_token',
+      access_token: tokens.accessToken,
+    });
     const r = await fetchJson<{ access_token?: string; expires_in?: number }>(
       `https://graph.instagram.com/refresh_access_token?${q}`,
     );
@@ -83,7 +96,9 @@ export class InstagramProvider implements SocialProvider {
 
   private async get<T>(path: string, params: Record<string, string>, token: string): Promise<T> {
     const q = new URLSearchParams({ ...params, access_token: token });
-    const r = await fetchJson<T & { error?: { code?: number; message?: string } }>(`${this.graph}${path}?${q}`);
+    const r = await fetchJson<T & { error?: { code?: number; message?: string } }>(
+      `${this.graph}${path}?${q}`,
+    );
     // Graph API error code 190 = invalid / expired / revoked OAuth token.
     if (r.body.error?.code === 190 || r.status === 401) throw new TokenRevokedError();
     if (r.status >= 400) throw new ProviderError(`Instagram ${path} failed (${r.status})`);
@@ -98,28 +113,46 @@ export class InstagramProvider implements SocialProvider {
       followers_count?: number;
       media_count?: number;
     };
-    const me = await this.get<Me>('/me', { fields: 'user_id,username,profile_picture_url,followers_count,media_count' }, token);
+    const me = await this.get<Me>(
+      '/me',
+      { fields: 'user_id,username,profile_picture_url,followers_count,media_count' },
+      token,
+    );
     type Media = { data: { id: string; like_count?: number; comments_count?: number }[] };
     const media = await this.get<Media>(
       '/me/media',
-      { fields: 'id,like_count,comments_count,media_type,timestamp', limit: String(ENGAGEMENT_SAMPLE_SIZE) },
+      {
+        fields: 'id,like_count,comments_count,media_type,timestamp',
+        limit: String(ENGAGEMENT_SAMPLE_SIZE),
+      },
       token,
     );
-    const posts = media.data.map((m) => ({ likes: m.like_count ?? 0, comments: m.comments_count ?? 0 }));
+    const posts = media.data.map((m) => ({
+      likes: m.like_count ?? 0,
+      comments: m.comments_count ?? 0,
+    }));
     const followers = me.followers_count ?? 0;
 
     // Reach per recent media (media insights metric "reach").
     const reaches = await Promise.allSettled(
       media.data.map((m) =>
-        this.get<{ data: { name: string; values: { value: number }[] }[] }>(`/${m.id}/insights`, { metric: 'reach' }, token),
+        this.get<{ data: { name: string; values: { value: number }[] }[] }>(
+          `/${m.id}/insights`,
+          { metric: 'reach' },
+          token,
+        ),
       ),
     );
     const reachValues = reaches.flatMap((r) =>
-      r.status === 'fulfilled' && r.value.data[0]?.values[0] ? [r.value.data[0].values[0].value] : [],
+      r.status === 'fulfilled' && r.value.data[0]?.values[0]
+        ? [r.value.data[0].values[0].value]
+        : [],
     );
 
     const [gender, age, country] = await Promise.all(
-      (['gender', 'age', 'country'] as const).map((b) => this.demographics(me.user_id, b, token).catch(() => null)),
+      (['gender', 'age', 'country'] as const).map((b) =>
+        this.demographics(me.user_id, b, token).catch(() => null),
+      ),
     );
     let audienceGender = null;
     if (gender) {
@@ -142,13 +175,27 @@ export class InstagramProvider implements SocialProvider {
     };
   }
 
-  private async demographics(userId: string, breakdown: 'gender' | 'age' | 'country', token: string) {
+  private async demographics(
+    userId: string,
+    breakdown: 'gender' | 'age' | 'country',
+    token: string,
+  ) {
     type Insights = {
-      data: { total_value?: { breakdowns?: { results?: { dimension_values: string[]; value: number }[] }[] } }[];
+      data: {
+        total_value?: {
+          breakdowns?: { results?: { dimension_values: string[]; value: number }[] }[];
+        };
+      }[];
     };
     const r = await this.get<Insights>(
       `/${userId}/insights`,
-      { metric: 'follower_demographics', period: 'lifetime', timeframe: 'last_90_days', metric_type: 'total_value', breakdown },
+      {
+        metric: 'follower_demographics',
+        period: 'lifetime',
+        timeframe: 'last_90_days',
+        metric_type: 'total_value',
+        breakdown,
+      },
       token,
     );
     const results = r.data[0]?.total_value?.breakdowns?.[0]?.results ?? [];

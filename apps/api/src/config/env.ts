@@ -74,7 +74,8 @@ export const envSchema = z
       }),
     INSTAGRAM_APP_ID: optional,
     INSTAGRAM_APP_SECRET: optional,
-    INSTAGRAM_GRAPH_VERSION: z.string().default('v23.0'),
+    // Latest per https://developers.facebook.com/docs/instagram-platform/api-reference/instagram-user/insights
+    INSTAGRAM_GRAPH_VERSION: z.string().default('v27.0'),
     TIKTOK_CLIENT_KEY: optional,
     TIKTOK_CLIENT_SECRET: optional,
     GOOGLE_CLIENT_ID: optional,

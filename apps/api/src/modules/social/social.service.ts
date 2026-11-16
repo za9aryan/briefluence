@@ -320,6 +320,7 @@ export class SocialService implements OnModuleInit {
         'This account is used in active applications. Withdraw or finish them first.',
       );
     }
+    await this.revokeAccess(acc);
     await this.links.unlink(acc.id);
     await this.prisma.socialAccount.delete({ where: { id: acc.id } });
     const remaining = await this.prisma.socialAccount.count({
@@ -332,6 +333,36 @@ export class SocialService implements OnModuleInit {
         data: { status: 'DRAFT' },
       });
     }
+  }
+
+  /**
+   * Tells the platform to end our access (YouTube and TikTok have a revoke endpoint; Instagram
+   * does not). Best effort: a platform error never blocks removing the account here, and the
+   * stored tokens are deleted right after either way.
+   */
+  async revokeAccess(acc: SocialAccount) {
+    const provider = this.providers[acc.platform];
+    // Manual accounts have no token; a revoked one has nothing left to end.
+    if (!provider.revoke || !acc.accessTokenEnc || acc.tokenRevokedAt) return;
+    try {
+      const tokens: TokenSet = {
+        accessToken: this.crypto.decrypt(acc.accessTokenEnc),
+        refreshToken: acc.refreshTokenEnc ? this.crypto.decrypt(acc.refreshTokenEnc) : null,
+        expiresAt: acc.tokenExpiresAt,
+      };
+      // TikTok revokes by access token, which lives 2h: refresh it first when needed.
+      const fresh =
+        (await provider.refreshIfNeeded(tokens, this.clock.now()).catch(() => null)) ?? tokens;
+      await provider.revoke(fresh);
+    } catch (err) {
+      this.logger.warn(`Revoking ${acc.platform} access failed: ${(err as Error).message}`);
+    }
+  }
+
+  /** Revokes every connected account of an influencer (account deletion). */
+  async revokeAllFor(influencerId: string) {
+    const accounts = await this.prisma.socialAccount.findMany({ where: { influencerId } });
+    for (const acc of accounts) await this.revokeAccess(acc);
   }
 
   /** Refreshes tokens and stats. A revoked token flags the account and emails the influencer once. */

@@ -1,5 +1,5 @@
 {
-  "updated": "Last updated: 3 November 2026 · Draft",
+  "updated": "Last updated: 16 November 2026 · Draft",
   "contact": "Questions? Write to support@briefluence.am.",
   "terms": {
     "title": "Terms of service",
@@ -11,7 +11,7 @@
       },
       "b": {
         "title": "2. Your account",
-        "body": "You must be at least 16, give accurate information and keep your password safe. One person or company per account. We may suspend accounts that break these terms."
+        "body": "You must be at least 16, give accurate information and keep your password safe. One person or company per account. We may suspend accounts that break these terms.\n\nIf you connect a YouTube channel, you also agree to be bound by the YouTube Terms of Service: https://www.youtube.com/t/terms"
       },
       "c": {
         "title": "3. Companies",
@@ -49,7 +49,7 @@
       },
       "b": {
         "title": "2. Connected social accounts",
-        "body": "When you connect Instagram, TikTok or YouTube through their official login, we receive your username, follower count, recent post statistics and, where available, aggregated audience demographics (age, gender, country). We never post on your behalf. Access tokens are stored encrypted (AES-256) and you can revoke access any time in the platform settings or by disconnecting the account here."
+        "body": "When you connect Instagram, TikTok or YouTube through their official login, we receive your username, follower count, recent post statistics and, where available, aggregated audience demographics (age, gender, country). We never post on your behalf. Access tokens are stored encrypted (AES-256) and you can revoke access any time in the platform settings or by disconnecting the account here; disconnecting also revokes our access at YouTube and TikTok.\n\nbriefluence uses YouTube API Services. By connecting YouTube you agree to the YouTube Terms of Service (https://www.youtube.com/t/terms), and Google’s Privacy Policy (https://www.google.com/policies/privacy) applies. You can also revoke our access to your YouTube data on Google’s security settings page: https://security.google.com/settings/security/permissions"
       },
       "c": {
         "title": "3. How we use it",
@@ -65,7 +65,7 @@
       },
       "f": {
         "title": "6. Retention and deletion",
-        "body": "We keep data while your account exists. To delete your account and all related data, including data received from Instagram, TikTok and YouTube, email support@briefluence.am from your account email. We delete it within 30 days and confirm by email."
+        "body": "We keep data while your account exists. To delete your account and all related data, including data received from Instagram, TikTok and YouTube, use “Delete account” in Settings or email support@briefluence.am from your account email. We delete it within 7 days."
       },
       "g": {
         "title": "7. Your rights",

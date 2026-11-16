@@ -47,7 +47,15 @@ export class MockSocialProvider implements SocialProvider {
       engagementRate: Math.round((1 + r(5) * 7) * 100) / 100,
       audienceGender: hasDemographics ? { male: 100 - female, female } : null,
       audienceAge: hasDemographics
-        ? { '13-17': 4, '18-24': 30 + Math.round(r(6) * 10), '25-34': 35, '35-44': 15, '45-54': 6, '55-64': 3, '65+': 1 }
+        ? {
+            '13-17': 4,
+            '18-24': 30 + Math.round(r(6) * 10),
+            '25-34': 35,
+            '35-44': 15,
+            '45-54': 6,
+            '55-64': 3,
+            '65+': 1,
+          }
         : null,
       audienceCountries: hasDemographics ? { AM: 60 + Math.round(r(7) * 25), RU: 10, US: 5 } : null,
     };

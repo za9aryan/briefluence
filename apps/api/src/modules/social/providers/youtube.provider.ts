@@ -17,6 +17,10 @@ import {
  *  - OAuth web server flow: https://developers.google.com/identity/protocols/oauth2/web-server
  *  - channels.list: https://developers.google.com/youtube/v3/docs/channels/list
  *  - Analytics reports: https://developers.google.com/youtube/analytics/channel_reports
+ *  - Dimensions (ageGroup, gender, country): https://developers.google.com/youtube/analytics/dimensions
+ *  - Revoking: https://developers.google.com/identity/protocols/oauth2/web-server (POST /revoke)
+ *  - Developer policies (privacy, revocation, 30-day refresh):
+ *    https://developers.google.com/youtube/terms/developer-policies
  */
 export class YouTubeProvider implements SocialProvider {
   readonly platform = 'YOUTUBE' as const;
@@ -66,8 +70,22 @@ export class YouTubeProvider implements SocialProvider {
   async refreshIfNeeded(tokens: TokenSet, now: Date): Promise<TokenSet | null> {
     if (tokens.expiresAt && tokens.expiresAt.getTime() - now.getTime() > 5 * 60_000) return null;
     if (!tokens.refreshToken) throw new TokenRevokedError('No refresh token');
-    const next = await this.token({ grant_type: 'refresh_token', refresh_token: tokens.refreshToken });
+    const next = await this.token({
+      grant_type: 'refresh_token',
+      refresh_token: tokens.refreshToken,
+    });
     return { ...next, refreshToken: next.refreshToken ?? tokens.refreshToken };
+  }
+
+  /** Revoking the refresh token ends the whole grant (access token included). */
+  async revoke(tokens: TokenSet): Promise<void> {
+    const r = await fetchJson<unknown>('https://oauth2.googleapis.com/revoke', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ token: tokens.refreshToken ?? tokens.accessToken }),
+    });
+    // 400 = the token is already invalid: nothing left to revoke.
+    if (r.status > 400) throw new ProviderError(`Google revoke failed (${r.status})`);
   }
 
   private async get<T>(url: string, token: string): Promise<T> {
@@ -100,15 +118,27 @@ export class YouTubeProvider implements SocialProvider {
       token,
     );
     const ids = (pl.items ?? []).map((i) => i.contentDetails.videoId);
-    type Videos = { items?: { statistics: { viewCount?: string; likeCount?: string; commentCount?: string } }[] };
+    type Videos = {
+      items?: { statistics: { viewCount?: string; likeCount?: string; commentCount?: string } }[];
+    };
     const vids = ids.length
-      ? await this.get<Videos>(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids.join(',')}`, token)
+      ? await this.get<Videos>(
+          `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids.join(',')}`,
+          token,
+        )
       : { items: [] };
     const stats = (vids.items ?? []).map((v) => v.statistics);
 
     const [demo, countries] = await Promise.all([
-      this.report(token, { metrics: 'viewerPercentage', dimensions: 'ageGroup,gender' }).catch(() => null),
-      this.report(token, { metrics: 'views', dimensions: 'country', sort: '-views', maxResults: '10' }).catch(() => null),
+      this.report(token, { metrics: 'viewerPercentage', dimensions: 'ageGroup,gender' }).catch(
+        () => null,
+      ),
+      this.report(token, {
+        metrics: 'views',
+        dimensions: 'country',
+        sort: '-views',
+        maxResults: '10',
+      }).catch(() => null),
     ]);
 
     let audienceGender = null;
@@ -123,12 +153,16 @@ export class YouTubeProvider implements SocialProvider {
         a[key] = (a[key] ?? 0) + pct;
       }
       const gp = toPercents(g);
-      audienceGender = { male: gp.male ?? 0, female: gp.female ?? 0, other: gp.user_specified ?? 0 };
+      audienceGender = {
+        male: gp.male ?? 0,
+        female: gp.female ?? 0,
+        other: gp.user_specified ?? 0,
+      };
       audienceAge = toPercents(a);
     }
-    const audienceCountries = countries?.length
-      ? toPercents(Object.fromEntries((countries as [string, number][]).map(([c, v]) => [c, v])))
-      : null;
+    // "ZZ" = views YouTube could not place in a country; leave them out of the top countries.
+    const placed = ((countries ?? []) as [string, number][]).filter(([c]) => c !== 'ZZ');
+    const audienceCountries = placed.length ? toPercents(Object.fromEntries(placed)) : null;
 
     return {
       externalId: channel.id,
@@ -141,7 +175,10 @@ export class YouTubeProvider implements SocialProvider {
       mediaCount: Number(channel.statistics.videoCount ?? 0),
       avgViews: averageViews(stats.map((s) => Number(s.viewCount ?? 0))),
       engagementRate: engagementRate(
-        stats.map((s) => ({ likes: Number(s.likeCount ?? 0), comments: Number(s.commentCount ?? 0) })),
+        stats.map((s) => ({
+          likes: Number(s.likeCount ?? 0),
+          comments: Number(s.commentCount ?? 0),
+        })),
         subscribers,
       ),
       audienceGender,
@@ -159,7 +196,10 @@ export class YouTubeProvider implements SocialProvider {
       endDate: end.toISOString().slice(0, 10),
       ...params,
     });
-    const r = await this.get<{ rows?: unknown[][] }>(`https://youtubeanalytics.googleapis.com/v2/reports?${q}`, token);
+    const r = await this.get<{ rows?: unknown[][] }>(
+      `https://youtubeanalytics.googleapis.com/v2/reports?${q}`,
+      token,
+    );
     return r.rows ?? [];
   }
 }

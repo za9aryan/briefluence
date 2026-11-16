@@ -5,7 +5,9 @@ import { getTranslations } from 'next-intl/server';
 export async function LegalPage({ doc }: { doc: 'terms' | 'privacy' }) {
   const t = await getTranslations(`legal.${doc}`);
   const tl = await getTranslations('legal');
-  const sections = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].filter((k) => t.has(`sections.${k}.title`));
+  const sections = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].filter((k) =>
+    t.has(`sections.${k}.title`),
+  );
   return (
     <Container size="md" py={{ base: 8, md: 16 }}>
       <Stack gap={8}>
@@ -23,8 +25,8 @@ export async function LegalPage({ doc }: { doc: 'terms' | 'privacy' }) {
             <Heading level={2} size="h2">
               {t(`sections.${k}.title`)}
             </Heading>
-            <Text tone="muted" className="whitespace-pre-line">
-              {t(`sections.${k}.body`)}
+            <Text tone="muted" className="whitespace-pre-line wrap-anywhere">
+              {linkify(t(`sections.${k}.body`))}
             </Text>
           </Stack>
         ))}
@@ -33,5 +35,24 @@ export async function LegalPage({ doc }: { doc: 'terms' | 'privacy' }) {
         </Text>
       </Stack>
     </Container>
+  );
+}
+
+/** Turns the https:// addresses in a legal text into links (they come from translations as text). */
+function linkify(text: string) {
+  return text.split(/(https:\/\/[^\s)]+[^\s).,;:])/g).map((part, i) =>
+    part.startsWith('https://') ? (
+      <a
+        key={i}
+        href={part}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="font-bold text-primary-text underline"
+      >
+        {part}
+      </a>
+    ) : (
+      part
+    ),
   );
 }

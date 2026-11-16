@@ -6,6 +6,7 @@ import { AppError } from '../../common/app-error';
 import { Clock } from '../../common/clock';
 import { PrismaService } from '../../common/prisma.service';
 import { PaddleBillingService } from '../billing/paddle/paddle-billing.service';
+import { SocialService } from '../social/social.service';
 
 /** Where a deleted account's email goes: unique, never deliverable, frees the real address. */
 export const deletedEmail = (userId: string) => `deleted-${userId}@deleted.invalid`;
@@ -17,6 +18,7 @@ export class AccountService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly paddle: PaddleBillingService,
+    private readonly social: SocialService,
     private readonly clock: Clock,
   ) {}
 
@@ -52,6 +54,9 @@ export class AccountService {
     ) {
       await this.paddle.cancelNow(sub);
     }
+
+    // Platforms' own access ends too (YouTube and TikTok revoke endpoints); best effort.
+    if (user.influencer) await this.social.revokeAllFor(user.influencer.id);
 
     const now = this.clock.now();
     const inf = user.influencer?.id;

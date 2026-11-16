@@ -2,9 +2,9 @@
 export default {
   legal: {
     updated: [
-      'Last updated: 3 November 2026 · Draft',
-      'Обновлено: 3 ноября 2026 · Черновик',
-      'Թարմացվել է՝ 2026 թ. նոյեմբերի 3 · Սևագիր',
+      'Last updated: 16 November 2026 · Draft',
+      'Обновлено: 16 ноября 2026 · Черновик',
+      'Թարմացվել է՝ 2026 թ. նոյեմբերի 16 · Սևագիր',
     ],
     contact: [
       'Questions? Write to support@briefluence.am.',
@@ -30,9 +30,9 @@ export default {
         b: {
           title: ['2. Your account', '2. Твой аккаунт', '2. Քո հաշիվը'],
           body: [
-            'You must be at least 16, give accurate information and keep your password safe. One person or company per account. We may suspend accounts that break these terms.',
-            'Тебе должно быть не меньше 16 лет, информация должна быть правдивой, а пароль — в безопасности. Один человек или компания — один аккаунт. Мы можем заблокировать аккаунт за нарушение условий.',
-            'Պետք է լինես առնվազն 16 տարեկան, տրամադրես ճշգրիտ տեղեկություններ և պահես գաղտնաբառդ ապահով։ Մեկ անձ կամ ընկերություն՝ մեկ հաշիվ։ Պայմանները խախտող հաշիվները կարող ենք արգելափակել։',
+            'You must be at least 16, give accurate information and keep your password safe. One person or company per account. We may suspend accounts that break these terms.\n\nIf you connect a YouTube channel, you also agree to be bound by the YouTube Terms of Service: https://www.youtube.com/t/terms',
+            'Тебе должно быть не меньше 16 лет, информация должна быть правдивой, а пароль — в безопасности. Один человек или компания — один аккаунт. Мы можем заблокировать аккаунт за нарушение условий.\n\nЕсли ты подключаешь YouTube-канал, ты также соглашаешься соблюдать Условия использования YouTube: https://www.youtube.com/t/terms',
+            'Պետք է լինես առնվազն 16 տարեկան, տրամադրես ճշգրիտ տեղեկություններ և պահես գաղտնաբառդ ապահով։ Մեկ անձ կամ ընկերություն՝ մեկ հաշիվ։ Պայմանները խախտող հաշիվները կարող ենք արգելափակել։\n\nԵթե միացնում ես YouTube ալիք, համաձայնում ես նաև պահպանել YouTube-ի օգտագործման պայմանները՝ https://www.youtube.com/t/terms',
           ],
         },
         c: {
@@ -116,9 +116,9 @@ export default {
             '2. Միացված սոցիալական հաշիվները',
           ],
           body: [
-            'When you connect Instagram, TikTok or YouTube through their official login, we receive your username, follower count, recent post statistics and, where available, aggregated audience demographics (age, gender, country). We never post on your behalf. Access tokens are stored encrypted (AES-256) and you can revoke access any time in the platform settings or by disconnecting the account here.',
-            'Когда ты подключаешь Instagram, TikTok или YouTube через официальный вход, мы получаем имя пользователя, число подписчиков, статистику последних публикаций и, если доступно, обобщённую демографию аудитории (возраст, пол, страна). Мы никогда не публикуем от твоего имени. Токены доступа хранятся в зашифрованном виде (AES-256), а отозвать доступ можно в любой момент в настройках платформы или отключив аккаунт здесь.',
-            'Երբ միացնում ես Instagram, TikTok կամ YouTube դրանց պաշտոնական մուտքով, մենք ստանում ենք օգտանունը, հետևորդների թիվը, վերջին հրապարակումների վիճակագրությունը և, եթե հասանելի է, լսարանի ամփոփ ժողովրդագրությունը (տարիք, սեռ, երկիր)։ Մենք երբեք չենք հրապարակում քո անունից։ Մուտքի թոքենները պահվում են գաղտնագրված (AES-256), իսկ մուտքը կարող ես հետ կանչել ցանկացած պահի՝ հարթակի կարգավորումներում կամ այստեղ անջատելով հաշիվը։',
+            'When you connect Instagram, TikTok or YouTube through their official login, we receive your username, follower count, recent post statistics and, where available, aggregated audience demographics (age, gender, country). We never post on your behalf. Access tokens are stored encrypted (AES-256) and you can revoke access any time in the platform settings or by disconnecting the account here; disconnecting also revokes our access at YouTube and TikTok.\n\nbriefluence uses YouTube API Services. By connecting YouTube you agree to the YouTube Terms of Service (https://www.youtube.com/t/terms), and Google’s Privacy Policy (https://www.google.com/policies/privacy) applies. You can also revoke our access to your YouTube data on Google’s security settings page: https://security.google.com/settings/security/permissions',
+            'Когда ты подключаешь Instagram, TikTok или YouTube через официальный вход, мы получаем имя пользователя, число подписчиков, статистику последних публикаций и, если доступно, обобщённую демографию аудитории (возраст, пол, страна). Мы никогда не публикуем от твоего имени. Токены доступа хранятся в зашифрованном виде (AES-256), а отозвать доступ можно в любой момент в настройках платформы или отключив аккаунт здесь; при отключении мы также отзываем свой доступ в YouTube и TikTok.\n\nbriefluence использует YouTube API Services. Подключая YouTube, ты соглашаешься с Условиями использования YouTube (https://www.youtube.com/t/terms), и к твоим данным применяется Политика конфиденциальности Google (https://www.google.com/policies/privacy). Отозвать наш доступ к данным YouTube можно и на странице настроек безопасности Google: https://security.google.com/settings/security/permissions',
+            'Երբ միացնում ես Instagram, TikTok կամ YouTube դրանց պաշտոնական մուտքով, մենք ստանում ենք օգտանունը, հետևորդների թիվը, վերջին հրապարակումների վիճակագրությունը և, եթե հասանելի է, լսարանի ամփոփ ժողովրդագրությունը (տարիք, սեռ, երկիր)։ Մենք երբեք չենք հրապարակում քո անունից։ Մուտքի թոքենները պահվում են գաղտնագրված (AES-256), իսկ մուտքը կարող ես հետ կանչել ցանկացած պահի՝ հարթակի կարգավորումներում կամ այստեղ անջատելով հաշիվը․ անջատելիս մենք նաև հետ ենք կանչում մեր մուտքը YouTube-ում և TikTok-ում։\n\nbriefluence-ն օգտագործում է YouTube API Services։ Միացնելով YouTube-ը՝ համաձայնում ես YouTube-ի օգտագործման պայմաններին (https://www.youtube.com/t/terms), և կիրառվում է Google-ի գաղտնիության քաղաքականությունը (https://www.google.com/policies/privacy)։ YouTube-ի տվյալներին մեր մուտքը կարող ես հետ կանչել նաև Google-ի անվտանգության կարգավորումների էջում՝ https://security.google.com/settings/security/permissions',
           ],
         },
         c: {
@@ -148,9 +148,9 @@ export default {
         f: {
           title: ['6. Retention and deletion', '6. Хранение и удаление', '6. Պահպանումը և ջնջումը'],
           body: [
-            'We keep data while your account exists. To delete your account and all related data, including data received from Instagram, TikTok and YouTube, email support@briefluence.am from your account email. We delete it within 30 days and confirm by email.',
-            'Мы храним данные, пока существует аккаунт. Чтобы удалить аккаунт и все связанные данные, включая полученные из Instagram, TikTok и YouTube, напиши на support@briefluence.am с email аккаунта. Мы удалим их в течение 30 дней и подтвердим письмом.',
-            'Տվյալները պահում ենք, քանի դեռ հաշիվը գոյություն ունի։ Հաշիվը և բոլոր կապված տվյալները, ներառյալ Instagram-ից, TikTok-ից և YouTube-ից ստացվածները, ջնջելու համար գրիր support@briefluence.am հաշվի էլ. փոստից։ Կջնջենք 30 օրվա ընթացքում և կհաստատենք նամակով։',
+            'We keep data while your account exists. To delete your account and all related data, including data received from Instagram, TikTok and YouTube, use “Delete account” in Settings or email support@briefluence.am from your account email. We delete it within 7 days.',
+            'Мы храним данные, пока существует аккаунт. Чтобы удалить аккаунт и все связанные данные, включая полученные из Instagram, TikTok и YouTube, нажми «Удалить аккаунт» в «Настройках» или напиши на support@briefluence.am с email аккаунта. Мы удалим их в течение 7 дней.',
+            'Տվյալները պահում ենք, քանի դեռ հաշիվը գոյություն ունի։ Հաշիվը և բոլոր կապված տվյալները, ներառյալ Instagram-ից, TikTok-ից և YouTube-ից ստացվածները, ջնջելու համար սեղմիր «Ջնջել հաշիվը» «Կարգավորումներում» կամ գրիր support@briefluence.am հաշվի էլ. փոստից։ Կջնջենք 7 օրվա ընթացքում։',
           ],
         },
         g: {

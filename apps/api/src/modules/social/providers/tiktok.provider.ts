@@ -1,6 +1,13 @@
 import { ENGAGEMENT_SAMPLE_SIZE, averageViews, engagementRate } from '@briefluence/shared';
 import type { Env } from '../../../config/env';
-import { fetchJson, ProviderError, TokenRevokedError, type SocialProvider, type SocialStats, type TokenSet } from './types';
+import {
+  fetchJson,
+  ProviderError,
+  TokenRevokedError,
+  type SocialProvider,
+  type SocialStats,
+  type TokenSet,
+} from './types';
 
 /**
  * TikTok Login Kit (web) + Display API. Audience demographics are not available from this API,
@@ -10,6 +17,8 @@ import { fetchJson, ProviderError, TokenRevokedError, type SocialProvider, type 
  *  - Tokens: https://developers.tiktok.com/doc/oauth-user-access-token-management
  *  - User info: https://developers.tiktok.com/doc/tiktok-api-v2-get-user-info
  *  - Video list: https://developers.tiktok.com/doc/tiktok-api-v2-video-list
+ *  - Video object fields: https://developers.tiktok.com/doc/tiktok-api-v2-video-object
+ *  - Revoke: https://developers.tiktok.com/doc/oauth-revoke-a-user-access-token
  */
 export class TikTokProvider implements SocialProvider {
   readonly platform = 'TIKTOK' as const;
@@ -51,15 +60,35 @@ export class TikTokProvider implements SocialProvider {
   }
 
   async refreshIfNeeded(tokens: TokenSet, now: Date): Promise<TokenSet | null> {
-    // Access tokens live 24h; refresh tokens 365 days and may rotate.
+    // Access tokens live 2h, refresh tokens 180 days (use expires_in, not these numbers); the
+    // refresh token may rotate.
     if (tokens.expiresAt && tokens.expiresAt.getTime() - now.getTime() > 60 * 60_000) return null;
     if (!tokens.refreshToken) throw new TokenRevokedError('No refresh token');
-    const next = await this.token({ grant_type: 'refresh_token', refresh_token: tokens.refreshToken });
+    const next = await this.token({
+      grant_type: 'refresh_token',
+      refresh_token: tokens.refreshToken,
+    });
     return { ...next, refreshToken: next.refreshToken ?? tokens.refreshToken };
   }
 
+  async revoke(tokens: TokenSet): Promise<void> {
+    const r = await fetchJson<{ error?: string }>('https://open.tiktokapis.com/v2/oauth/revoke/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_key: this.env.TIKTOK_CLIENT_KEY ?? '',
+        client_secret: this.env.TIKTOK_CLIENT_SECRET ?? '',
+        token: tokens.accessToken,
+      }),
+    });
+    if (r.status >= 400 || r.body.error) {
+      throw new ProviderError(`TikTok revoke failed (${r.status} ${r.body.error ?? ''})`);
+    }
+  }
+
   private check(status: number, body: { error?: { code?: string } }, what: string) {
-    if (body.error?.code === 'access_token_invalid' || status === 401) throw new TokenRevokedError();
+    if (body.error?.code === 'access_token_invalid' || status === 401)
+      throw new TokenRevokedError();
     if (status >= 400 || (body.error?.code && body.error.code !== 'ok')) {
       throw new ProviderError(`TikTok ${what} failed (${status} ${body.error?.code ?? ''})`);
     }
@@ -80,7 +109,8 @@ export class TikTokProvider implements SocialProvider {
       };
       error?: { code?: string };
     };
-    const fields = 'open_id,username,display_name,avatar_url,follower_count,likes_count,video_count,profile_deep_link';
+    const fields =
+      'open_id,username,display_name,avatar_url,follower_count,likes_count,video_count,profile_deep_link';
     const u = await fetchJson<User>(`https://open.tiktokapis.com/v2/user/info/?fields=${fields}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -108,7 +138,9 @@ export class TikTokProvider implements SocialProvider {
     return {
       externalId: user.open_id,
       username,
-      profileUrl: user.username ? `https://www.tiktok.com/@${user.username}` : (user.profile_deep_link ?? ''),
+      profileUrl: user.username
+        ? `https://www.tiktok.com/@${user.username}`
+        : (user.profile_deep_link ?? ''),
       avatarUrl: user.avatar_url ?? null,
       followers,
       mediaCount: user.video_count ?? null,
