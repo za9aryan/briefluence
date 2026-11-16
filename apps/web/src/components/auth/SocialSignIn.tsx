@@ -2,6 +2,7 @@
 import { Text } from '@briefluence/ui';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import type { ReactNode } from 'react';
 import { API_BASE, api } from '@/lib/api';
 
 type Provider = 'google';
@@ -33,16 +34,16 @@ function GoogleMark() {
 /**
  * "Continue with Google". Shown only when the API has it configured.
  * `role` (sign-up page) creates the account directly; without it, new people choose a role next.
- * `beforeStart` lets the sign-up page require accepting the terms first.
  */
 export function SocialSignIn({
   role,
   next,
-  beforeStart,
+  note,
 }: {
   role?: 'BRAND' | 'INFLUENCER';
   next?: string | null;
-  beforeStart?: () => boolean;
+  /** Small print under the button (the sign-up page's "By continuing… you accept the terms"). */
+  note?: ReactNode;
 }) {
   const t = useTranslations('auth.social');
   const providers = useQuery({
@@ -54,7 +55,6 @@ export function SocialSignIn({
   if (list.length === 0) return null;
 
   const go = (p: Provider) => {
-    if (beforeStart && !beforeStart()) return;
     const q = new URLSearchParams();
     if (role) q.set('role', role);
     if (next && next.startsWith('/') && !next.startsWith('//')) q.set('next', next);
@@ -70,6 +70,11 @@ export function SocialSignIn({
           <GoogleMark />
           {t('google')}
         </button>
+      )}
+      {note && (
+        <Text size="small" tone="muted" className="text-center">
+          {note}
+        </Text>
       )}
       <div className="my-2 flex items-center gap-4" role="separator">
         <span className="h-px flex-1 bg-line" />

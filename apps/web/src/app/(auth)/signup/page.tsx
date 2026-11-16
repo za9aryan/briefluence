@@ -31,6 +31,7 @@ const ROLES: { value: SignupInput['role']; icon: IconName }[] = [
 
 function SignupForm() {
   const t = useTranslations('auth');
+  const tc = useTranslations('auth.social');
   const fe = useFieldError();
   const router = useRouter();
   const params = useSearchParams();
@@ -103,14 +104,30 @@ function SignupForm() {
               )}
             />
           </fieldset>
-          {/* Social sign-up uses the chosen role; the terms checkbox below must be ticked first. */}
+          {/* Google sign-up uses the chosen role; continuing means accepting the terms (said right
+              under the button), so it doesn't wait for the checkbox further down. */}
           <SocialSignIn
             role={role}
-            beforeStart={() => {
-              if (form.getValues('acceptTerms')) return true;
-              form.setError('acceptTerms', { type: 'custom', message: 'acceptTerms' });
-              return false;
-            }}
+            note={tc.rich('consent', {
+              terms: (c) => (
+                <Link
+                  href="/terms"
+                  target="_blank"
+                  className="font-bold text-primary-text hover:underline"
+                >
+                  {c}
+                </Link>
+              ),
+              privacy: (c) => (
+                <Link
+                  href="/privacy"
+                  target="_blank"
+                  className="font-bold text-primary-text hover:underline"
+                >
+                  {c}
+                </Link>
+              ),
+            })}
           />
           <TextField
             name="email"
