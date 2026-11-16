@@ -37,6 +37,8 @@
   "digestHint": "New matching briefs or applicants, once a day. Payment and approval emails always arrive.",
   "password": "Password",
   "passwordHint": "Changing it signs you out on other devices.",
+  "setPassword": "Set a password",
+  "setPasswordHint": "You signed up with Google. Add a password to also log in with your email.",
   "currentPassword": "Current password",
   "changePassword": "Change password",
   "passwordChanged": "Password changed"
