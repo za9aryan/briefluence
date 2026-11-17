@@ -1,5 +1,5 @@
 {
-  "updated": "Last updated: 16 November 2026 · Draft",
+  "updated": "Last updated: 17 November 2026 · Draft",
   "contact": "Questions? Write to support@briefluence.am.",
   "terms": {
     "title": "Terms of service",
@@ -73,8 +73,15 @@
       },
       "h": {
         "title": "8. Cookies",
-        "body": "We use only necessary cookies: your session and your language choice. No advertising trackers."
+        "body": "We always use necessary cookies: your session and your language choice. If you allow it in the cookie banner, we also use Google Analytics to count visits and see which pages help people: it sets its own cookies (_ga) and Google processes the data for us. We never send Google your email, name or private links, and we run no ads. You can change your choice any time under \"Cookie settings\" at the bottom of the site."
       }
     }
+  },
+  "cookies": {
+    "title": "Cookies, okay?",
+    "body": "We would like to use Google Analytics to see how people find briefluence and which pages help. No ads, and no private data goes to Google. <link>Privacy policy</link>",
+    "allow": "Allow",
+    "deny": "Only necessary",
+    "settings": "Cookie settings"
   }
 }

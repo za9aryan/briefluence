@@ -216,6 +216,14 @@ applications and offer requests are withdrawn, and the user gets `deletedAt` + `
 filter hides it). The email becomes free to register again. Admins see **Deleted by owner** in Users and cannot
 unblock it. Uploaded images are not removed from storage yet.
 
+## Website statistics
+
+Admin › **Statistics** shows visits from Google Analytics 4: people on the site right now, visitors per day,
+where they come from (channels, sources, countries, cities), devices, languages, busiest hours, top and entry
+pages, next to our own sign-ups and the visitor → sign-up conversion. Visitors see a cookie banner first; the
+tag loads only after "Allow", and private links (tokens) are cleaned before page views are sent. Without the
+`GA_*` settings the banner is off and the page explains the setup: [docs/analytics.md](docs/analytics.md).
+
 ## Admin access
 
 There is no public admin sign-up. The admin account comes from `ADMIN_EMAIL` / `ADMIN_PASSWORD` in `.env`:

@@ -1,6 +1,7 @@
 import { Container, Grid, Stack, Text } from '@briefluence/ui';
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
+import { CookieSettingsButton } from '@/components/app/Analytics';
 import { Logo } from '@/components/common/Logo';
 
 export async function PublicFooter() {
@@ -53,6 +54,9 @@ export async function PublicFooter() {
                   {label}
                 </Link>
               ))}
+              {c.title === t('legal') && (
+                <CookieSettingsButton className="py-1 text-left text-small font-medium text-ink hover:text-primary-text" />
+              )}
             </Stack>
           ))}
         </Grid>

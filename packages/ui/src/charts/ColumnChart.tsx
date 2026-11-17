@@ -40,7 +40,11 @@ export function ColumnChart({
       {/* y axis */}
       <div className="relative w-8 shrink-0 text-right" style={{ height }} aria-hidden>
         {ticks.map((t) => (
-          <span key={t} className="absolute right-0 -translate-y-1/2 text-[11px] text-ink-muted tabular-nums" style={{ bottom: `calc(${pct(t)}% - 0.5em)` }}>
+          <span
+            key={t}
+            className="absolute right-0 -translate-y-1/2 text-[11px] text-ink-muted tabular-nums"
+            style={{ bottom: `calc(${pct(t)}% - 0.5em)` }}
+          >
             {format(t)}
           </span>
         ))}
@@ -48,7 +52,11 @@ export function ColumnChart({
       <div className="min-w-0 flex-1">
         <div ref={box} className="relative" style={{ height }}>
           {ticks.map((t) => (
-            <div key={t} className="absolute inset-x-0 h-px bg-line" style={{ bottom: `${pct(t)}%` }} />
+            <div
+              key={t}
+              className="absolute inset-x-0 h-px bg-line"
+              style={{ bottom: `${pct(t)}%` }}
+            />
           ))}
           <div className="absolute inset-0 flex items-end gap-0.5">
             {rows.map((r, i) => (
@@ -64,7 +72,11 @@ export function ColumnChart({
               >
                 <div
                   className="w-full max-w-6 rounded-t-[4px] bg-chart-1 transition-opacity"
-                  style={{ height: `${pct(r.value)}%`, opacity: active == null || active === i ? 1 : 0.45, minHeight: r.value > 0 ? 2 : 0 }}
+                  style={{
+                    height: `${pct(r.value)}%`,
+                    opacity: active == null || active === i ? 1 : 0.45,
+                    minHeight: r.value > 0 ? 2 : 0,
+                  }}
                 />
               </div>
             ))}
@@ -83,7 +95,11 @@ export function ColumnChart({
           {rows.map((r, i) => (
             <span
               key={r.key}
-              className={every === 1 ? 'min-w-0 flex-1 text-center text-[11px] leading-tight break-words text-ink-muted' : 'min-w-0 flex-1 overflow-visible text-center text-[11px] whitespace-nowrap text-ink-muted'}
+              className={
+                every === 1 && rows.length <= 12
+                  ? 'min-w-0 flex-1 text-center text-[11px] leading-tight break-words text-ink-muted'
+                  : 'min-w-0 flex-1 overflow-visible text-center text-[11px] whitespace-nowrap text-ink-muted'
+              }
             >
               {i % every === 0 ? r.label : ''}
             </span>

@@ -44,6 +44,7 @@ import {
   AdminAnalyticsService,
   type AnalyticsPeriod,
 } from './analytics.service';
+import { TRAFFIC_PERIODS, TrafficService, type TrafficPeriod } from './traffic.service';
 
 const pick = <T extends string>(list: readonly T[], v?: string) =>
   list.includes(v as T) ? (v as T) : undefined;
@@ -55,6 +56,7 @@ export class AdminController {
   constructor(
     private readonly admin: AdminService,
     private readonly analyticsService: AdminAnalyticsService,
+    private readonly traffic: TrafficService,
     private readonly plansService: PlansService,
     private readonly offersService: OffersService,
     private readonly jobs: JobsService,
@@ -69,7 +71,19 @@ export class AdminController {
     return this.analyticsService.overview(ANALYTICS_PERIODS.includes(d) ? d : 30);
   }
 
-  /** Blogger plans: prices, currency, Basic's application limit, on/off. */
+  /** Website visits from Google Analytics for the last 7 / 30 / 90 days (Statistics page). */
+  @Get('traffic')
+  trafficOverview(@Query('days') days?: string) {
+    const d = Number(days) as TrafficPeriod;
+    return this.traffic.overview(TRAFFIC_PERIODS.includes(d) ? d : 30);
+  }
+
+  /** People on the website in the last 30 minutes. */
+  @Get('traffic/live')
+  trafficLive() {
+    return this.traffic.live();
+  }
+
   /**
    * Offers: the review queue by default (offers are checked before companies see them);
    * `status=ALL` lists every offer, any other status filters by it; `q` searches title / name.

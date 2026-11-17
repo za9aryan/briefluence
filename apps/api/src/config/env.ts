@@ -121,6 +121,20 @@ export const envSchema = z
 
     SENTRY_DSN: optional,
 
+    /**
+     * Google Analytics 4 reports for the admin Statistics page, read with the Data API
+     * (https://developers.google.com/analytics/devguides/reporting/data/v1). The service account
+     * needs Viewer access to the property. All three set = Statistics on; the private key may be
+     * stored with "\n" escapes.
+     */
+    GA_PROPERTY_ID: z
+      .string()
+      .regex(/^\d*$/, 'The numeric property ID (Admin › Property details)')
+      .optional()
+      .transform((v) => (v ? v : undefined)),
+    GA_CLIENT_EMAIL: optional,
+    GA_PRIVATE_KEY: optional,
+
     // Web Push (VAPID). Both keys set = push on; generate with web-push's generateVAPIDKeys().
     VAPID_PUBLIC_KEY: optional,
     VAPID_PRIVATE_KEY: optional,

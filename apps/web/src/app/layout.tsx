@@ -3,6 +3,8 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { Manrope, Noto_Sans_Armenian, Syne } from 'next/font/google';
 import type { ReactNode } from 'react';
+import { Analytics } from '@/components/app/Analytics';
+import { isMeasurementId } from '@/lib/analytics';
 import { Providers } from './providers';
 import './globals.css';
 
@@ -47,6 +49,8 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const locale = await getLocale();
+  // Read at request time (not baked into the build), so the same image works with or without GA.
+  const ga = process.env.GA_MEASUREMENT_ID;
   return (
     <html
       lang={locale}
@@ -56,6 +60,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <body className="min-h-dvh">
         <NextIntlClientProvider>
           <Providers>{children}</Providers>
+          <Analytics measurementId={isMeasurementId(ga) ? ga : undefined} />
         </NextIntlClientProvider>
       </body>
     </html>

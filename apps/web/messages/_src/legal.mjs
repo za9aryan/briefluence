@@ -2,9 +2,9 @@
 export default {
   legal: {
     updated: [
-      'Last updated: 16 November 2026 · Draft',
-      'Обновлено: 16 ноября 2026 · Черновик',
-      'Թարմացվել է՝ 2026 թ. նոյեմբերի 16 · Սևագիր',
+      'Last updated: 17 November 2026 · Draft',
+      'Обновлено: 17 ноября 2026 · Черновик',
+      'Թարմացվել է՝ 2026 թ. նոյեմբերի 17 · Սևագիր',
     ],
     contact: [
       'Questions? Write to support@briefluence.am.',
@@ -164,12 +164,23 @@ export default {
         h: {
           title: ['8. Cookies', '8. Cookies', '8. Cookie-ներ'],
           body: [
-            'We use only necessary cookies: your session and your language choice. No advertising trackers.',
-            'Мы используем только необходимые cookies: сессию и выбранный язык. Никаких рекламных трекеров.',
-            'Օգտագործում ենք միայն անհրաժեշտ cookie-ներ՝ սեսիան և ընտրված լեզուն։ Գովազդային հետագծիչներ չկան։',
+            'We always use necessary cookies: your session and your language choice. If you allow it in the cookie banner, we also use Google Analytics to count visits and see which pages help people: it sets its own cookies (_ga) and Google processes the data for us. We never send Google your email, name or private links, and we run no ads. You can change your choice any time under "Cookie settings" at the bottom of the site.',
+            'Мы всегда используем необходимые cookies: сессию и выбранный язык. Если ты разрешишь это в баннере, мы также используем Google Analytics, чтобы считать посещения и понимать, какие страницы помогают людям: он ставит свои cookies (_ga), а Google обрабатывает данные для нас. Мы никогда не передаём Google твою почту, имя или личные ссылки и не показываем рекламу. Изменить выбор можно в любой момент через «Настройки cookies» внизу сайта.',
+            'Մենք միշտ օգտագործում ենք անհրաժեշտ cookie-ներ՝ սեսիան և ընտրված լեզուն։ Եթե թույլ տաս բաններում, օգտագործում ենք նաև Google Analytics՝ այցելությունները հաշվելու և հասկանալու համար, թե որ էջերն են օգնում մարդկանց․ այն դնում է իր cookie-ները (_ga), իսկ Google-ը մշակում է տվյալները մեզ համար։ Մենք երբեք Google-ին չենք փոխանցում քո էլ. փոստը, անունը կամ անձնական հղումները և գովազդ չենք ցուցադրում։ Ընտրությունդ կարող ես փոխել ցանկացած պահի կայքի ներքևում՝ «Cookie-ների կարգավորումներ» հղումով։',
           ],
         },
       },
+    },
+    cookies: {
+      title: ['Cookies, okay?', 'Cookies, ок?', 'Cookie-ներ, լա՞վ է'],
+      body: [
+        'We would like to use Google Analytics to see how people find briefluence and which pages help. No ads, and no private data goes to Google. <link>Privacy policy</link>',
+        'Мы хотим использовать Google Analytics, чтобы понимать, как люди находят briefluence и какие страницы помогают. Без рекламы, и личные данные Google не получает. <link>Политика конфиденциальности</link>',
+        'Ուզում ենք օգտագործել Google Analytics՝ հասկանալու համար, թե ինչպես են մարդիկ գտնում briefluence-ը և որ էջերն են օգնում։ Առանց գովազդի, և անձնական տվյալներ Google-ին չեն փոխանցվում։ <link>Գաղտնիության քաղաքականություն</link>',
+      ],
+      allow: ['Allow', 'Разрешить', 'Թույլատրել'],
+      deny: ['Only necessary', 'Только необходимые', 'Միայն անհրաժեշտները'],
+      settings: ['Cookie settings', 'Настройки cookies', 'Cookie-ների կարգավորումներ'],
     },
   },
 };

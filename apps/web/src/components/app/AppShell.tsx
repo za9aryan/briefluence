@@ -48,6 +48,7 @@ function useNav(role: Role): NavItem[] {
   }
   return [
     { href: '/admin/overview', label: t('admin.overview'), icon: 'dashboard' },
+    { href: '/admin/statistics', label: t('admin.statistics'), icon: 'chart' },
     { href: '/admin/verifications', label: t('admin.verifications'), icon: 'verified' },
     { href: '/admin/accounts', label: t('admin.accounts'), icon: 'link' },
     { href: '/admin/brief-review', label: t('admin.briefReview'), icon: 'shield' },

@@ -99,4 +99,17 @@ describe('admin analytics (e2e)', () => {
     expect(d).toMatchObject({ days: 30, unit: 'day' });
     expect(d.series.bloggers).toHaveLength(30);
   });
+
+  it('website statistics are admin-only and off until Google Analytics is configured', async () => {
+    const admin = await createAdmin(ctx);
+    const blogger = await signup(ctx, 'INFLUENCER');
+    await blogger.agent.get(`${API}/admin/traffic`).expect(403);
+    await blogger.agent.get(`${API}/admin/traffic/live`).expect(403);
+    expect((await admin.agent.get(`${API}/admin/traffic`).expect(200)).body).toEqual({
+      enabled: false,
+    });
+    expect((await admin.agent.get(`${API}/admin/traffic/live`).expect(200)).body).toEqual({
+      enabled: false,
+    });
+  });
 });

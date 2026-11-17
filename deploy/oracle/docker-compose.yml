@@ -69,6 +69,8 @@ services:
     environment:
       NODE_ENV: production
       API_INTERNAL_URL: http://api:4000
+      # Google Analytics tag + cookie banner (empty = off). Read at request time, not build time.
+      GA_MEASUREMENT_ID: ${GA_MEASUREMENT_ID:-}
     working_dir: /app/apps/web
     command: npx next start -p 3000 -H 0.0.0.0
     depends_on:
