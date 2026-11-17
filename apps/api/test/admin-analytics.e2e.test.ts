@@ -84,7 +84,7 @@ describe('admin analytics (e2e)', () => {
         shortlisted: { period: 1, total: 1 },
         accepted: { period: 1, total: 1 },
       },
-      plans: { TRIAL: 2, PRO: 0, BASIC: 0, NONE: 1 },
+      plans: { TRIAL: 0, PRO: 0, BASIC: 2, NONE: 1 },
       verification: { APPROVED: 2, PENDING_REVIEW: 0, NOT_VERIFIED: 1 },
       funnel: { sent: 2, shortlisted: 1, accepted: 1, completed: 0 },
       outcomes: { WAITING: 0, ACCEPTED: 1, NOT_SELECTED: 1 },

@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { applyPaddleSubscription, isNewerEvent, paddleAmountMinor, paddleLocale } from './paddle';
-import { effectiveTier, renewalState, startPlan, type SubscriptionState } from './subscription';
+import {
+  activateFreePro,
+  effectiveTier,
+  renewalState,
+  trialDaysLeft,
+  type SubscriptionState,
+} from './subscription';
 
 const now = new Date('2026-11-03T12:00:00Z');
 const end = new Date('2026-12-03T12:00:00Z');
-const trial = (): SubscriptionState => startPlan(new Date('2026-11-01T12:00:00Z'), 'PRO_MONTHLY');
+const trial = (): SubscriptionState => activateFreePro(null, new Date('2026-11-01T12:00:00Z'));
 
 describe('Paddle subscription mirror', () => {
   it('active: paid Pro until the period ends, renews automatically', () => {
@@ -75,8 +81,14 @@ describe('Paddle subscription mirror', () => {
     expect(paddleLocale('hy')).toBe('en');
   });
 
-  it('demo mode: free Pro can be shorter than 30 days', () => {
-    const s = startPlan(now, 'BASIC', 60 * 60 * 1000);
-    expect(s.trialEndsAt.toISOString()).toBe('2026-11-03T13:00:00.000Z');
+  it('paying during the free month ends it (the remaining free days are given up)', () => {
+    const s = applyPaddleSubscription(
+      trial(),
+      { id: 'sub_1', status: 'active', periodEndsAt: end, cancelScheduled: false },
+      'PRO_MONTHLY',
+      now,
+    );
+    expect(s.trialEndsAt).toEqual(now);
+    expect(trialDaysLeft(s, now)).toBe(0);
   });
 });

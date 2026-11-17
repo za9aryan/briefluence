@@ -1,5 +1,5 @@
 import type { PlanCode } from '../enums';
-import { toBasic, type SubscriptionState } from './subscription';
+import { endFreeDays, toBasic, type SubscriptionState } from './subscription';
 
 /**
  * Paddle Billing runs the subscription (charges, retries, cancel, plan changes); our row mirrors
@@ -19,7 +19,7 @@ export interface PaddleSubscriptionView {
 
 /**
  * Our subscription state after a Paddle subscription event. Active (and Paddle trials, which we
- * don't use) → paid Pro until the period ends; past due → Pro while Paddle retries; canceled or
+ * don't use) → paid Pro until the period ends, and a running free month ends; past due → Pro while Paddle retries; canceled or
  * paused → Basic. `bindingId` holds the Paddle subscription id: "renews automatically".
  */
 export function applyPaddleSubscription(
@@ -30,8 +30,9 @@ export function applyPaddleSubscription(
 ): SubscriptionState {
   if (p.status === 'canceled' || p.status === 'paused')
     return { ...toBasic(s, now), bindingId: null };
+  // Paying during the free month ends it (Option: the remaining free days are given up).
   const base: SubscriptionState = {
-    ...s,
+    ...endFreeDays(s, now),
     planCode,
     bindingId: p.id,
     currentPeriodEnd: p.periodEndsAt ?? s.currentPeriodEnd,

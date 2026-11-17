@@ -1,8 +1,7 @@
 {
   "plans": {
     "title": "Choose your plan",
-    "lead": "Every plan starts with 30 days of Pro for free.",
-    "leadPaddle": "Start on free Basic with {duration} of Pro included, or go Pro right away.",
+    "lead": "Basic is free. Pro removes the limits. You can switch any time.",
     "upgradeTitle": "Upgrade to Pro",
     "upgradeLead": "Unlimited applications. Cancel any time.",
     "name": {
@@ -21,7 +20,6 @@
     "perYear": "per year",
     "save": "Save {value}",
     "features": {
-      "freePro": "{duration} of Pro free to start",
       "daily": "Renews every day: for testing payments",
       "limit": "{count} applications every 30 days",
       "feed": "Full brief feed with match scores",
@@ -34,8 +32,8 @@
     "chooseBasic": "Start with Basic",
     "choosePro": "Choose Pro",
     "chooseYearly": "Choose Pro yearly",
-    "payNote": "You pay now; your paid period starts after the free days.",
     "payNowNote": "You pay now and your paid period starts today.",
+    "basicChosen": "You are on Basic",
     "startedFor": "Free Pro is on for {duration}",
     "chooseDaily": "Choose Pro daily"
   },
@@ -66,7 +64,6 @@
   "yourPlan": "Your plan",
   "freeDays": "Pro for free: {count, plural, one {# day} other {# days}} left, until {date}.",
   "afterFreeDays": "After that: {plan}.",
-  "paidAfterFreeDays": "Pro is paid; your paid period starts on {date}.",
   "basicUsage": "{used} of {limit} applications used in the last 30 days.",
   "renewsOn": "Renews on {date}.",
   "endsOn": "Pro ends on {date}; then you move to Basic.",
@@ -120,7 +117,43 @@
   "removeCardBody": "Without a card Pro will not renew; you move to Basic when the current period ends.",
   "demo": {
     "title": "Test mode",
-    "body": "Free Pro on Basic lasts 1 hour. To see a renewal soon, pick Pro daily (test). Pay with the test card {card}, any future date and any CVC. No real money is charged."
+    "body": "The free month of Pro lasts 1 hour here. To see a renewal soon, pick Pro daily (test). Pay with the test card {card}, any future date and any CVC. No real money is charged."
+  },
+  "freeMonth": {
+    "title": "One month of Pro, free",
+    "body": "Unlimited applications and offers for {duration}. No card, and nothing is charged afterwards. Turn it on when it suits you: it works once.",
+    "cta": "Activate free Pro"
+  },
+  "loseFreeDays": {
+    "title": "Paying ends your free Pro",
+    "body": "You still have {duration} of free Pro. If you pay now, the free days end today and your paid period starts today. The days left are not added later.",
+    "confirm": "Pay and end free Pro"
+  },
+  "coupon": {
+    "toggle": "Have a coupon?",
+    "label": "Coupon code",
+    "apply": "Apply",
+    "remove": "Remove coupon",
+    "applied": "Coupon {code}",
+    "free": "Free",
+    "off": "{percent}% off",
+    "periods": {
+      "PRO_DAILY": "{count, plural, one {for # day} other {for # days}}",
+      "PRO_MONTHLY": "{count, plural, one {for # month} other {for # months}}",
+      "PRO_YEARLY": "{count, plural, one {for # year} other {for # years}}"
+    },
+    "always": "on every payment",
+    "then": "Then the usual price. Cancel any time.",
+    "cardNote": "You add a card at checkout. It is charged only when the discount ends, unless you cancel before.",
+    "notForPlan": "The coupon does not apply to this plan",
+    "errors": {
+      "NOT_FOUND": "We can’t find this coupon. Check the code.",
+      "INACTIVE": "This coupon is turned off.",
+      "EXPIRED": "This coupon has expired.",
+      "USED_UP": "This coupon has been used up.",
+      "ALREADY_USED": "You have already used a coupon. One coupon per account.",
+      "WRONG_PLAN": "This coupon does not apply to this plan."
+    }
   },
   "mock": {
     "notice": "Test payment page. On the live site Paddle’s checkout opens instead. No real money is charged.",

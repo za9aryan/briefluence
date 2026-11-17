@@ -11,9 +11,9 @@ export default {
       'Պատմիր ընկերություններին քո մասին',
     ],
     influencerLead: [
-      'This takes two minutes. You will start your 30 free days yourself, when you are ready.',
-      'Это займёт две минуты. 30 бесплатных дней ты запустишь сам, когда будешь готов.',
-      'Սա կտևի երկու րոպե։ 30 անվճար օրը կսկսես ինքդ, երբ պատրաստ լինես։',
+      'This takes two minutes. Then pick a plan: Basic is free, and a free month of Pro is yours whenever you want it.',
+      'Это займёт две минуты. Потом выбери тариф: Basic бесплатный, а бесплатный месяц Pro можно включить когда угодно.',
+      'Սա կտևի երկու րոպե։ Հետո ընտրիր փաթեթը․ Basic-ն անվճար է, իսկ Pro-ի անվճար ամիսը կարող ես միացնել երբ ուզես։',
     ],
     saveAndContinue: ['Save and continue', 'Сохранить и продолжить', 'Պահպանել և շարունակել'],
     aboutYou: ['About you', 'О тебе', 'Քո մասին'],
@@ -627,14 +627,9 @@ export default {
     plans: {
       title: ['Choose your plan', 'Выбери тариф', 'Ընտրիր փաթեթը'],
       lead: [
-        'Every plan starts with 30 days of Pro for free.',
-        'Каждый тариф начинается с 30 дней Pro бесплатно.',
-        'Յուրաքանչյուր փաթեթ սկսվում է Pro-ի 30 անվճար օրով։',
-      ],
-      leadPaddle: [
-        'Start on free Basic with {duration} of Pro included, or go Pro right away.',
-        'Начни с бесплатного Basic — Pro бесплатно на {duration}, — или сразу подключи Pro.',
-        'Սկսիր անվճար Basic-ով՝ Pro-ն անվճար {duration}, կամ անմիջապես միացրու Pro-ն։',
+        'Basic is free. Pro removes the limits. You can switch any time.',
+        'Basic бесплатный. Pro снимает ограничения. Сменить тариф можно в любой момент.',
+        'Basic-ն անվճար է։ Pro-ն հանում է սահմանափակումները։ Փաթեթը կարող ես փոխել ցանկացած պահի։',
       ],
       upgradeTitle: ['Upgrade to Pro', 'Перейти на Pro', 'Անցնել Pro-ի'],
       upgradeLead: [
@@ -666,11 +661,6 @@ export default {
       perYear: ['per year', 'в год', 'տարեկան'],
       save: ['Save {value}', 'Выгода {value}', 'Խնայողություն {value}'],
       features: {
-        freePro: [
-          '{duration} of Pro free to start',
-          'Pro бесплатно на {duration}',
-          'Pro-ն անվճար {duration}',
-        ],
         daily: [
           'Renews every day: for testing payments',
           'Продлевается каждый день: для проверки оплаты',
@@ -711,16 +701,12 @@ export default {
       chooseBasic: ['Start with Basic', 'Начать с Basic', 'Սկսել Basic-ով'],
       choosePro: ['Choose Pro', 'Выбрать Pro', 'Ընտրել Pro'],
       chooseYearly: ['Choose Pro yearly', 'Выбрать Pro на год', 'Ընտրել Pro տարեկան'],
-      payNote: [
-        'You pay now; your paid period starts after the free days.',
-        'Оплата сейчас, а платный период начнётся после бесплатных дней.',
-        'Վճարում ես հիմա, իսկ վճարովի ժամկետը կսկսվի անվճար օրերից հետո։',
-      ],
       payNowNote: [
         'You pay now and your paid period starts today.',
         'Ты платишь сейчас, и оплаченный период начинается сегодня.',
         'Վճարում ես հիմա, և վճարված ժամկետը սկսվում է այսօր։',
       ],
+      basicChosen: ['You are on Basic', 'Ты на тарифе Basic', 'Դու Basic փաթեթում ես'],
       startedFor: [
         'Free Pro is on for {duration}',
         'Бесплатный Pro включён на {duration}',
@@ -807,11 +793,6 @@ export default {
       'Pro անվճար՝ մնացել է {count} օր, մինչև {date}։',
     ],
     afterFreeDays: ['After that: {plan}.', 'После этого: {plan}.', 'Դրանից հետո՝ {plan}։'],
-    paidAfterFreeDays: [
-      'Pro is paid; your paid period starts on {date}.',
-      'Pro оплачен; платный период начнётся {date}.',
-      'Pro-ն վճարված է․ վճարովի ժամկետը կսկսվի {date}։',
-    ],
     basicUsage: [
       '{used} of {limit} applications used in the last 30 days.',
       'Использовано {used} из {limit} откликов за последние 30 дней.',
@@ -950,10 +931,102 @@ export default {
     demo: {
       title: ['Test mode', 'Тестовый режим', 'Թեստային ռեժիմ'],
       body: [
-        'Free Pro on Basic lasts 1 hour. To see a renewal soon, pick Pro daily (test). Pay with the test card {card}, any future date and any CVC. No real money is charged.',
-        'Бесплатный Pro на Basic длится 1 час. Чтобы быстро увидеть продление, выбери Pro на день (тест). Плати тестовой картой {card}, любая будущая дата и любой CVC. Настоящие деньги не списываются.',
-        'Basic-ի անվճար Pro-ն տևում է 1 ժամ։ Երկարաձգումը շուտ տեսնելու համար ընտրիր Pro օրական (թեստ)։ Վճարիր {card} թեստային քարտով, ցանկացած ապագա ամսաթիվ և ցանկացած CVC։ Իրական գումար չի գանձվում։',
+        'The free month of Pro lasts 1 hour here. To see a renewal soon, pick Pro daily (test). Pay with the test card {card}, any future date and any CVC. No real money is charged.',
+        'Бесплатный месяц Pro здесь длится 1 час. Чтобы быстро увидеть продление, выбери Pro на день (тест). Плати тестовой картой {card}, любая будущая дата и любой CVC. Настоящие деньги не списываются.',
+        'Pro-ի անվճար ամիսն այստեղ տևում է 1 ժամ։ Երկարաձգումը շուտ տեսնելու համար ընտրիր Pro օրական (թեստ)։ Վճարիր {card} թեստային քարտով, ցանկացած ապագա ամսաթիվ և ցանկացած CVC։ Իրական գումար չի գանձվում։',
       ],
+    },
+    freeMonth: {
+      title: ['One month of Pro, free', 'Месяц Pro бесплатно', 'Pro-ի մեկ ամիս՝ անվճար'],
+      body: [
+        'Unlimited applications and offers for {duration}. No card, and nothing is charged afterwards. Turn it on when it suits you: it works once.',
+        'Отклики и предложения без ограничений на {duration}. Без карты, и потом ничего не спишется. Включи, когда тебе удобно: это можно сделать один раз.',
+        'Դիմումներ և առաջարկներ առանց սահմանափակման՝ {duration}։ Առանց քարտի, և հետո ոչինչ չի գանձվի։ Միացրու, երբ քեզ հարմար է․ դա կարելի է անել մեկ անգամ։',
+      ],
+      cta: ['Activate free Pro', 'Включить бесплатный Pro', 'Միացնել անվճար Pro-ն'],
+    },
+    loseFreeDays: {
+      title: [
+        'Paying ends your free Pro',
+        'Оплата завершит бесплатный Pro',
+        'Վճարումը կավարտի անվճար Pro-ն',
+      ],
+      body: [
+        'You still have {duration} of free Pro. If you pay now, the free days end today and your paid period starts today. The days left are not added later.',
+        'У тебя ещё {duration} бесплатного Pro. Если оплатишь сейчас, бесплатные дни закончатся сегодня и оплаченный период начнётся сегодня. Оставшиеся дни потом не добавятся.',
+        'Դեռ ունես {duration} անվճար Pro։ Եթե վճարես հիմա, անվճար օրերը կավարտվեն այսօր, և վճարված ժամկետը կսկսվի այսօր։ Մնացած օրերը հետո չեն ավելացվի։',
+      ],
+      confirm: [
+        'Pay and end free Pro',
+        'Оплатить и завершить бесплатный Pro',
+        'Վճարել և ավարտել անվճար Pro-ն',
+      ],
+    },
+    coupon: {
+      toggle: ['Have a coupon?', 'Есть купон?', 'Կտրոն ունե՞ս'],
+      label: ['Coupon code', 'Код купона', 'Կտրոնի կոդ'],
+      apply: ['Apply', 'Применить', 'Կիրառել'],
+      remove: ['Remove coupon', 'Убрать купон', 'Հեռացնել կտրոնը'],
+      applied: ['Coupon {code}', 'Купон {code}', 'Կտրոն {code}'],
+      free: ['Free', 'Бесплатно', 'Անվճար'],
+      off: ['{percent}% off', 'Скидка {percent}%', '{percent}% զեղչ'],
+      periods: {
+        PRO_DAILY: [
+          '{count, plural, one {for # day} other {for # days}}',
+          '{count, plural, one {на # день} few {на # дня} many {на # дней} other {на # дня}}',
+          '{count} օրով',
+        ],
+        PRO_MONTHLY: [
+          '{count, plural, one {for # month} other {for # months}}',
+          '{count, plural, one {на # месяц} few {на # месяца} many {на # месяцев} other {на # месяца}}',
+          '{count} ամսով',
+        ],
+        PRO_YEARLY: [
+          '{count, plural, one {for # year} other {for # years}}',
+          '{count, plural, one {на # год} few {на # года} many {на # лет} other {на # года}}',
+          '{count} տարով',
+        ],
+      },
+      always: ['on every payment', 'на каждый платёж', 'յուրաքանչյուր վճարման վրա'],
+      then: [
+        'Then the usual price. Cancel any time.',
+        'Потом обычная цена. Отменить можно в любой момент.',
+        'Հետո՝ սովորական գինը։ Կարող ես չեղարկել ցանկացած պահի։',
+      ],
+      cardNote: [
+        'You add a card at checkout. It is charged only when the discount ends, unless you cancel before.',
+        'Карту ты добавишь при оплате. Списание будет только после окончания скидки, если не отменишь раньше.',
+        'Քարտը կավելացնես վճարման ժամանակ։ Գանձումը կլինի միայն զեղչի ավարտից հետո, եթե մինչ այդ չչեղարկես։',
+      ],
+      notForPlan: [
+        'The coupon does not apply to this plan',
+        'Купон не действует на этот тариф',
+        'Կտրոնը չի գործում այս փաթեթի վրա',
+      ],
+      errors: {
+        NOT_FOUND: [
+          'We can’t find this coupon. Check the code.',
+          'Такого купона нет. Проверь код.',
+          'Այդպիսի կտրոն չկա։ Ստուգիր կոդը։',
+        ],
+        INACTIVE: ['This coupon is turned off.', 'Этот купон отключён.', 'Այս կտրոնն անջատված է։'],
+        EXPIRED: ['This coupon has expired.', 'Срок купона истёк.', 'Կտրոնի ժամկետն անցել է։'],
+        USED_UP: [
+          'This coupon has been used up.',
+          'Этот купон уже закончился.',
+          'Այս կտրոնն արդեն սպառվել է։',
+        ],
+        ALREADY_USED: [
+          'You have already used a coupon. One coupon per account.',
+          'Ты уже использовал купон. Один купон на аккаунт.',
+          'Դու արդեն օգտագործել ես կտրոն։ Մեկ կտրոն՝ մեկ հաշվի համար։',
+        ],
+        WRONG_PLAN: [
+          'This coupon does not apply to this plan.',
+          'Купон не действует на этот тариф.',
+          'Կտրոնը չի գործում այս փաթեթի վրա։',
+        ],
+      },
     },
     mock: {
       notice: [

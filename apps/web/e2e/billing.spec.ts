@@ -19,7 +19,7 @@ test.use({
   },
 });
 
-test('free Pro days → Basic → upgrade to Pro → renew with the saved card', async ({
+test('Basic → the free month → paying ends it → renew with the saved card', async ({
   page,
   playwright,
   baseURL,
@@ -36,29 +36,36 @@ test('free Pro days → Basic → upgrade to Pro → renew with the saved card',
     await page.getByRole('button', { name: 'Save and continue' }).click();
     await page.waitForURL('**/influencer/verification');
 
-    // Prices are only shown once signed in; every plan starts with free Pro days.
+    // Basic is free right away; the free month of Pro is a separate, one-time choice.
     await page.goto('/influencer/billing');
     await expect(page.getByText('Choose your plan')).toBeVisible();
     await page.getByRole('button', { name: 'Start with Basic' }).click();
+    await expect(seen(page, 'You are on Basic')).toBeVisible();
+    await expect(page.getByText('0 of 10 applications used in the last 30 days.')).toBeVisible();
+    await expect(page.getByText('One month of Pro, free')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Activate free Pro' }).click();
     await expect(seen(page, 'Free Pro is on for 30 days')).toBeVisible();
     await expect(page.getByText(/Pro for free: 30 days left/)).toBeVisible();
     await expect(page.getByText('After that: Basic.')).toBeVisible();
+    await expect(page.getByText('One month of Pro, free')).toHaveCount(0);
 
-    // Free days run out: the blogger is on Basic with its application limit.
-    await admin.advanceDays(31);
-    await admin.runJob('billing-daily');
-    await page.reload();
-    await expect(page.getByText('0 of 10 applications used in the last 30 days.')).toBeVisible();
-    await expect(page.getByText('Upgrade to Pro')).toBeVisible();
-
-    // Upgrade to Pro through the (mock) payment page.
+    // Buying Pro during the free month ends it: the blogger is asked first.
     await page.getByRole('button', { name: 'Choose Pro', exact: true }).click();
+    const warn = page.getByRole('dialog');
+    await expect(warn.getByText('Paying ends your free Pro')).toBeVisible();
+    await expect(warn.getByText(/You still have 30 days of free Pro/)).toBeVisible();
+    await warn.getByRole('button', { name: 'Cancel' }).click();
+    await expect(page.getByText(/Pro for free: 30 days left/)).toBeVisible();
+    await page.getByRole('button', { name: 'Choose Pro', exact: true }).click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Pay and end free Pro' }).click();
     await page.waitForURL('**/billing/mock-checkout**');
     await page.getByRole('button', { name: 'Pay' }).click();
     await page.waitForURL('**/influencer/billing**');
     await expect(seen(page, 'Payment received. Pro is on.')).toBeVisible();
     await expect(page.getByText('Auto-renewal on')).toBeVisible();
     await expect(page.getByText(/Renews automatically on/)).toBeVisible();
+    await expect(page.getByText(/Pro for free/)).toHaveCount(0);
 
     // Unsubscribe: renewal turns off, Pro stays until the period ends; then turn it back on.
     await page.getByRole('button', { name: 'Cancel subscription' }).click();

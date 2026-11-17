@@ -99,6 +99,34 @@ export interface PaddlePrice {
   unit_price: { amount: string; currency_code: string };
 }
 
+/**
+ * Discount entity (fields we use). https://developer.paddle.com/api-reference/discounts/overview
+ * `usage_limit` is a total across all customers; `times_used` grows when a transaction completes.
+ */
+export interface PaddleDiscount {
+  id: string;
+  status: 'active' | 'archived';
+  code: string | null;
+  times_used: number;
+  usage_limit: number | null;
+}
+
+/** Body of POST /discounts. https://developer.paddle.com/api-reference/discounts/create-discount */
+export interface PaddleDiscountInput {
+  description: string;
+  enabled_for_checkout: boolean;
+  code?: string;
+  type: 'percentage';
+  /** Percentage as a string, "0.01"–"100". */
+  amount: string;
+  recur: boolean;
+  maximum_recurring_intervals: number | null;
+  usage_limit: number | null;
+  restrict_to: string[];
+  expires_at: string | null;
+  custom_data: Record<string, string>;
+}
+
 export interface PaddleNotificationSetting {
   id: string;
   destination: string;
@@ -181,6 +209,21 @@ export class PaddleClient {
       'GET',
       `/subscriptions/${id}/update-payment-method-transaction`,
     );
+  }
+
+  /** https://developer.paddle.com/api-reference/discounts/create-discount */
+  createDiscount(body: PaddleDiscountInput) {
+    return this.request<PaddleDiscount>('POST', '/discounts', body);
+  }
+
+  /** On/off: `archived` discounts can't be used. https://developer.paddle.com/api-reference/discounts/update-discount */
+  setDiscountStatus(id: string, status: 'active' | 'archived') {
+    return this.request<PaddleDiscount>('PATCH', `/discounts/${id}`, { status });
+  }
+
+  /** https://developer.paddle.com/api-reference/discounts/get-discount */
+  getDiscount(id: string) {
+    return this.request<PaddleDiscount>('GET', `/discounts/${id}`);
   }
 
   listNotificationSettings() {

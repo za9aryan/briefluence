@@ -3,6 +3,8 @@ import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { BillingController } from './billing.controller';
 import { BillingService } from './billing.service';
+import { CouponsController } from './coupons.controller';
+import { CouponsService } from './coupons.service';
 import { PaddleBillingService } from './paddle/paddle-billing.service';
 import { PaddleClient } from './paddle/paddle.client';
 import { PlansService } from './plans.service';
@@ -11,10 +13,11 @@ import { PaddleProviderStub } from './providers/paddle.provider';
 import { PAYMENT_PROVIDER } from './providers/types';
 
 @Module({
-  controllers: [BillingController],
+  controllers: [BillingController, CouponsController],
   providers: [
     BillingService,
     PlansService,
+    CouponsService,
     PaddleClient,
     PaddleBillingService,
     {

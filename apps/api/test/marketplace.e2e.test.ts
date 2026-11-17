@@ -62,7 +62,10 @@ describe('marketplace core loop (e2e)', () => {
     await inf.agent.post(`${API}/billing/plan`).send({ plan: 'BASIC' }).expect(200);
     await inf.agent.post(`${API}/billing/plan`).send({ plan: 'BASIC' }).expect(200); // idempotent
     const me = await inf.agent.get(`${API}/auth/me`).expect(200);
-    expect(me.body.subscription).toMatchObject({
+    expect(me.body.subscription).toMatchObject({ status: 'ACTIVE', hasAccess: true });
+    await inf.agent.post(`${API}/billing/free-pro`).expect(200);
+    const free = await inf.agent.get(`${API}/auth/me`).expect(200);
+    expect(free.body.subscription).toMatchObject({
       status: 'TRIALING',
       trialDaysLeft: 30,
       hasAccess: true,

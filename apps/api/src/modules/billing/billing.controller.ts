@@ -16,8 +16,10 @@ import { ApiTags } from '@nestjs/swagger';
 import {
   checkoutSchema,
   choosePlanSchema,
+  couponCheckSchema,
   type CheckoutInput,
   type ChoosePlanInput,
+  type CouponCheckInput,
 } from '@briefluence/shared';
 import type { Request, Response } from 'express';
 import { z } from 'zod';
@@ -103,7 +105,7 @@ export class BillingController {
     return this.billing.getForUser(user.id);
   }
 
-  /** Blogger chooses a plan (Basic or Pro); the free Pro days start now. Not automatic. */
+  /** Blogger chooses Basic (free). Pro is bought through checkout. */
   @Roles('INFLUENCER')
   @Post('plan')
   @HttpCode(200)
@@ -112,13 +114,33 @@ export class BillingController {
     return this.billing.choosePlan(user.id, body.plan);
   }
 
-  /** Pays for a Pro plan (monthly or yearly): Paddle checkout settings, or the fake page's URL. */
+  /** Activates the one free month of Pro (no card). */
+  @Roles('INFLUENCER')
+  @Post('free-pro')
+  @HttpCode(200)
+  freePro(@CurrentUser() user: AuthUser) {
+    return this.billing.activateFreePro(user.id);
+  }
+
+  /** Checks a coupon code before checkout. */
+  @Roles('INFLUENCER')
+  @Post('coupon/check')
+  @HttpCode(200)
+  @ApiZodBody(couponCheckSchema)
+  checkCoupon(@CurrentUser() user: AuthUser, @ZodBody(couponCheckSchema) body: CouponCheckInput) {
+    return this.billing.checkCoupon(user.id, body.code);
+  }
+
+  /**
+   * Pays for a Pro plan (monthly or yearly), optionally with a coupon: Paddle checkout settings,
+   * or the fake page's URL.
+   */
   @Roles('INFLUENCER')
   @Post('checkout')
   @HttpCode(200)
   @ApiZodBody(checkoutSchema)
   checkout(@CurrentUser() user: AuthUser, @ZodBody(checkoutSchema) body: CheckoutInput) {
-    return this.billing.checkout(user.id, body.plan);
+    return this.billing.checkout(user.id, body.plan, body.coupon);
   }
 
   /** Redirect target of the fake payment page. Public because the access cookie may expire meanwhile. */

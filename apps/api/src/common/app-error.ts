@@ -28,6 +28,7 @@ const STATUS: Partial<Record<ErrorCode, HttpStatus>> = {
   DEAL_NOT_EDITABLE: HttpStatus.CONFLICT,
   RATE_LIMITED: HttpStatus.TOO_MANY_REQUESTS,
   PAYMENT_FAILED: HttpStatus.PAYMENT_REQUIRED,
+  COUPON_INVALID: HttpStatus.BAD_REQUEST,
   PROVIDER_ERROR: HttpStatus.BAD_GATEWAY,
 };
 

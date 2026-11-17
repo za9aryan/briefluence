@@ -140,7 +140,8 @@ describe('blogger offers (e2e)', () => {
 
   it('Basic allows one live offer, Pro more; only verified bloggers publish; brands only request live offers', async () => {
     const inf = await verifiedBlogger();
-    // Free Pro days: unlimited offers.
+    // The free month of Pro: unlimited offers.
+    await inf.agent.post(`${API}/billing/free-pro`).expect(200);
     const a = await inf.agent.post(`${API}/offers`).send(offerInput()).expect(201);
     const c = await inf.agent
       .post(`${API}/offers`)

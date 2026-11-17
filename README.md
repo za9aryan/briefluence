@@ -76,9 +76,12 @@ or shown to brands. Changing a manual account's platform or username, or fixing 
 - **Basic**: free, a limited number of applications per rolling 30 days (default 10).
 - **Pro** (monthly) and **Pro yearly**: unlimited applications.
 
-Bloggers who start on Basic get **30 days of Pro for free** (1 hour in the Paddle test mode). Choosing Pro opens
-Paddle's checkout and starts nothing until Paddle confirms the payment; the paid period starts at payment and Paddle
-runs the renewals. After a cancelled / failed renewal the blogger moves to Basic — nobody loses access. With Paddle,
+Bloggers choose **Basic** (free), **Pro monthly** or **Pro yearly**. Every account can also activate **one free month
+of Pro** from a banner in Billing, whenever it wants (no card; 1 hour in the Paddle test mode). Choosing Pro opens
+Paddle's checkout and starts nothing until Paddle confirms the payment; the paid period starts at payment (buying
+during the free month ends it, after a warning) and Paddle runs the renewals. **Coupons** (free Pro months or a
+discount, single or multiple use) are Paddle discounts created and tracked in **Admin → Coupons**; see
+`docs/paddle.md`. After a cancelled / failed renewal the blogger moves to Basic — nobody loses access. With Paddle,
 Pro plans and prices come from Paddle's prices (read-only in **Admin → Plans**, refreshed every 5 minutes; a
 **Pro daily (test)** plan appears in the sandbox only); Basic's limits are edited in **Admin → Plans**. With the test
 payment page all plans are edited there. Prices are never shown on public pages.

@@ -16,7 +16,7 @@ import {
   dealReviewKey,
   NICHES,
   matchScore,
-  startPlan,
+  activateFreePro,
   addDays,
   type ContentFormat,
   type Platform,
@@ -174,7 +174,8 @@ async function main() {
     const firstName = faker.person.firstName(gender === 'MALE' ? 'male' : 'female');
     const platforms = pickSome<Platform>(['INSTAGRAM', 'TIKTOK', 'YOUTUBE'], 1, 2);
     if (i === 1 && !platforms.includes('INSTAGRAM')) platforms.unshift('INSTAGRAM');
-    const trial = startPlan(addDays(now, -faker.number.int({ min: 0, max: 20 })), 'BASIC');
+    const freeFrom = addDays(now, -faker.number.int({ min: 0, max: 20 }));
+    const trial = activateFreePro(null, freeFrom);
     const user = await prisma.user.create({
       data: {
         email: `influencer${i}@briefluence.local`,
@@ -182,9 +183,17 @@ async function main() {
         passwordHash: hash,
         role: 'INFLUENCER',
         emailVerifiedAt: i === 30 ? null : now,
-        // The free month is opt-in: only bloggers 1–20 have started it.
+        // The free month is opt-in: only bloggers 1–20 have activated it.
         ...(i <= 20
-          ? { subscription: { create: { status: trial.status, trialEndsAt: trial.trialEndsAt } } }
+          ? {
+              subscription: {
+                create: {
+                  status: trial.status,
+                  trialEndsAt: trial.trialEndsAt,
+                  freeProActivatedAt: freeFrom,
+                },
+              },
+            }
           : {}),
         influencer: {
           create: {

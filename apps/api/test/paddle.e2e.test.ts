@@ -201,14 +201,21 @@ describe('Paddle billing (e2e)', () => {
     ).toBe(7);
   });
 
-  it('demo mode: 1 hour of free Pro on Basic; checkout returns the Paddle.js settings', async () => {
+  it('demo mode: the free month is 1 hour; checkout returns the Paddle.js settings', async () => {
     const b = await blogger();
+    const basic = (await b.agent.get(`${API}/billing/subscription`).expect(200)).body;
+    expect(basic.subscription).toMatchObject({ tier: 'BASIC', planCode: 'BASIC' });
+    expect(basic).toMatchObject({ freeProAvailable: true, coupons: true });
+    await b.agent.post(`${API}/billing/free-pro`).expect(200);
     const sub = await ctx.prisma.subscription.findUniqueOrThrow({ where: { id: b.subId } });
-    expect(sub.trialEndsAt.getTime() - sub.createdAt.getTime()).toBeLessThanOrEqual(
-      60 * 60 * 1000 + 5000,
-    );
+    expect(sub.trialEndsAt.getTime() - sub.freeProActivatedAt!.getTime()).toBe(60 * 60 * 1000);
     const state = (await b.agent.get(`${API}/billing/subscription`).expect(200)).body;
-    expect(state.subscription).toMatchObject({ tier: 'PRO', inFreeDays: true, planCode: 'BASIC' });
+    expect(state.subscription).toMatchObject({
+      tier: 'PRO',
+      inFreeDays: true,
+      planCode: 'BASIC',
+      freeDaysLost: 1,
+    });
     expect(state.paddle).toEqual({
       environment: 'sandbox',
       clientToken: 'test_client_token',
@@ -230,8 +237,9 @@ describe('Paddle billing (e2e)', () => {
     expect(yearly.body.paddle.priceId).toBe(PRICE.yearly);
   });
 
-  it('webhooks: bad signature refused; a paid checkout makes the blogger Pro once', async () => {
+  it('webhooks: bad signature refused; a paid checkout makes the blogger Pro once and ends the free month', async () => {
     const b = await blogger();
+    await b.agent.post(`${API}/billing/free-pro`).expect(200);
     const event = {
       event_id: 'evt_01checkout',
       event_type: 'transaction.completed',
@@ -274,7 +282,7 @@ describe('Paddle billing (e2e)', () => {
       await ctx.prisma.notification.count({ where: { userId: b.id, type: 'PAYMENT_SUCCEEDED' } }),
     ).toBe(1);
     const view = (await b.agent.get(`${API}/billing/subscription`).expect(200)).body.subscription;
-    expect(view).toMatchObject({ tier: 'PRO', renewal: 'renews' });
+    expect(view).toMatchObject({ tier: 'PRO', renewal: 'renews', inFreeDays: false });
   });
 
   it('subscription events: scheduled cancel, old events ignored, canceled → Basic', async () => {
@@ -445,6 +453,236 @@ describe('Paddle billing (e2e)', () => {
           options: { payment_outcome: 'failed', dunning_exhausted_action: 'subscription_canceled' },
         },
       },
+    });
+  });
+
+  describe('coupons', () => {
+    const DISCOUNT = 'dsc_01coupon00000000000000000';
+    const txn = (
+      id: string,
+      userId: string,
+      over: Record<string, unknown> = {},
+    ): Record<string, unknown> => ({
+      event_id: `evt_${id}`,
+      event_type: 'transaction.completed',
+      occurred_at: new Date().toISOString(),
+      data: {
+        id,
+        status: 'completed',
+        origin: 'web',
+        subscription_id: `sub_${id}`,
+        customer_id: `ctm_${id}`,
+        custom_data: { bf_user_id: userId },
+        currency_code: 'USD',
+        billing_period: { starts_at: new Date().toISOString(), ends_at: '2099-01-01T00:00:00Z' },
+        discount_id: DISCOUNT,
+        items: [{ price: { id: PRICE.monthly } }],
+        details: { totals: { grand_total: '0' } },
+        payments: [],
+        ...over,
+      },
+    });
+    const reason = (res: { body: { error: { code: string; details?: { reason?: string } } } }) =>
+      `${res.body.error.code}:${res.body.error.details?.reason ?? ''}`;
+
+    it('admin creates a Paddle discount; bloggers use it once; statistics and on/off', async () => {
+      const admin = await createAdmin(ctx);
+      let status = 'active';
+      reply = (method, url) =>
+        url.includes('/discounts')
+          ? {
+              id: DISCOUNT,
+              status: method === 'PATCH' ? (status = 'archived') : status,
+              code: 'BLOGGER2026',
+              times_used: 2,
+              usage_limit: 2,
+            }
+          : {};
+      const input = {
+        code: 'blogger2026',
+        note: 'Launch',
+        percentOff: 100,
+        billingPeriods: 3,
+        plans: ['PRO_MONTHLY'],
+        maxUses: 2,
+        expiresAt: null,
+      };
+      const a = await blogger();
+      await a.agent.post(`${API}/admin/coupons`).send(input).expect(403);
+      // 100% off forever is refused (free Pro needs a number of periods).
+      await admin.agent
+        .post(`${API}/admin/coupons`)
+        .send({ ...input, billingPeriods: null })
+        .expect(400);
+      const created = (await admin.agent.post(`${API}/admin/coupons`).send(input).expect(201)).body;
+      expect(created).toMatchObject({ code: 'BLOGGER2026', paddleDiscountId: DISCOUNT });
+      expect(calls.find((c) => c.method === 'POST' && c.url.endsWith('/discounts'))?.body).toEqual({
+        description: 'briefluence coupon: Launch',
+        enabled_for_checkout: true,
+        code: 'BLOGGER2026',
+        type: 'percentage',
+        amount: '100',
+        recur: true,
+        maximum_recurring_intervals: 3,
+        usage_limit: 2,
+        restrict_to: [PRICE.monthly],
+        expires_at: null,
+        custom_data: { source: 'briefluence-admin' },
+      });
+      await admin.agent.post(`${API}/admin/coupons`).send(input).expect(409); // same code
+
+      // The blogger checks the code (any case), then pays with it.
+      const check = await a.agent
+        .post(`${API}/billing/coupon/check`)
+        .send({ code: 'Blogger2026' })
+        .expect(200);
+      expect(check.body).toEqual({
+        code: 'BLOGGER2026',
+        percentOff: 100,
+        billingPeriods: 3,
+        plans: ['PRO_MONTHLY'],
+      });
+      expect(
+        reason(
+          await a.agent.post(`${API}/billing/coupon/check`).send({ code: 'NOPE123' }).expect(400),
+        ),
+      ).toBe('COUPON_INVALID:NOT_FOUND');
+      expect(
+        reason(
+          await a.agent
+            .post(`${API}/billing/checkout`)
+            .send({ plan: 'PRO_YEARLY', coupon: 'BLOGGER2026' })
+            .expect(400),
+        ),
+      ).toBe('COUPON_INVALID:WRONG_PLAN');
+      const checkout = await a.agent
+        .post(`${API}/billing/checkout`)
+        .send({ plan: 'PRO_MONTHLY', coupon: 'blogger2026' })
+        .expect(200);
+      expect(checkout.body.paddle).toMatchObject({ priceId: PRICE.monthly, discountId: DISCOUNT });
+
+      // Paddle confirms the $0 first month: counted once, even if the webhook repeats.
+      await post(txn('txn_a', a.id)).expect(200);
+      await post(txn('txn_a', a.id)).expect(200);
+      expect(await ctx.prisma.couponRedemption.count()).toBe(1);
+      const aSub = (await a.agent.get(`${API}/billing/subscription`).expect(200)).body;
+      expect(aSub.subscription).toMatchObject({ tier: 'PRO', planCode: 'PRO_MONTHLY' });
+      // One coupon per account (checked here; Paddle's limit is only a total).
+      await ctx.prisma.subscription.updateMany({
+        where: { userId: a.id },
+        data: { status: 'CANCELED', currentPeriodEnd: new Date(Date.now() - 1000) },
+      });
+      expect(
+        reason(
+          await a.agent
+            .post(`${API}/billing/coupon/check`)
+            .send({ code: 'BLOGGER2026' })
+            .expect(400),
+        ),
+      ).toBe('COUPON_INVALID:ALREADY_USED');
+
+      // A second blogger uses the last use; a third finds it used up.
+      const b2 = await blogger();
+      await post(txn('txn_b', b2.id)).expect(200);
+      const c3 = await blogger();
+      expect(
+        reason(
+          await c3.agent
+            .post(`${API}/billing/coupon/check`)
+            .send({ code: 'BLOGGER2026' })
+            .expect(400),
+        ),
+      ).toBe('COUPON_INVALID:USED_UP');
+
+      // After the free months the second blogger pays: conversion shows in the statistics.
+      await post(
+        txn('txn_b_renewal', b2.id, {
+          origin: 'subscription_recurring',
+          subscription_id: 'sub_txn_b',
+          discount_id: null,
+          details: { totals: { grand_total: '1499' } },
+        }),
+      ).expect(200);
+      const list = (await admin.agent.get(`${API}/admin/coupons`).expect(200)).body;
+      expect(list.enabled).toBe(true);
+      expect(list.coupons[0]).toMatchObject({
+        code: 'BLOGGER2026',
+        state: 'USED_UP',
+        usesLeft: 0,
+        stats: { uses: 2, paying: 1, conversion: 50 },
+      });
+      const detail = (await admin.agent.get(`${API}/admin/coupons/${created.id}`).expect(200)).body;
+      expect(detail.paddleTimesUsed).toBe(2);
+      expect(
+        detail.redemptions.map((r: { email: string; paidAfter: number[] }) => [
+          r.email,
+          r.paidAfter,
+        ]),
+      ).toEqual([
+        [b2.email, [0, 1499]],
+        [a.email, [0]],
+      ]);
+
+      // Off: archived in Paddle, refused here.
+      const off = await admin.agent
+        .patch(`${API}/admin/coupons/${created.id}`)
+        .send({ active: false })
+        .expect(200);
+      expect(off.body.active).toBe(false);
+      expect(
+        calls.find((c) => c.method === 'PATCH' && c.url.endsWith(`/discounts/${DISCOUNT}`))?.body,
+      ).toEqual({
+        status: 'archived',
+      });
+      expect(
+        (await admin.agent.get(`${API}/admin/coupons`).expect(200)).body.coupons[0].state,
+      ).toBe('OFF');
+    });
+
+    it('a coupon during the free month ends the free days; paid Pro cannot take a coupon', async () => {
+      const admin = await createAdmin(ctx);
+      reply = () => ({
+        id: DISCOUNT,
+        status: 'active',
+        code: 'HALF',
+        times_used: 0,
+        usage_limit: null,
+      });
+      await admin.agent
+        .post(`${API}/admin/coupons`)
+        .send({
+          code: 'HALF',
+          percentOff: 50,
+          billingPeriods: null,
+          plans: ['PRO_MONTHLY', 'PRO_YEARLY'],
+          maxUses: null,
+          expiresAt: null,
+        })
+        .expect(201);
+      expect(calls.at(-1)?.body).toMatchObject({
+        recur: true,
+        maximum_recurring_intervals: null,
+        usage_limit: null,
+        restrict_to: [PRICE.monthly, PRICE.yearly],
+      });
+      const b = await blogger();
+      await b.agent.post(`${API}/billing/free-pro`).expect(200);
+      expect(
+        (await b.agent.get(`${API}/billing/subscription`)).body.subscription.freeDaysLost,
+      ).toBe(1);
+      await post(
+        txn('txn_half', b.id, {
+          custom_data: { bf_user_id: b.id, bf_subscription_id: b.subId },
+          details: { totals: { grand_total: '750' } },
+        }),
+      ).expect(200);
+      const view = (await b.agent.get(`${API}/billing/subscription`).expect(200)).body.subscription;
+      expect(view).toMatchObject({ tier: 'PRO', inFreeDays: false, renewal: 'renews' });
+      const res = await b.agent
+        .post(`${API}/billing/coupon/check`)
+        .send({ code: 'HALF' })
+        .expect(409);
+      expect(res.body.error.code).toBe('CONFLICT');
     });
   });
 });

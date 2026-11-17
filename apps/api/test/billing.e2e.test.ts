@@ -28,10 +28,12 @@ describe('plans, subscription & payments (e2e)', () => {
     ctx.clock.reset();
   });
 
-  async function onboarded(plan: 'BASIC' | 'PRO_MONTHLY' | 'PRO_YEARLY' = 'BASIC') {
+  /** A blogger on Basic; `freeMonth` also activates the free month of Pro. */
+  async function onboarded({ freeMonth = false } = {}) {
     const inf = await signup(ctx, 'INFLUENCER');
     await inf.agent.put(`${API}/influencers/me`).send(influencerProfile).expect(200);
-    await inf.agent.post(`${API}/billing/plan`).send({ plan }).expect(200);
+    await inf.agent.post(`${API}/billing/plan`).send({ plan: 'BASIC' }).expect(200);
+    if (freeMonth) await inf.agent.post(`${API}/billing/free-pro`).expect(200);
     const admin = await createAdmin(ctx);
     return { ...inf, admin };
   }
@@ -56,21 +58,36 @@ describe('plans, subscription & payments (e2e)', () => {
   const sub = async (agent: Awaited<ReturnType<typeof onboarded>>['agent']) =>
     (await agent.get(`${API}/billing/subscription`).expect(200)).body;
 
-  it('Basic: 30 free Pro days, then Basic with an application limit; Pro removes the limit', async () => {
-    const inf = await onboarded('BASIC');
+  it('Basic is free right away; the free month is opt-in, once; then Basic with a limit; Pro removes it', async () => {
+    const inf = await onboarded();
     const start = await sub(inf.agent);
     expect(start.plans.map((p: { code: string }) => p.code)).toEqual([
       'BASIC',
       'PRO_MONTHLY',
       'PRO_YEARLY',
     ]);
+    expect(start.freeProAvailable).toBe(true);
     expect(start.subscription).toMatchObject({
+      status: 'ACTIVE',
       planCode: 'BASIC',
+      tier: 'BASIC',
+      inFreeDays: false,
+      freeDaysLost: 0,
+    });
+
+    // The blogger activates the free month whenever they want: 30 days of Pro, no card.
+    const free = (await inf.agent.post(`${API}/billing/free-pro`).expect(200)).body;
+    expect(free.freeProAvailable).toBe(false);
+    expect(free.subscription).toMatchObject({
+      status: 'TRIALING',
       tier: 'PRO',
       inFreeDays: true,
       trialDaysLeft: 30,
+      hasCard: false,
+      nextChargeAt: null,
       applications: { limit: null, left: null },
     });
+    await inf.agent.post(`${API}/billing/free-pro`).expect(409);
 
     // Admin sets Basic to 2 applications per 30 days.
     await inf.admin.agent
@@ -93,6 +110,9 @@ describe('plans, subscription & payments (e2e)', () => {
       tier: 'BASIC',
       applications: { used: 0, limit: 2, left: 2 },
     });
+    // Used once: it can't be activated again.
+    expect(basic.freeProAvailable).toBe(false);
+    await inf.agent.post(`${API}/billing/free-pro`).expect(409);
 
     // Apply to briefs: two go through, the third hits the Basic limit.
     await connectMock(ctx, inf.agent, 'instagram');
@@ -138,10 +158,11 @@ describe('plans, subscription & payments (e2e)', () => {
     await apply(deals[2]!).expect(201);
   });
 
-  it('Pro paid on day 1: the paid month starts after the free days; renewals use the current price', async () => {
-    const inf = await onboarded('PRO_MONTHLY');
-    const trialEnd = new Date((await sub(inf.agent)).subscription.trialEndsAt);
+  it('paying during the free month ends it: the paid month starts today; renewals use the current price', async () => {
+    const inf = await onboarded({ freeMonth: true });
     ctx.clock.advance(DAY);
+    // Shown before checkout: these free days are given up by paying now.
+    expect((await sub(inf.agent)).subscription.freeDaysLost).toBe(29);
     expect(await pay(inf.agent, 'success')).toBe('success');
     const paid = (await sub(inf.agent)).subscription;
     expect(paid).toMatchObject({
@@ -151,8 +172,12 @@ describe('plans, subscription & payments (e2e)', () => {
       hasCard: true,
       cardMask: '4111********1111',
       canCheckout: false,
+      inFreeDays: false,
+      trialDaysLeft: 0,
     });
-    expect(new Date(paid.currentPeriodEnd).getUTCMonth()).toBe((trialEnd.getUTCMonth() + 1) % 12);
+    const days = (new Date(paid.currentPeriodEnd).getTime() - ctx.clock.now().getTime()) / DAY;
+    expect(days).toBeGreaterThanOrEqual(28);
+    expect(days).toBeLessThanOrEqual(31);
     // In-app only: Paddle emails its own receipt.
     const notes = await inf.agent.get(`${API}/notifications`).expect(200);
     expect(notes.body.items.map((n: { type: string }) => n.type)).toContain('PAYMENT_SUCCEEDED');
@@ -176,7 +201,7 @@ describe('plans, subscription & payments (e2e)', () => {
   });
 
   it('Pro yearly costs the yearly price and runs 12 months', async () => {
-    const inf = await onboarded('BASIC');
+    const inf = await onboarded();
     ctx.clock.advance(31 * DAY);
     await inf.admin.agent.post(`${API}/admin/jobs/billing-daily/run`).expect(200);
     expect(await pay(inf.agent, 'success', 'PRO_YEARLY')).toBe('success');
@@ -189,7 +214,7 @@ describe('plans, subscription & payments (e2e)', () => {
   });
 
   it('declined renewal retries on days 1, 3, 5, then the blogger is on Basic', async () => {
-    const inf = await onboarded('BASIC');
+    const inf = await onboarded();
     ctx.clock.advance(31 * DAY);
     await inf.admin.agent.post(`${API}/admin/jobs/billing-daily/run`).expect(200);
     expect(await pay(inf.agent, 'renewal_decline')).toBe('success');
@@ -211,19 +236,13 @@ describe('plans, subscription & payments (e2e)', () => {
   });
 
   it('declined checkout keeps the free days; cancel and card removal work', async () => {
-    const inf = await onboarded('PRO_MONTHLY');
+    const inf = await onboarded({ freeMonth: true });
     expect(await pay(inf.agent, 'decline')).toBe('failed');
     expect((await sub(inf.agent)).subscription).toMatchObject({
       status: 'TRIALING',
-      planCode: 'PRO_MONTHLY',
-      tier: 'PRO',
-    });
-    // Cancelling Pro during the free days: Basic afterwards, nothing charged.
-    const cancelledTrial = await inf.agent.post(`${API}/billing/cancel`).expect(200);
-    expect(cancelledTrial.body.subscription).toMatchObject({
-      status: 'TRIALING',
       planCode: 'BASIC',
-      nextChargeAt: null,
+      tier: 'PRO',
+      trialDaysLeft: 30,
     });
 
     expect(await pay(inf.agent, 'success')).toBe('success');
@@ -246,7 +265,7 @@ describe('plans, subscription & payments (e2e)', () => {
   });
 
   it('card removed: renewal is off; Renew Pro pays the next period and turns renewal back on', async () => {
-    const inf = await onboarded('BASIC');
+    const inf = await onboarded();
     ctx.clock.advance(31 * DAY);
     await inf.admin.agent.post(`${API}/admin/jobs/billing-daily/run`).expect(200);
     expect(await pay(inf.agent, 'success')).toBe('success');
@@ -269,7 +288,7 @@ describe('plans, subscription & payments (e2e)', () => {
   });
 
   it('switches Pro monthly to yearly at the next renewal and charges the yearly price then', async () => {
-    const inf = await onboarded('BASIC');
+    const inf = await onboarded();
     ctx.clock.advance(31 * DAY);
     await inf.admin.agent.post(`${API}/admin/jobs/billing-daily/run`).expect(200);
     expect(await pay(inf.agent, 'success')).toBe('success');
@@ -311,28 +330,26 @@ describe('plans, subscription & payments (e2e)', () => {
     await inf.agent.post(`${API}/billing/switch`).send({ plan: 'PRO_MONTHLY' }).expect(409);
   });
 
-  it('the 30 free Pro days are given only once per account', async () => {
-    const inf = await onboarded('BASIC');
-    const first = (await sub(inf.agent)).subscription.trialEndsAt;
-    ctx.clock.advance(10 * DAY);
-    // Choosing again (even another plan) does not restart the free days.
-    await inf.agent.post(`${API}/billing/plan`).send({ plan: 'PRO_MONTHLY' }).expect(200);
-    expect((await sub(inf.agent)).subscription.trialEndsAt).toBe(first);
-    ctx.clock.advance(25 * DAY);
-    await inf.admin.agent.post(`${API}/admin/jobs/billing-daily/run`).expect(200);
-    await inf.agent.post(`${API}/billing/plan`).send({ plan: 'BASIC' }).expect(200);
-    const after = (await sub(inf.agent)).subscription;
-    expect(after).toMatchObject({
-      status: 'ACTIVE',
-      planCode: 'BASIC',
-      inFreeDays: false,
-      trialDaysLeft: 0,
-      trialEndsAt: first,
+  it('Pro can be bought without choosing Basic first; Pro is never picked without paying', async () => {
+    const inf = await signup(ctx, 'INFLUENCER');
+    await inf.agent.put(`${API}/influencers/me`).send(influencerProfile).expect(200);
+    await inf.agent.post(`${API}/billing/plan`).send({ plan: 'PRO_MONTHLY' }).expect(409);
+    expect(await pay(inf.agent, 'success', 'PRO_YEARLY')).toBe('success');
+    const s = await sub(inf.agent);
+    expect(s.subscription).toMatchObject({
+      planCode: 'PRO_YEARLY',
+      tier: 'PRO',
+      renewal: 'renews',
     });
+    // Paid Pro is running: the free month waits until it's over.
+    expect(s.freeProAvailable).toBe(false);
+    await inf.agent.post(`${API}/billing/free-pro`).expect(409);
+    // Coupons are Paddle discounts: not available with the test payment page.
+    expect(s.coupons).toBe(false);
   });
 
   it('admins manage plans; Basic stays free and on; turned-off plans cannot be chosen', async () => {
-    const inf = await onboarded('BASIC');
+    const inf = await onboarded();
     const plans = (await inf.admin.agent.get(`${API}/admin/plans`).expect(200)).body;
     expect(
       plans.map((p: { code: string; priceMinor: number }) => `${p.code}:${p.priceMinor}`),

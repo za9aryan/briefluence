@@ -1,5 +1,5 @@
 'use client';
-import type { PlanCode } from '@briefluence/shared';
+import type { CouponProblem, PlanCode } from '@briefluence/shared';
 import {
   Alert,
   Badge,
@@ -10,15 +10,19 @@ import {
   Icon,
   Inline,
   Stack,
+  Field,
+  Input,
   Text,
   buttonStyles,
   cn,
+  useConfirm,
   useToast,
 } from '@briefluence/ui';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { api } from '@/lib/api';
+import { useState } from 'react';
+import { ApiError, api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { type CheckoutResponse, useRunCheckout } from '@/lib/hooks/checkout';
 import { useFormat } from '@/lib/hooks/format';
@@ -31,35 +35,76 @@ export const useSubscription = () =>
     queryFn: () => api.get<SubscriptionDto>('/billing/subscription'),
   });
 
+/** A coupon the blogger checked (what it gives and on which plans). */
+export interface CouponDto {
+  code: string;
+  percentOff: number;
+  billingPeriods: number | null;
+  plans: PlanCode[];
+}
+
+/** "Free for 3 months" / "50% off on every payment" for one plan. */
+function useCouponDeal() {
+  const t = useTranslations('billing.coupon');
+  return (c: CouponDto, plan: PlanCode) => {
+    const deal = c.percentOff >= 100 ? t('free') : t('off', { percent: c.percentOff });
+    const when =
+      c.billingPeriods == null || plan === 'BASIC'
+        ? t('always')
+        : t(`periods.${plan}`, { count: c.billingPeriods });
+    return `${deal} ${when}`;
+  };
+}
+
+/** How much free Pro is left, as words ("12 days", or "40 minutes" → "1 hour" in test mode). */
+function useTimeLeft() {
+  const t = useTranslations('billing.plans.duration');
+  return (until: string) => {
+    const hours = Math.max(1, Math.ceil((new Date(until).getTime() - Date.now()) / 3_600_000));
+    return hours < 24 ? t('hours', { count: hours }) : t('days', { count: Math.ceil(hours / 24) });
+  };
+}
+
 /**
- * Picks a plan. `start`: the blogger has no plan yet — every plan starts with free Pro days, and
- * Pro also opens the payment page (test page redirect or Paddle overlay). With Paddle, picking Pro
- * starts nothing: Pro begins when Paddle confirms the payment. `upgrade`: only Pro plans.
+ * Picks a plan. Basic is free and starts right away; Pro opens the payment (test page redirect or
+ * Paddle overlay), with a coupon when one is applied. Paying during the free month ends it, so the
+ * blogger confirms that first. `upgrade`: only Pro plans.
  */
-function usePlanAction(mode: 'start' | 'upgrade', paddle: boolean, freePro: string) {
-  const t = useTranslations('billing.plans');
+function usePlanAction() {
+  const t = useTranslations('billing');
   const toast = useToast();
+  const confirm = useConfirm();
   const errorMessage = useErrorMessage();
   const qc = useQueryClient();
   const runCheckout = useRunCheckout();
+  const timeLeft = useTimeLeft();
   return useMutation({
-    mutationFn: async (plan: PlanCode) => {
-      const pro = plan !== 'BASIC';
-      if (mode === 'start' && !(paddle && pro)) await api.post('/billing/plan', { plan });
-      if (!pro) return 'started';
+    mutationFn: async ({ plan, coupon }: { plan: PlanCode; coupon?: string }) => {
+      if (plan === 'BASIC') {
+        await api.post('/billing/plan', { plan });
+        return 'basic' as const;
+      }
+      const s = qc.getQueryData<SubscriptionDto>(['billing', 'subscription'])?.subscription;
+      if (s?.inFreeDays && s.freeDaysLost > 0) {
+        const ok = await confirm({
+          title: t('loseFreeDays.title'),
+          description: t('loseFreeDays.body', { duration: timeLeft(s.trialEndsAt) }),
+          confirmLabel: t('loseFreeDays.confirm'),
+          tone: 'primary',
+        });
+        if (!ok) return null;
+      }
       // Paddle opens an overlay; the mutation stays pending until it is closed.
-      const r = await api.post<CheckoutResponse>('/billing/checkout', { plan });
-      await runCheckout(r);
-      return mode === 'start' && !paddle && !('redirectUrl' in r) ? 'started' : null;
+      await runCheckout(await api.post<CheckoutResponse>('/billing/checkout', { plan, coupon }));
+      return null;
     },
     onSuccess: (r) => {
       if (!r) return;
       for (const key of [ME_KEY, ['billing'], ['influencer'], ['feed'], ['deal']])
         void qc.invalidateQueries({ queryKey: key });
-      toast(t('startedFor', { duration: freePro }));
+      toast(t('plans.basicChosen'));
     },
     onError: (e) => {
-      // A Pro choice still started the free days even if the payment page failed to open.
       void qc.invalidateQueries({ queryKey: ['billing'] });
       void qc.invalidateQueries({ queryKey: ME_KEY });
       toast(errorMessage(e), 'danger');
@@ -69,14 +114,15 @@ function usePlanAction(mode: 'start' | 'upgrade', paddle: boolean, freePro: stri
 
 export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; className?: string }) {
   const t = useTranslations('billing.plans');
+  const tc = useTranslations('billing.coupon');
   const f = useFormat();
   const sub = useSubscription();
   const paddle = sub.data?.paddle;
-  const freePro = useFreeProDuration(sub.data?.freeProHours);
-  const action = usePlanAction(mode, !!paddle, freePro);
+  const action = usePlanAction();
+  const couponDeal = useCouponDeal();
+  const [coupon, setCoupon] = useState<CouponDto | null>(null);
   const plans = (sub.data?.plans ?? []).filter((p) => mode === 'start' || p.code !== 'BASIC');
   const monthly = plans.find((p) => p.code === 'PRO_MONTHLY');
-  const freeDaysLeft = mode === 'start' || !!sub.data?.subscription?.inFreeDays;
 
   const price = (p: PlanDto) =>
     p.code === 'BASIC' ? t('free') : f.money(p.priceMinor, p.currency);
@@ -90,13 +136,11 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
   const features = (p: PlanDto): string[] =>
     p.code === 'BASIC'
       ? [
-          t('features.freePro', { duration: freePro }),
           t('features.limit', { count: p.applicationLimit ?? 0 }),
           ...(p.offerLimit != null ? [t('features.offers', { count: p.offerLimit })] : []),
           t('features.feed'),
         ]
       : [
-          ...(mode === 'start' && !paddle ? [t('features.freePro', { duration: freePro })] : []),
           t('features.unlimited'),
           t('features.offersUnlimited'),
           p.code === 'PRO_YEARLY'
@@ -118,15 +162,10 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
         <Heading level={2} size="h2">
           {mode === 'start' ? t('title') : t('upgradeTitle')}
         </Heading>
-        <Text tone="muted">
-          {mode === 'upgrade'
-            ? t('upgradeLead')
-            : paddle
-              ? t('leadPaddle', { duration: freePro })
-              : t('lead')}
-        </Text>
+        <Text tone="muted">{mode === 'upgrade' ? t('upgradeLead') : t('lead')}</Text>
       </Stack>
-      {paddle?.demo && <DemoNote />}
+      {paddle?.demo && mode === 'start' && <DemoNote />}
+      {sub.data?.coupons && <CouponField value={coupon} onChange={setCoupon} />}
       <Grid
         cols={
           plans.length >= 4 ? { base: 1, md: 2, xl: 4 } : { base: 1, md: plans.length >= 3 ? 3 : 2 }
@@ -136,12 +175,17 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
         {plans.map((p) => {
           const pro = p.code !== 'BASIC';
           const pct = saving(p);
+          // An applied coupon only works on its plans; Basic is free anyway.
+          const fits = !!coupon && pro && coupon.plans.includes(p.code);
+          const blocked = !!coupon && pro && !fits;
           return (
             <Card
               key={p.code}
               className={cn(
                 'flex flex-col',
-                p.code === 'PRO_MONTHLY' && 'border-2 border-primary/40',
+                fits
+                  ? 'border-2 border-success'
+                  : p.code === 'PRO_MONTHLY' && !coupon && 'border-2 border-primary/40',
               )}
             >
               <Stack gap={4} className="flex-1">
@@ -152,9 +196,26 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
                   {pct != null && <Badge tone="primary">{t('save', { value: `${pct}%` })}</Badge>}
                 </Inline>
                 <Inline gap={2} align="baseline" wrap>
-                  <span className="text-h1 font-extrabold text-ink">{price(p)}</span>
+                  <span
+                    className={cn(
+                      'text-h1 font-extrabold text-ink',
+                      fits && 'text-h2 text-ink-muted line-through',
+                    )}
+                  >
+                    {price(p)}
+                  </span>
                   {pro && <Text tone="muted">{periodLabel(t, p.code)}</Text>}
                 </Inline>
+                {fits && coupon && (
+                  <Stack gap={1}>
+                    <Badge tone="success" icon="gift" variant="small" className="self-start">
+                      {couponDeal(coupon, p.code)}
+                    </Badge>
+                    <Text size="small" tone="muted">
+                      {tc('then')}
+                    </Text>
+                  </Stack>
+                )}
                 <Stack gap={2} className="flex-1">
                   {features(p).map((x) => (
                     <Inline key={x} gap={2} align="start">
@@ -166,16 +227,29 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
                 <Button
                   block
                   variant={pro ? 'primary' : 'secondary'}
-                  loading={action.isPending && action.variables === p.code}
-                  disabled={action.isPending}
-                  onClick={() => action.mutate(p.code)}
+                  loading={action.isPending && action.variables?.plan === p.code}
+                  disabled={action.isPending || blocked}
+                  onClick={() =>
+                    action.mutate({ plan: p.code, coupon: fits ? coupon?.code : undefined })
+                  }
                 >
                   {cta[p.code]}
                 </Button>
-                {pro && (paddle || freeDaysLeft) && (
+                {blocked ? (
                   <Text size="small" tone="muted">
-                    {paddle ? t('payNowNote') : t('payNote')}
+                    {tc('notForPlan')}
                   </Text>
+                ) : fits && coupon && coupon.percentOff >= 100 ? (
+                  <Text size="small" tone="muted">
+                    {tc('cardNote')}
+                  </Text>
+                ) : (
+                  pro &&
+                  paddle && (
+                    <Text size="small" tone="muted">
+                      {t('payNowNote')}
+                    </Text>
+                  )
                 )}
               </Stack>
             </Card>
@@ -186,9 +260,146 @@ export function PlanPicker({ mode, className }: { mode: 'start' | 'upgrade'; cla
   );
 }
 
+/** "Have a coupon?": checks the code with the API, then shows what it gives. */
+function CouponField({
+  value,
+  onChange,
+}: {
+  value: CouponDto | null;
+  onChange: (c: CouponDto | null) => void;
+}) {
+  const t = useTranslations('billing.coupon');
+  const errorMessage = useErrorMessage();
+  const [open, setOpen] = useState(false);
+  const [code, setCode] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const check = useMutation({
+    mutationFn: (c: string) => api.post<CouponDto>('/billing/coupon/check', { code: c }),
+    onSuccess: (c) => {
+      setError(null);
+      onChange(c);
+    },
+    onError: (e) => {
+      const reason =
+        e instanceof ApiError && e.code === 'COUPON_INVALID'
+          ? (e.details as { reason?: CouponProblem } | undefined)?.reason
+          : undefined;
+      setError(reason ? t(`errors.${reason}`) : errorMessage(e));
+    },
+  });
+
+  if (value)
+    return (
+      <div className="flex items-center gap-3 rounded-card border border-success bg-success/10 p-4">
+        <Icon name="gift" tone="success" />
+        <Text weight="bold" className="min-w-0 flex-1 whitespace-nowrap">
+          {t('applied', { code: value.code })}
+        </Text>
+        <Button
+          size="sm"
+          variant="ghost"
+          icon="close"
+          aria-label={t('remove')}
+          onClick={() => onChange(null)}
+        >
+          <span className="hidden sm:inline">{t('remove')}</span>
+        </Button>
+      </div>
+    );
+  if (!open)
+    return (
+      <Button variant="ghost" icon="gift" className="self-start" onClick={() => setOpen(true)}>
+        {t('toggle')}
+      </Button>
+    );
+  const valid = /^[A-Za-z0-9]{3,32}$/.test(code.trim());
+  return (
+    <form
+      className="max-w-md"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (valid) check.mutate(code.trim());
+      }}
+    >
+      <Field label={t('label')} error={error ?? undefined}>
+        {({ id, describedBy }) => (
+          <div className="flex gap-2">
+            <Input
+              id={id}
+              aria-describedby={describedBy}
+              value={code}
+              autoFocus
+              autoCapitalize="characters"
+              autoComplete="off"
+              maxLength={32}
+              invalid={!!error}
+              className="uppercase"
+              onChange={(e) => {
+                setCode(e.target.value);
+                setError(null);
+              }}
+            />
+            <Button type="submit" variant="secondary" loading={check.isPending} disabled={!valid}>
+              {t('apply')}
+            </Button>
+          </div>
+        )}
+      </Field>
+    </form>
+  );
+}
+
+/** The one free month of Pro: a small banner with an "Activate" button (no card). */
+export function FreeProBanner() {
+  const t = useTranslations('billing');
+  const toast = useToast();
+  const errorMessage = useErrorMessage();
+  const qc = useQueryClient();
+  const sub = useSubscription();
+  const duration = useFreeProDuration(sub.data?.freeProHours);
+  const activate = useMutation({
+    mutationFn: () => api.post('/billing/free-pro'),
+    onSuccess: () => {
+      for (const key of [ME_KEY, ['billing'], ['influencer'], ['feed'], ['deal']])
+        void qc.invalidateQueries({ queryKey: key });
+      toast(t('plans.startedFor', { duration }));
+    },
+    onError: (e) => toast(errorMessage(e), 'danger'),
+  });
+  if (!sub.data?.freeProAvailable) return null;
+  return (
+    <div className="flex flex-col gap-4 rounded-card border border-primary/30 bg-primary-soft p-4 sm:flex-row sm:items-center sm:p-5">
+      <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-pill bg-primary text-on-primary">
+        <Icon name="sparkles" />
+      </span>
+      <Stack gap={1} className="min-w-0 flex-1">
+        <Text weight="bold">{t('freeMonth.title')}</Text>
+        <Text size="small" tone="muted">
+          {t('freeMonth.body', { duration })}
+        </Text>
+      </Stack>
+      <Button
+        icon="sparkles"
+        className="shrink-0"
+        loading={activate.isPending}
+        onClick={() => activate.mutate()}
+      >
+        {t('freeMonth.cta')}
+      </Button>
+    </div>
+  );
+}
+
 /** "per day / month / year" for a Pro plan. */
-export function periodLabel(t: (key: 'perDay' | 'perMonth' | 'perYear') => string, code: PlanCode) {
-  return code === 'PRO_YEARLY' ? t('perYear') : code === 'PRO_DAILY' ? t('perDay') : t('perMonth');
+export function periodLabel(
+  tPlans: (key: 'perDay' | 'perMonth' | 'perYear') => string,
+  code: PlanCode,
+) {
+  return code === 'PRO_YEARLY'
+    ? tPlans('perYear')
+    : code === 'PRO_DAILY'
+      ? tPlans('perDay')
+      : tPlans('perMonth');
 }
 
 /** The free Pro period as words: "1 hour" in test mode, "30 days" live. */

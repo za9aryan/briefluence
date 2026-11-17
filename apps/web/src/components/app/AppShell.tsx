@@ -58,6 +58,7 @@ function useNav(role: Role): NavItem[] {
     { href: '/admin/offers', label: t('admin.offers'), icon: 'sparkles' },
     { href: '/admin/users', label: t('admin.users'), icon: 'users' },
     { href: '/admin/plans', label: t('admin.plans'), icon: 'star' },
+    { href: '/admin/coupons', label: t('admin.coupons'), icon: 'gift' },
     { href: '/admin/payments', label: t('admin.payments'), icon: 'wallet' },
   ];
 }

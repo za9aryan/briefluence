@@ -19,6 +19,8 @@ export interface PaddleCheckoutPayload {
   priceId: string;
   customerEmail: string;
   customData: Record<string, string>;
+  /** A coupon's Paddle discount (dsc_…), applied for the blogger. */
+  discountId?: string;
 }
 
 interface PaddleEvent {
@@ -96,6 +98,8 @@ export async function openPaddleCheckout(
       theme: 'light',
       locale: paddleLocale(uiLocale),
       allowLogout: false,
+      // Coupons are entered in Billing (one per account, checked by us), never in Paddle's form.
+      showAddDiscounts: false,
     };
     P.Checkout.open(
       'transactionId' in what
@@ -104,6 +108,7 @@ export async function openPaddleCheckout(
             items: [{ priceId: what.checkout.priceId, quantity: 1 }],
             customer: { email: what.checkout.customerEmail },
             customData: what.checkout.customData,
+            ...(what.checkout.discountId ? { discountId: what.checkout.discountId } : {}),
             settings,
           },
     );

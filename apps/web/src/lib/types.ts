@@ -313,6 +313,8 @@ export interface SubscriptionDto {
     cardMask: string | null;
     hasCard: boolean;
     trialDaysLeft: number;
+    /** Free days given up by paying for Pro now (the blogger confirms first). */
+    freeDaysLost: number;
     hasAccess: boolean;
     nextChargeAt: string | null;
     canCheckout: boolean;
@@ -325,8 +327,12 @@ export interface SubscriptionDto {
   provider: 'mock' | 'paddle';
   /** Paddle.js settings when Paddle takes the payments. */
   paddle: PaddleClientConfig | null;
-  /** Length of the free Pro period (720 = 30 days; 1 in the Paddle test mode). */
+  /** Length of the free month of Pro (720 = 30 days; 1 in the Paddle test mode). */
   freeProHours: number;
+  /** The one free month of Pro can be activated now. */
+  freeProAvailable: boolean;
+  /** Coupons can be used (they are Paddle discounts). */
+  coupons: boolean;
 }
 
 export interface PaymentDto {

@@ -1,5 +1,6 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import {
+  activateFreePro,
   applicationsLeft,
   applyCancel,
   applyPaymentSucceeded,
@@ -7,8 +8,10 @@ import {
   applyResume,
   applyTimeTransitions,
   basicWindowStart,
+  canActivateFreePro,
   canCheckout,
   effectiveTier,
+  freeDaysLostByPaying,
   inFreeDays,
   isChargeDue,
   nextChargePlan,
@@ -18,7 +21,7 @@ import {
   isPaidPlan,
   nextChargeAt,
   PLAN_WINDOW_DAYS,
-  startPlan,
+  startBasic,
   TRIAL_DAYS,
   TRIAL_REMINDER_DAYS_BEFORE,
   trialDaysLeft,
@@ -34,6 +37,7 @@ import { ENV } from '../../config/config.module';
 import type { Env } from '../../config/env';
 import { QueueService } from '../../queue/queue.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { CouponsService } from './coupons.service';
 import { PaddleBillingService } from './paddle/paddle-billing.service';
 import { PlansService } from './plans.service';
 import { fromState, toState } from './state';
@@ -74,6 +78,7 @@ export class BillingService implements OnModuleInit {
     @Inject(PAYMENT_PROVIDER) private readonly provider: PaymentProvider,
     @Inject(ENV) private readonly env: Env,
     private readonly paddle: PaddleBillingService,
+    private readonly coupons: CouponsService,
   ) {}
 
   /** Paddle sandbox demo: free Pro lasts 1 hour instead of 30 days. */
@@ -105,8 +110,16 @@ export class BillingService implements OnModuleInit {
       provider: this.provider.name,
       /** Paddle.js settings (public client token) when Paddle is the provider. */
       paddle: this.paddle.clientConfig(),
-      /** How long the free Pro period lasts (30 days; 1 hour in the Paddle test mode). */
+      /** How long the free month lasts (30 days; 1 hour in the Paddle test mode). */
       freeProHours: (this.freeProMs() ?? TRIAL_DAYS * 24 * 60 * 60 * 1000) / (60 * 60 * 1000),
+      /** Coupons need Paddle (they are Paddle discounts). */
+      coupons: this.paddle.enabled,
+      /** The one free month of Pro can be activated now. */
+      freeProAvailable: canActivateFreePro(
+        sub ? toState(sub) : null,
+        sub?.freeProActivatedAt ?? null,
+        this.clock.now(),
+      ),
     };
     if (!sub) return { subscription: null, ...base };
     const state = toState(sub);
@@ -127,6 +140,8 @@ export class BillingService implements OnModuleInit {
         cardMask: sub.cardMask,
         hasCard: !!sub.bindingId,
         trialDaysLeft: trialDaysLeft(state, now),
+        /** Free days given up by paying for Pro now (warned before checkout). */
+        freeDaysLost: freeDaysLostByPaying(state, now),
         hasAccess: true,
         nextChargeAt: nextChargeAt(state),
         canCheckout: canCheckout(state, now),
@@ -155,30 +170,64 @@ export class BillingService implements OnModuleInit {
     return sub;
   }
 
-  /**
-   * The blogger chooses a plan; the free Pro days start now whatever they chose. Idempotent:
-   * a second call keeps the existing subscription (only the chosen plan can still change while
-   * nothing was paid). Paying for Pro is a separate checkout.
-   */
-  async choosePlan(userId: string, planCode: PlanCode) {
+  private async requireProfile(userId: string) {
     const profile = await this.prisma.influencerProfile.findUnique({
       where: { userId },
       select: { id: true },
     });
     if (!profile) throw new AppError('PROFILE_INCOMPLETE', 'Complete your profile first');
-    // With Paddle, Pro starts only when Paddle confirms the payment (webhook), never here.
-    if (this.paddle.enabled && isPaidPlan(planCode))
-      throw new AppError('CONFLICT', 'Pay for Pro in the checkout');
-    const plan = await this.plans.get(planCode);
-    if (!plan.isActive) throw new AppError('VALIDATION_FAILED', 'This plan is not available');
-    const existing = await this.prisma.subscription.findUnique({ where: { userId } });
-    if (!existing) {
-      const s = startPlan(this.clock.now(), planCode, this.freeProMs());
-      await this.prisma.subscription.create({ data: { userId, ...fromState(s) } });
-    } else if (existing.status === 'TRIALING' && !existing.bindingId) {
-      await this.prisma.subscription.update({ where: { id: existing.id }, data: { planCode } });
-    }
+  }
+
+  /**
+   * The blogger chooses Basic: free from now on. Idempotent (an existing subscription is kept).
+   * Pro is bought through checkout; the free month is activated separately.
+   */
+  async choosePlan(userId: string, planCode: PlanCode) {
+    await this.requireProfile(userId);
+    if (isPaidPlan(planCode)) throw new AppError('CONFLICT', 'Pay for Pro in the checkout');
+    await this.ensureSubscription(userId);
     return this.getForUser(userId);
+  }
+
+  /** The subscription row, created on Basic if the blogger has none yet. */
+  private async ensureSubscription(userId: string) {
+    const existing = await this.prisma.subscription.findUnique({ where: { userId } });
+    if (existing) return existing;
+    try {
+      return await this.prisma.subscription.create({
+        data: { userId, ...fromState(startBasic(this.clock.now())) },
+      });
+    } catch (err) {
+      // Two requests raced; the other one created it.
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002')
+        return this.prisma.subscription.findUniqueOrThrow({ where: { userId } });
+      throw err;
+    }
+  }
+
+  /** The one free month of Pro, whenever the blogger wants it. No card, nothing is charged. */
+  async activateFreePro(userId: string) {
+    await this.requireProfile(userId);
+    const sub = await this.ensureSubscription(userId);
+    const now = this.clock.now();
+    if (!canActivateFreePro(toState(sub), sub.freeProActivatedAt, now))
+      throw new AppError('CONFLICT', 'The free month is not available');
+    const next = activateFreePro(toState(sub), now, this.freeProMs());
+    // Guarded by freeProActivatedAt so two clicks can't activate it twice.
+    const { count } = await this.prisma.subscription.updateMany({
+      where: { id: sub.id, freeProActivatedAt: null },
+      data: { ...fromState(next), freeProActivatedAt: now, trialReminderSentAt: null },
+    });
+    if (!count) throw new AppError('CONFLICT', 'The free month is not available');
+    return this.getForUser(userId);
+  }
+
+  /** Checks a coupon code before checkout (what it gives and on which plans). */
+  async checkCoupon(userId: string, code: string) {
+    const existing = await this.prisma.subscription.findUnique({ where: { userId } });
+    if (existing && !canCheckout(toState(existing), this.clock.now()))
+      throw new AppError('CONFLICT', 'Your Pro plan is already active');
+    return this.coupons.check(userId, code);
   }
 
   /** Records a pending payment; its order id is the short running payment number. */
@@ -213,6 +262,7 @@ export class BillingService implements OnModuleInit {
   async checkout(
     userId: string,
     planCode: PlanCode,
+    couponCode?: string,
   ): Promise<{ redirectUrl: string } | Awaited<ReturnType<PaddleBillingService['checkout']>>> {
     if (!isPaidPlan(planCode)) throw new AppError('VALIDATION_FAILED', 'Basic is free');
     const plan = await this.plans.get(planCode);
@@ -228,9 +278,12 @@ export class BillingService implements OnModuleInit {
         select: { email: true, influencer: { select: { id: true } } },
       });
       if (!user.influencer) throw new AppError('PROFILE_INCOMPLETE', 'Complete your profile first');
-      return this.paddle.checkout(existing, planCode, user.email, userId);
+      const coupon = couponCode ? await this.coupons.usable(userId, couponCode, planCode) : null;
+      return this.paddle.checkout(existing, planCode, user.email, userId, coupon?.paddleDiscountId);
     }
-    const sub = await this.requireSub(userId);
+    if (couponCode) throw new AppError('CONFLICT', 'Coupons work with Paddle payments only');
+    await this.requireProfile(userId);
+    const sub = await this.ensureSubscription(userId);
     const state = toState(sub);
     if (!canCheckout(state, now)) throw new AppError('CONFLICT', 'Your Pro plan is already active');
     // Renewing without a card (any Pro plan): the new period starts when the paid one ends.

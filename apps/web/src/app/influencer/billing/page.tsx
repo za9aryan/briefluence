@@ -29,7 +29,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { PageHeader } from '@/components/app/AppShell';
 import { PaymentStatusBadge } from '@/components/domain/badges';
-import { DemoNote, PlanPicker, periodLabel } from '@/components/influencer/StartTrial';
+import {
+  DemoNote,
+  FreeProBanner,
+  PlanPicker,
+  periodLabel,
+} from '@/components/influencer/StartTrial';
 import { api } from '@/lib/api';
 import { type CheckoutResponse, useRunCheckout, useUpdateCard } from '@/lib/hooks/checkout';
 import { useErrorMessage } from '@/lib/hooks/errors';
@@ -136,6 +141,7 @@ export default function BillingPage() {
       </Suspense>
       <PageHeader title={t('title')} description={t('lead')} />
       {paddle?.demo && s && <DemoNote />}
+      <FreeProBanner />
 
       {sub.isLoading ? (
         <Skeleton className="h-56 rounded-card" />
@@ -177,9 +183,6 @@ export default function BillingPage() {
                       >
                         {s.renewal === 'renews' ? t('renewalOn') : t('renewalOff')}
                       </Badge>
-                      {s.inFreeDays && (
-                        <Text>{t('paidAfterFreeDays', { date: f.date(s.trialEndsAt) })}</Text>
-                      )}
                       <Text>
                         {s.renewal === 'renews'
                           ? t('renewsAuto', {

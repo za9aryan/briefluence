@@ -28,7 +28,8 @@
     "SOCIAL_PLATFORM_TAKEN": "You already have an account on this platform. Remove it first to add another one.",
     "OFFER_LIMIT_REACHED": "Your plan allows no more live offers. Close one or choose Pro.",
     "APPLICATION_LIMIT_REACHED": "You used all applications of the Basic plan for now. Choose Pro for unlimited applications.",
-    "USERNAME_TAKEN": "This username is taken. Try another one."
+    "USERNAME_TAKEN": "This username is taken. Try another one.",
+    "COUPON_INVALID": "This coupon can't be used."
   },
   "field": {
     "required": "This field is required.",

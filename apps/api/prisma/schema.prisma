@@ -158,6 +158,8 @@ model User {
   notifications     Notification[]
   supportTickets    SupportTicket[]     @relation("SupportTicketUser")
   pushSubscriptions PushSubscription[]
+  couponsCreated    Coupon[]
+  couponRedemption  CouponRedemption?
   supportAssigned   SupportTicket[]     @relation("SupportTicketAssignee")
   refreshTokens     RefreshToken[]
   identities        AuthIdentity[]
@@ -375,8 +377,10 @@ model Subscription {
   userId               String             @unique
   user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   status               SubscriptionStatus
-  /// Chosen / current plan. Free Pro days come first for every plan; unpaid Pro falls back to BASIC.
+  /// Current plan. During the free month it is BASIC (what follows); unpaid Pro falls back to BASIC.
   planCode             PlanCode           @default(BASIC)
+  /// When the one free month of Pro was activated (null = still available).
+  freeProActivatedAt   DateTime?
   /// Pro plan to switch to at the next renewal (monthly <-> yearly)
   nextPlanCode         PlanCode?
   /// When the blogger moved to Basic; its limit counts applications from then on.
@@ -397,6 +401,46 @@ model Subscription {
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @default(now()) @updatedAt
   payments             Payment[]
+}
+
+/// A coupon = a Paddle discount the admin created in our dashboard (mirrored here for checks and stats).
+model Coupon {
+  id               String             @id @default(cuid())
+  /// Upper-case code customers enter (Paddle compares codes case-insensitively).
+  code             String             @unique
+  note             String?
+  /// 100 = free Pro for `billingPeriods` periods.
+  percentOff       Int
+  /// Billing periods the discount recurs for; null = every period.
+  billingPeriods   Int?
+  plans            PlanCode[]
+  /// Total redemptions allowed (1 = single use); null = unlimited.
+  maxUses          Int?
+  expiresAt        DateTime?
+  active           Boolean            @default(true)
+  paddleDiscountId String             @unique
+  createdById      String?
+  createdBy        User?              @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @default(now()) @updatedAt
+  redemptions      CouponRedemption[]
+}
+
+/// A completed Paddle checkout that used a coupon. One per account.
+model CouponRedemption {
+  id                  String   @id @default(cuid())
+  couponId            String
+  coupon              Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planCode            PlanCode
+  /// What the first transaction charged (0 for free months), minor units.
+  amount              Int
+  currency            Currency
+  paddleTransactionId String   @unique
+  createdAt           DateTime @default(now())
+
+  @@index([couponId, createdAt])
 }
 
 model Payment {

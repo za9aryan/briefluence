@@ -4,7 +4,7 @@ import {
   isNewerEvent,
   isPaidPlan,
   paddleAmountMinor,
-  startPlan,
+  startBasic,
   type Currency,
   type PlanCode,
 } from '@briefluence/shared';
@@ -13,6 +13,7 @@ import { AppError, notFound } from '../../../common/app-error';
 import { Clock } from '../../../common/clock';
 import { PrismaService } from '../../../common/prisma.service';
 import { NotificationsService } from '../../notifications/notifications.service';
+import { CouponsService } from '../coupons.service';
 import { PlansService } from '../plans.service';
 import { fromState, toState } from '../state';
 import { PaddleClient, type PaddleSubscription } from './paddle.client';
@@ -34,6 +35,8 @@ interface PaddleTransaction {
   custom_data: Record<string, unknown> | null;
   currency_code: string;
   billing_period: { starts_at: string; ends_at: string } | null;
+  /** The discount applied to this transaction (dsc_…), e.g. one of our coupons. */
+  discount_id?: string | null;
   items: { price: { id: string } }[];
   details?: { totals?: { grand_total?: string; total?: string } };
   payments?: { method_details?: { card?: { last4?: string } } }[];
@@ -56,6 +59,7 @@ export class PaddleBillingService {
     private readonly notifications: NotificationsService,
     private readonly plans: PlansService,
     private readonly clock: Clock,
+    private readonly coupons: CouponsService,
   ) {}
 
   get enabled() {
@@ -78,8 +82,17 @@ export class PaddleBillingService {
 
   // ─── Actions from the blogger ───────────────────────────
 
-  /** Paddle.js checkout for a Pro plan; the subscription itself arrives by webhook. */
-  async checkout(sub: Subscription | null, planCode: PlanCode, email: string, userId: string) {
+  /**
+   * Paddle.js checkout for a Pro plan, with a coupon's Paddle discount when given; the
+   * subscription itself arrives by webhook.
+   */
+  async checkout(
+    sub: Subscription | null,
+    planCode: PlanCode,
+    email: string,
+    userId: string,
+    discountId?: string,
+  ) {
     if (sub?.paddleSubscriptionId && (sub.status === 'ACTIVE' || sub.status === 'PAST_DUE'))
       throw new AppError('CONFLICT', 'You already have Pro; switch plans instead');
     const priceId = this.priceFor(planCode);
@@ -88,6 +101,7 @@ export class PaddleBillingService {
         priceId,
         customerEmail: email,
         customData: sub ? { [OUR_USER]: userId, [OUR_ID]: sub.id } : { [OUR_USER]: userId },
+        ...(discountId ? { discountId } : {}),
       },
     };
   }
@@ -209,7 +223,7 @@ export class PaddleBillingService {
     if (!user) return null;
     try {
       return await this.prisma.subscription.create({
-        data: { userId, ...fromState(startPlan(this.clock.now(), 'BASIC', 0)) },
+        data: { userId, ...fromState(startBasic(this.clock.now())) },
       });
     } catch (err) {
       // Two webhooks for the same first payment raced; the other one created it.
@@ -288,6 +302,16 @@ export class PaddleBillingService {
         throw err;
       });
     if (!created) return; // already recorded
+    // A first checkout with one of our coupons: count the redemption (once per account).
+    if (t.discount_id && t.origin === 'web')
+      await this.coupons.recordRedemption({
+        userId: sub.userId,
+        paddleDiscountId: t.discount_id,
+        paddleTransactionId: t.id,
+        planCode,
+        amount,
+        currency,
+      });
     // Link right away so Pro shows even if the subscription event comes later.
     if (!sub.paddleSubscriptionId || sub.status !== 'ACTIVE') {
       const s = await this.prisma.subscription.findUniqueOrThrow({ where: { id: sub.id } });

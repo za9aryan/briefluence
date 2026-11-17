@@ -26,6 +26,7 @@ export const ERROR_CODES = [
   'SLOTS_EXCEEDED',
   'DEAL_NOT_EDITABLE',
   'PAYMENT_FAILED',
+  'COUPON_INVALID',
   'PROVIDER_ERROR',
   'INTERNAL',
 ] as const;
