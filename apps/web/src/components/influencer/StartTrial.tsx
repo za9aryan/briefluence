@@ -22,6 +22,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useState } from 'react';
+import gift from './FreeProGift.module.css';
 import { ApiError, api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { type CheckoutResponse, useRunCheckout } from '@/lib/hooks/checkout';
@@ -349,9 +350,24 @@ function CouponField({
   );
 }
 
-/** The one free month of Pro: a small banner with an "Activate" button (no card). */
+/** Confetti pieces on the gift card: position (%), color token, delay (s). */
+const GIFT_CONFETTI = [
+  [12, 14, 'var(--bf-primary)', 0],
+  [26, 78, 'var(--bf-on-primary)', 1.2],
+  [44, 10, 'var(--bf-chart-2)', 2.1],
+  [58, 84, 'var(--bf-primary)', 0.6],
+  [72, 18, 'var(--bf-chart-3)', 1.7],
+  [86, 70, 'var(--bf-on-primary)', 2.8],
+  [94, 30, 'var(--bf-primary)', 3.4],
+] as const;
+
+/**
+ * The one free month of Pro as a gift: an animated card with the perks and an "Activate" button
+ * (no card, nothing charged afterwards). Renders nothing once it was used or while Pro runs.
+ */
 export function FreeProBanner() {
   const t = useTranslations('billing');
+  const tf = useTranslations('billing.plans.features');
   const toast = useToast();
   const errorMessage = useErrorMessage();
   const qc = useQueryClient();
@@ -368,25 +384,58 @@ export function FreeProBanner() {
   });
   if (!sub.data?.freeProAvailable) return null;
   return (
-    <div className="flex flex-col gap-4 rounded-card border border-primary/30 bg-primary-soft p-4 sm:flex-row sm:items-center sm:p-5">
-      <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-pill bg-primary text-on-primary">
-        <Icon name="sparkles" />
-      </span>
-      <Stack gap={1} className="min-w-0 flex-1">
-        <Text weight="bold">{t('freeMonth.title')}</Text>
-        <Text size="small" tone="muted">
-          {t('freeMonth.body', { duration })}
-        </Text>
-      </Stack>
-      <Button
-        icon="sparkles"
-        className="shrink-0"
-        loading={activate.isPending}
-        onClick={() => activate.mutate()}
-      >
-        {t('freeMonth.cta')}
-      </Button>
-    </div>
+    <section className={gift.stage} aria-labelledby="free-pro-gift">
+      <div className={gift.confetti} aria-hidden>
+        {GIFT_CONFETTI.map(([x, y, color, delay], i) => (
+          <span
+            key={i}
+            className={gift.bit}
+            style={{ left: `${x}%`, top: `${y}%`, background: color, animationDelay: `${delay}s` }}
+          />
+        ))}
+      </div>
+      <div className={gift.inner}>
+        <div className={gift.gift} aria-hidden>
+          <span className={gift.glow} />
+          <span className={gift.spark} />
+          <span className={gift.spark} />
+          <span className={gift.spark} />
+          <span className={gift.box} />
+          <span className={gift.lid} />
+          <span className={gift.month}>{t('freeMonth.month')}</span>
+        </div>
+        <Stack gap={2} className="min-w-0">
+          <span className={gift.eyebrow}>
+            <Icon name="gift" size="xs" />
+            {t('freeMonth.eyebrow')}
+          </span>
+          <h2 id="free-pro-gift" className={gift.title}>
+            {t.rich('freeMonth.title', { em: (c) => <em>{c}</em> })}
+          </h2>
+          <p className={gift.body}>{t('freeMonth.body', { duration })}</p>
+          <ul className={gift.perks}>
+            {[tf('unlimited'), tf('offersUnlimited'), t('freeMonth.noCard')].map((x) => (
+              <li key={x} className={gift.perk}>
+                <Icon name="check" size="xs" />
+                {x}
+              </li>
+            ))}
+          </ul>
+        </Stack>
+        <div className={gift.cta}>
+          <Button
+            size="lg"
+            icon="sparkles"
+            className={gift.ctaButton}
+            loading={activate.isPending}
+            onClick={() => activate.mutate()}
+          >
+            {t('freeMonth.cta')}
+          </Button>
+          <p className={gift.ctaNote}>{t('freeMonth.note')}</p>
+        </div>
+      </div>
+    </section>
   );
 }
 

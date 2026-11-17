@@ -937,13 +937,25 @@ export default {
       ],
     },
     freeMonth: {
-      title: ['One month of Pro, free', 'Месяц Pro бесплатно', 'Pro-ի մեկ ամիս՝ անվճար'],
-      body: [
-        'Unlimited applications and offers for {duration}. No card, and nothing is charged afterwards. Turn it on when it suits you: it works once.',
-        'Отклики и предложения без ограничений на {duration}. Без карты, и потом ничего не спишется. Включи, когда тебе удобно: это можно сделать один раз.',
-        'Դիմումներ և առաջարկներ առանց սահմանափակման՝ {duration}։ Առանց քարտի, և հետո ոչինչ չի գանձվի։ Միացրու, երբ քեզ հարմար է․ դա կարելի է անել մեկ անգամ։',
+      eyebrow: ['A gift for you', 'Подарок для тебя', 'Նվեր քեզ'],
+      title: [
+        'One month of <em>Pro, free</em>',
+        'Месяц <em>Pro бесплатно</em>',
+        'Pro-ի մեկ ամիս՝ <em>անվճար</em>',
       ],
+      body: [
+        'Unlimited applications and offers for {duration}. Turn it on whenever it suits you, for example right before a busy month.',
+        'Отклики и предложения без ограничений на {duration}. Включи, когда тебе удобно, например перед насыщенным месяцем.',
+        'Դիմումներ և առաջարկներ առանց սահմանափակման՝ {duration}։ Միացրու, երբ քեզ հարմար է, օրինակ՝ զբաղված ամսից առաջ։',
+      ],
+      noCard: ['No card needed', 'Без карты', 'Առանց քարտի'],
+      month: ['1 mo', '1 мес', '1 ամիս'],
       cta: ['Activate free Pro', 'Включить бесплатный Pro', 'Միացնել անվճար Pro-ն'],
+      note: [
+        'Once per account. Nothing is charged afterwards.',
+        'Один раз на аккаунт. Потом ничего не спишется.',
+        'Մեկ անգամ՝ մեկ հաշվի համար։ Հետո ոչինչ չի գանձվի։',
+      ],
     },
     loseFreeDays: {
       title: [

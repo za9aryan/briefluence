@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { PageHeader } from '@/components/app/AppShell';
 import { DealCard } from '@/components/domain/DealCard';
 import { ApplicationMiniCard } from '@/components/influencer/ApplicationMiniCard';
-import { BriefsChecklist } from '@/components/influencer/StartTrial';
+import { BriefsChecklist, FreeProBanner } from '@/components/influencer/StartTrial';
 import { api } from '@/lib/api';
 import { useFormat } from '@/lib/hooks/format';
 import { useMe } from '@/lib/hooks/session';
@@ -59,6 +59,7 @@ export default function InfluencerDashboardPage() {
       />
 
       <BriefsChecklist />
+      <FreeProBanner />
 
       <Grid className="bf-stagger" cols={{ base: 2, lg: 4 }} gap={{ base: 2, md: 4 }}>
         {stats.isLoading || !s ? (

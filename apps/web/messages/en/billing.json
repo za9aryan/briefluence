@@ -120,9 +120,13 @@
     "body": "The free month of Pro lasts 1 hour here. To see a renewal soon, pick Pro daily (test). Pay with the test card {card}, any future date and any CVC. No real money is charged."
   },
   "freeMonth": {
-    "title": "One month of Pro, free",
-    "body": "Unlimited applications and offers for {duration}. No card, and nothing is charged afterwards. Turn it on when it suits you: it works once.",
-    "cta": "Activate free Pro"
+    "eyebrow": "A gift for you",
+    "title": "One month of <em>Pro, free</em>",
+    "body": "Unlimited applications and offers for {duration}. Turn it on whenever it suits you, for example right before a busy month.",
+    "noCard": "No card needed",
+    "month": "1 mo",
+    "cta": "Activate free Pro",
+    "note": "Once per account. Nothing is charged afterwards."
   },
   "loseFreeDays": {
     "title": "Paying ends your free Pro",
