@@ -157,18 +157,13 @@ function PlanEditor({ plan }: { plan: PlanRow }) {
             </Field>
             <Field label={t('currency')}>
               {({ id }) => (
-                <Select
+                <Select<Currency>
                   id={id}
+                  options={CURRENCIES.map((c) => ({ value: c, label: c }))}
                   value={currency}
-                  onChange={(e) => setCurrency(e.target.value as Currency)}
+                  onChange={setCurrency}
                   disabled={basic}
-                >
-                  {CURRENCIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </Select>
+                />
               )}
             </Field>
             <Field label={t('limit')}>

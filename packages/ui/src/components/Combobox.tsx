@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { cn } from '../lib/cn';
+import { useFloatingList } from '../lib/floating';
 import { Icon } from '../primitives/Icon';
 
 export interface ComboOption {
@@ -62,6 +63,9 @@ export function Combobox(props: Props) {
   const [active, setActive] = useState(0);
   const box = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
+  const field = useRef<HTMLDivElement>(null);
+  const list = useRef<HTMLUListElement>(null);
+  const style = useFloatingList(open, field, list);
   const selected = props.multiple ? props.value : props.value ? [props.value] : [];
   const known = useRef(new Map<string, string>());
   for (const o of options) known.current.set(o.value, o.label);
@@ -120,7 +124,9 @@ export function Combobox(props: Props) {
     } else if (e.key === 'Enter' && open && shown[active]) {
       e.preventDefault();
       pick(shown[active]);
-    } else if (e.key === 'Escape') {
+    } else if (e.key === 'Escape' && open) {
+      e.preventDefault();
+      e.stopPropagation(); // don't also close the dialog around it
       setOpen(false);
     } else if (e.key === 'Backspace' && !query && props.multiple && props.value.length) {
       remove(props.value[props.value.length - 1]!);
@@ -131,6 +137,7 @@ export function Combobox(props: Props) {
   return (
     <div ref={box} className={cn('relative', className)}>
       <div
+        ref={field}
         className={cn(
           'flex min-h-11 w-full flex-wrap items-center gap-1.5 rounded-sm border bg-surface-raised px-2 py-1.5 transition-colors',
           'focus-within:border-primary focus-within:ring-3 focus-within:ring-primary/15',
@@ -201,10 +208,12 @@ export function Combobox(props: Props) {
       </div>
       {open && (
         <ul
+          ref={list}
           id={listId}
           role="listbox"
           aria-multiselectable={props.multiple || undefined}
-          className="bf-rise absolute inset-x-0 top-full z-40 mt-1 max-h-64 overflow-y-auto rounded-sm border border-line bg-surface-raised py-1 shadow-pop"
+          style={style}
+          className="bf-rise fixed z-[60] overflow-y-auto rounded-sm border border-line bg-surface-raised py-1 shadow-pop"
         >
           {shown.length ? (
             shown.map((o, i) => (

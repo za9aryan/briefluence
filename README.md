@@ -206,6 +206,21 @@ requests an hour — the built-in list. Cities are stored by their main (English
 viewer's language. The pickers show the "City data: GeoNames (CC BY 4.0)" credit their licence requires. Tests always
 use the built-in list.
 
+## Where a brief is for
+
+A brief targets countries, regions or both: `WORLD`, `EUROPE`, `ASIA`, `NORTH_AMERICA`, `LATIN_AMERICA`, `AFRICA` and
+`OCEANIA` are stored in the same `countries` list as the ISO codes. Which countries each region covers (UN M49, plus the
+Council of Europe countries that sit in both Europe and Asia) lives in `packages/shared/src/domain/regions.ts`.
+A blogger sees a brief when it targets their country, one of their regions or Worldwide. Cities can only be picked in
+real countries, not regions. In the brief search a blogger filters by **Where**: their city, their country (briefs
+with no city set), or international (Worldwide or a region).
+
+## Selects
+
+Every pick-one list uses `Select` from `packages/ui`, which has the same look as the searchable `Combobox` used for
+countries and cities. Use `Combobox` for long lists. The list floats above the page, so modals and menus never cut it
+off.
+
 ## Deleting an account
 
 Companies and influencers delete their own account in **Settings → Delete account** (`POST /api/v1/account/delete`,

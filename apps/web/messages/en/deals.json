@@ -21,10 +21,17 @@
     "platform": "Platform",
     "payment": "Payment",
     "niche": "Niche",
-    "city": "City",
+    "reach": "Where",
     "collaboration": "Collaboration",
     "budgetMin": "Minimum budget",
     "budgetHint": "In AMD, per influencer."
+  },
+  "reach": {
+    "any": "Anywhere",
+    "city": "My city",
+    "country": "My country",
+    "international": "International",
+    "internationalHint": "Worldwide or for a region"
   },
   "sort": {
     "label": "Sort",

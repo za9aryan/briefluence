@@ -153,28 +153,27 @@ export default function ApplicantsPage() {
       {d?.status === 'DRAFT' && <Alert tone="info">{t('draftNote')}</Alert>}
 
       <Inline gap={2} wrap>
-        <Select
+        <Select<'' | ApplicationStatus>
+          variant="pill"
           aria-label={t('filter')}
+          options={FILTERS.map((s) => ({ value: s, label: s ? ts(s) : t('allStatuses') }))}
           value={status}
-          onChange={(e) => setStatus(e.target.value as '' | ApplicationStatus)}
+          active={!!status}
+          onChange={setStatus}
           className="w-auto"
-        >
-          {FILTERS.map((s) => (
-            <option key={s} value={s}>
-              {s ? ts(s) : t('allStatuses')}
-            </option>
-          ))}
-        </Select>
-        <Select
+        />
+        <Select<typeof sort>
+          variant="pill"
           aria-label={t('sort')}
+          options={[
+            { value: 'match', label: t('sortMatch') },
+            { value: 'followers', label: t('sortFollowers') },
+            { value: 'newest', label: t('sortNewest') },
+          ]}
           value={sort}
-          onChange={(e) => setSort(e.target.value as typeof sort)}
+          onChange={setSort}
           className="w-auto"
-        >
-          <option value="match">{t('sortMatch')}</option>
-          <option value="followers">{t('sortFollowers')}</option>
-          <option value="newest">{t('sortNewest')}</option>
-        </Select>
+        />
       </Inline>
 
       {data.isLoading ? (

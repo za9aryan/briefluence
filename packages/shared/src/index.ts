@@ -7,6 +7,7 @@ export * from './errors';
 export * from './schemas';
 export * from './domain/audience';
 export * from './domain/matching';
+export * from './domain/regions';
 export * from './domain/subscription';
 export * from './domain/applications';
 export * from './domain/deals';

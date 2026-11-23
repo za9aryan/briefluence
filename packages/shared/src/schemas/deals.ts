@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { INFLUENCER_AGE_RANGE, LANGUAGES, NICHES } from '../constants';
+import { REGIONS } from '../domain/regions';
 import {
   COLLABORATION_TYPES,
   CONTENT_FORMATS,
@@ -35,7 +36,8 @@ export const dealBaseSchema = z.object({
   /** Hide the brand's name, logo and links from bloggers until it accepts them. */
   isConfidential: z.boolean().default(false),
   // Targeting
-  countries: z.array(countryCode).min(1, 'pickOne'),
+  /** Countries (ISO codes) and regions ("WORLD", "EUROPE"…), see domain/regions. */
+  countries: z.array(z.union([countryCode, z.enum(REGIONS)])).min(1, 'pickOne'),
   cities: z.array(z.string().trim().min(1).max(80)).default([]),
   languages: z.array(z.enum(LANGUAGES)).default([]),
   minFollowers: optionalInt(0, 1_000_000_000),
@@ -138,7 +140,11 @@ const csv = <T extends z.ZodType>(item: T) =>
 export const feedQuerySchema = paginationSchema.extend({
   platform: csv(z.enum(PLATFORMS)),
   niche: csv(z.enum(NICHES)),
-  city: csv(z.string().max(80)),
+  /**
+   * Where briefs are for, seen from the blogger: their city, their country (no city set), or
+   * international (Worldwide or a region).
+   */
+  reach: z.enum(['city', 'country', 'international']).optional(),
   paymentType: csv(z.enum(PAYMENT_TYPES)),
   collaboration: csv(z.enum(COLLABORATION_TYPES)),
   budgetMin: z.coerce.number().int().min(0).optional(),

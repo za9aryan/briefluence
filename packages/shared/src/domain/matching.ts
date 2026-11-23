@@ -7,6 +7,7 @@ import {
   majorityGender,
   shareInAgeRange,
 } from './audience';
+import { targetsCountry } from './regions';
 
 export interface MatchAccount {
   id: string;
@@ -94,7 +95,7 @@ export function checkEligibility(
     if (deal.status !== 'ACTIVE') return 'NOT_ACTIVE';
     if (deal.applicationDeadline.getTime() <= now.getTime()) return 'DEADLINE_PASSED';
   }
-  if (deal.countries.length > 0 && !deal.countries.includes(inf.country)) return 'COUNTRY';
+  if (!targetsCountry(deal.countries, inf.country)) return 'COUNTRY';
   if (deal.cities.length > 0 && (!inf.city || !deal.cities.includes(inf.city))) return 'CITY';
   if (eligibleAccounts(deal, inf.accounts).length === 0) return 'PLATFORM_OR_FOLLOWERS';
   if (deal.influencerGender !== 'ANY' && inf.gender !== deal.influencerGender) return 'GENDER';

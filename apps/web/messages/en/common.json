@@ -50,6 +50,7 @@
   "goHome": "Go to home page",
   "reset": "Reset",
   "searchCountry": "Search for a country",
+  "searchCountryOrRegion": "Search for a country or region",
   "searchCity": "Search for a city",
   "nothingFound": "Nothing found",
   "logoutTitle": "Log out?",

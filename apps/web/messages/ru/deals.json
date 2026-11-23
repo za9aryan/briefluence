@@ -21,10 +21,17 @@
     "platform": "Платформа",
     "payment": "Оплата",
     "niche": "Ниша",
-    "city": "Город",
+    "reach": "Где",
     "collaboration": "Сотрудничество",
     "budgetMin": "Минимальный бюджет",
     "budgetHint": "В драмах, на одного инфлюенсера."
+  },
+  "reach": {
+    "any": "Везде",
+    "city": "Мой город",
+    "country": "Моя страна",
+    "international": "Международные",
+    "internationalHint": "Весь мир или целый регион"
   },
   "sort": {
     "label": "Сортировка",

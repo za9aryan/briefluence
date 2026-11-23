@@ -52,7 +52,6 @@ export {
   UrlInput,
   PrefixInput,
   Textarea,
-  Select,
   Checkbox,
   Switch,
   type InputProps,
@@ -60,6 +59,7 @@ export {
 export { FieldGrid } from './components/FieldGrid';
 export { ChipGroup, type ChipOption } from './components/ChipGroup';
 export { Combobox, type ComboOption } from './components/Combobox';
+export { Select, type SelectOption, type SelectProps } from './components/Select';
 export { FilterDropdown, type FilterOption } from './components/FilterDropdown';
 export { FiltersButton, SheetSection } from './components/FilterSheet';
 export { RangeInput, Slider } from './components/RangeInput';

@@ -324,17 +324,14 @@ function TicketView({
           <div className="min-w-0 flex-1">
             <Select
               aria-label={t('admin.assignee')}
+              options={[
+                { value: '', label: t('admin.nobody') },
+                ...d.admins.map((a) => ({ value: a.id, label: a.email })),
+              ]}
               value={d.assignee?.id ?? ''}
               disabled={assign.isPending}
-              onChange={(e) => assign.mutate(e.target.value || null)}
-            >
-              <option value="">{t('admin.nobody')}</option>
-              {d.admins.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.email}
-                </option>
-              ))}
-            </Select>
+              onChange={(v) => assign.mutate(v || null)}
+            />
           </div>
           {me && d.assignee?.id !== me.id && (
             <Button

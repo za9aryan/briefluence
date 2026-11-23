@@ -1,5 +1,5 @@
 'use client';
-import type { CityOption } from '@briefluence/shared';
+import { onlyCountries, type CityOption } from '@briefluence/shared';
 import { Combobox } from '@briefluence/ui';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useLocale, useTranslations } from 'next-intl';
@@ -37,7 +37,7 @@ export function CountrySelect({
   );
 }
 
-/** Several countries (brief targeting). */
+/** Several countries or regions ("Worldwide", "Europe"…) for brief targeting. */
 export function CountriesSelect({
   value,
   onChange,
@@ -51,11 +51,11 @@ export function CountriesSelect({
       id={f.id}
       invalid={f.invalid}
       aria-describedby={f.describedBy}
-      options={o.allCountries}
+      options={[...o.regions, ...o.allCountries]}
       value={value}
       onChange={onChange}
       labelOf={o.country}
-      placeholder={t('searchCountry')}
+      placeholder={t('searchCountryOrRegion')}
       emptyLabel={t('nothingFound')}
       removeLabel={t('remove')}
     />
@@ -154,7 +154,8 @@ export function CitiesSelect({
   ...f
 }: FieldProps & { countries: string[]; value: string[]; onChange: (v: string[]) => void }) {
   const t = useTranslations('common');
-  const s = useCitySearch(countries);
+  // Cities belong to countries; regions in the list have none to search.
+  const s = useCitySearch(onlyCountries(countries));
   return (
     <>
       <Combobox
@@ -165,7 +166,7 @@ export function CitiesSelect({
         value={value}
         onChange={onChange}
         {...s}
-        disabled={!countries.length}
+        disabled={!onlyCountries(countries).length}
         placeholder={t('searchCity')}
         emptyLabel={t('nothingFound')}
         removeLabel={t('remove')}

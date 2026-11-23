@@ -125,29 +125,27 @@ export default function AdminUsersPage() {
           onChange={(e) => setQ(e.target.value)}
           className="sm:w-72"
         />
-        <Select
+        <Select<'' | Role>
           aria-label={t('role')}
+          options={[
+            { value: '', label: t('allRoles') },
+            ...ROLES.map((r) => ({ value: r, label: tr(r) })),
+          ]}
           value={role}
-          onChange={(e) => setRole(e.target.value as '' | Role)}
-          className="w-auto"
-        >
-          <option value="">{t('allRoles')}</option>
-          {ROLES.map((r) => (
-            <option key={r} value={r}>
-              {tr(r)}
-            </option>
-          ))}
-        </Select>
-        <Select
+          onChange={setRole}
+          className="w-auto min-w-44"
+        />
+        <Select<typeof state>
           aria-label={t('stateFilter')}
+          options={[
+            { value: '', label: t('allStates') },
+            { value: 'unverified', label: t('stateUnverified') },
+            { value: 'blocked', label: t('stateBlocked') },
+          ]}
           value={state}
-          onChange={(e) => setState(e.target.value as typeof state)}
-          className="w-auto"
-        >
-          <option value="">{t('allStates')}</option>
-          <option value="unverified">{t('stateUnverified')}</option>
-          <option value="blocked">{t('stateBlocked')}</option>
-        </Select>
+          onChange={setState}
+          className="w-auto min-w-44"
+        />
       </Inline>
       {list.isLoading ? (
         <Skeleton className="h-64 rounded-card" />

@@ -227,15 +227,17 @@ function Browse() {
             clearLabel={tc('clear')}
           />
         </div>
-        <Select
+        <Select<Filters['sort']>
+          variant="pill"
           aria-label={t('sortNewest') + ' / ' + t('sortPrice')}
+          options={[
+            { value: 'newest', label: t('sortNewest') },
+            { value: 'price', label: t('sortPrice') },
+          ]}
           value={filters.sort}
-          onChange={(e) => set('sort', e.target.value as Filters['sort'])}
-          className="ml-auto h-11 w-auto rounded-pill md:ml-0"
-        >
-          <option value="newest">{t('sortNewest')}</option>
-          <option value="price">{t('sortPrice')}</option>
-        </Select>
+          onChange={(v) => set('sort', v)}
+          className="ml-auto w-auto md:ml-0"
+        />
       </div>
       <OfferFilterSheet
         key={sheetKey}

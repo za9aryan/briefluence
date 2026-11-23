@@ -8,13 +8,20 @@ import {
   type Platform,
   stripScheme,
 } from '@briefluence/shared';
-import { Button, FieldGrid, Modal, Stack, Text, useToast } from '@briefluence/ui';
+import { Button, Field, FieldGrid, Modal, Stack, Text, useToast } from '@briefluence/ui';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import type { z } from 'zod';
-import { FormError, SelectField, TextField, useServerErrors } from '@/components/forms/form';
+import {
+  FormError,
+  SelectField,
+  TextField,
+  useFieldError,
+  useServerErrors,
+} from '@/components/forms/form';
+import { CountrySelect } from '@/components/forms/LocationFields';
 import { api } from '@/lib/api';
 import { useOptions } from '@/lib/hooks/options';
 import type { SocialAccountDto } from '@/lib/types';
@@ -73,6 +80,7 @@ function ManualAccountDialog({ open, account, usedPlatforms, onClose, onSaved }:
     defaultValues: account ? toValues(account) : { ...EMPTY, platform: free[0] ?? EMPTY.platform },
   });
   const serverError = useServerErrors(form.setError);
+  const fe = useFieldError();
   const errors = form.formState.errors;
 
   const save = useMutation({
@@ -127,7 +135,7 @@ function ManualAccountDialog({ open, account, usedPlatforms, onClose, onSaved }:
               name="platform"
               label={t('platform')}
               required
-              register={form.register}
+              control={form.control}
               error={errors.platform}
               options={o.platforms.filter((x) => free.includes(x.value))}
             />
@@ -195,13 +203,22 @@ function ManualAccountDialog({ open, account, usedPlatforms, onClose, onSaved }:
               </Text>
             </Text>
             <FieldGrid cols={{ base: 1, sm: 2 }}>
-              <SelectField
+              <Controller
+                control={form.control}
                 name="topCountry"
-                label={t('topCountry')}
-                placeholder={tc('notSet')}
-                register={form.register}
-                error={errors.topCountry}
-                options={o.countries}
+                render={({ field }) => (
+                  <Field label={t('topCountry')} error={fe(errors.topCountry)}>
+                    {({ id, invalid, describedBy }) => (
+                      <CountrySelect
+                        id={id}
+                        invalid={invalid}
+                        describedBy={describedBy}
+                        value={field.value ?? null}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  </Field>
+                )}
               />
               <TextField
                 name="topCountryShare"
@@ -216,7 +233,7 @@ function ManualAccountDialog({ open, account, usedPlatforms, onClose, onSaved }:
                 name="topAge"
                 label={t('topAge')}
                 placeholder={tc('notSet')}
-                register={form.register}
+                control={form.control}
                 error={errors.topAge}
                 options={AUDIENCE_AGE_BUCKETS.map((b) => ({ value: b, label: b }))}
               />

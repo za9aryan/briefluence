@@ -30,34 +30,29 @@ export function PreferenceFields({ className }: { className?: string }) {
   const setCurrency = useSetCurrency();
   return (
     <div className={cn('flex flex-col gap-2', className)}>
-      <label className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1">
         <span className="text-label text-ink-muted uppercase">{t('language')}</span>
-        <Select
+        <Select<Locale>
+          aria-label={t('language')}
+          options={LOCALES.map((l) => ({ value: l, label: LOCALE_NAMES[l], lang: l }))}
           value={locale}
           disabled={pending}
-          onChange={(e) => choose(e.target.value as Locale)}
-        >
-          {LOCALES.map((l) => (
-            <option key={l} value={l} lang={l}>
-              {LOCALE_NAMES[l]}
-            </option>
-          ))}
-        </Select>
-      </label>
-      <label className="flex flex-col gap-1">
+          onChange={choose}
+        />
+      </div>
+      <div className="flex flex-col gap-1">
         <span className="text-label text-ink-muted uppercase">{t('currency')}</span>
-        <Select
+        <Select<Currency>
+          aria-label={t('currency')}
+          options={CURRENCIES.map((c) => ({
+            value: c,
+            label: `${CURRENCY_SYMBOL[c]} ${c} · ${tr(`currency.${c}`)}`,
+          }))}
           value={currency}
           disabled={setCurrency.isPending}
-          onChange={(e) => setCurrency.mutate(e.target.value as Currency)}
-        >
-          {CURRENCIES.map((c) => (
-            <option key={c} value={c}>
-              {CURRENCY_SYMBOL[c]} {c} · {tr(`currency.${c}`)}
-            </option>
-          ))}
-        </Select>
-      </label>
+          onChange={(c) => setCurrency.mutate(c)}
+        />
+      </div>
     </div>
   );
 }

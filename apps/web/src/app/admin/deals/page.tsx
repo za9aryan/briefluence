@@ -76,19 +76,16 @@ export default function AdminDealsPage() {
           onChange={(e) => setQ(e.target.value)}
           className="sm:w-72"
         />
-        <Select
+        <Select<'' | DealStatus>
           aria-label={t('status')}
+          options={[
+            { value: '', label: tc('all') },
+            ...DEAL_STATUSES.map((s) => ({ value: s, label: td(s) })),
+          ]}
           value={status}
-          onChange={(e) => setStatus(e.target.value as '' | DealStatus)}
-          className="w-auto"
-        >
-          <option value="">{tc('all')}</option>
-          {DEAL_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {td(s)}
-            </option>
-          ))}
-        </Select>
+          onChange={setStatus}
+          className="w-auto min-w-44"
+        />
       </Inline>
       {list.isLoading ? (
         <Skeleton className="h-64 rounded-card" />

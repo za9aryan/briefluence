@@ -17,6 +17,8 @@ import {
   type FeedQuery,
   type ReachPreviewInput,
   reachPreviewSchema,
+  REGIONS,
+  targetCountries,
 } from '@briefluence/shared';
 import type { Deal, Prisma } from '@prisma/client';
 import { AppError, forbidden, notFound } from '../../common/app-error';
@@ -163,10 +165,12 @@ export class DealsService {
   async previewReach(input: ReachPreviewInput): Promise<{ count: number }> {
     const t = reachPreviewSchema.parse(input);
     const year = this.clock.now().getUTCFullYear();
+    // Regions become their countries; Worldwide means no country filter.
+    const countries = targetCountries(t.countries);
     const where: Prisma.InfluencerProfileWhereInput = {
       status: 'APPROVED',
       user: { blockedAt: null },
-      ...(t.countries.length ? { country: { in: t.countries } } : {}),
+      ...(countries ? { country: { in: countries } } : {}),
       ...(t.cities.length ? { city: { in: t.cities } } : {}),
       ...(t.influencerGender !== 'ANY' ? { gender: t.influencerGender } : {}),
       ...(t.influencerAgeMin != null || t.influencerAgeMax != null
@@ -213,7 +217,16 @@ export class DealsService {
     const userFilters: Prisma.DealWhereInput[] = [];
     if (q.platform?.length) userFilters.push({ platforms: { hasSome: q.platform } });
     if (q.niche?.length) userFilters.push({ niches: { hasSome: q.niche } });
-    if (q.city?.length) userFilters.push({ cities: { hasSome: q.city } });
+    // Reach: briefs for the blogger's city (eligibility already keeps only their own city), for
+    // their country as a whole, or international (Worldwide or a region).
+    if (q.reach === 'city') userFilters.push({ cities: { isEmpty: false } });
+    if (q.reach === 'country')
+      userFilters.push({ cities: { isEmpty: true }, countries: { has: profile.country } });
+    if (q.reach === 'international')
+      userFilters.push({
+        cities: { isEmpty: true },
+        OR: [{ countries: { isEmpty: true } }, { countries: { hasSome: [...REGIONS] } }],
+      });
     if (q.paymentType?.length) userFilters.push({ paymentType: { in: q.paymentType } });
     if (q.collaboration?.length) userFilters.push({ collaborationType: { in: q.collaboration } });
     if (q.budgetMin != null) {
@@ -231,7 +244,7 @@ export class DealsService {
     }
     if (q.deadlineBefore) userFilters.push({ applicationDeadline: { lte: q.deadlineBefore } });
 
-    if (q.page === 1) void this.recordSearch(profile.id, q, now);
+    if (q.page === 1) void this.recordSearch(profile.id, q, profile.city, now);
 
     const hard = dealHardFilterWhere(inf, now);
     const deals = await this.prisma.deal.findMany({
@@ -280,12 +293,13 @@ export class DealsService {
    * Logs the filters of a feed search for brand insights. Identical repeats within 10 minutes
    * (refreshes, sorting) are skipped. Fire-and-forget: a logging failure never breaks the feed.
    */
-  private async recordSearch(influencerId: string, q: FeedQuery, now: Date) {
+  private async recordSearch(influencerId: string, q: FeedQuery, city: string | null, now: Date) {
     const data = {
       influencerId,
       platforms: q.platform ?? [],
       niches: q.niche ?? [],
-      cities: q.city ?? [],
+      // "Briefs for my city": counts as a search for the blogger's city.
+      cities: q.reach === 'city' && city ? [city] : [],
       paymentTypes: q.paymentType ?? [],
       collaborationTypes: q.collaboration ?? [],
       budgetMin: null as number | null,

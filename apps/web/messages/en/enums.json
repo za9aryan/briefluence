@@ -38,6 +38,19 @@
     "KZ": "Kazakhstan",
     "IR": "Iran"
   },
+  "region": {
+    "WORLD": "Worldwide",
+    "EUROPE": "Europe",
+    "ASIA": "Asia",
+    "NORTH_AMERICA": "North America",
+    "LATIN_AMERICA": "Latin America",
+    "AFRICA": "Africa",
+    "OCEANIA": "Oceania"
+  },
+  "regionHint": {
+    "world": "Any country",
+    "region": "Whole region"
+  },
   "gender": {
     "MALE": "Male",
     "FEMALE": "Female",

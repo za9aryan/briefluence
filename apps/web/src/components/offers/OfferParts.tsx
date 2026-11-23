@@ -323,18 +323,13 @@ export function OfferForm({
             </Field>
             <Field label={t('fields.currency')}>
               {({ id }) => (
-                <Select
+                <Select<Currency>
                   id={id}
+                  options={CURRENCIES.map((c) => ({ value: c, label: c }))}
                   value={v.currency}
                   disabled={onRequest}
-                  onChange={(e) => set('currency', e.target.value as Currency)}
-                >
-                  {CURRENCIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </Select>
+                  onChange={(c) => set('currency', c)}
+                />
               )}
             </Field>
           </FieldGrid>

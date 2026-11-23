@@ -34,10 +34,11 @@ import { useMe } from '@/lib/hooks/session';
 import { useOptions } from '@/lib/hooks/options';
 import type { FeedDealDto, InfluencerProfileDto, Paginated } from '@/lib/types';
 
+type Reach = NonNullable<FeedQuery['reach']>;
 type Filters = {
   platform: Platform[];
   niche: string[];
-  city: string;
+  reach: Reach | '';
   paymentType: PaymentType[];
   collaboration: CollaborationType[];
   budgetMin: string;
@@ -46,7 +47,7 @@ type Filters = {
 const EMPTY: Filters = {
   platform: [],
   niche: [],
-  city: '',
+  reach: '',
   paymentType: [],
   collaboration: [],
   budgetMin: '',
@@ -54,12 +55,18 @@ const EMPTY: Filters = {
 };
 type Saved = { name: string; query: Partial<Filters> };
 
+/** A saved filter; ones saved before the reach filter may still hold a city, which is dropped. */
+const fromSaved = (q: Partial<Filters> & { city?: string }) => {
+  const { city: _city, ...rest } = q;
+  return { ...EMPTY, ...rest };
+};
+
 const countActive = (f: Filters) =>
   f.platform.length +
   f.niche.length +
   f.paymentType.length +
   f.collaboration.length +
-  (f.city ? 1 : 0) +
+  (f.reach ? 1 : 0) +
   (f.budgetMin ? 1 : 0);
 
 /** The feed API query for a set of filters (budget typed in the viewer's currency). */
@@ -70,13 +77,34 @@ function feedQuery(f: Filters, page: number, pageSize: number, currency: string)
     sort: f.sort,
     platform: f.platform,
     niche: f.niche,
-    city: f.city ? [f.city] : undefined,
+    reach: f.reach || undefined,
     paymentType: f.paymentType,
     collaboration: f.collaboration,
     // Entered in the viewer's currency (major units); the API converts it for each deal's currency.
     budgetMin: f.budgetMin ? toMinor(Number(f.budgetMin)) : undefined,
     budgetCurrency: f.budgetMin ? currency : undefined,
   };
+}
+
+/** Where briefs are for, seen from the blogger: anywhere, their city, their country, abroad. */
+function useReachOptions() {
+  const t = useTranslations('deals.reach');
+  // Same query (and cache) as the page's profile.
+  const { data: p } = useQuery({
+    queryKey: ['influencer', 'me'],
+    queryFn: () => api.get<InfluencerProfileDto>('/influencers/me'),
+  });
+  const o = useOptions();
+  return [
+    { value: '' as const, label: t('any') },
+    { value: 'city' as const, label: t('city'), hint: p?.city ?? undefined },
+    {
+      value: 'country' as const,
+      label: t('country'),
+      hint: p?.country ? o.country(p.country) : undefined,
+    },
+    { value: 'international' as const, label: t('international'), hint: t('internationalHint') },
+  ];
 }
 
 /**
@@ -98,6 +126,7 @@ function FilterSheet({
   const tc = useTranslations('common');
   const currency = useDisplayCurrency();
   const o = useOptions();
+  const reach = useReachOptions();
   const [draft, setDraft] = useState(initial);
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) => setDraft((d) => ({ ...d, [k]: v }));
   const q = feedQuery(draft, 1, 1, currency);
@@ -165,19 +194,13 @@ function FilterSheet({
           aria-label={t('filters.niche')}
         />
       </SheetSection>
-      <SheetSection title={t('filters.city')}>
-        <Select
-          aria-label={t('filters.city')}
-          value={draft.city}
-          onChange={(e) => set('city', e.target.value)}
-        >
-          <option value="">{tc('any')}</option>
-          {o.citiesOf(['AM']).map((c) => (
-            <option key={c.value} value={c.value}>
-              {c.label}
-            </option>
-          ))}
-        </Select>
+      <SheetSection title={t('filters.reach')}>
+        <ChipGroup<Reach | ''>
+          options={reach}
+          value={draft.reach}
+          onChange={(v) => set('reach', v)}
+          aria-label={t('filters.reach')}
+        />
       </SheetSection>
       <SheetSection title={`${t('filters.budgetMin')} (${currency})`}>
         <Input
@@ -206,16 +229,18 @@ function SortSelect({
 }) {
   const t = useTranslations('deals');
   return (
-    <Select
+    <Select<Filters['sort']>
+      variant="pill"
       aria-label={t('sort.label')}
+      options={[
+        { value: 'match', label: t('sort.match') },
+        { value: 'deadline', label: t('sort.deadline') },
+        { value: 'newest', label: t('sort.newest') },
+      ]}
       value={value}
-      onChange={(e) => onChange(e.target.value as Filters['sort'])}
-      className={`h-11 w-auto rounded-pill ${className ?? ''}`}
-    >
-      <option value="match">{t('sort.match')}</option>
-      <option value="deadline">{t('sort.deadline')}</option>
-      <option value="newest">{t('sort.newest')}</option>
-    </Select>
+      onChange={onChange}
+      className={`w-auto ${className ?? ''}`}
+    />
   );
 }
 
@@ -225,8 +250,8 @@ function FilterBar({ value, onChange }: { value: Filters; onChange: (f: Filters)
   const tc = useTranslations('common');
   const currency = useDisplayCurrency();
   const o = useOptions();
+  const reach = useReachOptions();
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) => onChange({ ...value, [k]: v });
-  const pill = 'h-11 rounded-pill w-auto';
   const active = countActive(value);
   return (
     <div role="toolbar" aria-label={tc('filters')} className="flex flex-wrap items-center gap-2">
@@ -258,21 +283,17 @@ function FilterBar({ value, onChange }: { value: Filters; onChange: (f: Filters)
         onChange={(v) => set('niche', v)}
         clearLabel={tc('clear')}
       />
-      <Select
-        aria-label={t('filters.city')}
-        value={value.city}
-        onChange={(e) => set('city', e.target.value)}
-        className={`${pill} ${value.city ? 'border-primary bg-primary-soft font-bold text-primary-text' : ''}`}
-      >
-        <option value="">
-          {t('filters.city')}: {tc('any')}
-        </option>
-        {o.citiesOf(['AM']).map((c) => (
-          <option key={c.value} value={c.value}>
-            {c.label}
-          </option>
-        ))}
-      </Select>
+      <Select<Reach | ''>
+        variant="pill"
+        aria-label={t('filters.reach')}
+        options={reach.map((r) =>
+          r.value ? r : { ...r, label: `${t('filters.reach')}: ${r.label}` },
+        )}
+        value={value.reach}
+        active={!!value.reach}
+        onChange={(v) => set('reach', v)}
+        className="w-auto"
+      />
       <div className="w-52">
         <Input
           aria-label={`${t('filters.budgetMin')} (${currency})`}
@@ -388,7 +409,7 @@ export default function DealFeedPage() {
               <button
                 type="button"
                 className="min-h-11 pl-4 pr-2 text-small font-bold text-ink"
-                onClick={() => update({ ...EMPTY, ...s.query })}
+                onClick={() => update(fromSaved(s.query))}
               >
                 {s.name}
               </button>

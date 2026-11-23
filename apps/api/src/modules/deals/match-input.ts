@@ -1,5 +1,6 @@
 import {
   isAccountUsable,
+  targetCodesFor,
   type AudienceAge,
   type AudienceCountries,
   type AudienceGender,
@@ -73,7 +74,13 @@ export function dealHardFilterWhere(inf: MatchInfluencer, now: Date): Prisma.Dea
     applicationDeadline: { gt: now },
     brand: { user: { blockedAt: null } },
     AND: [
-      { OR: [{ countries: { isEmpty: true } }, { countries: { has: inf.country } }] },
+      {
+        OR: [
+          { countries: { isEmpty: true } },
+          // The blogger's country, Worldwide or one of its regions.
+          { countries: { hasSome: targetCodesFor(inf.country) } },
+        ],
+      },
       { OR: [{ cities: { isEmpty: true } }, ...(inf.city ? [{ cities: { has: inf.city } }] : [])] },
       {
         OR: inf.accounts.map((a) => ({

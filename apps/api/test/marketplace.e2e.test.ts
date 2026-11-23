@@ -335,6 +335,45 @@ describe('marketplace core loop (e2e)', () => {
     expect((await lastEmailTo(ctx, brand.email))?.subject).toBe('1 new applicant yesterday');
   });
 
+  it('shows region and Worldwide briefs to bloggers in them; reach filters by where briefs are for', async () => {
+    const inf = await approvedInfluencer(); // Armenia, Yerevan
+    await brandWithDeal({ title: 'Armenia campaign' });
+    await brandWithDeal({ title: 'Yerevan campaign', cities: ['Yerevan'] });
+    await brandWithDeal({ title: 'Europe campaign', countries: ['EUROPE'] });
+    await brandWithDeal({ title: 'Worldwide campaign', countries: ['WORLD'] });
+    await brandWithDeal({ title: 'Africa campaign', countries: ['AFRICA'] });
+    const titles = async (q = '') =>
+      ((await inf.agent.get(`${API}/deals/feed${q}`).expect(200)).body.items as { title: string }[])
+        .map((d) => d.title)
+        .sort();
+    expect(await titles()).toEqual([
+      'Armenia campaign',
+      'Europe campaign',
+      'Worldwide campaign',
+      'Yerevan campaign',
+    ]);
+    expect(await titles('?reach=city')).toEqual(['Yerevan campaign']);
+    expect(await titles('?reach=country')).toEqual(['Armenia campaign']);
+    expect(await titles('?reach=international')).toEqual(['Europe campaign', 'Worldwide campaign']);
+    await inf.agent.get(`${API}/deals/feed?reach=moon`).expect(400);
+
+    const brand = await signup(ctx, 'BRAND');
+    await brand.agent.put(`${API}/brands/me`).send(brandProfile).expect(200);
+    const reach = (countries: string[]) =>
+      brand.agent
+        .post(`${API}/deals/preview-reach`)
+        .send({ platforms: ['INSTAGRAM'], countries })
+        .expect(200)
+        .then((r) => r.body.count as number);
+    expect(await reach(['WORLD'])).toBe(1);
+    expect(await reach(['ASIA'])).toBe(1);
+    expect(await reach(['LATIN_AMERICA'])).toBe(0);
+    await brand.agent
+      .post(`${API}/deals`)
+      .send(dealInput({ countries: ['MARS'] }))
+      .expect(400);
+  });
+
   it('records feed filters and shows brands aggregated insights', async () => {
     const inf = await approvedInfluencer();
     const brand = await brandWithDeal();
@@ -348,8 +387,8 @@ describe('marketplace core loop (e2e)', () => {
         `${API}/deals/feed?platform=INSTAGRAM&niche=beauty,food&paymentType=BARTER&budgetMin=5000000`,
       )
       .expect(200); // refresh: deduped
-    await inf.agent.get(`${API}/deals/feed?platform=TIKTOK&city=Yerevan&page=2`).expect(200); // page 2: not recorded
-    await inf.agent.get(`${API}/deals/feed?platform=TIKTOK&city=Yerevan`).expect(200);
+    await inf.agent.get(`${API}/deals/feed?platform=TIKTOK&reach=city&page=2`).expect(200); // page 2: not recorded
+    await inf.agent.get(`${API}/deals/feed?platform=TIKTOK&reach=city`).expect(200);
     await new Promise((r) => setTimeout(r, 200)); // recording is fire-and-forget
 
     await inf.agent.get(`${API}/brands/me/insights`).expect(403);

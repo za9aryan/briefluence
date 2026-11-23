@@ -54,19 +54,16 @@ export default function AdminOffersPage() {
           onChange={(e) => setQ(e.target.value)}
           className="sm:w-72"
         />
-        <Select
+        <Select<'ALL' | OfferStatus>
           aria-label={t('status')}
+          options={[
+            { value: 'ALL', label: tc('all') },
+            ...OFFER_STATUSES.map((s) => ({ value: s, label: ts(s) })),
+          ]}
           value={status}
-          onChange={(e) => setStatus(e.target.value as 'ALL' | OfferStatus)}
-          className="w-auto"
-        >
-          <option value="ALL">{tc('all')}</option>
-          {OFFER_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {ts(s)}
-            </option>
-          ))}
-        </Select>
+          onChange={setStatus}
+          className="w-auto min-w-44"
+        />
       </Inline>
       {list.isLoading ? (
         <Skeleton className="h-64 rounded-card" />

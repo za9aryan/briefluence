@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { checkEligibility, matchScore, scoreAccount, type MatchDeal, type MatchInfluencer } from './matching';
+import {
+  checkEligibility,
+  matchScore,
+  scoreAccount,
+  type MatchDeal,
+  type MatchInfluencer,
+} from './matching';
 
 const now = new Date('2026-10-15T12:00:00Z');
 
@@ -51,10 +57,14 @@ describe('checkEligibility', () => {
   });
   it('hides non-active and past-deadline deals', () => {
     expect(checkEligibility(deal({ status: 'PAUSED' }), inf(), now)).toBe('NOT_ACTIVE');
-    expect(checkEligibility(deal({ applicationDeadline: now }), inf(), now)).toBe('DEADLINE_PASSED');
+    expect(checkEligibility(deal({ applicationDeadline: now }), inf(), now)).toBe(
+      'DEADLINE_PASSED',
+    );
   });
   it('ignores status for reach preview', () => {
-    expect(checkEligibility(deal({ status: 'DRAFT' }), inf(), now, { ignoreStatus: true })).toBeNull();
+    expect(
+      checkEligibility(deal({ status: 'DRAFT' }), inf(), now, { ignoreStatus: true }),
+    ).toBeNull();
   });
   it('filters by country and city', () => {
     expect(checkEligibility(deal({ countries: ['GE'] }), inf(), now)).toBe('COUNTRY');
@@ -62,18 +72,33 @@ describe('checkEligibility', () => {
     expect(checkEligibility(deal({ cities: ['Yerevan'] }), inf(), now)).toBeNull();
     expect(checkEligibility(deal({ cities: ['Yerevan'] }), inf({ city: null }), now)).toBe('CITY');
   });
+  it('lets regions and Worldwide reach the countries in them', () => {
+    expect(checkEligibility(deal({ countries: ['WORLD'] }), inf(), now)).toBeNull();
+    expect(checkEligibility(deal({ countries: ['EUROPE'] }), inf(), now)).toBeNull();
+    expect(checkEligibility(deal({ countries: ['AFRICA', 'GE'] }), inf(), now)).toBe('COUNTRY');
+  });
   it('requires an account on the platform within the follower range', () => {
-    expect(checkEligibility(deal({ platforms: ['TIKTOK'] }), inf(), now)).toBe('PLATFORM_OR_FOLLOWERS');
-    expect(checkEligibility(deal({ minFollowers: 50_000 }), inf(), now)).toBe('PLATFORM_OR_FOLLOWERS');
-    expect(checkEligibility(deal({ maxFollowers: 10_000 }), inf(), now)).toBe('PLATFORM_OR_FOLLOWERS');
-    expect(checkEligibility(deal({ minFollowers: 10_000, maxFollowers: 50_000 }), inf(), now)).toBeNull();
+    expect(checkEligibility(deal({ platforms: ['TIKTOK'] }), inf(), now)).toBe(
+      'PLATFORM_OR_FOLLOWERS',
+    );
+    expect(checkEligibility(deal({ minFollowers: 50_000 }), inf(), now)).toBe(
+      'PLATFORM_OR_FOLLOWERS',
+    );
+    expect(checkEligibility(deal({ maxFollowers: 10_000 }), inf(), now)).toBe(
+      'PLATFORM_OR_FOLLOWERS',
+    );
+    expect(
+      checkEligibility(deal({ minFollowers: 10_000, maxFollowers: 50_000 }), inf(), now),
+    ).toBeNull();
   });
   it('filters by influencer gender and age', () => {
     expect(checkEligibility(deal({ influencerGender: 'MALE' }), inf(), now)).toBe('GENDER');
     expect(checkEligibility(deal({ influencerGender: 'FEMALE' }), inf(), now)).toBeNull();
     expect(checkEligibility(deal({ influencerAgeMin: 30 }), inf(), now)).toBe('AGE');
     expect(checkEligibility(deal({ influencerAgeMax: 30 }), inf(), now)).toBeNull();
-    expect(checkEligibility(deal({ influencerAgeMax: 30 }), inf({ birthYear: null }), now)).toBe('AGE');
+    expect(checkEligibility(deal({ influencerAgeMax: 30 }), inf({ birthYear: null }), now)).toBe(
+      'AGE',
+    );
   });
 });
 
@@ -93,7 +118,13 @@ describe('scoreAccount / matchScore', () => {
       languages: ['en'], // miss: -10
     });
     const b = scoreAccount(d, inf(), inf().accounts[0]!);
-    expect(b).toMatchObject({ niche: 0, engagement: 10, audienceGender: 0, audienceCountry: 0, language: 0 });
+    expect(b).toMatchObject({
+      niche: 0,
+      engagement: 10,
+      audienceGender: 0,
+      audienceCountry: 0,
+      language: 0,
+    });
     expect(b.audienceAge).toBeCloseTo(12);
     expect(b.total).toBe(22);
   });

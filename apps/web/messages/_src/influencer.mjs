@@ -324,6 +324,25 @@ export default {
         'Компания пока не раскрывает название по бизнес-причинам. Ты узнаешь, кто это, когда тебя примут.',
         'Ընկերությունն առայժմ չի բացահայտում անունը բիզնես նկատառումներով։ Կիմանաս, թե ով է, երբ քեզ ընդունեն։',
       ],
+      stamp: ['Confidential', 'Конфиденциально', 'Գաղտնի'],
+      reveal: [
+        'Revealed once you’re accepted',
+        'Откроется, когда тебя выберут',
+        'Կբացվի, երբ քեզ ընտրեն',
+      ],
+      steps: {
+        apply: ['You apply', 'Ты откликаешься', 'Դու դիմում ես'],
+        accepted: [
+          'The company accepts you',
+          'Компания выбирает тебя',
+          'Ընկերությունը ընտրում է քեզ',
+        ],
+        open: [
+          'Name and contacts open',
+          'Открываются имя и контакты',
+          'Բացվում են անունը և կոնտակտները',
+        ],
+      },
     },
     views: [
       '{count, plural, one {# view} other {# views}}',
@@ -340,13 +359,24 @@ export default {
       platform: ['Platform', 'Платформа', 'Հարթակ'],
       payment: ['Payment', 'Оплата', 'Վճարում'],
       niche: ['Niche', 'Ниша', 'Նիշա'],
-      city: ['City', 'Город', 'Քաղաք'],
+      reach: ['Where', 'Где', 'Որտեղ'],
       collaboration: ['Collaboration', 'Сотрудничество', 'Համագործակցություն'],
       budgetMin: ['Minimum budget', 'Минимальный бюджет', 'Նվազագույն բյուջե'],
       budgetHint: [
         'In AMD, per influencer.',
         'В драмах, на одного инфлюенсера.',
         'Դրամով, մեկ ինֆլյուենսերի համար։',
+      ],
+    },
+    reach: {
+      any: ['Anywhere', 'Везде', 'Ամենուր'],
+      city: ['My city', 'Мой город', 'Իմ քաղաքը'],
+      country: ['My country', 'Моя страна', 'Իմ երկիրը'],
+      international: ['International', 'Международные', 'Միջազգային'],
+      internationalHint: [
+        'Worldwide or for a region',
+        'Весь мир или целый регион',
+        'Ամբողջ աշխարհը կամ տարածաշրջան',
       ],
     },
     sort: {

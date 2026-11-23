@@ -7,7 +7,9 @@ import {
   INFLUENCER_AGE_RANGE,
   dealInputSchema,
   dealReviewKey,
+  onlyCountries,
   type AudienceSizePreset,
+  type Currency,
   type GenderFilter,
   type PaymentType,
 } from '@briefluence/shared';
@@ -384,6 +386,7 @@ export function DealWizard({
                   render={({ field }) => (
                     <Field
                       label={t('fields.countries')}
+                      hint={t('fields.countriesHint')}
                       error={fe(errors.countries as never)}
                       required
                     >
@@ -394,16 +397,16 @@ export function DealWizard({
                           describedBy={describedBy}
                           value={field.value ?? []}
                           onChange={(c) => {
-                            // Removing every country also clears its cities.
+                            // No country left (none, or only regions): no cities either.
                             field.onChange(c);
-                            if (!c.length) form.setValue('cities', []);
+                            if (!onlyCountries(c).length) form.setValue('cities', []);
                           }}
                         />
                       )}
                     </Field>
                   )}
                 />
-                {(v.countries ?? []).length > 0 && (
+                {onlyCountries(v.countries ?? []).length > 0 && (
                   <Controller
                     control={form.control}
                     name="cities"
@@ -680,13 +683,15 @@ export function DealWizard({
                     </Field>
                     <Field label={t('fields.currency')}>
                       {({ id }) => (
-                        <Select id={id} {...form.register('currency')}>
-                          {CURRENCIES.map((c) => (
-                            <option key={c} value={c}>
-                              {c} · {te(`currency.${c}`)}
-                            </option>
-                          ))}
-                        </Select>
+                        <Select
+                          id={id}
+                          options={CURRENCIES.map((c) => ({
+                            value: c,
+                            label: `${c} · ${te(`currency.${c}`)}`,
+                          }))}
+                          value={v.currency ?? 'AMD'}
+                          onChange={(c) => form.setValue('currency', c, { shouldDirty: true })}
+                        />
                       )}
                     </Field>
                   </FieldGrid>
@@ -746,7 +751,11 @@ export function DealWizard({
                               value: c,
                               label: `${CURRENCY_SYMBOL[c]} ${c}`,
                             }))}
-                            currency={form.register('currency')}
+                            currency={{
+                              value: v.currency ?? 'AMD',
+                              onChange: (c) =>
+                                form.setValue('currency', c as Currency, { shouldDirty: true }),
+                            }}
                             {...amount}
                           />
                         );

@@ -1,7 +1,6 @@
 'use client';
 import {
   ALL_COUNTRIES,
-  CITIES,
   COLLABORATION_TYPES,
   CONTENT_FORMATS,
   COUNTRIES,
@@ -10,7 +9,8 @@ import {
   NICHES,
   PAYMENT_TYPES,
   PLATFORMS,
-  type Country,
+  REGIONS,
+  isRegion,
   type Platform,
 } from '@briefluence/shared';
 import type { IconName } from '@briefluence/ui';
@@ -42,8 +42,13 @@ function regionName(locale: string, code: string): string | undefined {
 export function useOptions() {
   const t = useTranslations('enums');
   const locale = useLocale();
+  // Brief targets hold regions ("EUROPE") next to country codes.
   const countryName = (c: string) =>
-    t.has(`country.${c}`) ? t(`country.${c}`) : (regionName(locale, c) ?? c);
+    isRegion(c)
+      ? t(`region.${c}`)
+      : t.has(`country.${c}`)
+        ? t(`country.${c}`)
+        : (regionName(locale, c) ?? c);
   const popular = new Set<string>(COUNTRIES);
   return {
     platforms: PLATFORMS.map((p): { value: Platform; label: string; icon: IconName } => ({
@@ -61,10 +66,12 @@ export function useOptions() {
         .map((c) => ({ value: c, label: countryName(c) }))
         .sort((a, b) => a.label.localeCompare(b.label, locale)),
     ],
-    citiesOf: (countries: string[]) =>
-      countries.flatMap((c) =>
-        (CITIES[c as Country] ?? []).map((city) => ({ value: city, label: city })),
-      ),
+    /** Worldwide and the regions a brief can target, shown above the countries. */
+    regions: REGIONS.map((r) => ({
+      value: r as string,
+      label: t(`region.${r}`),
+      hint: t(r === 'WORLD' ? 'regionHint.world' : 'regionHint.region'),
+    })),
     formats: CONTENT_FORMATS.map((f) => ({ value: f, label: t(`contentFormat.${f}`) })),
     paymentTypes: PAYMENT_TYPES.map((p) => ({ value: p, label: t(`paymentType.${p}`) })),
     collaboration: COLLABORATION_TYPES.map((c) => ({

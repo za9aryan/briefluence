@@ -2,7 +2,9 @@
 import { Alert, Field, Input, Textarea, Select, UrlInput, type InputProps } from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
 import type { ReactNode } from 'react';
+import { Controller } from 'react-hook-form';
 import type {
+  Control,
   FieldError,
   FieldValues,
   Path,
@@ -125,10 +127,11 @@ export function TextAreaField<T extends FieldValues>({
   );
 }
 
+/** A short list to pick one from; an empty choice (the placeholder) is stored as null. */
 export function SelectField<T extends FieldValues>({
   name,
   label,
-  register,
+  control,
   error,
   options,
   placeholder,
@@ -137,7 +140,7 @@ export function SelectField<T extends FieldValues>({
 }: {
   name: Path<T>;
   label: ReactNode;
-  register: UseFormRegister<T>;
+  control: Control<T>;
   error?: FieldError;
   options: { value: string; label: string }[];
   placeholder?: string;
@@ -145,22 +148,26 @@ export function SelectField<T extends FieldValues>({
   hint?: ReactNode;
 }) {
   const fe = useFieldError();
+  const all = placeholder !== undefined ? [{ value: '', label: placeholder }, ...options] : options;
   return (
     <Field label={label} error={fe(error)} required={required} hint={hint}>
       {({ id, describedBy, invalid }) => (
-        <Select
-          id={id}
-          aria-describedby={describedBy}
-          invalid={invalid}
-          {...register(name, { setValueAs: (v) => (v === '' ? null : v) })}
-        >
-          {placeholder !== undefined && <option value="">{placeholder}</option>}
-          {options.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </Select>
+        <Controller
+          control={control}
+          name={name}
+          render={({ field }) => (
+            <Select
+              id={id}
+              aria-describedby={describedBy}
+              invalid={invalid}
+              options={all}
+              value={(field.value as string | null) ?? ''}
+              placeholder={placeholder}
+              onChange={(v) => field.onChange(v === '' ? null : v)}
+              onBlur={field.onBlur}
+            />
+          )}
+        />
       )}
     </Field>
   );

@@ -106,7 +106,7 @@ export function InfluencerProfileForm({
             <SelectField
               name="gender"
               label={t('gender')}
-              register={form.register}
+              control={form.control}
               error={errors.gender}
               placeholder={t('preferNotToSay')}
               options={o.genders}
