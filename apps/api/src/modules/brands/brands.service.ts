@@ -2,10 +2,14 @@ import { Injectable } from '@nestjs/common';
 import type { BrandProfileData } from '@briefluence/shared';
 import { AppError, notFound } from '../../common/app-error';
 import { PrismaService } from '../../common/prisma.service';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class BrandsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly storage: StorageService,
+  ) {}
 
   getMine(userId: string) {
     return this.prisma.brandProfile.findUnique({ where: { userId } });
@@ -23,6 +27,14 @@ export class BrandsService {
       create: { userId, ...data },
       update: data,
     });
+  }
+
+  /** Saves the logo as soon as it is uploaded, without the rest of the form. */
+  async setLogo(userId: string, logoUrl: string | null) {
+    if (logoUrl && !this.storage.isOwnUpload(logoUrl, 'logo'))
+      throw new AppError('VALIDATION_FAILED', 'Upload the image first', { field: 'logoUrl' });
+    await this.requireMine(userId);
+    return this.prisma.brandProfile.update({ where: { userId }, data: { logoUrl } });
   }
 
   /** Public brand card for influencers; contact person is revealed per application, not here. */

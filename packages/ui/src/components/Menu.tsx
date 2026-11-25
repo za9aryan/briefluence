@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import { cn } from '../lib/cn';
+import { inFloatingList } from '../lib/floating';
 import { Modal } from './Modal';
 
 export interface MenuProps {
@@ -49,14 +50,18 @@ export function Menu({ trigger, children, align = 'end', className, sheet }: Men
   useEffect(() => {
     if (!open || asSheet) return;
     const onDown = (e: MouseEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+      if (!ref.current?.contains(e.target as Node) && !inFloatingList(e.target)) setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
     document.addEventListener('mousedown', onDown);
     // The page scrolled: the fixed panel would drift, so close. Scrolling inside the panel
     // itself (a long notification list) must not close it.
     const onScroll = (e: Event) => {
-      if (e.type === 'scroll' && panel.current?.contains(e.target as Node)) return;
+      if (
+        e.type === 'scroll' &&
+        (panel.current?.contains(e.target as Node) || inFloatingList(e.target))
+      )
+        return;
       setOpen(false);
     };
     document.addEventListener('keydown', onKey);

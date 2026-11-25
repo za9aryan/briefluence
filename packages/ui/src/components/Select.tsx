@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from 'react';
 import { cn } from '../lib/cn';
-import { useFloatingList } from '../lib/floating';
+import { createPortal } from 'react-dom';
+import { FLOATING_ATTR, useFloatingList } from '../lib/floating';
 import { Icon, type IconName } from '../primitives/Icon';
 
 export interface SelectOption<T extends string = string> {
@@ -64,7 +65,7 @@ export function Select<T extends string = string>({
   const box = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLUListElement>(null);
-  const style = useFloatingList(open, button, list);
+  const { style, host } = useFloatingList(open, button, list);
   const typed = useRef({ text: '', at: 0 });
   const index = options.findIndex((o) => o.value === value);
   const current = index >= 0 ? options[index] : undefined;
@@ -72,7 +73,8 @@ export function Select<T extends string = string>({
   useEffect(() => {
     if (!open) return;
     const onDown = (e: PointerEvent) => {
-      if (!box.current?.contains(e.target as Node)) setOpen(false);
+      const t = e.target as Node;
+      if (!box.current?.contains(t) && !list.current?.contains(t)) setOpen(false);
     };
     document.addEventListener('pointerdown', onDown);
     return () => document.removeEventListener('pointerdown', onDown);
@@ -205,48 +207,52 @@ export function Select<T extends string = string>({
         />
       </div>
       {name && <input type="hidden" name={name} value={value ?? ''} />}
-      {open && (
-        <ul
-          ref={list}
-          id={listId}
-          role="listbox"
-          aria-label={aria['aria-label']}
-          style={style}
-          className="bf-rise fixed z-[60] w-max overflow-y-auto rounded-sm border border-line bg-surface-raised py-1 shadow-pop"
-        >
-          {options.map((o, i) => {
-            const on = o.value === value;
-            return (
-              <li
-                key={o.value}
-                id={`${id}-opt-${i}`}
-                role="option"
-                aria-selected={on}
-                onPointerDown={(e) => e.preventDefault()}
-                onClick={() => pick(i)}
-                onMouseEnter={() => setActive(i)}
-                className={cn(
-                  'flex min-h-11 cursor-pointer items-center gap-2 px-3 py-1.5 text-small text-ink',
-                  i === active && 'bg-primary-soft/60',
-                )}
-              >
-                {o.icon && <Icon name={o.icon} tone="muted" />}
-                <span className="flex min-w-0 flex-1 flex-col">
-                  <span lang={o.lang} className={cn(on ? 'font-bold' : 'font-medium')}>
-                    {o.label}
+      {open &&
+        host &&
+        createPortal(
+          <ul
+            {...{ [FLOATING_ATTR]: '' }}
+            ref={list}
+            id={listId}
+            role="listbox"
+            aria-label={aria['aria-label']}
+            style={style}
+            className="bf-rise fixed z-[60] w-max overflow-y-auto rounded-sm border border-line bg-surface-raised py-1 shadow-pop"
+          >
+            {options.map((o, i) => {
+              const on = o.value === value;
+              return (
+                <li
+                  key={o.value}
+                  id={`${id}-opt-${i}`}
+                  role="option"
+                  aria-selected={on}
+                  onPointerDown={(e) => e.preventDefault()}
+                  onClick={() => pick(i)}
+                  onMouseEnter={() => setActive(i)}
+                  className={cn(
+                    'flex min-h-11 cursor-pointer items-center gap-2 px-3 py-1.5 text-small text-ink',
+                    i === active && 'bg-primary-soft/60',
+                  )}
+                >
+                  {o.icon && <Icon name={o.icon} tone="muted" />}
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span lang={o.lang} className={cn(on ? 'font-bold' : 'font-medium')}>
+                      {o.label}
+                    </span>
+                    {o.hint && <span className="text-ink-muted">{o.hint}</span>}
                   </span>
-                  {o.hint && <span className="text-ink-muted">{o.hint}</span>}
-                </span>
-                <Icon
-                  name="check"
-                  size="sm"
-                  className={cn('shrink-0 text-primary-text', !on && 'invisible')}
-                />
-              </li>
-            );
-          })}
-        </ul>
-      )}
+                  <Icon
+                    name="check"
+                    size="sm"
+                    className={cn('shrink-0 text-primary-text', !on && 'invisible')}
+                  />
+                </li>
+              );
+            })}
+          </ul>,
+          host,
+        )}
     </div>
   );
 }

@@ -15,6 +15,7 @@ import type { AuthUser } from '../../common/auth-user';
 import { Clock } from '../../common/clock';
 import { PrismaService } from '../../common/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { StorageService } from '../storage/storage.service';
 import { publicPortfolioItem } from './portfolio.service';
 import { publicAccount } from './serializers';
 
@@ -50,6 +51,7 @@ export class InfluencersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notifications: NotificationsService,
+    private readonly storage: StorageService,
     private readonly clock: Clock,
   ) {}
 
@@ -169,6 +171,18 @@ export class InfluencersService {
   // ─── Public page: briefluence.com/@username ─────────────
 
   /** Sets (or with null removes) the blogger's public link name. */
+  /** Saves the photo as soon as it is uploaded, without the rest of the form. */
+  async setAvatar(userId: string, avatarUrl: string | null) {
+    if (avatarUrl && !this.storage.isOwnUpload(avatarUrl, 'avatar'))
+      throw new AppError('VALIDATION_FAILED', 'Upload the image first', { field: 'avatarUrl' });
+    const { count } = await this.prisma.influencerProfile.updateMany({
+      where: { userId },
+      data: { avatarUrl },
+    });
+    if (!count) throw new AppError('PROFILE_INCOMPLETE', 'Complete your profile first');
+    return this.getMine(userId);
+  }
+
   async setUsername(userId: string, username: string | null) {
     try {
       await this.prisma.influencerProfile.update({ where: { userId }, data: { username } });

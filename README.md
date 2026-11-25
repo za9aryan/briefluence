@@ -218,8 +218,15 @@ with no city set), or international (Worldwide or a region).
 ## Selects
 
 Every pick-one list uses `Select` from `packages/ui`, which has the same look as the searchable `Combobox` used for
-countries and cities. Use `Combobox` for long lists. The list floats above the page, so modals and menus never cut it
-off.
+countries and cities. Use `Combobox` for long lists. The list is rendered into the page body (or the dialog around the
+field), so menus and modals with their own animation or scroll can neither shift nor cut it off.
+
+## Profile photo and logo
+
+On the account pages a new profile photo or company logo is saved as soon as it is uploaded
+(`PUT /api/v1/influencers/me/avatar`, `PUT /api/v1/brands/me/logo`; only our own uploads of that kind are accepted, `null`
+removes it). The rest of the profile still saves with the form's Save button. During onboarding the image is saved with
+the form.
 
 ## Deleting an account
 

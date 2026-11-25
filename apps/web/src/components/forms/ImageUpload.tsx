@@ -5,11 +5,16 @@ import { useRef, useState } from 'react';
 import { api } from '@/lib/api';
 import { useErrorMessage } from '@/lib/hooks/errors';
 
-/** Uploads an image to /uploads/{kind} and reports the URL. 5 MB, PNG/JPEG/WebP (checked by the API). */
+/**
+ * Uploads an image to /uploads/{kind} and reports the URL. 5 MB, PNG/JPEG/WebP (checked by the API).
+ * With `save`, a new or removed image is saved right away (account pages), so it does not wait for
+ * the form's Save button; if saving fails the previous image comes back.
+ */
 export function ImageUpload({
   kind,
   value,
   onChange,
+  save,
   name,
   label,
   wide,
@@ -17,6 +22,7 @@ export function ImageUpload({
   kind: 'avatar' | 'logo' | 'deal' | 'portfolio' | 'offer';
   value: string | null | undefined;
   onChange: (url: string | null) => void;
+  save?: (url: string | null) => Promise<unknown>;
   name: string;
   label: string;
   wide?: boolean;
@@ -27,12 +33,24 @@ export function ImageUpload({
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
 
+  const set = async (url: string | null) => {
+    const before = value ?? null;
+    onChange(url);
+    if (!save) return;
+    try {
+      await save(url);
+    } catch (e) {
+      onChange(before);
+      throw e;
+    }
+  };
+
   const pick = async (file: File | undefined) => {
     if (!file) return;
     setBusy(true);
     try {
       const { url } = await api.upload(kind, file);
-      onChange(url);
+      await set(url);
     } catch (e) {
       toast(errorMessage(e), 'danger');
     } finally {
@@ -71,7 +89,12 @@ export function ImageUpload({
             {value ? t('change') : t('upload')}
           </Button>
           {value && (
-            <Button variant="ghost" size="sm" onClick={() => onChange(null)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={busy}
+              onClick={() => set(null).catch((e) => toast(errorMessage(e), 'danger'))}
+            >
               {t('remove')}
             </Button>
           )}

@@ -53,6 +53,7 @@ export default function InfluencerAccountPage() {
           <InfluencerProfileForm
             initial={profile.data}
             submitLabel={tc('save')}
+            saveImageNow
             onSaved={(p) => {
               qc.setQueryData(['influencer', 'me'], p);
               void qc.invalidateQueries({ queryKey: ME_KEY });

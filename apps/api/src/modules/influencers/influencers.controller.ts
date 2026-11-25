@@ -4,6 +4,7 @@ import { ApiTags } from '@nestjs/swagger';
 import {
   feedQuerySchema,
   influencerProfileSchema,
+  setAvatarSchema,
   setUsernameSchema,
   type InfluencerProfileData,
 } from '@briefluence/shared';
@@ -64,6 +65,17 @@ export class InfluencersController {
       return { name, query: (f as { query: unknown }).query };
     });
     await this.influencers.saveFilters(user.id, clean);
+  }
+
+  /** Just the photo, saved right after upload (null removes it). */
+  @Roles('INFLUENCER')
+  @Put('me/avatar')
+  @ApiZodBody(setAvatarSchema)
+  setAvatar(
+    @CurrentUser() user: AuthUser,
+    @ZodBody(setAvatarSchema) body: { avatarUrl: string | null },
+  ) {
+    return this.influencers.setAvatar(user.id, body.avatarUrl);
   }
 
   /** Public link name: briefluence.com/@username. */

@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { cn } from '../lib/cn';
-import { useFloatingList } from '../lib/floating';
+import { createPortal } from 'react-dom';
+import { FLOATING_ATTR, useFloatingList } from '../lib/floating';
 import { Icon } from '../primitives/Icon';
 
 export interface ComboOption {
@@ -65,7 +66,7 @@ export function Combobox(props: Props) {
   const input = useRef<HTMLInputElement>(null);
   const field = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLUListElement>(null);
-  const style = useFloatingList(open, field, list);
+  const { style, host } = useFloatingList(open, field, list);
   const selected = props.multiple ? props.value : props.value ? [props.value] : [];
   const known = useRef(new Map<string, string>());
   for (const o of options) known.current.set(o.value, o.label);
@@ -90,7 +91,8 @@ export function Combobox(props: Props) {
   useEffect(() => {
     if (!open) return;
     const onDown = (e: PointerEvent) => {
-      if (!box.current?.contains(e.target as Node)) setOpen(false);
+      const t = e.target as Node;
+      if (!box.current?.contains(t) && !list.current?.contains(t)) setOpen(false);
     };
     document.addEventListener('pointerdown', onDown);
     return () => document.removeEventListener('pointerdown', onDown);
@@ -206,39 +208,43 @@ export function Combobox(props: Props) {
           <Icon name="search" tone="muted" className="mr-1" />
         )}
       </div>
-      {open && (
-        <ul
-          ref={list}
-          id={listId}
-          role="listbox"
-          aria-multiselectable={props.multiple || undefined}
-          style={style}
-          className="bf-rise fixed z-[60] overflow-y-auto rounded-sm border border-line bg-surface-raised py-1 shadow-pop"
-        >
-          {shown.length ? (
-            shown.map((o, i) => (
-              <li
-                key={o.value}
-                id={`${id}-opt-${i}`}
-                role="option"
-                aria-selected={selected.includes(o.value)}
-                onPointerDown={(e) => e.preventDefault()}
-                onClick={() => pick(o)}
-                onMouseEnter={() => setActive(i)}
-                className={cn(
-                  'flex min-h-11 cursor-pointer flex-col justify-center px-3 py-1.5 text-small text-ink',
-                  i === active && 'bg-primary-soft/60',
-                )}
-              >
-                <span className="font-medium">{o.label}</span>
-                {o.hint && <span className="text-ink-muted">{o.hint}</span>}
-              </li>
-            ))
-          ) : (
-            <li className="px-3 py-3 text-small text-ink-muted">{loading ? '…' : emptyLabel}</li>
-          )}
-        </ul>
-      )}
+      {open &&
+        host &&
+        createPortal(
+          <ul
+            {...{ [FLOATING_ATTR]: '' }}
+            ref={list}
+            id={listId}
+            role="listbox"
+            aria-multiselectable={props.multiple || undefined}
+            style={style}
+            className="bf-rise fixed z-[60] overflow-y-auto rounded-sm border border-line bg-surface-raised py-1 shadow-pop"
+          >
+            {shown.length ? (
+              shown.map((o, i) => (
+                <li
+                  key={o.value}
+                  id={`${id}-opt-${i}`}
+                  role="option"
+                  aria-selected={selected.includes(o.value)}
+                  onPointerDown={(e) => e.preventDefault()}
+                  onClick={() => pick(o)}
+                  onMouseEnter={() => setActive(i)}
+                  className={cn(
+                    'flex min-h-11 cursor-pointer flex-col justify-center px-3 py-1.5 text-small text-ink',
+                    i === active && 'bg-primary-soft/60',
+                  )}
+                >
+                  <span className="font-medium">{o.label}</span>
+                  {o.hint && <span className="text-ink-muted">{o.hint}</span>}
+                </li>
+              ))
+            ) : (
+              <li className="px-3 py-3 text-small text-ink-muted">{loading ? '…' : emptyLabel}</li>
+            )}
+          </ul>,
+          host,
+        )}
     </div>
   );
 }

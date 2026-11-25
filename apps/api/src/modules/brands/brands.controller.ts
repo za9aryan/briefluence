@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Put, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { brandProfileSchema, type BrandProfileData } from '@briefluence/shared';
+import { brandProfileSchema, setLogoSchema, type BrandProfileData } from '@briefluence/shared';
 import type { AuthUser } from '../../common/auth-user';
 import { CurrentUser, Roles } from '../../common/decorators';
 import { ApiZodBody, ZodBody } from '../../common/zod';
@@ -26,6 +26,14 @@ export class BrandsController {
   @ApiZodBody(brandProfileSchema)
   update(@CurrentUser() user: AuthUser, @ZodBody(brandProfileSchema) body: BrandProfileData) {
     return this.brands.upsertMine(user.id, body);
+  }
+
+  /** Just the logo, saved right after upload (null removes it). */
+  @Roles('BRAND')
+  @Put('me/logo')
+  @ApiZodBody(setLogoSchema)
+  setLogo(@CurrentUser() user: AuthUser, @ZodBody(setLogoSchema) body: { logoUrl: string | null }) {
+    return this.brands.setLogo(user.id, body.logoUrl);
   }
 
   @Roles('BRAND')

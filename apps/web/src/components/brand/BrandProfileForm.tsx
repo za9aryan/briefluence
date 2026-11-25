@@ -27,10 +27,13 @@ export function BrandProfileForm({
   initial,
   submitLabel,
   onSaved,
+  saveImageNow,
 }: {
   initial?: BrandProfileDto | null;
   submitLabel: string;
   onSaved: (b: BrandProfileDto) => void;
+  /** Save a new logo as soon as it is uploaded (account page; onboarding saves it with the form). */
+  saveImageNow?: boolean;
 }) {
   const t = useTranslations('onboarding');
   const tc = useTranslations('common');
@@ -84,6 +87,12 @@ export function BrandProfileForm({
                 name={form.watch('companyName') ?? ''}
                 value={field.value}
                 onChange={field.onChange}
+                save={
+                  saveImageNow
+                    ? async (url) =>
+                        onSaved(await api.put<BrandProfileDto>('/brands/me/logo', { logoUrl: url }))
+                    : undefined
+                }
               />
             )}
           />

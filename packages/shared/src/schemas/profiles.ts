@@ -85,6 +85,10 @@ export const usernameSchema = z
 export const setUsernameSchema = z.object({ username: usernameSchema.nullable() });
 export type SetUsernameInput = z.input<typeof setUsernameSchema>;
 
+/** Saves just the photo / logo, right after it is uploaded (null removes it). */
+export const setAvatarSchema = z.object({ avatarUrl: optionalUrl });
+export const setLogoSchema = z.object({ logoUrl: optionalUrl });
+
 export const brandProfileSchema = z
   .object({
     companyName: z.string().trim().min(2).max(120),

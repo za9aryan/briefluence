@@ -42,6 +42,7 @@ export default function BrandAccountPage() {
           <BrandProfileForm
             initial={brand.data}
             submitLabel={tc('save')}
+            saveImageNow
             onSaved={(b) => {
               qc.setQueryData(['brand', 'me'], b);
               void qc.invalidateQueries({ queryKey: ME_KEY });

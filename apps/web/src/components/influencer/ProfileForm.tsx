@@ -30,10 +30,13 @@ export function InfluencerProfileForm({
   initial,
   submitLabel,
   onSaved,
+  saveImageNow,
 }: {
   initial?: InfluencerProfileDto | null;
   submitLabel: string;
   onSaved: (p: InfluencerProfileDto) => void;
+  /** Save a new photo as soon as it is uploaded (account page; onboarding saves it with the form). */
+  saveImageNow?: boolean;
 }) {
   const t = useTranslations('onboarding');
   const tc = useTranslations('common');
@@ -91,6 +94,16 @@ export function InfluencerProfileForm({
                 name={form.watch('displayName') ?? ''}
                 value={field.value}
                 onChange={field.onChange}
+                save={
+                  saveImageNow
+                    ? async (url) =>
+                        onSaved(
+                          await api.put<InfluencerProfileDto>('/influencers/me/avatar', {
+                            avatarUrl: url,
+                          }),
+                        )
+                    : undefined
+                }
               />
             )}
           />
