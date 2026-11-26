@@ -74,6 +74,7 @@ export { OptionalField } from './components/OptionalField';
 export { ChatBubble } from './components/ChatBubble';
 export { Table, THead, TBody, TR, TH, TD } from './components/Table';
 export { Alert, EmptyState, ErrorState, Skeleton, Spinner } from './components/Feedback';
+export { Promo, AppIconVisual } from './components/Promo';
 export { ToastProvider, useToast, toast, type ToastTone } from './components/Toast';
 export {
   ScoreMeter,

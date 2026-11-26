@@ -8,9 +8,11 @@ import {
   Stack,
   Switch,
   Text,
+  cn,
   useToast,
 } from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 import { useErrorMessage } from '@/lib/hooks/errors';
 import { useInstall, usePush, type PushState } from '@/lib/pwa';
 
@@ -30,6 +32,19 @@ export function AppInstallCard() {
   const errorMessage = useErrorMessage();
   const { state: install, prompt } = useInstall();
   const push = usePush();
+  const shown = !!install && install.platform !== 'desktop';
+  const [flash, setFlash] = useState(false);
+
+  // Opened from the "Add to Home Screen" reminder (…/settings#app): the card appears only once the
+  // device is known, after the browser's own jump to #app, so scroll to it here and light it up.
+  useEffect(() => {
+    if (!shown || window.location.hash !== '#app') return;
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.getElementById('app')?.scrollIntoView({ behavior: still ? 'auto' : 'smooth' });
+    setFlash(true);
+    const t = window.setTimeout(() => setFlash(false), 2400);
+    return () => window.clearTimeout(t);
+  }, [shown]);
 
   // The toast reports what actually happened (the user may block the permission dialog).
   const onSwitch = async (on: boolean) => {
@@ -46,9 +61,15 @@ export function AppInstallCard() {
   };
 
   // Phones and tablets only: that's where installing and push matter.
-  if (!install || install.platform === 'desktop') return null;
+  if (!shown) return null;
   return (
-    <Card id="app" className="scroll-mt-24">
+    <Card
+      id="app"
+      className={cn(
+        'scroll-mt-24 transition-shadow duration-700',
+        flash && 'ring-3 ring-primary/40',
+      )}
+    >
       <CardHeader title={t('title')} description={t('lead')} />
       <Stack gap={6}>
         <Stack gap={2}>

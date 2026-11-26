@@ -153,7 +153,9 @@ sign-in, sign-out and session refresh. In production Caddy routes `/api/v1/ws/*`
   The service worker only shows push notifications and opens the linked page on tap; it caches
   nothing, so the site is never stale. **Settings → App and notifications** shows install steps
   for the visitor's device (iPhone: Share → Add to Home Screen; Android/desktop: one-tap Install
-  when the browser offers it).
+  when the browser offers it). On phones a `Promo` panel at the top of the app invites people to
+  add it (or turn push on); "Show me how" opens Settings scrolled to that card and highlights it.
+  ✕ hides the invitation for 14 days on that device.
 - **Push:** every in-app notification is also sent as Web Push (title and text in the user's
   language, tap opens its link) to each device the user enabled, through the job queue. Devices
   the push service reports gone (404/410) are removed. iPhone/iPad allow push only for the app
@@ -166,6 +168,12 @@ sign-in, sign-out and session refresh. In production Caddy routes `/api/v1/ws/*`
 - **Keys:** VAPID keys in `.env` (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, optional
   `VAPID_SUBJECT`). Without them push is off and the switch says so. Generate a pair with
   `node -e "console.log(require('web-push').generateVAPIDKeys())"` in `apps/api`.
+
+## Signed-in routing
+
+`apps/web/src/proxy.ts` reads the `bf_role` hint cookie (it expires with the session and is cleared on
+logout): signed-in people opening the home page, login or signup go to their dashboard, and each role's area
+needs that role. The API still checks every permission.
 
 ## Public blogger pages
 

@@ -57,15 +57,21 @@ export default {
       ],
     },
     banner: {
-      install: [
-        'Add briefluence to your Home Screen to get notified about replies and new requests.',
-        'Добавь briefluence на экран «Домой», чтобы получать уведомления об ответах и новых запросах.',
-        'Ավելացրու briefluence-ը գլխավոր էկրանին՝ պատասխանների և նոր հարցումների մասին ծանուցումներ ստանալու համար։',
+      installTitle: [
+        'Put briefluence on your Home Screen',
+        'Добавь briefluence на экран «Домой»',
+        'Ավելացրու briefluence-ը գլխավոր էկրանին',
       ],
+      install: [
+        'It opens like an app, and replies and new requests arrive as notifications.',
+        'Он откроется как приложение, а ответы и новые запросы будут приходить уведомлениями.',
+        'Այն կբացվի որպես հավելված, իսկ պատասխաններն ու նոր հարցումները կգան ծանուցումներով։',
+      ],
+      pushTitle: ['Don’t miss a reply', 'Не пропусти ответ', 'Բաց մի թող պատասխանը'],
       push: [
-        'Turn on notifications so you don’t miss replies and new requests.',
-        'Включи уведомления, чтобы не пропустить ответы и новые запросы.',
-        'Միացրու ծանուցումները, որ բաց չթողնես պատասխաններն ու նոր հարցումները։',
+        'Turn on notifications and know right away when there’s a reply or a new request.',
+        'Включи уведомления и узнавай сразу, когда приходит ответ или новый запрос.',
+        'Միացրու ծանուցումները և իմացիր անմիջապես, երբ պատասխան կամ նոր հարցում է գալիս։',
       ],
       howTo: ['Show me how', 'Как это сделать', 'Ինչպես անել'],
       installButton: ['Install', 'Установить', 'Տեղադրել'],

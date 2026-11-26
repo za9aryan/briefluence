@@ -1,6 +1,6 @@
 'use client';
 import type { Role } from '@briefluence/shared';
-import { Alert, Button, Icon, Inline, buttonStyles, useToast } from '@briefluence/ui';
+import { AppIconVisual, Button, Icon, Promo, buttonStyles, useToast } from '@briefluence/ui';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -11,9 +11,9 @@ const HIDE_KEY = 'bf:app-reminder-hidden-until';
 const HIDE_DAYS = 14;
 
 /**
- * Top-of-page reminder on phones and tablets (like the verify-email banner): add briefluence to
- * the Home Screen (iPhone needs that for push) or turn push on. Hidden on desktop, for admins,
- * once done, or for 14 days after ✕ on this device.
+ * Top-of-page invitation on phones and tablets: add briefluence to the Home Screen (iPhone needs
+ * that for push) or turn push on. "Show me how" opens the steps in Settings (scrolled to them).
+ * Hidden on desktop, for admins, once done, or for 14 days after ✕ on this device.
  */
 export function AppReminder({ role }: { role: Role }) {
   const t = useTranslations('pwa.banner');
@@ -60,30 +60,28 @@ export function AppReminder({ role }: { role: Role }) {
   };
 
   return (
-    <Alert
-      tone="brand"
+    <Promo
+      visual={<AppIconVisual badge={kind === 'push' ? 'bell' : 'plus'} />}
+      title={kind === 'push' ? t('pushTitle') : t('installTitle')}
+      onDismiss={hide}
+      dismissLabel={t('dismiss')}
       action={
-        <Inline gap={1}>
-          {kind === 'push' ? (
-            <Button size="sm" loading={push.busy} onClick={() => void turnOn()}>
-              {t('turnOn')}
-            </Button>
-          ) : kind === 'install-prompt' ? (
-            <Button size="sm" onClick={() => void prompt()}>
-              {t('installButton')}
-            </Button>
-          ) : (
-            <Link href={settings} className={buttonStyles({ size: 'sm' })}>
-              {t('howTo')}
-            </Link>
-          )}
-          <Button variant="ghost" size="icon" aria-label={t('dismiss')} onClick={hide}>
-            <Icon name="close" />
+        kind === 'push' ? (
+          <Button icon="bell" loading={push.busy} onClick={() => void turnOn()}>
+            {t('turnOn')}
           </Button>
-        </Inline>
+        ) : kind === 'install-prompt' ? (
+          <Button icon="plus" onClick={() => void prompt()}>
+            {t('installButton')}
+          </Button>
+        ) : (
+          <Link href={settings} className={buttonStyles({})}>
+            {t('howTo')} <Icon name="arrow-right" />
+          </Link>
+        )
       }
     >
       {kind === 'push' ? t('push') : t('install')}
-    </Alert>
+    </Promo>
   );
 }

@@ -31,7 +31,8 @@ export function proxy(req: NextRequest) {
       return NextResponse.redirect(new URL(HOME[role] ?? '/', req.url));
   }
 
-  if ((pathname === '/login' || pathname === '/signup') && role && HOME[role]) {
+  // Signed in: the home page, login and signup lead to the dashboard.
+  if ((pathname === '/' || pathname === '/login' || pathname === '/signup') && role && HOME[role]) {
     return NextResponse.redirect(new URL(HOME[role]!, req.url));
   }
   return NextResponse.next();
@@ -39,6 +40,7 @@ export function proxy(req: NextRequest) {
 
 export const config = {
   matcher: [
+    '/',
     '/influencer/:path*',
     '/brand/:path*',
     '/admin/:path*',
