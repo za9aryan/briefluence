@@ -96,6 +96,7 @@ export function ConnectTiles({ used }: { used: Platform[] }) {
             key={pl}
             style={glow}
             href={`${API_BASE}/social/${pl.toLowerCase()}/connect`}
+            data-same-tab
             className={cn(css.tile, css.open, 'rounded-card p-4')}
           >
             <TileBody

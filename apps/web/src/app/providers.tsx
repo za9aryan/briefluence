@@ -6,12 +6,14 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 import { SupportWidget } from '@/components/support/SupportWidget';
 import { ApiError } from '@/lib/api';
+import { openExternalLinksInNewTab } from '@/lib/external-links';
 import { registerServiceWorker } from '@/lib/pwa';
 
 export function Providers({ children }: { children: ReactNode }) {
   const tc = useTranslations('common');
   // Installable app + push notifications (public/sw.js).
   useEffect(() => registerServiceWorker(), []);
+  useEffect(() => openExternalLinksInNewTab(), []);
   const tn = useTranslations('notifications');
   // No support chat button in the admin area (or on /support), so toasts sit in the corner.
   const pathname = usePathname();
